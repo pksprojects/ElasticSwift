@@ -3,5 +3,9 @@
 import PackageDescription
 
 let package = Package(
-    name: "ElasticSwift"
+    name: "ElasticSwift",
+    dependencies: [
+        .Package(url: "https://github.com/IBM-Swift/SwiftyJSON.git", majorVersion: 16),
+        .Package(url: "https://github.com/Alamofire/Alamofire.git", majorVersion: 4, minor: 4)
+        ]
 )
