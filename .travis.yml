@@ -9,4 +9,4 @@ before_script:
 env:
   - TOOLCHAINS=swift
 script:
-  - swift build --fetch
+  - swift build
