@@ -2,3 +2,11 @@ language: objective-c
 osx_image: xcode8.3
 xcode_project: ElasticSwift.xcodeproj
 xcode_scheme: ElasticSwiftTests
+services:
+  - elasticsearch
+before_script:
+  - sleep 10
+env:
+  - TOOLCHAINS=swift
+script:
+  - swift build --fetch
