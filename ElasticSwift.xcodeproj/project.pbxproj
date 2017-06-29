@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		066F2E071F04E12F003DCDF8 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 066F2E061F04E12F003DCDF8 /* README.md */; };
 		069290D61EE3B950001F7F20 /* QueryBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 069290D51EE3B950001F7F20 /* QueryBuilder.swift */; };
 		069290DA1EE3BD12001F7F20 /* QueryBuilders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 069290D91EE3BD12001F7F20 /* QueryBuilders.swift */; };
 		069290DC1EE3C62F001F7F20 /* Query.swift in Sources */ = {isa = PBXBuildFile; fileRef = 069290DB1EE3C62F001F7F20 /* Query.swift */; };
@@ -94,6 +95,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		066F2E061F04E12F003DCDF8 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		069290D51EE3B950001F7F20 /* QueryBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QueryBuilder.swift; sourceTree = "<group>"; };
 		069290D91EE3BD12001F7F20 /* QueryBuilders.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QueryBuilders.swift; sourceTree = "<group>"; };
 		069290DB1EE3C62F001F7F20 /* Query.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Query.swift; sourceTree = "<group>"; };
@@ -329,6 +331,7 @@
 		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
+				066F2E061F04E12F003DCDF8 /* README.md */,
 				OBJ_6 /* Package.swift */,
 				OBJ_7 /* Sources */,
 				OBJ_19 /* Tests */,
@@ -526,6 +529,7 @@
 				OBJ_90 /* IndexRequest.swift in Sources */,
 				06FA8DD51EDF5565003BC28C /* DeleteRequest.swift in Sources */,
 				06FA8DD31EDF5556003BC28C /* UpdateRequest.swift in Sources */,
+				066F2E071F04E12F003DCDF8 /* README.md in Sources */,
 				OBJ_95 /* Transport.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
