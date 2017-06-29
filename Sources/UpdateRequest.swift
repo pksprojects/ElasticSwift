@@ -8,14 +8,14 @@
 
 import Foundation
 
-class UpdateRequestBuilder: ESRequestBuilder {
+public class UpdateRequestBuilder: ESRequestBuilder {
     
     init(client: RestClient) {
         super.init(UpdateRequest(), withClient: client)
     }
 }
 
-class UpdateRequest: ESRequest {
+public class UpdateRequest: ESRequest {
     
     init() {
         super.init(method: .PUT)

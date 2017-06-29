@@ -8,7 +8,7 @@
 
 import Foundation
 
-class ClusterAdmin {
+public class ClusterAdmin {
     
     let client: ESClient
     

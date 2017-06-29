@@ -9,7 +9,7 @@
 import Foundation
 import SwiftyJSON
 
-class ESRequest {
+public class ESRequest {
     
     var index: String?
     var type: String?
@@ -65,7 +65,7 @@ class ESRequest {
 }
 
 
-class ESRequestBuilder {
+public class ESRequestBuilder {
     
     var request: ESRequest
     var client: ESClient

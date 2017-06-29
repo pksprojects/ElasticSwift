@@ -8,7 +8,7 @@
 
 import Foundation
 
-class SearchRequestBuilder: ESRequestBuilder {
+public class SearchRequestBuilder: ESRequestBuilder {
     
     init(client: RestClient) {
         super.init(SearchRequest(), withClient: client)
@@ -44,7 +44,7 @@ class SearchRequestBuilder: ESRequestBuilder {
     
 }
 
-class SearchRequest: ESRequest {
+public class SearchRequest: ESRequest {
     
     var from: Int16?
     var size: Int16?

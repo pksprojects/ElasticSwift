@@ -8,7 +8,7 @@
 
 import Foundation
 
-class DeleteRequestbuilder: ESRequestBuilder {
+public class DeleteRequestbuilder: ESRequestBuilder {
     
     init(client: RestClient) {
         super.init(DeleteRequest(), withClient: client)
@@ -36,7 +36,7 @@ class DeleteRequestbuilder: ESRequestBuilder {
     }
 }
 
-class DeleteRequest: ESRequest {
+public class DeleteRequest: ESRequest {
     
     init() {
         super.init(method: .DELETE)

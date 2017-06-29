@@ -8,7 +8,7 @@
 
 import Foundation
 
-class IndexRequestBuilder: ESRequestBuilder {
+public class IndexRequestBuilder: ESRequestBuilder {
     
     init(client: RestClient) {
         super.init(IndexRequest(), withClient: client)

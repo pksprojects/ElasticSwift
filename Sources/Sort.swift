@@ -9,7 +9,7 @@
 import Foundation
 
 
-final class SortBuilders {
+public final class SortBuilders {
     
     func scoreSort() -> ScoreSortBuilder {
         return ScoreSortBuilder()
@@ -24,7 +24,7 @@ final class SortBuilders {
     }
 }
 
-class ScoreSortBuilder: SortBuilder {
+public class ScoreSortBuilder: SortBuilder {
     
     var sort: Sort
     
@@ -43,7 +43,7 @@ class ScoreSortBuilder: SortBuilder {
 
 }
 
-class FieldSortBuilder: SortBuilder {
+public class FieldSortBuilder: SortBuilder {
     var sort: Sort
     
     init(_ field: String) {
@@ -76,7 +76,7 @@ protocol SortBuilder {
     func build() -> Sort
 }
 
-class Sort {
+public class Sort {
     
     let field: String
     var sortOrder: SortOrder = .desc
@@ -107,12 +107,12 @@ class Sort {
     }
 }
 
-enum SortOrder: String {
+public enum SortOrder: String {
     case asc = "asc"
     case desc = "desc"
 }
 
-enum SortMode: String {
+public enum SortMode: String {
     case max = "max"
     case min = "min"
     case avg = "avg"

@@ -3,7 +3,7 @@ import Foundation
 typealias Host = URL
 
 
-class RestClient: ESClient {
+public class RestClient: ESClient {
     
     let admin: Admin
     
@@ -39,7 +39,7 @@ class RestClient: ESClient {
 }
 
 
-class Settings {
+public class Settings {
     
     var hosts: [Host]
     
@@ -72,7 +72,7 @@ class Settings {
 }
 
 
-internal class ESClient {
+public class ESClient {
     
     let transport: Transport
     

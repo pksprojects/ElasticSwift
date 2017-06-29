@@ -8,7 +8,7 @@
 
 import Foundation
 
-class GetRequestBuilder: ESRequestBuilder {
+public class GetRequestBuilder: ESRequestBuilder {
     
     init(client: RestClient) {
         super.init(GetRequest(), withClient: client)
@@ -36,7 +36,7 @@ class GetRequestBuilder: ESRequestBuilder {
     }
 }
 
-class GetRequest: ESRequest {
+public class GetRequest: ESRequest {
     
     init() {
         super.init(method: .GET)

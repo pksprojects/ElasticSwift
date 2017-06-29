@@ -8,7 +8,7 @@
 
 import Foundation
 
-class IndiciesAdmin {
+public class IndiciesAdmin {
     
     let client: ESClient
     

@@ -16,7 +16,7 @@ protocol Query {
     func toDic() -> [String: Any]
 }
 
-class BoolQuery: Query {
+public class BoolQuery: Query {
 
     var name: String = "bool"
     private let MUST: String = "must"
@@ -47,7 +47,7 @@ class BoolQuery: Query {
     }
 }
 
-class MatchQuery: Query {
+public class MatchQuery: Query {
 
     var name: String = "match"
     var field: String
@@ -79,7 +79,7 @@ class MatchQuery: Query {
     
 }
 
-class MatchAllQuery: Query {
+public class MatchAllQuery: Query {
 
     var name: String = "match_all"
     
@@ -88,7 +88,7 @@ class MatchAllQuery: Query {
     }
 }
 
-class MatchNoneQuery: Query {
+public class MatchNoneQuery: Query {
     
     var name: String = "match_none"
     

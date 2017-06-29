@@ -8,7 +8,7 @@
 
 import Foundation
 
-class ESResponse {
+public class ESResponse {
     
     let data: Data?
     let httpResponse: URLResponse?

@@ -8,6 +8,6 @@
 
 import Foundation
 
-class ElasticsearchError: Error {
+public class ElasticsearchError: Error {
     
 }

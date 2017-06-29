@@ -10,7 +10,7 @@ import Foundation
 
 /// Class to get instances of various Query Builders.
 
-final class QueryBuilders {
+public final class QueryBuilders {
     
     private init() {}
     
@@ -30,7 +30,7 @@ final class QueryBuilders {
 
 /// Builder for MatchAll query.
 
-class MatchAllQueryBuilder: QueryBuilder {
+public class MatchAllQueryBuilder: QueryBuilder {
     
     private var _query: MatchAllQuery
     
@@ -51,7 +51,7 @@ class MatchAllQueryBuilder: QueryBuilder {
 
 /// Builder for Match query.
 
-class MatchQueryBuilder: QueryBuilder {
+public class MatchQueryBuilder: QueryBuilder {
     
     private var _query: MatchQuery
     
@@ -83,7 +83,7 @@ class MatchQueryBuilder: QueryBuilder {
 
 /// Builder for Bool query.
 
-class BoolQueryBuilder: QueryBuilder {
+public class BoolQueryBuilder: QueryBuilder {
     
     var boost: Float = 0.0
     
