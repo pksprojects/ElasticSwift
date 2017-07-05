@@ -9,7 +9,7 @@
 import Foundation
 import SwiftyJSON
 
-protocol Query {
+public protocol Query {
     
     var name: String { get }
     
@@ -18,7 +18,7 @@ protocol Query {
 
 public class BoolQuery: Query {
 
-    var name: String = "bool"
+    public var name: String = "bool"
     private let MUST: String = "must"
     private let MUST_NOT: String = "must_not"
     private let SHOULD: String = "should"
@@ -35,7 +35,7 @@ public class BoolQuery: Query {
         self.filterClauses = filter.map { $0.query }
     }
     
-    func toDic() -> [String : Any] {
+    public func toDic() -> [String : Any] {
         var dic = [String : Any]()
         var subDic = [String : Any]()
         subDic[MUST] = self.mustClauses.map { $0.toDic() }
@@ -49,7 +49,7 @@ public class BoolQuery: Query {
 
 public class MatchQuery: Query {
 
-    var name: String = "match"
+    public var name: String = "match"
     var field: String
     var value: String
     var isFuzzy: Bool = false
@@ -67,7 +67,7 @@ public class MatchQuery: Query {
         self.value = ""
     }
     
-    func toDic() -> [String : Any] {
+    public func toDic() -> [String : Any] {
         return (self.isFuzzy) ? [self.name : [self.field : self.value]] :
             [self.name: [self.field: [
                 "query": self.value,
@@ -81,18 +81,18 @@ public class MatchQuery: Query {
 
 public class MatchAllQuery: Query {
 
-    var name: String = "match_all"
+    public var name: String = "match_all"
     
-    func toDic() -> [String : Any] {
+    public func toDic() -> [String : Any] {
         return [self.name : [:]]
     }
 }
 
 public class MatchNoneQuery: Query {
     
-    var name: String = "match_none"
+    public var name: String = "match_none"
     
-    func toDic() -> [String : Any] {
+    public func toDic() -> [String : Any] {
         return [self.name : [:]]
     }
 }

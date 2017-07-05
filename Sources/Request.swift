@@ -69,19 +69,19 @@ public class ESRequestBuilder {
     
     var request: ESRequest
     var client: ESClient
-    var completionHandler: ((_ response: ESResponse) -> Void)?
+    public var completionHandler: ((_ response: ESResponse) -> Void)?
     
     init(_ request: ESRequest, withClient client: ESClient) {
         self.client = client
         self.request = request
     }
     
-    func set(completionHandler: @escaping (_ response: ESResponse) -> Void) -> ESRequestBuilder {
+    public func set(completionHandler: @escaping (_ response: ESResponse) -> Void) -> ESRequestBuilder {
         self.completionHandler = completionHandler
         return self
     }
     
-    func execute() {
+    public func execute() {
         self.client.execute(request: self.request, completionHandler: self.completionHandler!)
     }
     

@@ -10,9 +10,9 @@ import Foundation
 
 public class ESResponse {
     
-    let data: Data?
-    let httpResponse: URLResponse?
-    let error: Error?
+    public let data: Data?
+    public let httpResponse: URLResponse?
+    public let error: Error?
     
     init(data: Data? ,httpResponse: URLResponse?, error: Error?) {
         self.data = data

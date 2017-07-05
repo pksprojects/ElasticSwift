@@ -14,28 +14,28 @@ public class SearchRequestBuilder: ESRequestBuilder {
         super.init(SearchRequest(), withClient: client)
     }
     
-    func set(index: String) -> SearchRequestBuilder {
+    public func set(index: String) -> SearchRequestBuilder {
         if let request = self.request as? SearchRequest {
             request.set(index: index)
         }
         return self
     }
     
-    func set(type: String) -> SearchRequestBuilder {
+    public func set(type: String) -> SearchRequestBuilder {
         if let request = self.request as? SearchRequest {
             request.set(type: type)
         }
         return self
     }
     
-    func set(query: String) -> SearchRequestBuilder {
+    public func set(query: String) -> SearchRequestBuilder {
         if let request = self.request as? SearchRequest {
             request.set(type: query)
         }
         return self
     }
     
-    func set(builder: QueryBuilder) -> SearchRequestBuilder {
+    public func set(builder: QueryBuilder) -> SearchRequestBuilder {
         if let request = self.request as? SearchRequest {
             request.query = builder.query
         }

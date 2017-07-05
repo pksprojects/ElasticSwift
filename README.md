@@ -4,7 +4,7 @@
 
 This project is very early in developement, more information will be made available as project progresses.
 
-If you'd like to contribute contact me via <prafull@pksprojects.org>
+If you'd like to contribute contact me via <support@pksprojects.org>
 
 High level implementation Plan:
 

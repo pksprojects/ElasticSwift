@@ -1,6 +1,6 @@
 import Foundation
 
-typealias Host = URL
+public typealias Host = URL
 
 
 public class RestClient: ESClient {
@@ -12,27 +12,27 @@ public class RestClient: ESClient {
         super.init(hosts: settings.hosts)
     }
     
-    convenience init() {
+    public convenience init() {
         self.init(settings: Settings.default)
     }
     
-    func prepareIndex() -> IndexRequestBuilder {
+    public func prepareIndex() -> IndexRequestBuilder {
         return IndexRequestBuilder(client: self)
     }
     
-    func prepareGet() -> GetRequestBuilder {
+    public func prepareGet() -> GetRequestBuilder {
         return GetRequestBuilder(client: self)
     }
     
-    func prepareUpdate() -> UpdateRequestBuilder {
+    public func prepareUpdate() -> UpdateRequestBuilder {
         return UpdateRequestBuilder(client: self)
     }
     
-    func prepareDelete() -> DeleteRequestbuilder {
+    public func prepareDelete() -> DeleteRequestbuilder {
         return DeleteRequestbuilder(client: self)
     }
     
-    func prepareSearch() -> SearchRequestBuilder {
+    public func prepareSearch() -> SearchRequestBuilder {
         return SearchRequestBuilder(client: self)
     }
     
@@ -47,23 +47,23 @@ public class Settings {
         self.init(forHost: Host(string: "http://localhost:9200")!)
     }
     
-    init(forHost host: Host) {
+    public init(forHost host: Host) {
         hosts = [host]
     }
     
-    init(forHost host: String) {
+    public init(forHost host: String) {
         hosts = [URL(string: host)!]
     }
     
-    init(forHosts hosts: [Host]) {
+    public init(forHosts hosts: [Host]) {
         self.hosts = hosts
     }
     
-    init(forHosts hosts: [String], withSSL enableSSL: Bool) {
+    public init(forHosts hosts: [String], withSSL enableSSL: Bool) {
         self.hosts = hosts.map({ return URL(string: $0)! })
     }
     
-    static var `default`: Settings {
+    public static var `default`: Settings {
         get {
             return Settings()
         }

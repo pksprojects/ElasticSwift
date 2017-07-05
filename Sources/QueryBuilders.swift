@@ -14,15 +14,15 @@ public final class QueryBuilders {
     
     private init() {}
     
-    static func matchAllQuery() -> MatchAllQueryBuilder {
+    public static func matchAllQuery() -> MatchAllQueryBuilder {
         return MatchAllQueryBuilder()
     }
     
-    static func matchQuery() -> MatchQueryBuilder {
+    public static func matchQuery() -> MatchQueryBuilder {
         return MatchQueryBuilder()
     }
     
-    static func boolQuery() -> BoolQueryBuilder {
+    public static func boolQuery() -> BoolQueryBuilder {
         return BoolQueryBuilder()
     }
 }
@@ -38,11 +38,11 @@ public class MatchAllQueryBuilder: QueryBuilder {
         self._query = MatchAllQuery()
     }
     
-    func set(boost: Float) -> Self {
+    public func set(boost: Float) -> Self {
         return self
     }
     
-    var query: Query {
+    public var query: Query {
         get {
             return self._query
         }
@@ -59,23 +59,23 @@ public class MatchQueryBuilder: QueryBuilder {
         self._query = MatchQuery()
     }
     
-    init(field: String, value: String) {
+    public init(field: String, value: String) {
         self._query = MatchQuery(field: field, value: value)
     }
     
-    func match(field: String, value: String) -> Self {
+    public func match(field: String, value: String) -> Self {
         self._query.field = field
         self._query.value = value
         return self
     }
     
-    var query: Query {
+    public var query: Query {
         get {
             return self._query
         }
     }
     
-    func set(boost: Float) -> Self {
+    public func set(boost: Float) -> Self {
         return self
     }
 }
@@ -99,39 +99,39 @@ public class BoolQueryBuilder: QueryBuilder {
     private var minimumShouldMatch: String = ""
     
     @discardableResult
-    func must(query: QueryBuilder) -> BoolQueryBuilder {
+    public func must(query: QueryBuilder) -> BoolQueryBuilder {
         self.mustClauses.append(query)
         return self
     }
     
     @discardableResult
-    func mustNot(query: QueryBuilder) -> BoolQueryBuilder {
+    public func mustNot(query: QueryBuilder) -> BoolQueryBuilder {
         self.mustNotClauses.append(query)
         return self
     }
     
     @discardableResult
-    func filter(query: QueryBuilder) -> BoolQueryBuilder {
+    public func filter(query: QueryBuilder) -> BoolQueryBuilder {
         self.filterClauses.append(query)
         return self
     }
     
     @discardableResult
-    func should(query: QueryBuilder) -> BoolQueryBuilder {
+    public func should(query: QueryBuilder) -> BoolQueryBuilder {
         self.shouldClauses.append(query)
         return self
     }
     
-    func set(minimumShouldMatch: Int) -> BoolQueryBuilder {
+    public func set(minimumShouldMatch: Int) -> BoolQueryBuilder {
         self.minimumShouldMatch = String(minimumShouldMatch)
         return self
     }
     
-    func set(boost: Float) -> Self {
+    public func set(boost: Float) -> Self {
         return self
     }
     
-    var query: Query {
+    public var query: Query {
         get {
             return BoolQuery(must: self.mustClauses, mustnot: self.mustNotClauses, should: self.shouldClauses, filter: self.filterClauses)
         }

@@ -9,7 +9,7 @@
 import Foundation
 
 
-protocol QueryBuilder {
+public protocol QueryBuilder {
     
     var query: Query { get }
     
