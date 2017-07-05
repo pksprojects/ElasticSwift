@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import Alamofire
 
 /**
  Class managing connection(URLSession) pool and HTTP requests.
