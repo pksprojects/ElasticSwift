@@ -35,7 +35,33 @@ High-performant means providing end user's response under 100ms not including th
 
 ## Installation
 
-Current we support only Swift Package Manager but will also support cocopods once we get to RC.
+### CocoaPods
+
+[CocoaPods](http://cocoapods.org) is a dependency manager for Cocoa projects. You can install it with the following command:
+
+```bash
+$ gem install cocoapods
+```
+
+> CocoaPods 1.2.0+ is required to build ElasticSwift.
+
+To integrate Elasticswift into your Xcode project using CocoaPods, specify it in your `Podfile`:
+
+```ruby
+source 'https://github.com/CocoaPods/Specs.git'
+platform :ios, '10.0'
+use_frameworks!
+
+target '<Your Target Name>' do
+    pod 'ElasticSwift', '~> 1.0.0-alpha.1'
+end
+```
+
+Then, run the following command:
+
+```bash
+$ pod install
+```
 
 ### Swift Package Manager
 
