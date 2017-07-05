@@ -2,16 +2,10 @@
   "autoPin": true,
   "pins": [
     {
-      "package": "Alamofire",
-      "reason": null,
-      "repositoryURL": "https://github.com/Alamofire/Alamofire.git",
-      "version": "4.4.0"
-    },
-    {
       "package": "SwiftyJSON",
       "reason": null,
       "repositoryURL": "https://github.com/IBM-Swift/SwiftyJSON.git",
-      "version": "16.0.0"
+      "version": "16.0.1"
     }
   ],
   "version": 1
