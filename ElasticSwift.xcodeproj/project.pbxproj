@@ -6,81 +6,102 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		"ElasticSwift::ElasticSwiftPackageTests::ProductTarget" /* ElasticSwiftPackageTests */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = OBJ_87 /* Build configuration list for PBXAggregateTarget "ElasticSwiftPackageTests" */;
+			buildPhases = (
+			);
+			dependencies = (
+				OBJ_90 /* PBXTargetDependency */,
+			);
+			name = ElasticSwiftPackageTests;
+			productName = ElasticSwiftPackageTests;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
-		069290D61EE3B950001F7F20 /* QueryBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 069290D51EE3B950001F7F20 /* QueryBuilder.swift */; };
-		069290DA1EE3BD12001F7F20 /* QueryBuilders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 069290D91EE3BD12001F7F20 /* QueryBuilders.swift */; };
-		069290DC1EE3C62F001F7F20 /* Query.swift in Sources */ = {isa = PBXBuildFile; fileRef = 069290DB1EE3C62F001F7F20 /* Query.swift */; };
-		069290DE1EE3EB90001F7F20 /* Sort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 069290DD1EE3EB90001F7F20 /* Sort.swift */; };
-		06E71FE71EF78C3900A9A3B2 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06E71FE61EF78C3900A9A3B2 /* Utils.swift */; };
-		06E71FEA1EF7A13000A9A3B2 /* Indices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06E71FE91EF7A13000A9A3B2 /* Indices.swift */; };
-		06E71FEC1EF7A1C500A9A3B2 /* Clusters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06E71FEB1EF7A1C500A9A3B2 /* Clusters.swift */; };
-		06E71FEE1EF7A87D00A9A3B2 /* IndicesRequests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06E71FED1EF7A87D00A9A3B2 /* IndicesRequests.swift */; };
-		06E71FF01EF7AC4000A9A3B2 /* Admin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06E71FEF1EF7AC4000A9A3B2 /* Admin.swift */; };
-		06FA8DCD1EDDDE50003BC28C /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06FA8DCC1EDDDE50003BC28C /* Request.swift */; };
-		06FA8DCF1EDDDE78003BC28C /* Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06FA8DCE1EDDDE78003BC28C /* Response.swift */; };
-		06FA8DD11EDEAF88003BC28C /* GetRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06FA8DD01EDEAF88003BC28C /* GetRequest.swift */; };
-		06FA8DD31EDF5556003BC28C /* UpdateRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06FA8DD21EDF5556003BC28C /* UpdateRequest.swift */; };
-		06FA8DD51EDF5565003BC28C /* DeleteRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06FA8DD41EDF5565003BC28C /* DeleteRequest.swift */; };
-		06FA8DD71EDF5574003BC28C /* SearchRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06FA8DD61EDF5574003BC28C /* SearchRequest.swift */; };
-		06FB58371FAE42B10067E4D7 /* ResponseSerialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06FB58361FAE42B10067E4D7 /* ResponseSerialization.swift */; };
-		OBJ_106 /* ElasticSwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_21 /* ElasticSwiftTests.swift */; };
-		OBJ_110 /* ElasticSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_47 /* ElasticSwift.framework */; };
-		OBJ_87 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_10 /* SessionManager.swift */; };
-		OBJ_88 /* ElasticSwift.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* ElasticSwift.swift */; };
-		OBJ_89 /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_12 /* Errors.swift */; };
-		OBJ_90 /* IndexRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_13 /* IndexRequest.swift */; };
-		OBJ_95 /* Transport.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_18 /* Transport.swift */; };
+		OBJ_49 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_6 /* Package.swift */; };
+		OBJ_55 /* ElasticSwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_40 /* ElasticSwiftTests.swift */; };
+		OBJ_57 /* ElasticSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "ElasticSwift::ElasticSwift::Product" /* ElasticSwift.framework */; };
+		OBJ_64 /* Admin.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_10 /* Admin.swift */; };
+		OBJ_65 /* Clusters.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* Clusters.swift */; };
+		OBJ_66 /* Indices.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_12 /* Indices.swift */; };
+		OBJ_67 /* ElasticSwift.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_13 /* ElasticSwift.swift */; };
+		OBJ_68 /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_15 /* Errors.swift */; };
+		OBJ_69 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_17 /* SessionManager.swift */; };
+		OBJ_70 /* Query.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_19 /* Query.swift */; };
+		OBJ_71 /* QueryBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_20 /* QueryBuilder.swift */; };
+		OBJ_72 /* QueryBuilders.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_21 /* QueryBuilders.swift */; };
+		OBJ_73 /* Sort.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_22 /* Sort.swift */; };
+		OBJ_74 /* DeleteRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_24 /* DeleteRequest.swift */; };
+		OBJ_75 /* GetRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_25 /* GetRequest.swift */; };
+		OBJ_76 /* IndexRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_26 /* IndexRequest.swift */; };
+		OBJ_77 /* IndicesRequests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_27 /* IndicesRequests.swift */; };
+		OBJ_78 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_28 /* Request.swift */; };
+		OBJ_79 /* SearchRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_29 /* SearchRequest.swift */; };
+		OBJ_80 /* UpdateRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_30 /* UpdateRequest.swift */; };
+		OBJ_81 /* Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_32 /* Response.swift */; };
+		OBJ_82 /* ResponseSerialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_34 /* ResponseSerialization.swift */; };
+		OBJ_83 /* Transport.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_35 /* Transport.swift */; };
+		OBJ_84 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_37 /* Utils.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		06FA8DC41EDDD292003BC28C /* PBXContainerItemProxy */ = {
+		06FB58381FAE47CD0067E4D7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_80;
+			remoteGlobalIDString = "ElasticSwift::ElasticSwift";
 			remoteInfo = ElasticSwift;
+		};
+		06FB58391FAE47CD0067E4D7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = OBJ_1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = "ElasticSwift::ElasticSwiftTests";
+			remoteInfo = ElasticSwiftTests;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		066F2E061F04E12F003DCDF8 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		069290D51EE3B950001F7F20 /* QueryBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QueryBuilder.swift; sourceTree = "<group>"; };
-		069290D91EE3BD12001F7F20 /* QueryBuilders.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QueryBuilders.swift; sourceTree = "<group>"; };
-		069290DB1EE3C62F001F7F20 /* Query.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Query.swift; sourceTree = "<group>"; };
-		069290DD1EE3EB90001F7F20 /* Sort.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sort.swift; sourceTree = "<group>"; };
-		06E71FE61EF78C3900A9A3B2 /* Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
-		06E71FE91EF7A13000A9A3B2 /* Indices.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Indices.swift; sourceTree = "<group>"; };
-		06E71FEB1EF7A1C500A9A3B2 /* Clusters.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Clusters.swift; sourceTree = "<group>"; };
-		06E71FED1EF7A87D00A9A3B2 /* IndicesRequests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IndicesRequests.swift; sourceTree = "<group>"; };
-		06E71FEF1EF7AC4000A9A3B2 /* Admin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Admin.swift; sourceTree = "<group>"; };
-		06FA8DCC1EDDDE50003BC28C /* Request.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
-		06FA8DCE1EDDDE78003BC28C /* Response.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Response.swift; sourceTree = "<group>"; };
-		06FA8DD01EDEAF88003BC28C /* GetRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GetRequest.swift; sourceTree = "<group>"; };
-		06FA8DD21EDF5556003BC28C /* UpdateRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpdateRequest.swift; sourceTree = "<group>"; };
-		06FA8DD41EDF5565003BC28C /* DeleteRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeleteRequest.swift; sourceTree = "<group>"; };
-		06FA8DD61EDF5574003BC28C /* SearchRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchRequest.swift; sourceTree = "<group>"; };
-		06FB58361FAE42B10067E4D7 /* ResponseSerialization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResponseSerialization.swift; sourceTree = "<group>"; };
-		OBJ_10 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
-		OBJ_11 /* ElasticSwift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElasticSwift.swift; sourceTree = "<group>"; };
-		OBJ_12 /* Errors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
-		OBJ_13 /* IndexRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexRequest.swift; sourceTree = "<group>"; };
-		OBJ_18 /* Transport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transport.swift; sourceTree = "<group>"; };
-		OBJ_21 /* ElasticSwiftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElasticSwiftTests.swift; sourceTree = "<group>"; };
-		OBJ_47 /* ElasticSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ElasticSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		OBJ_48 /* ElasticSwiftTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = ElasticSwiftTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		"ElasticSwift::ElasticSwift::Product" /* ElasticSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ElasticSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		"ElasticSwift::ElasticSwiftTests::Product" /* ElasticSwiftTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = ElasticSwiftTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		OBJ_10 /* Admin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Admin.swift; sourceTree = "<group>"; };
+		OBJ_11 /* Clusters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Clusters.swift; sourceTree = "<group>"; };
+		OBJ_12 /* Indices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Indices.swift; sourceTree = "<group>"; };
+		OBJ_13 /* ElasticSwift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElasticSwift.swift; sourceTree = "<group>"; };
+		OBJ_15 /* Errors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
+		OBJ_17 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
+		OBJ_19 /* Query.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Query.swift; sourceTree = "<group>"; };
+		OBJ_20 /* QueryBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryBuilder.swift; sourceTree = "<group>"; };
+		OBJ_21 /* QueryBuilders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryBuilders.swift; sourceTree = "<group>"; };
+		OBJ_22 /* Sort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sort.swift; sourceTree = "<group>"; };
+		OBJ_24 /* DeleteRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteRequest.swift; sourceTree = "<group>"; };
+		OBJ_25 /* GetRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetRequest.swift; sourceTree = "<group>"; };
+		OBJ_26 /* IndexRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexRequest.swift; sourceTree = "<group>"; };
+		OBJ_27 /* IndicesRequests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndicesRequests.swift; sourceTree = "<group>"; };
+		OBJ_28 /* Request.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
+		OBJ_29 /* SearchRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchRequest.swift; sourceTree = "<group>"; };
+		OBJ_30 /* UpdateRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateRequest.swift; sourceTree = "<group>"; };
+		OBJ_32 /* Response.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Response.swift; sourceTree = "<group>"; };
+		OBJ_34 /* ResponseSerialization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseSerialization.swift; sourceTree = "<group>"; };
+		OBJ_35 /* Transport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transport.swift; sourceTree = "<group>"; };
+		OBJ_37 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		OBJ_40 /* ElasticSwiftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElasticSwiftTests.swift; sourceTree = "<group>"; };
 		OBJ_6 /* Package.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		OBJ_107 /* Frameworks */ = {
+		OBJ_56 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_110 /* ElasticSwift.framework in Frameworks */,
+				OBJ_57 /* ElasticSwift.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_96 /* Frameworks */ = {
+		OBJ_85 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
@@ -90,162 +111,153 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		06FB582C1FAE40430067E4D7 /* Responses */ = {
+		OBJ_14 /* Errors */ = {
 			isa = PBXGroup;
 			children = (
-				06FA8DCE1EDDDE78003BC28C /* Response.swift */,
-			);
-			path = Responses;
-			sourceTree = "<group>";
-		};
-		06FB582D1FAE40920067E4D7 /* Requests */ = {
-			isa = PBXGroup;
-			children = (
-				OBJ_13 /* IndexRequest.swift */,
-				06FA8DCC1EDDDE50003BC28C /* Request.swift */,
-				06FA8DD01EDEAF88003BC28C /* GetRequest.swift */,
-				06FA8DD21EDF5556003BC28C /* UpdateRequest.swift */,
-				06FA8DD41EDF5565003BC28C /* DeleteRequest.swift */,
-				06FA8DD61EDF5574003BC28C /* SearchRequest.swift */,
-				06E71FED1EF7A87D00A9A3B2 /* IndicesRequests.swift */,
-			);
-			path = Requests;
-			sourceTree = "<group>";
-		};
-		06FB582E1FAE40D20067E4D7 /* Utils */ = {
-			isa = PBXGroup;
-			children = (
-				06E71FE61EF78C3900A9A3B2 /* Utils.swift */,
-			);
-			path = Utils;
-			sourceTree = "<group>";
-		};
-		06FB582F1FAE40F50067E4D7 /* Queries */ = {
-			isa = PBXGroup;
-			children = (
-				069290D51EE3B950001F7F20 /* QueryBuilder.swift */,
-				069290D91EE3BD12001F7F20 /* QueryBuilders.swift */,
-				069290DB1EE3C62F001F7F20 /* Query.swift */,
-				069290DD1EE3EB90001F7F20 /* Sort.swift */,
-			);
-			path = Queries;
-			sourceTree = "<group>";
-		};
-		06FB58301FAE411E0067E4D7 /* Errors */ = {
-			isa = PBXGroup;
-			children = (
-				OBJ_12 /* Errors.swift */,
+				OBJ_15 /* Errors.swift */,
 			);
 			path = Errors;
 			sourceTree = "<group>";
 		};
-		06FB58331FAE417C0067E4D7 /* Admin */ = {
+		OBJ_16 /* Networking */ = {
 			isa = PBXGroup;
 			children = (
-				06E71FE91EF7A13000A9A3B2 /* Indices.swift */,
-				06E71FEB1EF7A1C500A9A3B2 /* Clusters.swift */,
-				06E71FEF1EF7AC4000A9A3B2 /* Admin.swift */,
-			);
-			path = Admin;
-			sourceTree = "<group>";
-		};
-		06FB58341FAE419C0067E4D7 /* Networking */ = {
-			isa = PBXGroup;
-			children = (
-				OBJ_10 /* SessionManager.swift */,
+				OBJ_17 /* SessionManager.swift */,
 			);
 			path = Networking;
 			sourceTree = "<group>";
 		};
-		06FB58351FAE42B10067E4D7 /* Serialization */ = {
+		OBJ_18 /* Queries */ = {
 			isa = PBXGroup;
 			children = (
-				06FB58361FAE42B10067E4D7 /* ResponseSerialization.swift */,
+				OBJ_19 /* Query.swift */,
+				OBJ_20 /* QueryBuilder.swift */,
+				OBJ_21 /* QueryBuilders.swift */,
+				OBJ_22 /* Sort.swift */,
 			);
-			name = Serialization;
-			path = Sources/Serialization;
-			sourceTree = SOURCE_ROOT;
+			path = Queries;
+			sourceTree = "<group>";
 		};
-		OBJ_19 /* Tests */ = {
+		OBJ_23 /* Requests */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_20 /* ElasticSwiftTests */,
+				OBJ_24 /* DeleteRequest.swift */,
+				OBJ_25 /* GetRequest.swift */,
+				OBJ_26 /* IndexRequest.swift */,
+				OBJ_27 /* IndicesRequests.swift */,
+				OBJ_28 /* Request.swift */,
+				OBJ_29 /* SearchRequest.swift */,
+				OBJ_30 /* UpdateRequest.swift */,
+			);
+			path = Requests;
+			sourceTree = "<group>";
+		};
+		OBJ_31 /* Responses */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_32 /* Response.swift */,
+			);
+			path = Responses;
+			sourceTree = "<group>";
+		};
+		OBJ_33 /* Serialization */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_34 /* ResponseSerialization.swift */,
+			);
+			path = Serialization;
+			sourceTree = "<group>";
+		};
+		OBJ_36 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_37 /* Utils.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		OBJ_38 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_39 /* ElasticSwiftTests */,
 			);
 			name = Tests;
 			sourceTree = SOURCE_ROOT;
 		};
-		OBJ_20 /* ElasticSwiftTests */ = {
+		OBJ_39 /* ElasticSwiftTests */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_21 /* ElasticSwiftTests.swift */,
+				OBJ_40 /* ElasticSwiftTests.swift */,
 			);
 			name = ElasticSwiftTests;
 			path = Tests/ElasticSwiftTests;
 			sourceTree = SOURCE_ROOT;
 		};
-		OBJ_44 /* Products */ = {
+		OBJ_41 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_47 /* ElasticSwift.framework */,
-				OBJ_48 /* ElasticSwiftTests.xctest */,
+				"ElasticSwift::ElasticSwiftTests::Product" /* ElasticSwiftTests.xctest */,
+				"ElasticSwift::ElasticSwift::Product" /* ElasticSwift.framework */,
 			);
 			name = Products;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		OBJ_5 = {
+		OBJ_5 /*  */ = {
 			isa = PBXGroup;
 			children = (
-				066F2E061F04E12F003DCDF8 /* README.md */,
 				OBJ_6 /* Package.swift */,
 				OBJ_7 /* Sources */,
-				OBJ_19 /* Tests */,
-				OBJ_44 /* Products */,
+				OBJ_38 /* Tests */,
+				OBJ_41 /* Products */,
 			);
+			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_7 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				06FB58351FAE42B10067E4D7 /* Serialization */,
-				06FB58331FAE417C0067E4D7 /* Admin */,
-				06FB58341FAE419C0067E4D7 /* Networking */,
-				06FB58301FAE411E0067E4D7 /* Errors */,
-				06FB582F1FAE40F50067E4D7 /* Queries */,
-				06FB582D1FAE40920067E4D7 /* Requests */,
-				06FB582C1FAE40430067E4D7 /* Responses */,
-				06FB582E1FAE40D20067E4D7 /* Utils */,
-				OBJ_11 /* ElasticSwift.swift */,
-				OBJ_18 /* Transport.swift */,
+				OBJ_8 /* ElasticSwift */,
 			);
-			path = Sources;
+			name = Sources;
 			sourceTree = SOURCE_ROOT;
+		};
+		OBJ_8 /* ElasticSwift */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_9 /* Admin */,
+				OBJ_14 /* Errors */,
+				OBJ_16 /* Networking */,
+				OBJ_18 /* Queries */,
+				OBJ_23 /* Requests */,
+				OBJ_31 /* Responses */,
+				OBJ_33 /* Serialization */,
+				OBJ_36 /* Utils */,
+				OBJ_35 /* Transport.swift */,
+				OBJ_13 /* ElasticSwift.swift */,
+			);
+			name = ElasticSwift;
+			path = Sources/ElasticSwift;
+			sourceTree = SOURCE_ROOT;
+		};
+		OBJ_9 /* Admin */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_10 /* Admin.swift */,
+				OBJ_11 /* Clusters.swift */,
+				OBJ_12 /* Indices.swift */,
+			);
+			path = Admin;
+			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		OBJ_101 /* ElasticSwiftTests */ = {
+		"ElasticSwift::ElasticSwift" /* ElasticSwift */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_102 /* Build configuration list for PBXNativeTarget "ElasticSwiftTests" */;
+			buildConfigurationList = OBJ_60 /* Build configuration list for PBXNativeTarget "ElasticSwift" */;
 			buildPhases = (
-				OBJ_105 /* Sources */,
-				OBJ_107 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				OBJ_113 /* PBXTargetDependency */,
-			);
-			name = ElasticSwiftTests;
-			productName = ElasticSwiftTests;
-			productReference = OBJ_48 /* ElasticSwiftTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		OBJ_80 /* ElasticSwift */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_81 /* Build configuration list for PBXNativeTarget "ElasticSwift" */;
-			buildPhases = (
-				OBJ_84 /* Sources */,
-				OBJ_96 /* Frameworks */,
+				OBJ_63 /* Sources */,
+				OBJ_85 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -253,7 +265,38 @@
 			);
 			name = ElasticSwift;
 			productName = ElasticSwift;
-			productReference = OBJ_47 /* ElasticSwift.framework */;
+			productReference = "ElasticSwift::ElasticSwift::Product" /* ElasticSwift.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		"ElasticSwift::ElasticSwiftTests" /* ElasticSwiftTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = OBJ_51 /* Build configuration list for PBXNativeTarget "ElasticSwiftTests" */;
+			buildPhases = (
+				OBJ_54 /* Sources */,
+				OBJ_56 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				OBJ_58 /* PBXTargetDependency */,
+			);
+			name = ElasticSwiftTests;
+			productName = ElasticSwiftTests;
+			productReference = "ElasticSwift::ElasticSwiftTests::Product" /* ElasticSwiftTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		"ElasticSwift::SwiftPMPackageDescription" /* ElasticSwiftPackageDescription */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = OBJ_45 /* Build configuration list for PBXNativeTarget "ElasticSwiftPackageDescription" */;
+			buildPhases = (
+				OBJ_48 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ElasticSwiftPackageDescription;
+			productName = ElasticSwiftPackageDescription;
 			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
@@ -262,14 +305,14 @@
 		OBJ_1 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0900;
+				LastUpgradeCheck = 0910;
 				TargetAttributes = {
-					OBJ_101 = {
-						LastSwiftMigration = 0900;
-					};
-					OBJ_80 = {
+					"ElasticSwift::ElasticSwift" = {
 						DevelopmentTeam = QW3346JMC7;
-						LastSwiftMigration = 0900;
+						ProvisioningStyle = Automatic;
+					};
+					"ElasticSwift::SwiftPMPackageDescription" = {
+						DevelopmentTeam = QW3346JMC7;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -281,103 +324,80 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5;
-			productRefGroup = OBJ_44 /* Products */;
+			mainGroup = OBJ_5 /*  */;
+			productRefGroup = OBJ_41 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				OBJ_80 /* ElasticSwift */,
-				OBJ_101 /* ElasticSwiftTests */,
+				"ElasticSwift::SwiftPMPackageDescription" /* ElasticSwiftPackageDescription */,
+				"ElasticSwift::ElasticSwiftTests" /* ElasticSwiftTests */,
+				"ElasticSwift::ElasticSwift" /* ElasticSwift */,
+				"ElasticSwift::ElasticSwiftPackageTests::ProductTarget" /* ElasticSwiftPackageTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		OBJ_105 /* Sources */ = {
+		OBJ_48 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_106 /* ElasticSwiftTests.swift in Sources */,
+				OBJ_49 /* Package.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_84 /* Sources */ = {
+		OBJ_54 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				06FA8DD71EDF5574003BC28C /* SearchRequest.swift in Sources */,
-				06E71FEA1EF7A13000A9A3B2 /* Indices.swift in Sources */,
-				069290DC1EE3C62F001F7F20 /* Query.swift in Sources */,
-				06FA8DD11EDEAF88003BC28C /* GetRequest.swift in Sources */,
-				06FA8DCD1EDDDE50003BC28C /* Request.swift in Sources */,
-				OBJ_87 /* SessionManager.swift in Sources */,
-				069290DE1EE3EB90001F7F20 /* Sort.swift in Sources */,
-				069290D61EE3B950001F7F20 /* QueryBuilder.swift in Sources */,
-				OBJ_88 /* ElasticSwift.swift in Sources */,
-				06E71FF01EF7AC4000A9A3B2 /* Admin.swift in Sources */,
-				OBJ_89 /* Errors.swift in Sources */,
-				06E71FEC1EF7A1C500A9A3B2 /* Clusters.swift in Sources */,
-				069290DA1EE3BD12001F7F20 /* QueryBuilders.swift in Sources */,
-				06FA8DCF1EDDDE78003BC28C /* Response.swift in Sources */,
-				06E71FE71EF78C3900A9A3B2 /* Utils.swift in Sources */,
-				06E71FEE1EF7A87D00A9A3B2 /* IndicesRequests.swift in Sources */,
-				OBJ_90 /* IndexRequest.swift in Sources */,
-				06FA8DD51EDF5565003BC28C /* DeleteRequest.swift in Sources */,
-				06FB58371FAE42B10067E4D7 /* ResponseSerialization.swift in Sources */,
-				06FA8DD31EDF5556003BC28C /* UpdateRequest.swift in Sources */,
-				OBJ_95 /* Transport.swift in Sources */,
+				OBJ_55 /* ElasticSwiftTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		OBJ_63 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 0;
+			files = (
+				OBJ_64 /* Admin.swift in Sources */,
+				OBJ_65 /* Clusters.swift in Sources */,
+				OBJ_66 /* Indices.swift in Sources */,
+				OBJ_67 /* ElasticSwift.swift in Sources */,
+				OBJ_68 /* Errors.swift in Sources */,
+				OBJ_69 /* SessionManager.swift in Sources */,
+				OBJ_70 /* Query.swift in Sources */,
+				OBJ_71 /* QueryBuilder.swift in Sources */,
+				OBJ_72 /* QueryBuilders.swift in Sources */,
+				OBJ_73 /* Sort.swift in Sources */,
+				OBJ_74 /* DeleteRequest.swift in Sources */,
+				OBJ_75 /* GetRequest.swift in Sources */,
+				OBJ_76 /* IndexRequest.swift in Sources */,
+				OBJ_77 /* IndicesRequests.swift in Sources */,
+				OBJ_78 /* Request.swift in Sources */,
+				OBJ_79 /* SearchRequest.swift in Sources */,
+				OBJ_80 /* UpdateRequest.swift in Sources */,
+				OBJ_81 /* Response.swift in Sources */,
+				OBJ_82 /* ResponseSerialization.swift in Sources */,
+				OBJ_83 /* Transport.swift in Sources */,
+				OBJ_84 /* Utils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		OBJ_113 /* PBXTargetDependency */ = {
+		OBJ_58 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_80 /* ElasticSwift */;
-			targetProxy = 06FA8DC41EDDD292003BC28C /* PBXContainerItemProxy */;
+			target = "ElasticSwift::ElasticSwift" /* ElasticSwift */;
+			targetProxy = 06FB58381FAE47CD0067E4D7 /* PBXContainerItemProxy */;
+		};
+		OBJ_90 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = "ElasticSwift::ElasticSwiftTests" /* ElasticSwiftTests */;
+			targetProxy = 06FB58391FAE47CD0067E4D7 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		OBJ_103 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
-				);
-				HEADER_SEARCH_PATHS = "$(inherited)";
-				INFOPLIST_FILE = ElasticSwift.xcodeproj/ElasticSwiftTests_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks";
-				OTHER_LDFLAGS = "$(inherited)";
-				OTHER_SWIFT_FLAGS = "$(inherited)";
-				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 4.0;
-				TARGET_NAME = ElasticSwiftTests;
-			};
-			name = Debug;
-		};
-		OBJ_104 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
-				);
-				HEADER_SEARCH_PATHS = "$(inherited)";
-				INFOPLIST_FILE = ElasticSwift.xcodeproj/ElasticSwiftTests_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks";
-				OTHER_LDFLAGS = "$(inherited)";
-				OTHER_SWIFT_FLAGS = "$(inherited)";
-				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 4.0;
-				TARGET_NAME = ElasticSwiftTests;
-			};
-			name = Release;
-		};
 		OBJ_3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -420,7 +440,6 @@
 				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator appletvos appletvsimulator watchos watchsimulator";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = SWIFT_PACKAGE;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 3.0;
 				USE_HEADERMAP = NO;
 			};
 			name = Debug;
@@ -464,15 +483,77 @@
 				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator appletvos appletvsimulator watchos watchsimulator";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = SWIFT_PACKAGE;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 3.0;
 				USE_HEADERMAP = NO;
 			};
 			name = Release;
 		};
-		OBJ_82 /* Debug */ = {
+		OBJ_46 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = QW3346JMC7;
+				LD = /usr/bin/true;
+				OTHER_SWIFT_FLAGS = "-swift-version 4 -I /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/pm/4 -target x86_64-apple-macosx10.10 -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Debug;
+		};
+		OBJ_47 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = QW3346JMC7;
+				LD = /usr/bin/true;
+				OTHER_SWIFT_FLAGS = "-swift-version 4 -I /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/pm/4 -target x86_64-apple-macosx10.10 -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Release;
+		};
+		OBJ_52 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = ElasticSwift.xcodeproj/ElasticSwiftTests_Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks";
+				OTHER_LDFLAGS = "$(inherited)";
+				OTHER_SWIFT_FLAGS = "$(inherited)";
+				SWIFT_VERSION = 4.0;
+				TARGET_NAME = ElasticSwiftTests;
+			};
+			name = Debug;
+		};
+		OBJ_53 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = ElasticSwift.xcodeproj/ElasticSwiftTests_Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks";
+				OTHER_LDFLAGS = "$(inherited)";
+				OTHER_SWIFT_FLAGS = "$(inherited)";
+				SWIFT_VERSION = 4.0;
+				TARGET_NAME = ElasticSwiftTests;
+			};
+			name = Release;
+		};
+		OBJ_61 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = QW3346JMC7;
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -482,7 +563,6 @@
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = ElasticSwift.xcodeproj/ElasticSwift_Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = ElasticSwift;
@@ -490,16 +570,16 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
-				SWIFT_SWIFT3_OBJC_INFERENCE = On;
 				SWIFT_VERSION = 4.0;
 				TARGET_NAME = ElasticSwift;
 			};
 			name = Debug;
 		};
-		OBJ_83 /* Release */ = {
+		OBJ_62 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = QW3346JMC7;
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -509,7 +589,6 @@
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = ElasticSwift.xcodeproj/ElasticSwift_Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = ElasticSwift;
@@ -517,24 +596,26 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
-				SWIFT_SWIFT3_OBJC_INFERENCE = On;
 				SWIFT_VERSION = 4.0;
 				TARGET_NAME = ElasticSwift;
+			};
+			name = Release;
+		};
+		OBJ_88 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		OBJ_89 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		OBJ_102 /* Build configuration list for PBXNativeTarget "ElasticSwiftTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				OBJ_103 /* Debug */,
-				OBJ_104 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
-		};
 		OBJ_2 /* Build configuration list for PBXProject "ElasticSwift" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -544,11 +625,38 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		OBJ_81 /* Build configuration list for PBXNativeTarget "ElasticSwift" */ = {
+		OBJ_45 /* Build configuration list for PBXNativeTarget "ElasticSwiftPackageDescription" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_82 /* Debug */,
-				OBJ_83 /* Release */,
+				OBJ_46 /* Debug */,
+				OBJ_47 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		OBJ_51 /* Build configuration list for PBXNativeTarget "ElasticSwiftTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				OBJ_52 /* Debug */,
+				OBJ_53 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		OBJ_60 /* Build configuration list for PBXNativeTarget "ElasticSwift" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				OBJ_61 /* Debug */,
+				OBJ_62 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		OBJ_87 /* Build configuration list for PBXAggregateTarget "ElasticSwiftPackageTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				OBJ_88 /* Debug */,
+				OBJ_89 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
