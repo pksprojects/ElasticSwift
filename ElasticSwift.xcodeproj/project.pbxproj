@@ -90,44 +90,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		069290D41EE3B924001F7F20 /* Query */ = {
+		06FB582C1FAE40430067E4D7 /* Responses */ = {
 			isa = PBXGroup;
 			children = (
-				069290D51EE3B950001F7F20 /* QueryBuilder.swift */,
-				069290D91EE3BD12001F7F20 /* QueryBuilders.swift */,
-				069290DB1EE3C62F001F7F20 /* Query.swift */,
-				069290DD1EE3EB90001F7F20 /* Sort.swift */,
+				06FA8DCE1EDDDE78003BC28C /* Response.swift */,
 			);
-			name = Query;
+			path = Responses;
 			sourceTree = "<group>";
 		};
-		06E71FE51EF78C1000A9A3B2 /* Utils */ = {
-			isa = PBXGroup;
-			children = (
-				06E71FE61EF78C3900A9A3B2 /* Utils.swift */,
-			);
-			name = Utils;
-			sourceTree = "<group>";
-		};
-		06E71FE81EF7A0DE00A9A3B2 /* Admin */ = {
-			isa = PBXGroup;
-			children = (
-				06E71FE91EF7A13000A9A3B2 /* Indices.swift */,
-				06E71FEB1EF7A1C500A9A3B2 /* Clusters.swift */,
-				06E71FEF1EF7AC4000A9A3B2 /* Admin.swift */,
-			);
-			name = Admin;
-			sourceTree = "<group>";
-		};
-		06E84F331EE54D6E004673AA /* Serialization */ = {
-			isa = PBXGroup;
-			children = (
-				06E84F341EE54D9E004673AA /* ResponseSerialization.swift */,
-			);
-			name = Serialization;
-			sourceTree = "<group>";
-		};
-		06FA8DC51EDDD324003BC28C /* Requests */ = {
+		06FB582D1FAE40920067E4D7 /* Requests */ = {
 			isa = PBXGroup;
 			children = (
 				OBJ_13 /* IndexRequest.swift */,
@@ -138,31 +109,60 @@
 				06FA8DD61EDF5574003BC28C /* SearchRequest.swift */,
 				06E71FED1EF7A87D00A9A3B2 /* IndicesRequests.swift */,
 			);
-			name = Requests;
+			path = Requests;
 			sourceTree = "<group>";
 		};
-		06FA8DC61EDDD32B003BC28C /* Networking */ = {
+		06FB582E1FAE40D20067E4D7 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_10 /* SessionManager.swift */,
+				06E71FE61EF78C3900A9A3B2 /* Utils.swift */,
 			);
-			name = Networking;
+			path = Utils;
 			sourceTree = "<group>";
 		};
-		06FA8DC81EDDDD6B003BC28C /* Responses */ = {
+		06FB582F1FAE40F50067E4D7 /* Queries */ = {
 			isa = PBXGroup;
 			children = (
-				06FA8DCE1EDDDE78003BC28C /* Response.swift */,
+				069290D51EE3B950001F7F20 /* QueryBuilder.swift */,
+				069290D91EE3BD12001F7F20 /* QueryBuilders.swift */,
+				069290DB1EE3C62F001F7F20 /* Query.swift */,
+				069290DD1EE3EB90001F7F20 /* Sort.swift */,
 			);
-			name = Responses;
+			path = Queries;
 			sourceTree = "<group>";
 		};
-		06FA8DC91EDDDD94003BC28C /* Errors */ = {
+		06FB58301FAE411E0067E4D7 /* Errors */ = {
 			isa = PBXGroup;
 			children = (
 				OBJ_12 /* Errors.swift */,
 			);
-			name = Errors;
+			path = Errors;
+			sourceTree = "<group>";
+		};
+		06FB58311FAE41390067E4D7 /* Serialization */ = {
+			isa = PBXGroup;
+			children = (
+				06E84F341EE54D9E004673AA /* ResponseSerialization.swift */,
+			);
+			path = Serialization;
+			sourceTree = SOURCE_ROOT;
+		};
+		06FB58331FAE417C0067E4D7 /* Admin */ = {
+			isa = PBXGroup;
+			children = (
+				06E71FE91EF7A13000A9A3B2 /* Indices.swift */,
+				06E71FEB1EF7A1C500A9A3B2 /* Clusters.swift */,
+				06E71FEF1EF7AC4000A9A3B2 /* Admin.swift */,
+			);
+			path = Admin;
+			sourceTree = "<group>";
+		};
+		06FB58341FAE419C0067E4D7 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_10 /* SessionManager.swift */,
+			);
+			path = Networking;
 			sourceTree = "<group>";
 		};
 		OBJ_19 /* Tests */ = {
@@ -205,14 +205,14 @@
 		OBJ_7 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				06E71FE81EF7A0DE00A9A3B2 /* Admin */,
-				06FA8DC61EDDD32B003BC28C /* Networking */,
-				06E84F331EE54D6E004673AA /* Serialization */,
-				06FA8DC91EDDDD94003BC28C /* Errors */,
-				069290D41EE3B924001F7F20 /* Query */,
-				06FA8DC51EDDD324003BC28C /* Requests */,
-				06FA8DC81EDDDD6B003BC28C /* Responses */,
-				06E71FE51EF78C1000A9A3B2 /* Utils */,
+				06FB58311FAE41390067E4D7 /* Serialization */,
+				06FB58331FAE417C0067E4D7 /* Admin */,
+				06FB58341FAE419C0067E4D7 /* Networking */,
+				06FB58301FAE411E0067E4D7 /* Errors */,
+				06FB582F1FAE40F50067E4D7 /* Queries */,
+				06FB582D1FAE40920067E4D7 /* Requests */,
+				06FB582C1FAE40430067E4D7 /* Responses */,
+				06FB582E1FAE40D20067E4D7 /* Utils */,
 				OBJ_11 /* ElasticSwift.swift */,
 				OBJ_18 /* Transport.swift */,
 			);
