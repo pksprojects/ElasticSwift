@@ -16,13 +16,13 @@
 		06E71FEC1EF7A1C500A9A3B2 /* Clusters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06E71FEB1EF7A1C500A9A3B2 /* Clusters.swift */; };
 		06E71FEE1EF7A87D00A9A3B2 /* IndicesRequests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06E71FED1EF7A87D00A9A3B2 /* IndicesRequests.swift */; };
 		06E71FF01EF7AC4000A9A3B2 /* Admin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06E71FEF1EF7AC4000A9A3B2 /* Admin.swift */; };
-		06E84F351EE54D9E004673AA /* ResponseSerialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06E84F341EE54D9E004673AA /* ResponseSerialization.swift */; };
 		06FA8DCD1EDDDE50003BC28C /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06FA8DCC1EDDDE50003BC28C /* Request.swift */; };
 		06FA8DCF1EDDDE78003BC28C /* Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06FA8DCE1EDDDE78003BC28C /* Response.swift */; };
 		06FA8DD11EDEAF88003BC28C /* GetRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06FA8DD01EDEAF88003BC28C /* GetRequest.swift */; };
 		06FA8DD31EDF5556003BC28C /* UpdateRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06FA8DD21EDF5556003BC28C /* UpdateRequest.swift */; };
 		06FA8DD51EDF5565003BC28C /* DeleteRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06FA8DD41EDF5565003BC28C /* DeleteRequest.swift */; };
 		06FA8DD71EDF5574003BC28C /* SearchRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06FA8DD61EDF5574003BC28C /* SearchRequest.swift */; };
+		06FB58371FAE42B10067E4D7 /* ResponseSerialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06FB58361FAE42B10067E4D7 /* ResponseSerialization.swift */; };
 		OBJ_106 /* ElasticSwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_21 /* ElasticSwiftTests.swift */; };
 		OBJ_110 /* ElasticSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_47 /* ElasticSwift.framework */; };
 		OBJ_87 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_10 /* SessionManager.swift */; };
@@ -53,13 +53,13 @@
 		06E71FEB1EF7A1C500A9A3B2 /* Clusters.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Clusters.swift; sourceTree = "<group>"; };
 		06E71FED1EF7A87D00A9A3B2 /* IndicesRequests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IndicesRequests.swift; sourceTree = "<group>"; };
 		06E71FEF1EF7AC4000A9A3B2 /* Admin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Admin.swift; sourceTree = "<group>"; };
-		06E84F341EE54D9E004673AA /* ResponseSerialization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResponseSerialization.swift; sourceTree = "<group>"; };
 		06FA8DCC1EDDDE50003BC28C /* Request.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
 		06FA8DCE1EDDDE78003BC28C /* Response.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Response.swift; sourceTree = "<group>"; };
 		06FA8DD01EDEAF88003BC28C /* GetRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GetRequest.swift; sourceTree = "<group>"; };
 		06FA8DD21EDF5556003BC28C /* UpdateRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpdateRequest.swift; sourceTree = "<group>"; };
 		06FA8DD41EDF5565003BC28C /* DeleteRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeleteRequest.swift; sourceTree = "<group>"; };
 		06FA8DD61EDF5574003BC28C /* SearchRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchRequest.swift; sourceTree = "<group>"; };
+		06FB58361FAE42B10067E4D7 /* ResponseSerialization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResponseSerialization.swift; sourceTree = "<group>"; };
 		OBJ_10 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 		OBJ_11 /* ElasticSwift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElasticSwift.swift; sourceTree = "<group>"; };
 		OBJ_12 /* Errors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
@@ -139,14 +139,6 @@
 			path = Errors;
 			sourceTree = "<group>";
 		};
-		06FB58311FAE41390067E4D7 /* Serialization */ = {
-			isa = PBXGroup;
-			children = (
-				06E84F341EE54D9E004673AA /* ResponseSerialization.swift */,
-			);
-			path = Serialization;
-			sourceTree = SOURCE_ROOT;
-		};
 		06FB58331FAE417C0067E4D7 /* Admin */ = {
 			isa = PBXGroup;
 			children = (
@@ -164,6 +156,15 @@
 			);
 			path = Networking;
 			sourceTree = "<group>";
+		};
+		06FB58351FAE42B10067E4D7 /* Serialization */ = {
+			isa = PBXGroup;
+			children = (
+				06FB58361FAE42B10067E4D7 /* ResponseSerialization.swift */,
+			);
+			name = Serialization;
+			path = Sources/Serialization;
+			sourceTree = SOURCE_ROOT;
 		};
 		OBJ_19 /* Tests */ = {
 			isa = PBXGroup;
@@ -205,7 +206,7 @@
 		OBJ_7 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				06FB58311FAE41390067E4D7 /* Serialization */,
+				06FB58351FAE42B10067E4D7 /* Serialization */,
 				06FB58331FAE417C0067E4D7 /* Admin */,
 				06FB58341FAE419C0067E4D7 /* Networking */,
 				06FB58301FAE411E0067E4D7 /* Errors */,
@@ -313,7 +314,6 @@
 				069290DE1EE3EB90001F7F20 /* Sort.swift in Sources */,
 				069290D61EE3B950001F7F20 /* QueryBuilder.swift in Sources */,
 				OBJ_88 /* ElasticSwift.swift in Sources */,
-				06E84F351EE54D9E004673AA /* ResponseSerialization.swift in Sources */,
 				06E71FF01EF7AC4000A9A3B2 /* Admin.swift in Sources */,
 				OBJ_89 /* Errors.swift in Sources */,
 				06E71FEC1EF7A1C500A9A3B2 /* Clusters.swift in Sources */,
@@ -323,6 +323,7 @@
 				06E71FEE1EF7A87D00A9A3B2 /* IndicesRequests.swift in Sources */,
 				OBJ_90 /* IndexRequest.swift in Sources */,
 				06FA8DD51EDF5565003BC28C /* DeleteRequest.swift in Sources */,
+				06FB58371FAE42B10067E4D7 /* ResponseSerialization.swift in Sources */,
 				06FA8DD31EDF5556003BC28C /* UpdateRequest.swift in Sources */,
 				OBJ_95 /* Transport.swift in Sources */,
 			);
