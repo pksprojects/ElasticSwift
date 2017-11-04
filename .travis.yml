@@ -1,9 +1,11 @@
 language: objective-c
-osx_image: xcode9
+osx_image: xcode9.1
 xcode_project: ElasticSwift.xcodeproj
 xcode_scheme: ElasticSwiftTests
-services:
-  - elasticsearch
+before_install:
+  - brew update
+  - brew install elasticsearch
+  - brew services start elasticsearch
 before_script:
   - sleep 10
 env:
