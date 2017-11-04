@@ -1,5 +1,5 @@
 import XCTest
-import SwiftyJSON
+
 @testable import ElasticSwift
 
 class ElasticSwiftTests: XCTestCase {
@@ -12,13 +12,13 @@ class ElasticSwiftTests: XCTestCase {
     }
     
     func testPlay() {
-        print(JSON(["field":"value"]).rawString()!)
+        //print(JSON(["field":"value"]).rawString()!)
         var query = [String: Any]()
         query["query"] = ["field":"value"]
-        print(JSON(query).rawString()!)
-        var query2 = [String: Any]()
-        query2["query"] = JSON(["field": [:]]).rawString()!
-        print(JSON(query2).rawString()!)
+        //print(JSON(query).rawString()!)
+        //var query2 = [String: Any]()
+        //query2["query"] = JSON(["field": [:]]).rawString()!
+        //print(JSON(query2).rawString()!)
         sleep(1)
     }
     
@@ -56,7 +56,10 @@ class ElasticSwiftTests: XCTestCase {
         func handler(_ response: ESResponse) -> Void {
             print(String(data: response.data!, encoding: .utf8 )!)
         }
-        let body: String = JSON(["msg": "test1"]).rawString()!
+        var body: String = "{}"
+        if let json = try? JSONSerialization.data(withJSONObject: ["msg": "test1"], options: []) {
+            body = String(data: json, encoding: .utf8)!
+        }
         print("Body: ", body)
         let requestBuilder = self.client?.prepareIndex()
             .set(index: "test")

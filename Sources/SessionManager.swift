@@ -22,7 +22,8 @@ class SessionManager {
     init(forHost url: URL) {
         let config = URLSessionConfiguration.ephemeral
         config.httpAdditionalHeaders = ["Content-Type": "application/json; charset=UTF-8"]
-        self.session = URLSession(configuration: config)
+        let queue = OperationQueue()
+        self.session = URLSession(configuration: config, delegate: nil, delegateQueue: queue) // URLSession(configuration: config)
         self.url = url
     }
     
@@ -55,10 +56,10 @@ class SessionManager {
             let response = ESResponse(data: data, httpResponse: response, error: error)
             return callback(response)
         }
+        
         debugPrint("Data Task Created:", self.dataTask!)
         return self
     }
-    
     func execute() {
         self.dataTask?.resume()
         debugPrint("DataTask Resumed")
