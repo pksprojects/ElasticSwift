@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import SwiftyJSON
 
 public class ESRequest {
     
@@ -54,7 +53,12 @@ public class ESRequest {
     var body: String {
         get {
             if let req = self as? SearchRequest {
-                return JSON(req.makeBody()).rawString()!
+                if let json = try? JSONSerialization.data(withJSONObject: req.makeBody(), options: []) {
+                    return String(data: json, encoding: .utf8)!
+                }
+                else {
+                    return "{}"
+                }
             }
             if let req = self as? IndexRequest {
                 return req.source!
