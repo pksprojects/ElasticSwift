@@ -2,4 +2,118 @@
 <Bucket
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Sources/ElasticSwift/Transport.swift"
+            timestampString = "538881292.2983691"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "23"
+            endingLineNumber = "23"
+            landmarkName = "init(forHosts:credentials:sslConfig:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Sources/ElasticSwift/ElasticSwift.swift"
+            timestampString = "538881292.298579"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "111"
+            endingLineNumber = "111"
+            landmarkName = "init(hosts:credentials:sslConfig:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Sources/ElasticSwift/ElasticSwift.swift"
+            timestampString = "538881292.298776"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "71"
+            endingLineNumber = "71"
+            landmarkName = "init(forHosts:withCredentials:withSSL:sslConfig:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Sources/ElasticSwift/ElasticSwift.swift"
+            timestampString = "538881292.298833"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "70"
+            endingLineNumber = "70"
+            landmarkName = "init(forHosts:withCredentials:withSSL:sslConfig:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Sources/ElasticSwift/ElasticSwift.swift"
+            timestampString = "538881292.298884"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "69"
+            endingLineNumber = "69"
+            landmarkName = "init(forHosts:withCredentials:withSSL:sslConfig:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ElasticSwift.Settings.init(forHosts: Swift.Array&lt;Swift.String&gt;, withCredentials: Swift.Optional&lt;ElasticSwift.ClientCredential&gt;, withSSL: Swift.Bool, sslConfig: Swift.Optional&lt;ElasticSwift.SSLConfiguration&gt;) -&gt; ElasticSwift.Settings"
+                  moduleName = "ElasticSwift"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/PKS/Projects/Swift/ElasticSwift/Sources/ElasticSwift/ElasticSwift.swift"
+                  timestampString = "538880453.544034"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "69"
+                  endingLineNumber = "69"
+                  offsetFromSymbolStart = "290">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.String) -&gt; Foundation.URL in ElasticSwift.Settings.init(forHosts: Swift.Array&lt;Swift.String&gt;, withCredentials: Swift.Optional&lt;ElasticSwift.ClientCredential&gt;, withSSL: Swift.Bool, sslConfig: Swift.Optional&lt;ElasticSwift.SSLConfiguration&gt;) -&gt; ElasticSwift.Settings"
+                  moduleName = "ElasticSwift"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/PKS/Projects/Swift/ElasticSwift/Sources/ElasticSwift/ElasticSwift.swift"
+                  timestampString = "538880453.546749"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "69"
+                  endingLineNumber = "69"
+                  offsetFromSymbolStart = "20">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>

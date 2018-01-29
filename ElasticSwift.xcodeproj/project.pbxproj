@@ -65,6 +65,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		06A95506201C10B800B97138 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		06A95507201C1AEA00B97138 /* ElasticSwift.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ElasticSwift.podspec; sourceTree = "<group>"; };
 		"ElasticSwift::ElasticSwift::Product" /* ElasticSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ElasticSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"ElasticSwift::ElasticSwiftTests::Product" /* ElasticSwiftTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = ElasticSwiftTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		OBJ_10 /* Admin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Admin.swift; sourceTree = "<group>"; };
@@ -202,15 +204,16 @@
 			name = Products;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
+				06A95507201C1AEA00B97138 /* ElasticSwift.podspec */,
+				06A95506201C10B800B97138 /* README.md */,
 				OBJ_6 /* Package.swift */,
 				OBJ_7 /* Sources */,
 				OBJ_38 /* Tests */,
 				OBJ_41 /* Products */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_7 /* Sources */ = {
@@ -305,7 +308,7 @@
 		OBJ_1 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0910;
+				LastUpgradeCheck = 0920;
 				TargetAttributes = {
 					"ElasticSwift::ElasticSwift" = {
 						DevelopmentTeam = QW3346JMC7;
@@ -324,7 +327,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_41 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -490,7 +493,7 @@
 		OBJ_46 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = QW3346JMC7;
 				LD = /usr/bin/true;
@@ -503,7 +506,7 @@
 		OBJ_47 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = QW3346JMC7;
 				LD = /usr/bin/true;
@@ -552,7 +555,7 @@
 		OBJ_61 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = QW3346JMC7;
 				ENABLE_TESTABILITY = YES;
@@ -578,7 +581,7 @@
 		OBJ_62 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = QW3346JMC7;
 				ENABLE_TESTABILITY = YES;

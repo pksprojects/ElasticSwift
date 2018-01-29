@@ -18,9 +18,9 @@ class Transport {
     var sessionPool: SessionPool?
     
     
-    init(forHosts urls: [URL]) {
+    init(forHosts urls: [URL], credentials: ClientCredential? = nil, sslConfig: SSLConfiguration? = nil) {
         self.hosts = urls
-        self.sessionPool = SessionPool(forHosts: urls)
+        self.sessionPool = SessionPool(forHosts: urls, credentials: credentials, sslConfig: sslConfig)
     }
     
     func perform_request(method: HTTPMethod, endPoint: String?, params: [QueryParams], completionHandler: @escaping (_ response: ESResponse) -> Void) {
