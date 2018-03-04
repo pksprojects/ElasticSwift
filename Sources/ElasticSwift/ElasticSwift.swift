@@ -16,24 +16,24 @@ public class RestClient: ESClient {
         self.init(settings: Settings.default)
     }
     
-    public func prepareIndex() -> IndexRequestBuilder {
-        return IndexRequestBuilder(client: self)
+    public func makeGet<T: Codable>() -> GetRequestBuilder<T> {
+        return GetRequestBuilder<T>(withClient: self)
     }
     
-    public func prepareGet() -> GetRequestBuilder {
-        return GetRequestBuilder(client: self)
+    public func makeIndex<T: Codable>() -> IndexRequestBuilder<T> {
+        return IndexRequestBuilder<T>(withClient: self)
     }
     
-    public func prepareUpdate() -> UpdateRequestBuilder {
-        return UpdateRequestBuilder(client: self)
+    public func makeDelete() -> DeleteRequestBuilder {
+        return DeleteRequestBuilder(withClient: self)
     }
     
-    public func prepareDelete() -> DeleteRequestbuilder {
-        return DeleteRequestbuilder(client: self)
+    public func makeUpdate() -> UpdateRequestBuilder {
+        return UpdateRequestBuilder(withClient: self)
     }
-    
-    public func prepareSearch() -> SearchRequestBuilder {
-        return SearchRequestBuilder(client: self)
+
+    public func makeSearch<T: Codable>() -> SearchRequestBuilder<T> {
+        return SearchRequestBuilder<T>(withClient: self)
     }
     
 }
@@ -111,8 +111,12 @@ public class ESClient {
         self.transport = Transport(forHosts: hosts, credentials: credentials, sslConfig: sslConfig)
     }
     
-    func execute(request: ESRequest, completionHandler: @escaping (_ response: ESResponse) -> Void) -> Void {
-        self.transport.perform_request(method: request.method, endPoint: request.endPoint, params: [], body: request.body, completionHandler: completionHandler)
+    func execute(request: Request, completionHandler: @escaping (_ response: ESResponse) -> Void) -> Void {
+        if request.method == .GET {
+            self.transport.performRequest(method: request.method, endPoint: request.endPoint, params: [], completionHandler: completionHandler)
+        } else {
+            self.transport.performRequest(method: request.method, endPoint: request.endPoint, params: [], body: request.body, completionHandler: completionHandler)
+        }
     }
 }
 

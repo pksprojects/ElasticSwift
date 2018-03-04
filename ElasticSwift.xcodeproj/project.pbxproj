@@ -42,7 +42,7 @@
 		OBJ_79 /* SearchRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_29 /* SearchRequest.swift */; };
 		OBJ_80 /* UpdateRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_30 /* UpdateRequest.swift */; };
 		OBJ_81 /* Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_32 /* Response.swift */; };
-		OBJ_82 /* ResponseSerialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_34 /* ResponseSerialization.swift */; };
+		OBJ_82 /* Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_34 /* Serialization.swift */; };
 		OBJ_83 /* Transport.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_35 /* Transport.swift */; };
 		OBJ_84 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_37 /* Utils.swift */; };
 /* End PBXBuildFile section */
@@ -87,7 +87,7 @@
 		OBJ_29 /* SearchRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchRequest.swift; sourceTree = "<group>"; };
 		OBJ_30 /* UpdateRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateRequest.swift; sourceTree = "<group>"; };
 		OBJ_32 /* Response.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Response.swift; sourceTree = "<group>"; };
-		OBJ_34 /* ResponseSerialization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseSerialization.swift; sourceTree = "<group>"; };
+		OBJ_34 /* Serialization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Serialization.swift; sourceTree = "<group>"; };
 		OBJ_35 /* Transport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transport.swift; sourceTree = "<group>"; };
 		OBJ_37 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		OBJ_40 /* ElasticSwiftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElasticSwiftTests.swift; sourceTree = "<group>"; };
@@ -165,7 +165,7 @@
 		OBJ_33 /* Serialization */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_34 /* ResponseSerialization.swift */,
+				OBJ_34 /* Serialization.swift */,
 			);
 			path = Serialization;
 			sourceTree = "<group>";
@@ -379,7 +379,7 @@
 				OBJ_79 /* SearchRequest.swift in Sources */,
 				OBJ_80 /* UpdateRequest.swift in Sources */,
 				OBJ_81 /* Response.swift in Sources */,
-				OBJ_82 /* ResponseSerialization.swift in Sources */,
+				OBJ_82 /* Serialization.swift in Sources */,
 				OBJ_83 /* Transport.swift in Sources */,
 				OBJ_84 /* Utils.swift in Sources */,
 			);

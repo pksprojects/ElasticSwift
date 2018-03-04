@@ -89,6 +89,15 @@ class SessionManager: NSObject, URLSessionDelegate {
         return self
     }
     
+    func createRequest(method: HTTPMethod, forPath pathComponent: String, witParams: Any, body: Data) -> Self {
+        var currRequest = URLRequest(url: self.url.appendingPathComponent(pathComponent))
+        currRequest.httpMethod = method.rawValue
+        currRequest.httpBody = body
+        self.request = currRequest
+        debugPrint("URLRequest with body created")
+        return self
+    }
+    
     func createDataTask(onCompletion callback: @escaping (_ response: ESResponse) -> Void) -> Self {
         self.dataTask = self.session?.dataTask(with: self.request!) { data, response, error in
             let response = ESResponse(data: data, httpResponse: response, error: error)

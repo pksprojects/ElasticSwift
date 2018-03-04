@@ -67,7 +67,7 @@ public class MatchQuery: Query {
     }
     
     public func toDic() -> [String : Any] {
-        return (self.isFuzzy) ? [self.name : [self.field : self.value]] :
+        return !(self.isFuzzy) ? [self.name : [self.field : self.value]] :
             [self.name: [self.field: [
                 "query": self.value,
                 "operator": self.operator.rawValue,

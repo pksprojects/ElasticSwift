@@ -8,41 +8,101 @@
 
 import Foundation
 
-public class GetRequestBuilder: ESRequestBuilder {
+public class GetRequestBuilder<T: Codable>: RequestBuilder {
     
-    init(client: RestClient) {
-        super.init(GetRequest(), withClient: client)
+    var client: ESClient
+    var index: String?
+    var type: String?
+    var id: String?
+    var source: T?
+    var method: HTTPMethod = .GET
+    var completionHandler: ((_ response: GetResponse<T>?, _ error: Error?) -> Void)?
+    
+    init(withClient client: ESClient) {
+        self.client = client
     }
     
-    func set(index: String) -> GetRequestBuilder {
-        if let request = self.request as? GetRequest {
-            request.set(index: index)
-        }
+    func set(index: String) -> Self {
+        self.index = index
         return self
     }
     
-    func set(type: String) -> GetRequestBuilder {
-        if let request = self.request as? GetRequest {
-            request.set(type: type)
-        }
+    func set(type: String) -> Self {
+        self.type = type
         return self
     }
     
-    func set(id: String) -> GetRequestBuilder {
-        if let request = self.request as? GetRequest {
-            request.set(id: id)
-        }
+    func set(id: String) -> Self {
+        self.id = id
         return self
     }
+    
+    func set(completionHandler: @escaping (_ response: GetResponse<T>?, _ error: Error?) -> Void) -> Self {
+        self.completionHandler = completionHandler
+        return self
+    }
+    
+    public func build() -> Request {
+        return GetRequest<T>(withBuilder: self)
+    }
+    
+    
 }
 
-public class GetRequest: ESRequest {
+public class GetRequest<T: Codable>: Request {
     
-    init() {
-        super.init(method: .GET)
+    let client: ESClient
+    let completionHandler: ((_ response: GetResponse<T>?, _ error: Error?) -> Void)
+    var index: String?
+    var type: String?
+    var id: String?
+    
+    public var method: HTTPMethod = .GET
+    
+    init(withBuilder builder: GetRequestBuilder<T>) {
+        self.client = builder.client
+        self.completionHandler = builder.completionHandler!
+        self.index = builder.index
+        self.type = builder.type
+        self.id =  builder.id
     }
     
-    override func makeEndPoint() -> String {
+    public func execute() -> Void {
+        self.client.execute(request: self, completionHandler: responseHandler)
+    }
+    
+    func makeEndPoint() -> String {
         return self.index! + "/" + self.type! + "/" + self.id!
+    }
+    
+    public var endPoint: String {
+        get {
+            return self.makeEndPoint()
+        }
+    }
+    
+    public var body: Data {
+        get {
+            return Data()
+        }
+    }
+    
+    func responseHandler(_ response: ESResponse) -> Void {
+        if let error = response.error {
+            return completionHandler(nil, error)
+        }
+        do {
+            let decoded: GetResponse<T>? = try Serializers.decode(data: response.data!)
+            if let decoded = decoded {
+                return completionHandler(decoded, nil)
+            } else {
+                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
+                if let decoded = decodedError {
+                    return completionHandler(nil, decoded)
+                }
+            }
+        } catch {
+            return completionHandler(nil, error)
+        }
     }
 }

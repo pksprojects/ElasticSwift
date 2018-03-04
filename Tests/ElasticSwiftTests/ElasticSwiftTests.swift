@@ -9,6 +9,10 @@ class ElasticSwiftTests: XCTestCase {
     override func setUp() {
         super.setUp()
         self.client = RestClient()
+//        let cred = ClientCredential(username: "elastic", password: "elastic")
+//        let ssl = SSLConfiguration(certPath: "/usr/local/Cellar/kibana/6.1.2/config/certs/elastic-certificates.der", isSelf: true)
+//        let settings = Settings(forHosts: ["https://localhost:9200"], withCredentials: cred, withSSL: true, sslConfig: ssl)
+//        self.client = RestClient(settings: settings)
     }
     
     func testPlay() {
@@ -31,105 +35,180 @@ class ElasticSwiftTests: XCTestCase {
     }
     
     func testCreateIndex() {
-        func handler(_ response: ESResponse) -> Void {
-            print(String(data: response.data!, encoding: .utf8 )!)
+        func handler(_ response: CreateIndexResponse?, _ error: Error?) -> Void {
+            if let error = error {
+                print("Error", error)
+                return
+            }
+            print(response?.acknowledged as Any)
         }
-        let requestBuilder = self.client?.admin.indices().create()
+        let request = self.client?.admin.indices().create()
             .set(name: "test")
             .set(completionHandler: handler)
-        requestBuilder?.execute()
+            .build()
+        request?.execute()
         sleep(1)
     }
     
-    func testGetIndex() {
-        func handler(_ response: ESResponse) -> Void {
-            print(String(data: response.data!, encoding: .utf8 )!)
+    func testGetIndex() throws {
+        func handler(_ response: GetIndexResponse?, _ error: Error?) -> Void {
+            if let error = error {
+                print("Error", error)
+                return
+            }
+            print(response?.settings as Any)
         }
-        let requestBuilder = self.client?.admin.indices().get()
+        let request = try self.client?.admin.indices().get()
             .set(name: "test")
             .set(completionHandler: handler)
-        requestBuilder?.execute()
+            .build()
+        request?.execute()
         sleep(1)
     }
     
-    func testIndex() {
-        func handler(_ response: ESResponse) -> Void {
-            print(String(data: response.data!, encoding: .utf8 )!)
+    func testIndex() throws {
+        func handler(_ response: IndexResponse?, _ error:  Error?) -> Void {
+            if let error = error {
+                print(error)
+            }
+            if let response = response {
+                print("Found", response.result!)
+            }
         }
-        var body: String = "{}"
-        if let json = try? JSONSerialization.data(withJSONObject: ["msg": "test1"], options: []) {
-            body = String(data: json, encoding: .utf8)!
-        }
-        print("Body: ", body)
-        let requestBuilder = self.client?.prepareIndex()
+        let msg = Message()
+        msg.msg = "Test Message"
+        let request = try self.client?.makeIndex()
             .set(index: "test")
             .set(type: "msg")
-            .set(id: "1")
-            .set(source: body)
+            .set(id: "0")
+            .set(source: msg)
             .set(completionHandler: handler)
-        requestBuilder?.execute()
-        let requestBuilder2 = self.client?.prepareIndex()
-            .set(index: "test")
-            .set(type: "msg")
-            .set(id: "2")
-            .set(source: body)
-            .set(completionHandler: handler)
-        requestBuilder2?.execute()
+            .build()
+        
+        request?.execute()
         sleep(1)
     }
     
-    func testGet() {
-        func handler(_ response: ESResponse) -> Void {
-            print(String(data: response.data!, encoding: .utf8 )!)
+    func testIndexNoId() throws {
+        func handler(_ response: IndexResponse?, _ error:  Error?) -> Void {
+            if let error = error {
+                print(error)
+            }
+            if let response = response {
+                print("Found", response.result!)
+            }
         }
-        let requestBuilder = self.client?.prepareGet()
+        let msg = Message()
+        msg.msg = "Test Message No Id"
+        let request = try self.client?.makeIndex()
             .set(index: "test")
             .set(type: "msg")
-            .set(id: "2")
+            .set(source: msg)
             .set(completionHandler: handler)
-        requestBuilder?.execute()
+            .build()
+        
+        request?.execute()
         sleep(1)
     }
     
-    func testDelete() {
-        func handler(_ response: ESResponse) -> Void {
-            print(String(data: response.data!, encoding: .utf8 )!)
-            print(response.httpResponse!)
+    func testGet() throws {
+        
+        try testIndex()
+        
+        func handler(_ response: GetResponse<Message>?, _ error: Error?) -> Void {
+            if let error = error {
+                print(error)
+            }
+            if let response = response {
+                print("Found", response.found!)
+            }
         }
-        let requestBuilder = self.client?.prepareDelete()
+        
+        let request = self.client?.makeGet()
             .set(index: "test")
             .set(type: "msg")
-            .set(id: "2")
+            .set(id: "0")
             .set(completionHandler: handler)
-        requestBuilder?.execute()
+            .build()
+        
+        request?.execute()
         sleep(1)
     }
     
-    func testSearch() {
-        func handler(_ response: ESResponse) -> Void {
-            print(String(data: response.data!, encoding: .utf8 )!)
-            print(response.httpResponse!)
+    func testDelete() throws {
+        func handler(_ response: IndexResponse?, _ error:  Error?) -> Void {
+            if let error = error {
+                print(error)
+            }
+            if let response = response {
+                print("Found", response.result!)
+            }
+        }
+        let msg = Message()
+        msg.msg = "Test Message"
+        let request = try self.client?.makeIndex()
+            .set(index: "test")
+            .set(type: "msg")
+            .set(id: "0")
+            .set(source: msg)
+            .set(completionHandler: handler)
+            .build()
+
+        request?.execute()
+        sleep(1)
+        func handler1(_ response: DeleteResponse?, _ error:  Error?) -> Void {
+            if let error = error {
+                print(error)
+            }
+            if let response = response {
+                print("Found", response.result!)
+            }
+        }
+        let request1 = self.client?.makeDelete()
+            .set(index: "test")
+            .set(type: "msg")
+            .set(id: "0")
+            .set(completionHandler: handler1)
+            .build()
+        
+        request1?.execute()
+        sleep(1)
+    }
+    
+    func testSearch() throws {
+        func handler(_ response: SearchResponse<Message>?, _ error: Error?) -> Void {
+            if let error = error {
+                print("Error", error)
+                return
+            }
+            print(response?.hits as Any)
         }
         let builder = QueryBuilders.boolQuery()
-        let match = QueryBuilders.matchQuery().match(field: "msg", value: "test1")
+        let match = QueryBuilders.matchQuery().match(field: "play_name", value: "Henry IV")
         builder.must(query: match)
-        let requestBuilder = self.client?.prepareSearch()
-            .set(index: "test")
-            .set(type: "msg")
-            .set(builder: builder)
+        let request = try self.client?.makeSearch()
+            .set(indices: "shakespeare")
+            .set(types: "doc")
+            .set(query: builder.query)
             .set(completionHandler: handler)
-        requestBuilder?.execute()
+            .build()
+        request?.execute()
         sleep(1)
     }
     
-    func testDeleteIndex() {
-        func handler(_ response: ESResponse) -> Void {
-            print(String(data: response.data!, encoding: .utf8 )!)
+    func testDeleteIndex() throws {
+        func handler(_ response: DeleteIndexResponse?, _ error: Error?) -> Void {
+            if let error = error {
+                print("Error", error)
+                return
+            }
+            print(response?.acknowledged as Any)
         }
-        let requestBuilder = self.client?.admin.indices().delete()
+        let request = try self.client?.admin.indices().delete()
             .set(name: "test")
             .set(completionHandler: handler)
-        requestBuilder?.execute()
+            .build()
+        request?.execute()
         sleep(1)
     }
 
@@ -140,8 +219,17 @@ class ElasticSwiftTests: XCTestCase {
         ("testCreateIndex", testCreateIndex),
         ("testGetIndex", testGetIndex),
         ("testIndex", testIndex),
+        ("testIndexNoId", testIndexNoId),
         ("testGet", testGet),
         ("testDelete", testDelete),
         ("testDeleteIndex", testDeleteIndex)
     ]
+}
+
+class Message: Codable {
+    var msg: String?
+    
+    init() {
+        
+    }
 }
