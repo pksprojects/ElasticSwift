@@ -8,85 +8,34 @@
 
 import Foundation
 
-public class ESRequest {
+public protocol Request {
     
-    var index: String?
-    var type: String?
-    var id: String?
-    var source: String?
-    var method: HTTPMethod = .GET
+    var method: HTTPMethod { get }
     
-    init(method: HTTPMethod) {
-        self.method = method
-    }
+    var endPoint: String { get }
     
-    func set(index: String) -> Void {
-        self.index = index
-    }
+    var body: Data { get }
     
-    func set(type: String) -> Void {
-        self.type = type
-    }
+    func execute() -> Void
     
-    func set(id: String) -> Void {
-        self.id = id
-    }
+}
+
+public class Response<T: Codable> {
     
-    func set(source: String) -> Void {
-        self.source = source
-    }
+    public let data: T?
+    public let httpResponse: URLResponse?
+    public let error: Error?
     
-    func makeEndPoint() -> String {
-        preconditionFailure("This method must be overridden")
-    }
-    
-    func makeBody() -> [String: Any] {
-        preconditionFailure("This method must be overridden")
-    }
-    
-    var endPoint: String {
-        get {
-            return self.makeEndPoint()
-        }
-    }
-    
-    var body: String {
-        get {
-            if let req = self as? SearchRequest {
-                if let json = try? JSONSerialization.data(withJSONObject: req.makeBody(), options: []) {
-                    return String(data: json, encoding: .utf8)!
-                }
-                else {
-                    return "{}"
-                }
-            }
-            if let req = self as? IndexRequest {
-                return req.source!
-            }
-            return ""
-        }
+    init(data: T? ,httpResponse: URLResponse?, error: Error?) {
+        self.data = data
+        self.httpResponse = httpResponse
+        self.error = error
     }
 }
 
 
-public class ESRequestBuilder {
+public protocol RequestBuilder {
     
-    var request: ESRequest
-    var client: ESClient
-    public var completionHandler: ((_ response: ESResponse) -> Void)?
-    
-    init(_ request: ESRequest, withClient client: ESClient) {
-        self.client = client
-        self.request = request
-    }
-    
-    public func set(completionHandler: @escaping (_ response: ESResponse) -> Void) -> ESRequestBuilder {
-        self.completionHandler = completionHandler
-        return self
-    }
-    
-    public func execute() {
-        self.client.execute(request: self.request, completionHandler: self.completionHandler!)
-    }
-    
+    func build() throws -> Request
 }
+

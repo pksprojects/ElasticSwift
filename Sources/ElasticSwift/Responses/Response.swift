@@ -21,41 +21,128 @@ public class ESResponse {
     }
 }
 
-public struct GetResponse{//: Codable {
-    public let index: String
-    public let type: String
-    public let id: String
-    public let version: Int
-    public let found: Bool
-    public let source: AnyObject
-}
-
-public struct SearchResponse {
+public class GetResponse<T: Codable>: Codable {
     
-    public let took: Int? = 0
-    public let timedOut: Bool?
-    public let shards: Shard?
-    public let hits: Hits?
+    public var index: String?
+    public var type: String?
+    public var id: String?
+    public var version: Int?
+    public var found: Bool?
     
-    public struct Shard {
-        public let total: Int
-        public let successful: Int32
-        public let final: Int32
+    public var source: T?
+    
+    init() {
+        
     }
     
-    public struct Hits {
-        public let total: Int
-        public let maxScore: Double
-        public let hits: [SearchHit]
+    enum CodingKeys: String, CodingKey {
+        case index = "_index"
+        case type = "_type"
+        case id = "_id"
+        case version = "_version"
+        case source = "_source"
+        
+        case found
     }
 }
 
-public struct SearchHit {
+public class IndexResponse: Codable {
     
-    public let index: String
-    public let type: String
-    public let id: String
-    public let score: Double
-    public let source: AnyObject
+    public var shards: Shards?
+    public var index: String?
+    public var type: String?
+    public var id: String?
+    public var version: Int?
+    public var seqNumber: Int?
+    public var primaryTerm: Int?
+    public var result: String?
     
+    init() {
+        
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case shards = "_shards"
+        case index = "_index"
+        case type = "_type"
+        case id = "_id"
+        case version = "_version"
+        case seqNumber = "_seq_no"
+        case primaryTerm = "_primary_term"
+        case result
+    }
+}
+
+public class SearchResponse<T: Codable>: Codable {
+    
+    public var took: Int?
+    public var timedOut: Bool?
+    public var shards: Shards?
+    public var hits: Hits<T>?
+    
+    init() {
+        
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case took
+        case timedOut = "timed_out"
+        case shards = "_shards"
+        case hits
+    }
+}
+
+public class Shards: Codable {
+    
+    public var total: Int?
+    public var successful: Int?
+    public var skipped: Int?
+    public var failed: Int?
+    
+    init() {
+        
+    }
+    
+}
+
+
+public class Hits<T: Codable>: Codable {
+    
+    public var total: Int?
+    public var maxScore: Double?
+    public var hits: [SearchHit<T>] = []
+    
+    init() {
+        
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case total
+        case maxScore = "max_score"
+        case hits
+    }
+    
+}
+
+
+public class SearchHit<T: Codable>: Codable {
+    
+    public var index: String?
+    public var type: String?
+    public var id: String?
+    public var score: Double?
+    public var source: T?
+    
+    
+    init() {
+        
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case index = "_index"
+        case type = "_type"
+        case id = "_id"
+        case score = "_score"
+        case source = "_source"
+    }
 }
