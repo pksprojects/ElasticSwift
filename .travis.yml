@@ -1,5 +1,5 @@
 language: objective-c
-osx_image: xcode9.1
+osx_image: xcode9.2
 xcode_project: ElasticSwift.xcodeproj
 xcode_scheme: ElasticSwiftTests
 before_install:
