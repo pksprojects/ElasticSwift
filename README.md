@@ -53,7 +53,7 @@ platform :ios, '10.0'
 use_frameworks!
 
 target '<Your Target Name>' do
-    pod 'ElasticSwift', '~> 1.0.0-alpha.1'
+    pod 'ElasticSwift', '~> 1.0.0-alpha.2'
 end
 ```
 
@@ -71,7 +71,7 @@ Once you have your Swift package set up, adding ElasticSwift as a dependency is 
 
 ```swift
 dependencies: [
-    .Package(url: "https://github.com/pksprojects/ElasticSwift.git", "1.0.0-alpha.1")
+    .Package(url: "https://github.com/pksprojects/ElasticSwift.git", "1.0.0-alpha.2")
 ]
 ```
 
@@ -96,11 +96,21 @@ Creating `Settings` for specified host.
 ```swift
 
 // with host address as string
-var settings = Settings(forHost: "http://eamplehost:port")
+var settings = Settings(forHost: "http://samplehost:port")
 
 // with host address
-var host = Host(string: "http://eamplehost:port")
+var host = Host(string: "http://samplehost:port")
 var settings = Settings(forHost: host)
+
+```
+
+```swift
+
+let cred = ClientCredential(username: "elastic", password: "elastic")
+let certPath = "/path/to/certificate.der"
+let sslConfig = SSLConfiguration(certPath: certPath, isSelf: true)
+let settings = Settings(forHosts: ["https://samplehost:port"], withCredentials: cred, withSSL: true, sslConfig: sslConfig)
+let client = RestClient(settings: settings)
 
 ```
 
@@ -111,21 +121,37 @@ When creating default settings it creates settings for `http://localhost:9200`.
 Create and Delete Index
 
 ```swift
-func handler(_ response: ESResponse) -> Void {
-  print(String(data: response.data!, encoding: .utf8 )!)
+func createHandler(_ response: CreateIndexResponse?, _ error: Error?) -> Void {
+    if let error = error {
+      print("Error", error)
+    }
+    if let response = response {
+        print("Response", response)
+    }
 }
 
 // creating index
-let createIndexRequestBuilder = client.admin.indices().create()
-            .set(name: "IndexName")
-            .set(completionHandler: handler)
-createIndexRequestBuilder.execute() // executes request
+let createRequest = self.client?.admin.indices().create()
+            .set(name: "indexName")
+            .set(completionHandler: createHandler)
+            .build()
+createRequest?.execute() // executes request
 
 // delete index
-let createIndexRequestBuilder = client.admin.indices().delete()
-            .set(name: "IndexName")
-            .set(completionHandler: handler)
-createIndexRequestBuilder.execute() // executes request
+func deleteHandler(_ response: DeleteIndexResponse?, _ error: Error?) -> Void {
+    if let error = error {
+        print("Error", error)
+    }
+    if let response = response {
+        print("Response", response)
+    }
+}
+
+let deleteRequest = try self.client?.admin.indices().delete()
+    .set(name: "indexName")
+    .set(completionHandler: deleteHandler)
+    .build()
+deleteRequest?.execute() // executes request
 
 ```
 
@@ -134,36 +160,70 @@ createIndexRequestBuilder.execute() // executes request
 Document CRUD
 
 ```swift
-func handler(_ response: ESResponse) -> Void {
-  print(String(data: response.data!, encoding: .utf8 )!)
+class MyClass: Codable {
+  var myField: String?
 }
 
-let body: String = JSON(["test": "test"]).rawString()!
-
 // index document
-let indexRequestBuilder = client.prepareIndex()
-            .set(index: "IndexName")
-            .set(type: "type")
-            .set(id: "id")
-            .set(source: body)
-            .set(completionHandler: handler)
-indexRequestBuilder.execute()
+func indexHandler(_ response: IndexResponse?, _ error:  Error?) -> Void {
+    if let error = error {
+        print(error)
+    }
+    if let response = response {
+        print("Response", response)
+    }
+}
+
+let mySource = MyClass()
+mySource.myField = "My value"
+
+let indexRequest = try self.client?.makeIndex()
+    .set(index: "indexName")
+    .set(type: "type")
+    .set(id: "id")
+    .set(source: mySource)
+    .set(completionHandler: indexHandler)
+    .build()
+
+indexRequest?.execute()
 
 // get document
-let getRequestBuilder = client.prepareGet()
-            .set(index: "IndexName")
-            .set(type: "type")
-            .set(id: "id")
-            .set(completionHandler: handler)
-getRequestBuilder.execute()
+func getHandler(_ response: GetResponse<MyClass>?, _ error: Error?) -> Void {
+    if let error = error {
+        print(error)
+    }
+    if let response = response {
+        print("Response", response)
+    }
+}
+
+let getRequest = self.client?.makeGet()
+    .set(index: "indexName")
+    .set(type: "type")
+    .set(id: "id")
+    .set(completionHandler: getHandler)
+    .build()
+
+getRequest?.execute()
 
 // delete document
-let deleteRequestBuilder = client.prepareDelete()
-            .set(index: "IndexName")
-            .set(type: "type")
-            .set(id: "id")
-            .set(completionHandler: handler)
-deleteRequestBuilder.execute()
+func deleteHandler(_ response: DeleteResponse?, _ error:  Error?) -> Void {
+    if let error = error {
+        print(error)
+    }
+    if let response = response {
+        print("Response", response)
+    }
+}
+
+let deleteRequest = self.client?.makeDelete()
+    .set(index: "indexName")
+    .set(type: "type")
+    .set(id: "id")
+    .set(completionHandler: deleteHandler)
+    .build()
+
+deleteRequest?.execute()
 
 ```
 
@@ -177,7 +237,7 @@ let builder = QueryBuilders.boolQuery()
 let mustMatch = QueryBuilders.matchQuery().match(field: "fieldName", value: "value")
 let mustNotMatch = QueryBuilders.matchQuery().match(field: "fieldName", value: "value")
 builder.must(query: mustMatch)
-builder.mustNot(query: match)
+builder.mustNot(query: mustNotMatch)
 
 ```
 
@@ -187,18 +247,24 @@ Creating simple search request.
 
 ```swift
 
-func handler(_ response: ESResponse) -> Void {
-  print(String(data: response.data!, encoding: .utf8 )!)
-  print(response.httpResponse!)
+func handler(_ response: SearchResponse<MyClass>?, _ error: Error?) -> Void {
+    if let error = error {
+        print("Error", error)
+        return
+    }
+    print(response?.hits as Any)
 }
+
 let builder = QueryBuilders.boolQuery()
-let match = QueryBuilders.matchQuery().match(field: "fieldName", value: "value")
+let match = QueryBuilders.matchQuery().match(field: "myField", value: "MySearchValue")
 builder.must(query: match)
-let requestBuilder = client.prepareSearch()
-            .set(index: "IndexName")
-            .set(type: "type")
-            .set(builder: builder)
-            .set(completionHandler: handler)
-requestBuilder.execute()
+
+let request = try self.client?.makeSearch()
+    .set(indices: "indexName")
+    .set(types: "type")
+    .set(query: builder.query)
+    .set(completionHandler: handler)
+    .build()
+request?.execute()
 
 ```

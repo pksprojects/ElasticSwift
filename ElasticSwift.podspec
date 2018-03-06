@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "ElasticSwift"
-  s.version      = "1.0.0-alpha.1"
+  s.version      = "1.0.0-alpha.2"
   s.summary      = "Elasticsearch client in native swift"
   s.description  = "ElasticSwift allows you to bring prower of elasticsearch in your apps on macOS, iOS, tvOS, watchOS and linux."
 
@@ -15,6 +15,6 @@ Pod::Spec.new do |s|
   s.watchos.deployment_target = "3.0"
   s.tvos.deployment_target = "10.0"
   
-  s.source_files = 'Sources/*.swift'
+  s.source_files = 'Sources/ElasticSwift/**/*.swift'
 
 end
