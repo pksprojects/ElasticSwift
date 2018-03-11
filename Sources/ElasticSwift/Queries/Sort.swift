@@ -11,11 +11,11 @@ import Foundation
 
 public final class SortBuilders {
     
-    public func scoreSort() -> ScoreSortBuilder {
+    public static func scoreSort() -> ScoreSortBuilder {
         return ScoreSortBuilder()
     }
     
-    public func fieldSort(_ field: String) -> FieldSortBuilder {
+    public static func fieldSort(_ field: String) -> FieldSortBuilder {
         return FieldSortBuilder(field)
     }
 }
