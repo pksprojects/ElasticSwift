@@ -21,27 +21,27 @@ public class DeleteRequestBuilder: RequestBuilder {
         self.client = client
     }
     
-    func set(index: String) -> Self {
+    public func set(index: String) -> Self {
         self.index = index
         return self
     }
     
-    func set(type: String) -> Self {
+    public func set(type: String) -> Self {
         self.type = type
         return self
     }
     
-    func set(id: String) -> Self {
+    public func set(id: String) -> Self {
         self.id = id
         return self
     }
     
-    func set(version: Int) -> Self {
+    public func set(version: Int) -> Self {
         self.version = version
         return self
     }
     
-    func set(completionHandler: @escaping (DeleteResponse?, Error?) -> Void) -> Self {
+    public func set(completionHandler: @escaping (DeleteResponse?, Error?) -> Void) -> Self {
         self.completionHandler = completionHandler
         return self
     }

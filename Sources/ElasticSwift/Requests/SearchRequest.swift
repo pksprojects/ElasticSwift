@@ -26,52 +26,52 @@ public class SearchRequestBuilder<T: Codable>: RequestBuilder {
         self.client = client
     }
     
-    func set(indices: String...) -> Self {
+    public func set(indices: String...) -> Self {
         self.index = indices.flatMap({$0}).joined(separator: ",")
         return self
     }
     
-    func set(types: String...) -> Self {
+    public func set(types: String...) -> Self {
         self.type = types.flatMap({$0}).joined(separator: ",")
         return self
     }
     
-    func set(from: Int16) -> Self {
+    public func set(from: Int16) -> Self {
         self.from = from
         return self
     }
     
-    func set(size: Int16) -> Self {
+    public func set(size: Int16) -> Self {
         self.size = size
         return self
     }
     
-    func set(query: Query) -> Self {
+    public func set(query: Query) -> Self {
         self.query = query
         return self
     }
     
-    func set(sort: Sort) -> Self {
+    public func set(sort: Sort) -> Self {
         self.sort = sort
         return self
     }
     
-    func fetchSource(_ fetchSource: Bool) -> Self {
+    public func fetchSource(_ fetchSource: Bool) -> Self {
         self.fetchSource = fetchSource
         return self
     }
     
-    func explain(_ explain: Bool) -> Self {
+    public func explain(_ explain: Bool) -> Self {
         self.explain = explain
         return self
     }
     
-    func set(minScore: Float) -> Self {
+    public func set(minScore: Float) -> Self {
         self.minScore = minScore
         return self
     }
     
-    func set(completionHandler: @escaping (_ response: SearchResponse<T>?, _ error: Error?) -> Void) -> Self {
+    public func set(completionHandler: @escaping (_ response: SearchResponse<T>?, _ error: Error?) -> Void) -> Self {
         self.completionHandler = completionHandler
         return self
     }

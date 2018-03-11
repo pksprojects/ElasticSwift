@@ -20,12 +20,12 @@ public class CreateIndexRequestBuilder: RequestBuilder {
         self.client = client
     }
     
-    func set(name: String) -> Self {
+    public func set(name: String) -> Self {
         self.name = name
         return self
     }
     
-    func set(completionHandler: @escaping (_ response: CreateIndexResponse?, _ error: Error?) -> Void) -> Self {
+    public func set(completionHandler: @escaping (_ response: CreateIndexResponse?, _ error: Error?) -> Void) -> Self {
         self.completionHandler = completionHandler
         return self
     }
@@ -45,12 +45,12 @@ public class DeleteIndexRequestBuilder: RequestBuilder {
         self.client = client
     }
     
-    func set(name: String) -> Self {
+    public func set(name: String) -> Self {
         self.name = name
         return self
     }
     
-    func set(completionHandler: @escaping (_ response: DeleteIndexResponse?, _ error: Error?) -> Void) -> Self {
+    public func set(completionHandler: @escaping (_ response: DeleteIndexResponse?, _ error: Error?) -> Void) -> Self {
         self.completionHandler = completionHandler
         return self
     }
@@ -70,12 +70,12 @@ public class GetIndexRequestBuilder: RequestBuilder {
         self.client = client
     }
     
-    func set(name: String) -> Self {
+    public func set(name: String) -> Self {
         self.name = name
         return self
     }
     
-    func set(completionHandler: @escaping (_ response: GetIndexResponse?, _ error: Error?) -> Void) -> Self {
+    public func set(completionHandler: @escaping (_ response: GetIndexResponse?, _ error: Error?) -> Void) -> Self {
         self.completionHandler = completionHandler
         return self
     }
@@ -289,9 +289,9 @@ class DeleteIndexRequest: Request {
 
 public class CreateIndexResponse: Codable {
     
-    let acknowledged: Bool
-    let shardsAcknowledged: Bool
-    let index: String
+    public let acknowledged: Bool
+    public let shardsAcknowledged: Bool
+    public let index: String
     
     init(acknowledged: Bool, shardsAcknowledged: Bool, index: String) {
         self.acknowledged = acknowledged
@@ -309,9 +309,9 @@ public class CreateIndexResponse: Codable {
 
 public class GetIndexResponse: Codable {
     
-    let aliases: [String: String]
-    let mappings: [String: String]
-    let settings: IndexSettings
+    public let aliases: [String: String]
+    public let mappings: [String: String]
+    public let settings: IndexSettings
     
     init(aliases: [String: String]=[:], mappings: [String: String]=[:], settings: IndexSettings) {
         self.aliases = aliases
@@ -322,7 +322,7 @@ public class GetIndexResponse: Codable {
 
 public class DeleteIndexResponse: Codable {
     
-    let acknowledged: Bool
+    public let acknowledged: Bool
     
     init(acknowledged: Bool) {
         self.acknowledged = acknowledged
@@ -331,12 +331,12 @@ public class DeleteIndexResponse: Codable {
 
 public class IndexSettings: Codable {
     
-    let creationDate: Date
-    let numberOfShards: String
-    let numberOfReplicas: String
-    let uuid: String
-    let providedName: String
-    let version: IndexVersion
+    public let creationDate: Date
+    public let numberOfShards: String
+    public let numberOfReplicas: String
+    public let uuid: String
+    public let providedName: String
+    public let version: IndexVersion
     
     init(creationDate: Date, numberOfShards: String, numberOfReplicas: String, uuid: String, providedName: String, version: IndexVersion) {
         self.creationDate = creationDate
@@ -359,7 +359,7 @@ public class IndexSettings: Codable {
 }
 
 public class IndexVersion: Codable {
-    let created: String
+    public let created: String
     
     init(created: String) {
         self.created = created
