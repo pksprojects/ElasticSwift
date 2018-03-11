@@ -11,16 +11,12 @@ import Foundation
 
 public final class SortBuilders {
     
-    func scoreSort() -> ScoreSortBuilder {
+    public static func scoreSort() -> ScoreSortBuilder {
         return ScoreSortBuilder()
     }
     
-    func fieldSort(_ field: String) -> FieldSortBuilder {
+    public static func fieldSort(_ field: String) -> FieldSortBuilder {
         return FieldSortBuilder(field)
-    }
-    
-    func geoSort(field: String, latitute: Double, longitute: Double) -> GeoDistanceSortBuilder {
-        return GeoDistanceSortBuilder()
     }
 }
 
@@ -32,12 +28,12 @@ public class ScoreSortBuilder: SortBuilder {
         self.sort = Sort(field: "_score")
     }
     
-    func set(order: SortOrder) -> ScoreSortBuilder {
+    public func set(order: SortOrder) -> ScoreSortBuilder {
         self.sort.sortOrder = order
         return self
     }
     
-    func build() -> Sort {
+    public func build() -> Sort {
         return self.sort
     }
 
@@ -50,25 +46,21 @@ public class FieldSortBuilder: SortBuilder {
         self.sort = Sort(field: field)
     }
     
-    func set(order: SortOrder) -> FieldSortBuilder {
+    public func set(order: SortOrder) -> FieldSortBuilder {
         self.sort.sortOrder = order
         return self
     }
     
-    func set(mode: SortMode) -> FieldSortBuilder {
+    public func set(mode: SortMode) -> FieldSortBuilder {
         self.sort.mode = mode
         self.sort.fieldTypeisArray = true
         return self
     }
     
-    func build() -> Sort {
+    public func build() -> Sort {
         return self.sort
     }
 
-}
-
-class GeoDistanceSortBuilder {
-    
 }
 
 protocol SortBuilder {

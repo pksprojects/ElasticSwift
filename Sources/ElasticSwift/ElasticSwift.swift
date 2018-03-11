@@ -7,7 +7,7 @@ public class RestClient: ESClient {
     
     let admin: Admin
     
-    init(settings: Settings) {
+    public init(settings: Settings) {
         self.admin = Admin(hosts: settings.hosts, credentials: settings.credentials, sslConfig: settings.sslConfig)
         super.init(hosts: settings.hosts, credentials: settings.credentials, sslConfig: settings.sslConfig)
     }
@@ -84,7 +84,7 @@ public class ClientCredential {
     let username: String
     let password: String
     
-    init(username: String, password: String) {
+    public init(username: String, password: String) {
         self.username = username
         self.password = password
     }
@@ -96,7 +96,7 @@ public class SSLConfiguration {
     let certPath: String
     let isSelfSigned: Bool
     
-    init(certPath: String, isSelf isSelfSigned: Bool) {
+    public init(certPath: String, isSelf isSelfSigned: Bool) {
         self.certPath = certPath
         self.isSelfSigned = isSelfSigned
     }

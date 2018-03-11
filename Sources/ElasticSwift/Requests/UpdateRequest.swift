@@ -19,17 +19,17 @@ public class UpdateRequestBuilder: RequestBuilder {
         self.client = client
     }
     
-    func set(index: String) -> Self {
+    public func set(index: String) -> Self {
         self.index = index
         return self
     }
     
-    func set(type: String) -> Self {
+    public func set(type: String) -> Self {
         self.type = type
         return self
     }
     
-    func set(id: String) -> Self {
+    public func set(id: String) -> Self {
         self.id = id
         return self
     }

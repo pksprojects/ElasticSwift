@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "ElasticSwift"
-  s.version      = "1.0.0-alpha.2"
+  s.version      = "1.0.0-alpha.4"
   s.summary      = "Elasticsearch client in native swift"
   s.description  = "ElasticSwift allows you to bring prower of elasticsearch in your apps on macOS, iOS, tvOS, watchOS and linux."
 
