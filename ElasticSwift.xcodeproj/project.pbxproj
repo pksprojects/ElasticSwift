@@ -21,15 +21,28 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		0601C37E208C9597001FADB3 /* MatchAllQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0601C37D208C9597001FADB3 /* MatchAllQuery.swift */; };
+		0621AEE62082AD900069F6C4 /* TermLevelQueries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0621AEE52082AD900069F6C4 /* TermLevelQueries.swift */; };
+		0621AEE82082B3920069F6C4 /* TermLevelQueryBuilders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0621AEE72082B3920069F6C4 /* TermLevelQueryBuilders.swift */; };
+		0621AEEA2082CC030069F6C4 /* CompoundQuries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0621AEE92082CC030069F6C4 /* CompoundQuries.swift */; };
+		0621AEEC2082CCAA0069F6C4 /* CompoundQueryBuilders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0621AEEB2082CCAA0069F6C4 /* CompoundQueryBuilders.swift */; };
+		0621AEEE2082D0530069F6C4 /* JoiningQueries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0621AEED2082D0530069F6C4 /* JoiningQueries.swift */; };
+		0621AEF02082D0F20069F6C4 /* JoiningQueryBuilders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0621AEEF2082D0F20069F6C4 /* JoiningQueryBuilders.swift */; };
+		0621AEF22082D6A50069F6C4 /* GeoQueries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0621AEF12082D6A50069F6C4 /* GeoQueries.swift */; };
+		0621AEF42082D6CE0069F6C4 /* GeoQueryBuilders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0621AEF32082D6CE0069F6C4 /* GeoQueryBuilders.swift */; };
+		0621AEF62082DCD60069F6C4 /* SpecializedQuries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0621AEF52082DCD60069F6C4 /* SpecializedQuries.swift */; };
+		0621AEF82082DD200069F6C4 /* SpecializedQueryBuilders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0621AEF72082DD200069F6C4 /* SpecializedQueryBuilders.swift */; };
+		0621AEFA2082EC240069F6C4 /* SpanQueries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0621AEF92082EC240069F6C4 /* SpanQueries.swift */; };
+		0621AEFC2082ED310069F6C4 /* SpanQueryBuilders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0621AEFB2082ED310069F6C4 /* SpanQueryBuilders.swift */; };
+		06F93C7C20794B57000ACFC3 /* FullTextQueries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06F93C7B20794B57000ACFC3 /* FullTextQueries.swift */; };
 		OBJ_53 /* Admin.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_10 /* Admin.swift */; };
 		OBJ_54 /* Clusters.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* Clusters.swift */; };
 		OBJ_55 /* Indices.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_12 /* Indices.swift */; };
 		OBJ_56 /* ElasticSwift.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_13 /* ElasticSwift.swift */; };
 		OBJ_57 /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_15 /* Errors.swift */; };
 		OBJ_58 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_17 /* SessionManager.swift */; };
-		OBJ_59 /* Compound.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_20 /* Compound.swift */; };
-		OBJ_60 /* FullText.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_21 /* FullText.swift */; };
-		OBJ_61 /* MatchAll.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_22 /* MatchAll.swift */; };
+		OBJ_60 /* FullTextBuilders.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_21 /* FullTextBuilders.swift */; };
+		OBJ_61 /* MatchAllBuilders.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_22 /* MatchAllBuilders.swift */; };
 		OBJ_62 /* QueryBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_23 /* QueryBuilder.swift */; };
 		OBJ_63 /* QueryBuilders.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_24 /* QueryBuilders.swift */; };
 		OBJ_64 /* Query.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_25 /* Query.swift */; };
@@ -68,6 +81,20 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0601C37D208C9597001FADB3 /* MatchAllQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchAllQuery.swift; sourceTree = "<group>"; };
+		0621AEE52082AD900069F6C4 /* TermLevelQueries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermLevelQueries.swift; sourceTree = "<group>"; };
+		0621AEE72082B3920069F6C4 /* TermLevelQueryBuilders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermLevelQueryBuilders.swift; sourceTree = "<group>"; };
+		0621AEE92082CC030069F6C4 /* CompoundQuries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompoundQuries.swift; sourceTree = "<group>"; };
+		0621AEEB2082CCAA0069F6C4 /* CompoundQueryBuilders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompoundQueryBuilders.swift; sourceTree = "<group>"; };
+		0621AEED2082D0530069F6C4 /* JoiningQueries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoiningQueries.swift; sourceTree = "<group>"; };
+		0621AEEF2082D0F20069F6C4 /* JoiningQueryBuilders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoiningQueryBuilders.swift; sourceTree = "<group>"; };
+		0621AEF12082D6A50069F6C4 /* GeoQueries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoQueries.swift; sourceTree = "<group>"; };
+		0621AEF32082D6CE0069F6C4 /* GeoQueryBuilders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoQueryBuilders.swift; sourceTree = "<group>"; };
+		0621AEF52082DCD60069F6C4 /* SpecializedQuries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpecializedQuries.swift; sourceTree = "<group>"; };
+		0621AEF72082DD200069F6C4 /* SpecializedQueryBuilders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpecializedQueryBuilders.swift; sourceTree = "<group>"; };
+		0621AEF92082EC240069F6C4 /* SpanQueries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanQueries.swift; sourceTree = "<group>"; };
+		0621AEFB2082ED310069F6C4 /* SpanQueryBuilders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanQueryBuilders.swift; sourceTree = "<group>"; };
+		06F93C7B20794B57000ACFC3 /* FullTextQueries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullTextQueries.swift; sourceTree = "<group>"; };
 		"ElasticSwift::ElasticSwift::Product" /* ElasticSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ElasticSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"ElasticSwift::ElasticSwiftTests::Product" /* ElasticSwiftTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = ElasticSwiftTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		OBJ_10 /* Admin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Admin.swift; sourceTree = "<group>"; };
@@ -76,9 +103,8 @@
 		OBJ_13 /* ElasticSwift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElasticSwift.swift; sourceTree = "<group>"; };
 		OBJ_15 /* Errors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
 		OBJ_17 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
-		OBJ_20 /* Compound.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compound.swift; sourceTree = "<group>"; };
-		OBJ_21 /* FullText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullText.swift; sourceTree = "<group>"; };
-		OBJ_22 /* MatchAll.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchAll.swift; sourceTree = "<group>"; };
+		OBJ_21 /* FullTextBuilders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullTextBuilders.swift; sourceTree = "<group>"; };
+		OBJ_22 /* MatchAllBuilders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchAllBuilders.swift; sourceTree = "<group>"; };
 		OBJ_23 /* QueryBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryBuilder.swift; sourceTree = "<group>"; };
 		OBJ_24 /* QueryBuilders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryBuilders.swift; sourceTree = "<group>"; };
 		OBJ_25 /* Query.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Query.swift; sourceTree = "<group>"; };
@@ -139,6 +165,14 @@
 				OBJ_19 /* Builders */,
 				OBJ_25 /* Query.swift */,
 				OBJ_26 /* Sort.swift */,
+				06F93C7B20794B57000ACFC3 /* FullTextQueries.swift */,
+				0621AEE52082AD900069F6C4 /* TermLevelQueries.swift */,
+				0621AEE92082CC030069F6C4 /* CompoundQuries.swift */,
+				0621AEED2082D0530069F6C4 /* JoiningQueries.swift */,
+				0621AEF12082D6A50069F6C4 /* GeoQueries.swift */,
+				0621AEF52082DCD60069F6C4 /* SpecializedQuries.swift */,
+				0621AEF92082EC240069F6C4 /* SpanQueries.swift */,
+				0601C37D208C9597001FADB3 /* MatchAllQuery.swift */,
 			);
 			path = Queries;
 			sourceTree = "<group>";
@@ -146,11 +180,16 @@
 		OBJ_19 /* Builders */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_20 /* Compound.swift */,
-				OBJ_21 /* FullText.swift */,
-				OBJ_22 /* MatchAll.swift */,
+				OBJ_21 /* FullTextBuilders.swift */,
+				OBJ_22 /* MatchAllBuilders.swift */,
 				OBJ_23 /* QueryBuilder.swift */,
 				OBJ_24 /* QueryBuilders.swift */,
+				0621AEE72082B3920069F6C4 /* TermLevelQueryBuilders.swift */,
+				0621AEEB2082CCAA0069F6C4 /* CompoundQueryBuilders.swift */,
+				0621AEEF2082D0F20069F6C4 /* JoiningQueryBuilders.swift */,
+				0621AEF32082D6CE0069F6C4 /* GeoQueryBuilders.swift */,
+				0621AEF72082DD200069F6C4 /* SpecializedQueryBuilders.swift */,
+				0621AEFB2082ED310069F6C4 /* SpanQueryBuilders.swift */,
 			);
 			path = Builders;
 			sourceTree = "<group>";
@@ -219,7 +258,7 @@
 			name = Products;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -227,7 +266,6 @@
 				OBJ_42 /* Tests */,
 				OBJ_45 /* Products */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_7 /* Sources */ = {
@@ -331,7 +369,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_45 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -350,14 +388,17 @@
 			buildActionMask = 0;
 			files = (
 				OBJ_53 /* Admin.swift in Sources */,
+				0621AEE62082AD900069F6C4 /* TermLevelQueries.swift in Sources */,
 				OBJ_54 /* Clusters.swift in Sources */,
 				OBJ_55 /* Indices.swift in Sources */,
+				06F93C7C20794B57000ACFC3 /* FullTextQueries.swift in Sources */,
 				OBJ_56 /* ElasticSwift.swift in Sources */,
 				OBJ_57 /* Errors.swift in Sources */,
 				OBJ_58 /* SessionManager.swift in Sources */,
-				OBJ_59 /* Compound.swift in Sources */,
-				OBJ_60 /* FullText.swift in Sources */,
-				OBJ_61 /* MatchAll.swift in Sources */,
+				0621AEEA2082CC030069F6C4 /* CompoundQuries.swift in Sources */,
+				OBJ_60 /* FullTextBuilders.swift in Sources */,
+				OBJ_61 /* MatchAllBuilders.swift in Sources */,
+				0621AEE82082B3920069F6C4 /* TermLevelQueryBuilders.swift in Sources */,
 				OBJ_62 /* QueryBuilder.swift in Sources */,
 				OBJ_63 /* QueryBuilders.swift in Sources */,
 				OBJ_64 /* Query.swift in Sources */,
@@ -365,12 +406,22 @@
 				OBJ_66 /* DeleteRequest.swift in Sources */,
 				OBJ_67 /* GetRequest.swift in Sources */,
 				OBJ_68 /* IndexRequest.swift in Sources */,
+				0621AEFA2082EC240069F6C4 /* SpanQueries.swift in Sources */,
 				OBJ_69 /* IndicesRequests.swift in Sources */,
+				0621AEF22082D6A50069F6C4 /* GeoQueries.swift in Sources */,
+				0621AEEC2082CCAA0069F6C4 /* CompoundQueryBuilders.swift in Sources */,
+				0621AEF02082D0F20069F6C4 /* JoiningQueryBuilders.swift in Sources */,
 				OBJ_70 /* Request.swift in Sources */,
+				0621AEEE2082D0530069F6C4 /* JoiningQueries.swift in Sources */,
 				OBJ_71 /* SearchRequest.swift in Sources */,
+				0621AEF82082DD200069F6C4 /* SpecializedQueryBuilders.swift in Sources */,
+				0621AEFC2082ED310069F6C4 /* SpanQueryBuilders.swift in Sources */,
 				OBJ_72 /* UpdateRequest.swift in Sources */,
 				OBJ_73 /* Response.swift in Sources */,
+				0621AEF42082D6CE0069F6C4 /* GeoQueryBuilders.swift in Sources */,
+				0601C37E208C9597001FADB3 /* MatchAllQuery.swift in Sources */,
 				OBJ_74 /* Serialization.swift in Sources */,
+				0621AEF62082DCD60069F6C4 /* SpecializedQuries.swift in Sources */,
 				OBJ_75 /* Transport.swift in Sources */,
 				OBJ_76 /* Utils.swift in Sources */,
 			);

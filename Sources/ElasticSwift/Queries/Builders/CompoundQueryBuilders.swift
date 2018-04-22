@@ -1,13 +1,23 @@
 //
-//  Compound.swift
-//  ElasticSwiftPackageDescription
+//  CompoundQueryBuilders.swift
+//  ElasticSwift
 //
-//  Created by Prafull Kumar Soni on 4/7/18.
+//  Created by Prafull Kumar Soni on 4/14/18.
 //
 
 import Foundation
 
-/// Builder for Bool query.
+// MARK:- Constant Score Query Builder
+
+public class ConstantScoreQueryBuilder: QueryBuilder {
+    
+    public var query: Query {
+        return ConstantScoreQuery(withBuilder: self)
+    }
+    
+}
+
+// MARK:- Bool Query Builder
 
 public class BoolQueryBuilder: QueryBuilder {
     
@@ -25,25 +35,25 @@ public class BoolQueryBuilder: QueryBuilder {
     private var minimumShouldMatch: String = ""
     
     @discardableResult
-    public func must(query: QueryBuilder) -> BoolQueryBuilder {
+    public func must<T: QueryBuilder>(query: T) -> BoolQueryBuilder {
         self.mustClauses.append(query)
         return self
     }
     
     @discardableResult
-    public func mustNot(query: QueryBuilder) -> BoolQueryBuilder {
+    public func mustNot<T: QueryBuilder>(query: T) -> BoolQueryBuilder {
         self.mustNotClauses.append(query)
         return self
     }
     
     @discardableResult
-    public func filter(query: QueryBuilder) -> BoolQueryBuilder {
+    public func filter<T: QueryBuilder>(query: T) -> BoolQueryBuilder {
         self.filterClauses.append(query)
         return self
     }
     
     @discardableResult
-    public func should(query: QueryBuilder) -> BoolQueryBuilder {
+    public func should<T: QueryBuilder>(query: T) -> BoolQueryBuilder {
         self.shouldClauses.append(query)
         return self
     }
@@ -64,3 +74,32 @@ public class BoolQueryBuilder: QueryBuilder {
     }
 }
 
+// MARK:- Dis Max Query Builder
+
+public class DisMaxQueryBuilder: QueryBuilder {
+    
+    public var query: Query {
+        return DisMaxQuery(withBuilder: self)
+    }
+    
+}
+
+// MARK:- Function Score Query Builder
+
+public class FunctionScoreQueryBuilder: QueryBuilder {
+    
+    public var query: Query {
+        return FunctionScoreQuery(withBuilder: self)
+    }
+    
+}
+
+// MARK:- Boosting Query Builder
+
+public class BoostingQueryBuilder: QueryBuilder {
+    
+    public var query: Query {
+        return BoostingQuery(withBuilder: self)
+    }
+    
+}

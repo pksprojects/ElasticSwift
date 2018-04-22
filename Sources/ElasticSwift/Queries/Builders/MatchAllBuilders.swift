@@ -11,19 +11,27 @@ import Foundation
 
 public class MatchAllQueryBuilder: QueryBuilder {
     
-    private var _query: MatchAllQuery
-    
-    init() {
-        self._query = MatchAllQuery()
-    }
-    
-    public func set(boost: Float) -> Self {
-        return self
-    }
+    public var boost: Float?
     
     public var query: Query {
         get {
-            return self._query
+            return MatchAllQuery(withBuilder: self)
+        }
+    }
+    
+    public func set(boost: Float) -> Self {
+        self.boost = boost
+        return self
+    }
+}
+
+/// Builder for MatchAll query.
+
+public class MatchNoneQueryBuilder: QueryBuilder {
+    
+    public var query: Query {
+        get {
+            return MatchNoneQuery(withBuilder: self)
         }
     }
 }
