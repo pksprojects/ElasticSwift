@@ -69,33 +69,65 @@ class SessionManager: NSObject, URLSessionDelegate {
         var currRequest = URLRequest(url: self.url)
         currRequest.httpMethod = method.rawValue
         self.request = currRequest
+        debugPrint("URLRequest created \(self.request.debugDescription)")
+        
         return self
     }
     
-    func createRequest(method: HTTPMethod, forPath pathComponent: String, witParams: Any) -> Self {
-        var currRequest = URLRequest(url: self.url.appendingPathComponent(pathComponent))
-        currRequest.httpMethod = method.rawValue
-        self.request = currRequest
-        debugPrint("URLRequest without body created")
+    func createRequest(method: HTTPMethod, forPath pathComponent: String, witParams queryItems: [QueryParams:String]?) -> Self {
+        if let url = url(fromBaseURL: self.url, path: pathComponent, queryItems: queryItems) {
+            var currRequest = URLRequest(url: url.appendingPathComponent(pathComponent))
+            currRequest.httpMethod = method.rawValue
+            self.request = currRequest
+            debugPrint("URLRequest with body created \(self.request.debugDescription)")
+        } else {
+            print("Impossible to create URLRequest")
+        }
         return self
     }
     
-    func createRequest(method: HTTPMethod, forPath pathComponent: String, witParams: Any, body: String) -> Self {
-        var currRequest = URLRequest(url: self.url.appendingPathComponent(pathComponent))
-        currRequest.httpMethod = method.rawValue
-        currRequest.httpBody = body.data(using: .utf8)
-        self.request = currRequest
-        debugPrint("URLRequest with body created")
+    func createRequest(method: HTTPMethod, forPath pathComponent: String, witParams queryItems: [QueryParams:String]?, body: String) -> Self {
+        if let url = url(fromBaseURL: self.url, path: pathComponent, queryItems: queryItems) {
+            var currRequest = URLRequest(url: url.appendingPathComponent(pathComponent))
+            currRequest.httpMethod = method.rawValue
+            currRequest.httpBody = body.data(using: .utf8)
+            self.request = currRequest
+            debugPrint("URLRequest with body created \(self.request.debugDescription)")
+        } else {
+            print("Impossible to create URLRequest")
+        }
         return self
     }
     
-    func createRequest(method: HTTPMethod, forPath pathComponent: String, witParams: Any, body: Data) -> Self {
-        var currRequest = URLRequest(url: self.url.appendingPathComponent(pathComponent))
-        currRequest.httpMethod = method.rawValue
-        currRequest.httpBody = body
-        self.request = currRequest
-        debugPrint("URLRequest with body created")
+    func createRequest(method: HTTPMethod, forPath pathComponent: String, witParams queryItems: [QueryParams:String]?, body: Data) -> Self {
+        if let url = url(fromBaseURL: self.url, path: pathComponent, queryItems: queryItems) {
+            var currRequest = URLRequest(url: url)
+            currRequest.httpMethod = method.rawValue
+            currRequest.httpBody = body
+            self.request = currRequest
+            debugPrint("URLRequest with body created \(self.request.debugDescription)")
+        } else {
+            print("Impossible to create URLRequest")
+        }
         return self
+    }
+    
+    private func url(fromBaseURL baseURL:URL, path:String, queryItems:[QueryParams:String]?) -> URL? {
+        let url = baseURL.appendingPathComponent(path)
+        var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
+        
+        if let items = queryItems {
+            var query = [URLQueryItem]()
+            for itemKey in items.keys {
+                if let itemValue = items[itemKey] {
+                    let qi = URLQueryItem(name: itemKey.rawValue, value: itemValue)
+                    query.append(qi)
+                }
+            }
+            components?.queryItems = query
+        }
+        
+        return components?.url
     }
     
     func createDataTask(onCompletion callback: @escaping (_ response: ESResponse) -> Void) -> Self {

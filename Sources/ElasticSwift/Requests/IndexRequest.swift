@@ -18,6 +18,7 @@ public class IndexRequestBuilder<T: Codable>: RequestBuilder {
     var source: T?
     var routing: String?
     var parent: String?
+    var refresh: IndexRefresh?
     
     init(withClient client: ESClient) {
         self.client = client
@@ -53,6 +54,11 @@ public class IndexRequestBuilder<T: Codable>: RequestBuilder {
         return self
     }
     
+    public func set(refresh: IndexRefresh) -> Self {
+        self.refresh = refresh
+        return self
+    }
+    
     public func set(completionHandler: @escaping (_ response: IndexResponse?, _ error: Error?) -> Void) -> Self {
         self.completionHandler = completionHandler
         return self
@@ -64,7 +70,7 @@ public class IndexRequestBuilder<T: Codable>: RequestBuilder {
     
 }
 
-public class IndexRequest<T: Codable>: Request {
+public class IndexRequest<T: Codable>: NSObject, Request {
     
     let client: ESClient
     let completionHandler: ((_ response: IndexResponse?, _ error: Error?) -> Void)
@@ -84,11 +90,13 @@ public class IndexRequest<T: Codable>: Request {
     var source: T?
     var routing: String?
     var parent: String?
+    var refresh: IndexRefresh?
     
     
     init(withBuilder builder: IndexRequestBuilder<T>) throws {
         self.client = builder.client
         self.completionHandler = builder.completionHandler!
+        super.init()
         self.index = builder.index
         self.type = builder.type
         self.id = builder.id
@@ -96,14 +104,46 @@ public class IndexRequest<T: Codable>: Request {
         self.routing = builder.routing
         self.parent = builder.parent
         self._builtBody = try makeBody()
+        self.refresh = builder.refresh
     }
     
     func makeEndPoint() -> String {
-        var _endPoint = self.index! + "/" + self.type!
-        if let id = self.id {
-            _endPoint = _endPoint + "/" + id
+        var _endPoint = self.index!
+        
+        if let type = self.type {
+            _endPoint += "/" + type
+        } else {
+            _endPoint += "/_doc"
         }
+        
+        if let id = self.id {
+            _endPoint += "/" + id
+        } else {
+            _endPoint += "/"
+        }
+        
         return _endPoint
+    }
+    
+    public var parameters: [QueryParams : Encodable]? {
+        get {
+            if let refresh = self.refresh {
+                var result = [QueryParams : Encodable]()
+                switch refresh {
+                case .FALSE:
+                    result[QueryParams.refresh] = "false"
+                    break
+                case .TRUE:
+                    result[QueryParams.refresh] = "true"
+                    break
+                case .WAIT:
+                    result[QueryParams.refresh] = "wait_for"
+                    break
+                }
+                return result
+            }
+            return nil
+        }
     }
     
     public var endPoint: String {
@@ -123,6 +163,7 @@ public class IndexRequest<T: Codable>: Request {
     }
     
     public func execute() {
+        print("Executing SearchRequest: "+self.description)
         self.client.execute(request: self, completionHandler: responseHandler)
     }
     
@@ -131,8 +172,9 @@ public class IndexRequest<T: Codable>: Request {
             return completionHandler(nil, error)
         }
         do {
+            print("Response : \(String(bytes: response.data!, encoding: .utf8))")
             let decoded: IndexResponse? = try Serializers.decode(data: response.data!)
-            if decoded?.id == nil {
+            if decoded?.id != nil {
                 return completionHandler(decoded, nil)
             } else {
                 let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
@@ -144,6 +186,12 @@ public class IndexRequest<T: Codable>: Request {
             return completionHandler(nil, error)
         }
         
+    }
+    
+    public override var description: String {
+        get {
+            return "\(self.method) " + self.endPoint + " " + (String(bytes: self.body, encoding: .utf8) ?? "")
+        }
     }
     
 }

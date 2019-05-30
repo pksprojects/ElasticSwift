@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum QueryParams: String {
+public enum QueryParams: String {
     case format = "format"
     case h = "h"
     case help = "help"
@@ -28,6 +28,7 @@ enum QueryParams: String {
     case nodeId = "node_id"
     case parentNode = "parent_node"
     case parentTask = "parent_task"
+    case refresh = "refresh"
 }
 
 enum EndPointCategory: String {
@@ -110,3 +111,11 @@ public enum RegexFlag: String {
     case NONE = "NONE"
     case ALL = "ALL"
 }
+
+public enum IndexRefresh: String {
+    case TRUE = "true"
+    case FALSE = "false"
+    case WAIT = "wait_for"
+}
+
+

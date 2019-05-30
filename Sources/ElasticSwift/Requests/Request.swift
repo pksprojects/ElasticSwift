@@ -14,10 +14,18 @@ public protocol Request {
     
     var endPoint: String { get }
     
+    var parameters: [QueryParams:String]? { get }
+    
     var body: Data { get }
     
     func execute() -> Void
     
+}
+
+extension Request {
+    public var parameters: [QueryParams:String]? {
+        return nil
+    }
 }
 
 public class Response<T: Codable> {

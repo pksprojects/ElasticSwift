@@ -81,7 +81,7 @@ public class SearchRequestBuilder<T: Codable>: RequestBuilder {
     }
 }
 
-public class SearchRequest<T: Codable>: Request {
+public class SearchRequest<T: Codable>: NSObject, Request {
     
     let client: ESClient
     var index: String?
@@ -98,6 +98,8 @@ public class SearchRequest<T: Codable>: Request {
     
     init(withBuilder builder: SearchRequestBuilder<T>) throws {
         self.client = builder.client
+        self.completionHandler = builder.completionHandler!
+        super.init()
         self.index = builder.index
         self.type = builder.type
         self.from = builder.from
@@ -107,7 +109,6 @@ public class SearchRequest<T: Codable>: Request {
         self.fetchSource = builder.fetchSource
         self.explain = builder.explain
         self.minScore = builder.minScore
-        self.completionHandler = builder.completionHandler!
         self._builtBody = try makeBody()
     }
     
@@ -130,6 +131,7 @@ public class SearchRequest<T: Codable>: Request {
     }
     
     public func execute() {
+        print("Executing SearchRequest: "+self.description)
         self.client.execute(request: self, completionHandler: responseHandler)
     }
     
@@ -195,6 +197,14 @@ public class SearchRequest<T: Codable>: Request {
             } catch {
                 return completionHandler(nil, error)
             }
+        }
+    }
+    
+    public override var debugDescription: String {
+        get {
+            var result = "POST " + self.endPoint + " " + (String(bytes: self.body, encoding: .utf8) ?? "")
+            result += " Params: \(String(describing: self.parameters))"
+            return result
         }
     }
 }

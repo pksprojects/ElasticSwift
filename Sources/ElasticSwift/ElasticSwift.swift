@@ -113,9 +113,9 @@ public class ESClient {
     
     func execute(request: Request, completionHandler: @escaping (_ response: ESResponse) -> Void) -> Void {
         if request.method == .GET {
-            self.transport.performRequest(method: request.method, endPoint: request.endPoint, params: [], completionHandler: completionHandler)
+            self.transport.performRequest(method: request.method, endPoint: request.endPoint, params: request.parameters, completionHandler: completionHandler)
         } else {
-            self.transport.performRequest(method: request.method, endPoint: request.endPoint, params: [], body: request.body, completionHandler: completionHandler)
+            self.transport.performRequest(method: request.method, endPoint: request.endPoint, params: request.parameters, body: request.body, completionHandler: completionHandler)
         }
     }
 }
