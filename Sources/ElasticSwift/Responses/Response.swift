@@ -108,7 +108,7 @@ public class Shards: Codable {
 
 public class Hits<T: Codable>: Codable {
     
-    public var total: Int?
+    public var total: Total?
     public var maxScore: Double?
     public var hits: [SearchHit<T>] = []
     
@@ -144,5 +144,15 @@ public class SearchHit<T: Codable>: Codable {
         case id = "_id"
         case score = "_score"
         case source = "_source"
+    }
+}
+
+public class Total : Codable {
+    
+    public var value: Int?
+    public var relation: String?
+    
+    init() {
+    
     }
 }
