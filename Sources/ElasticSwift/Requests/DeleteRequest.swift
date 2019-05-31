@@ -15,7 +15,7 @@ public class DeleteRequestBuilder: RequestBuilder {
     var type: String?
     var id: String?
     var version: Int?
-    var completionHandler: ((DeleteResponse?, Error?) -> Void)?
+    var completionHandler: ((DeleteResponse?, Error?) -> ())?
     
     init(withClient client: ESClient) {
         self.client = client
@@ -41,33 +41,42 @@ public class DeleteRequestBuilder: RequestBuilder {
         return self
     }
     
-    public func set(completionHandler: @escaping (DeleteResponse?, Error?) -> Void) -> Self {
+    public func set(completionHandler: @escaping (DeleteResponse?, Error?) -> ()) -> Self {
         self.completionHandler = completionHandler
         return self
     }
     
-    public func build() -> Request {
+    public func make() throws -> Request {
         return DeleteRequest(withBuilder: self)
     }
     
+    public func validate() throws {
+        if index == nil {
+            throw RequestBuilderConstants.Errors.Validation.MissingField(field:"index")
+        }
+        if id == nil {
+            throw RequestBuilderConstants.Errors.Validation.MissingField(field:"id")
+        }
+    }
 }
 
 public class DeleteRequest: Request {
     
     let client: ESClient
     let index: String
-    let type: String
+    let type: String?
     let id: String
     var version: Int?
-    var completionHandler: ((DeleteResponse?, Error?) -> Void)
+    var completionHandler: ((DeleteResponse?, Error?) -> ())?
     
     init(withBuilder builder: DeleteRequestBuilder) {
         self.client = builder.client
         self.index = builder.index!
-        self.type = builder.type!
         self.id = builder.id!
+        
+        self.type = builder.type
         self.version = builder.version
-        self.completionHandler = builder.completionHandler!
+        self.completionHandler = builder.completionHandler
     }
     
     public var method: HTTPMethod {
@@ -78,7 +87,17 @@ public class DeleteRequest: Request {
     
     public var endPoint: String {
         get {
-            return makeEndPoint()
+            var result = self.index + "/"
+            
+            if let type = self.type {
+                result += type + "/"
+            } else {
+                result += "_doc/"
+            }
+            
+            result += self.id
+            
+            return result
         }
     }
     
@@ -92,53 +111,51 @@ public class DeleteRequest: Request {
         self.client.execute(request: self, completionHandler: responseHandler)
     }
     
-    func makeEndPoint() -> String {
-        return self.index + "/" + self.type + "/" + self.id
-    }
-    
-    func responseHandler(_ response: ESResponse) -> Void {
+    func responseHandler(_ response: ESResponse) {
         if let error = response.error {
-            return completionHandler(nil, error)
+            completionHandler?(nil, error)
+            return
         }
+        
+        guard let data = response.data else {
+            completionHandler?(nil,nil)
+            return
+        }
+        
+        var decodingError : Error? = nil
         do {
-            print(String(data: response.data!, encoding: .utf8)!)
-            let decoded: DeleteResponse? = try Serializers.decode(data: response.data!)
-            if decoded?.id != nil {
-                return completionHandler(decoded, nil)
-            } else {
-                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
-                if let decoded = decodedError {
-                    return completionHandler(nil, decoded)
-                }
-            }
+            let decoded = try Serializers.decode(data: data) as DeleteResponse
+            completionHandler?(decoded, nil)
+            return
         } catch {
-            do {
-                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
-                if let decoded = decodedError {
-                    return completionHandler(nil, decoded)
-                }
-            } catch {
-                return completionHandler(nil, error)
-            }
+            decodingError = error
         }
+        
+        do {
+            let esError = try Serializers.decode(data: data) as ElasticsearchError
+            completionHandler?(nil, esError)
+            return
+        } catch {
+            let message = "Error decoding response with data: " + (String(bytes: data, encoding: .utf8) ?? "nil") + " Underlying error: " + (decodingError?.localizedDescription ?? "nil")
+            let error = RequestConstants.Errors.Response.Deserialization(content: message)
+            completionHandler?(nil, error)
+            return
+        }
+        
     }
     
 }
 
 public class DeleteResponse: Codable {
     
-    public var shards: Shards?
-    public var index: String?
+    public var shards: Shards
+    public var index: String
     public var type: String?
-    public var id: String?
+    public var id: String
     public var version: Int?
     public var seqNumber: Int?
     public var primaryTerm: Int?
-    public var result: String?
-    
-    init() {
-        
-    }
+    public var result: String
     
     enum CodingKeys: String, CodingKey {
         case shards = "_shards"

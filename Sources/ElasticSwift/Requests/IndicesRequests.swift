@@ -14,7 +14,7 @@ public class CreateIndexRequestBuilder: RequestBuilder {
     
     let client: ESClient
     var name: String?
-    var completionHandler: ((_ response: CreateIndexResponse?, _ error: Error?) -> Void)?
+    var completionHandler: ((_ response: CreateIndexResponse?, _ error: Error?) -> ())?
     
     init(withClient client: ESClient) {
         self.client = client
@@ -25,13 +25,19 @@ public class CreateIndexRequestBuilder: RequestBuilder {
         return self
     }
     
-    public func set(completionHandler: @escaping (_ response: CreateIndexResponse?, _ error: Error?) -> Void) -> Self {
+    public func set(completionHandler: @escaping (_ response: CreateIndexResponse?, _ error: Error?) -> ()) -> Self {
         self.completionHandler = completionHandler
         return self
     }
     
-    public func build() -> Request {
+    public func make() -> Request {
         return CreateIndexRequest(withBuilder: self)
+    }
+    
+    public func validate() throws {
+        if name == nil {
+            throw RequestBuilderConstants.Errors.Validation.MissingField(field:"name")
+        }
     }
 }
 
@@ -39,7 +45,7 @@ public class DeleteIndexRequestBuilder: RequestBuilder {
     
     let client: ESClient
     var name: String?
-    var completionHandler: ((_ response: DeleteIndexResponse?, _ error: Error?) -> Void)?
+    var completionHandler: ((_ response: DeleteIndexResponse?, _ error: Error?) -> ())?
     
     init(withClient client: ESClient) {
         self.client = client
@@ -50,13 +56,19 @@ public class DeleteIndexRequestBuilder: RequestBuilder {
         return self
     }
     
-    public func set(completionHandler: @escaping (_ response: DeleteIndexResponse?, _ error: Error?) -> Void) -> Self {
+    public func set(completionHandler: @escaping (_ response: DeleteIndexResponse?, _ error: Error?) -> ()) -> Self {
         self.completionHandler = completionHandler
         return self
     }
     
-    public func build() throws -> Request {
+    public func make() throws -> Request {
         return DeleteIndexRequest(withBuilder: self)
+    }
+    
+    public func validate() throws {
+        if name == nil {
+            throw RequestBuilderConstants.Errors.Validation.MissingField(field:"name")
+        }
     }
 }
 
@@ -64,7 +76,7 @@ public class GetIndexRequestBuilder: RequestBuilder {
     
     let client: ESClient
     var name: String?
-    var completionHandler: ((_ response: GetIndexResponse?, _ error: Error?) -> Void)?
+    var completionHandler: ((_ response: GetIndexResponse?, _ error: Error?) -> ())?
     
     init(withClient client: ESClient) {
         self.client = client
@@ -80,8 +92,14 @@ public class GetIndexRequestBuilder: RequestBuilder {
         return self
     }
     
-    public func build() throws -> Request {
+    public func make() throws -> Request {
         return GetIndexRequest(withBuilder: self)
+    }
+    
+    public func validate() throws {
+        if name == nil {
+            throw RequestBuilderConstants.Errors.Validation.MissingField(field:"name")
+        }
     }
 }
 
@@ -91,16 +109,12 @@ public class CreateIndexRequest: Request {
     
     let client: ESClient
     let name: String
-    var completionHandler: ((_ response: CreateIndexResponse?, _ error: Error?) -> Void)
+    var completionHandler: ((_ response: CreateIndexResponse?, _ error: Error?) -> ())?
     
     init(withBuilder builder: CreateIndexRequestBuilder) {
         self.client = builder.client
         self.name = builder.name!
-        self.completionHandler = builder.completionHandler!
-    }
-    
-    func makeEndPoint() -> String {
-        return self.name
+        self.completionHandler = builder.completionHandler
     }
     
     public var method: HTTPMethod {
@@ -111,7 +125,7 @@ public class CreateIndexRequest: Request {
     
     public var endPoint: String {
         get {
-            return makeEndPoint()
+            return self.name
         }
     }
     
@@ -125,31 +139,37 @@ public class CreateIndexRequest: Request {
         self.client.execute(request: self, completionHandler: responseHandler)
     }
     
-    func responseHandler(_ response: ESResponse) -> Void {
+    func responseHandler(_ response: ESResponse) {
         if let error = response.error {
-            return completionHandler(nil, error)
+            completionHandler?(nil, error)
+            return
         }
+        
+        guard let data = response.data else {
+            completionHandler?(nil,nil)
+            return
+        }
+        
+        var decodingError : Error? = nil
         do {
-            print(String(data: response.data!, encoding: .utf8)!)
-            let decoded: CreateIndexResponse? = try Serializers.decode(data: response.data!)
-            if decoded?.index != nil {
-                return completionHandler(decoded, nil)
-            } else {
-                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
-                if let decoded = decodedError {
-                    return completionHandler(nil, decoded)
-                }
-            }
+            let decoded = try Serializers.decode(data: data) as CreateIndexResponse
+            completionHandler?(decoded, nil)
+            return
         } catch {
-            do {
-                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
-                if let decoded = decodedError {
-                    return completionHandler(nil, decoded)
-                }
-            } catch {
-                return completionHandler(nil, error)
-            }
+            decodingError = error
         }
+        
+        do {
+            let esError = try Serializers.decode(data: data) as ElasticsearchError
+            completionHandler?(nil, esError)
+            return
+        } catch {
+            let message = "Error decoding response with data: " + (String(bytes: data, encoding: .utf8) ?? "nil") + " Underlying error: " + (decodingError?.localizedDescription ?? "nil")
+            let error = RequestConstants.Errors.Response.Deserialization(content: message)
+            completionHandler?(nil, error)
+            return
+        }
+       
     }
 }
 
@@ -157,16 +177,12 @@ class GetIndexRequest: Request {
     
     let client: ESClient
     let name: String
-    var completionHandler: ((_ response: GetIndexResponse?, _ error: Error?) -> Void)
+    var completionHandler: ((_ response: GetIndexResponse?, _ error: Error?) -> ())?
     
     init(withBuilder builder: GetIndexRequestBuilder) {
         self.client = builder.client
         self.name = builder.name!
-        self.completionHandler = builder.completionHandler!
-    }
-    
-    func makeEndPoint() -> String {
-        return self.name
+        self.completionHandler = builder.completionHandler
     }
     
     public var method: HTTPMethod {
@@ -177,7 +193,7 @@ class GetIndexRequest: Request {
     
     public var endPoint: String {
         get {
-            return makeEndPoint()
+            return self.name
         }
     }
     
@@ -191,30 +207,35 @@ class GetIndexRequest: Request {
         self.client.execute(request: self, completionHandler: responseHandler)
     }
     
-    func responseHandler(_ response: ESResponse) -> Void {
+    func responseHandler(_ response: ESResponse) {
         if let error = response.error {
-            return completionHandler(nil, error)
+            completionHandler?(nil, error)
+            return
         }
+        
+        guard let data = response.data else {
+            completionHandler?(nil,nil)
+            return
+        }
+        
+        var decodingError : Error? = nil
         do {
-            print(String(data: response.data!, encoding: .utf8)!)
-            let decoded: GetIndexResponse? = try Serializers.decode(data: response.data!)
-            if decoded?.settings != nil {
-                return completionHandler(decoded, nil)
-            } else {
-                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
-                if let decoded = decodedError {
-                    return completionHandler(nil, decoded)
-                }
-            }
+            let decoded = try Serializers.decode(data: data) as GetIndexResponse
+            completionHandler?(decoded, nil)
+            return
         } catch {
-            do {
-                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
-                if let decoded = decodedError {
-                    return completionHandler(nil, decoded)
-                }
-            } catch {
-                return completionHandler(nil, error)
-            }
+            decodingError = error
+        }
+        
+        do {
+            let esError = try Serializers.decode(data: data) as ElasticsearchError
+            completionHandler?(nil, esError)
+            return
+        } catch {
+            let message = "Error decoding response with data: " + (String(bytes: data, encoding: .utf8) ?? "nil") + " Underlying error: " + (decodingError?.localizedDescription ?? "nil")
+            let error = RequestConstants.Errors.Response.Deserialization(content: message)
+            completionHandler?(nil, error)
+            return
         }
     }
 }
@@ -223,18 +244,15 @@ class DeleteIndexRequest: Request {
     
     let client: ESClient
     let name: String
-    var completionHandler: ((_ response: DeleteIndexResponse?, _ error: Error?) -> Void)
+    var completionHandler: ((_ response: DeleteIndexResponse?, _ error: Error?) -> ())?
     
     init(withBuilder builder: DeleteIndexRequestBuilder) {
         self.client = builder.client
         self.name = builder.name!
-        self.completionHandler = builder.completionHandler!
+        self.completionHandler = builder.completionHandler
     }
     
-    func makeEndPoint() -> String {
-        return self.name
-    }
-    
+   
     public var method: HTTPMethod {
         get {
             return .DELETE
@@ -243,7 +261,7 @@ class DeleteIndexRequest: Request {
     
     public var endPoint: String {
         get {
-            return makeEndPoint()
+            return self.name
         }
     }
     
@@ -259,28 +277,33 @@ class DeleteIndexRequest: Request {
     
     func responseHandler(_ response: ESResponse) -> Void {
         if let error = response.error {
-            return completionHandler(nil, error)
+            completionHandler?(nil, error)
+            return
         }
+        
+        guard let data = response.data else {
+            completionHandler?(nil,nil)
+            return
+        }
+        
+        var decodingError : Error? = nil
         do {
-            print(String(data: response.data!, encoding: .utf8)!)
-            let decoded: DeleteIndexResponse? = try Serializers.decode(data: response.data!)
-            if decoded?.acknowledged != nil {
-                return completionHandler(decoded, nil)
-            } else {
-                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
-                if let decoded = decodedError {
-                    return completionHandler(nil, decoded)
-                }
-            }
+            let decoded = try Serializers.decode(data: data) as DeleteIndexResponse
+            completionHandler?(decoded, nil)
+            return
         } catch {
-            do {
-                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
-                if let decoded = decodedError {
-                    return completionHandler(nil, decoded)
-                }
-            } catch {
-                return completionHandler(nil, error)
-            }
+            decodingError = error
+        }
+        
+        do {
+            let esError = try Serializers.decode(data: data) as ElasticsearchError
+            completionHandler?(nil, esError)
+            return
+        } catch {
+            let message = "Error decoding response with data: " + (String(bytes: data, encoding: .utf8) ?? "nil") + " Underlying error: " + (decodingError?.localizedDescription ?? "nil")
+            let error = RequestConstants.Errors.Response.Deserialization(content: message)
+            completionHandler?(nil, error)
+            return
         }
     }
 }

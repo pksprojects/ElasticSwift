@@ -34,8 +34,17 @@ public class UpdateRequestBuilder: RequestBuilder {
         return self
     }
     
-    public func build() -> Request {
+    public func make() throws -> Request {
         return UpdateRequest(withBuilder: self)
+    }
+    
+    public func validate() throws {
+        if index == nil {
+           throw RequestBuilderConstants.Errors.Validation.MissingField(field:"index")
+        }
+        if id == nil {
+           throw RequestBuilderConstants.Errors.Validation.MissingField(field:"id")
+        }
     }
 }
 
@@ -43,13 +52,13 @@ public class UpdateRequest: Request {
     
     let client: ESClient
     let index: String
-    let type: String
+    let type: String?
     let id: String
     
     init(withBuilder builder: UpdateRequestBuilder) {
         self.client = builder.client
         self.index = builder.index!
-        self.type = builder.type!
+        self.type = builder.type
         self.id = builder.id!
     }
     
@@ -61,7 +70,18 @@ public class UpdateRequest: Request {
     
     public var endPoint: String {
         get {
-            return index + "/" + type + "/" + id + "/_update"
+            var result = self.index + "/"
+            
+            if let type = self.type {
+                result += type + "/"
+            } else {
+                result += "_doc/"
+            }
+            
+            result += self.id
+            result += "/_update"
+            
+            return result
         }
     }
     

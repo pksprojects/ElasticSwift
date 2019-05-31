@@ -40,7 +40,7 @@ public class ElasticError: Codable {
 
 public protocol ESClientError: Error {
     
-    func messgae() -> String
+    func message() -> String
     
 }
 
@@ -52,8 +52,9 @@ public class RequestCreationError: ESClientError {
         self.msg = msg
     }
     
-    public func messgae() -> String {
+    public func message() -> String {
         return msg
     }
     
 }
+

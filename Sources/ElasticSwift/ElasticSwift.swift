@@ -111,7 +111,7 @@ public class ESClient {
         self.transport = Transport(forHosts: hosts, credentials: credentials, sslConfig: sslConfig)
     }
     
-    func execute(request: Request, completionHandler: @escaping (_ response: ESResponse) -> Void) -> Void {
+    func execute(request: Request, completionHandler: @escaping (_ response: ESResponse) -> ()) {
         if request.method == .GET {
             self.transport.performRequest(method: request.method, endPoint: request.endPoint, params: request.parameters, completionHandler: completionHandler)
         } else {

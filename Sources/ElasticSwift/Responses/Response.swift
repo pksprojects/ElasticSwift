@@ -13,6 +13,7 @@ public class ESResponse {
     public let data: Data?
     public let httpResponse: URLResponse?
     public let error: Error?
+    //TODO: add completion handler
     
     init(data: Data? ,httpResponse: URLResponse?, error: Error?) {
         self.data = data
@@ -21,19 +22,15 @@ public class ESResponse {
     }
 }
 
-public class GetResponse<T: Codable>: Codable {
+public class GetResponse<T: Codable>: Response {
     
-    public var index: String?
+    public var index: String
     public var type: String?
-    public var id: String?
-    public var version: Int?
-    public var found: Bool?
+    public var id: String
+    public var version: Int
+    public var found: Bool
     
     public var source: T?
-    
-    init() {
-        
-    }
     
     enum CodingKeys: String, CodingKey {
         case index = "_index"
@@ -46,20 +43,16 @@ public class GetResponse<T: Codable>: Codable {
     }
 }
 
-public class IndexResponse: Codable {
+public class IndexResponse: Response {
     
-    public var shards: Shards?
-    public var index: String?
+    public var shards: Shards
+    public var index: String
     public var type: String?
-    public var id: String?
+    public var id: String
     public var version: Int?
     public var seqNumber: Int?
     public var primaryTerm: Int?
-    public var result: String?
-    
-    init() {
-        
-    }
+    public var result: String
     
     enum CodingKeys: String, CodingKey {
         case shards = "_shards"
@@ -73,16 +66,12 @@ public class IndexResponse: Codable {
     }
 }
 
-public class SearchResponse<T: Codable>: Codable {
+public class SearchResponse<T: Codable>: Response {
     
-    public var took: Int?
-    public var timedOut: Bool?
-    public var shards: Shards?
+    public var took: Int
+    public var timedOut: Bool
+    public var shards: Shards
     public var hits: Hits<T>?
-    
-    init() {
-        
-    }
     
     enum CodingKeys: String, CodingKey {
         case took
@@ -94,19 +83,15 @@ public class SearchResponse<T: Codable>: Codable {
 
 public class Shards: Codable {
     
-    public var total: Int?
-    public var successful: Int?
+    public var total: Int
+    public var successful: Int
     public var skipped: Int?
-    public var failed: Int?
-    
-    init() {
-        
-    }
+    public var failed: Int
     
 }
 
 
-public class Hits<T: Codable>: Codable {
+public class Hits<T: Codable>: Response {
     
     public var total: Total?
     public var maxScore: Double?
@@ -125,7 +110,7 @@ public class Hits<T: Codable>: Codable {
 }
 
 
-public class SearchHit<T: Codable>: Codable {
+public class SearchHit<T: Codable>: Response {
     
     public var index: String?
     public var type: String?
@@ -147,7 +132,7 @@ public class SearchHit<T: Codable>: Codable {
     }
 }
 
-public class Total : Codable {
+public class Total : Response {
     
     public var value: Int?
     public var relation: String?

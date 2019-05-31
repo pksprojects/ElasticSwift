@@ -11,7 +11,7 @@ import Foundation
 public class IndexRequestBuilder<T: Codable>: RequestBuilder {
     
     let client: ESClient
-    var completionHandler: ((_ response: IndexResponse?, _ error: Error?) -> Void)?
+    var completionHandler: ((_ response: IndexResponse?, _ error: Error?) -> ())?
     var index: String?
     var type: String?
     var id: String?
@@ -59,13 +59,22 @@ public class IndexRequestBuilder<T: Codable>: RequestBuilder {
         return self
     }
     
-    public func set(completionHandler: @escaping (_ response: IndexResponse?, _ error: Error?) -> Void) -> Self {
+    public func set(completionHandler: @escaping (_ response: IndexResponse?, _ error: Error?) -> ()) -> Self {
         self.completionHandler = completionHandler
         return self
     }
     
-    public func build() throws -> Request {
+    public func make() throws -> Request {
         return try IndexRequest(withBuilder: self)
+    }
+    
+    public func validate() throws {
+        if index == nil {
+            throw RequestBuilderConstants.Errors.Validation.MissingField(field:"index")
+        }
+        if source == nil {
+            throw RequestBuilderConstants.Errors.Validation.MissingField(field:"source")
+        }
     }
     
 }
@@ -73,7 +82,7 @@ public class IndexRequestBuilder<T: Codable>: RequestBuilder {
 public class IndexRequest<T: Codable>: NSObject, Request {
     
     let client: ESClient
-    let completionHandler: ((_ response: IndexResponse?, _ error: Error?) -> Void)
+    let completionHandler: ((_ response: IndexResponse?, _ error: Error?) -> ())?
     public var method: HTTPMethod  {
         get {
             if self.id == nil {
@@ -84,10 +93,10 @@ public class IndexRequest<T: Codable>: NSObject, Request {
     }
     
     var _builtBody: Data?
-    var index: String?
+    var index: String
     var type: String?
     var id: String?
-    var source: T?
+    var source: T
     var routing: String?
     var parent: String?
     var refresh: IndexRefresh?
@@ -95,40 +104,23 @@ public class IndexRequest<T: Codable>: NSObject, Request {
     
     init(withBuilder builder: IndexRequestBuilder<T>) throws {
         self.client = builder.client
-        self.completionHandler = builder.completionHandler!
+        self.completionHandler = builder.completionHandler
+        self.index = builder.index!
+        self.source = builder.source!
+        
         super.init()
-        self.index = builder.index
         self.type = builder.type
         self.id = builder.id
-        self.source = builder.source
         self.routing = builder.routing
         self.parent = builder.parent
         self._builtBody = try makeBody()
         self.refresh = builder.refresh
     }
     
-    func makeEndPoint() -> String {
-        var _endPoint = self.index!
-        
-        if let type = self.type {
-            _endPoint += "/" + type
-        } else {
-            _endPoint += "/_doc"
-        }
-        
-        if let id = self.id {
-            _endPoint += "/" + id
-        } else {
-            _endPoint += "/"
-        }
-        
-        return _endPoint
-    }
-    
-    public var parameters: [QueryParams : Encodable]? {
+    public var parameters: [QueryParams : String]? {
         get {
             if let refresh = self.refresh {
-                var result = [QueryParams : Encodable]()
+                var result = [QueryParams : String]()
                 switch refresh {
                 case .FALSE:
                     result[QueryParams.refresh] = "false"
@@ -148,7 +140,19 @@ public class IndexRequest<T: Codable>: NSObject, Request {
     
     public var endPoint: String {
         get {
-            return makeEndPoint()
+            var result = self.index + "/"
+            
+            if let type = self.type {
+                result += type + "/"
+            } else {
+                result += "_doc/"
+            }
+            
+            if let id = self.id {
+                result += id
+            }
+            
+            return result
         }
     }
     
@@ -159,46 +163,54 @@ public class IndexRequest<T: Codable>: NSObject, Request {
     }
     
     public func makeBody() throws -> Data {
-       return try Serializers.encode(self.source!)!
+       return try Serializers.encode(self.source)
     }
     
     public func execute() {
-        print("Executing SearchRequest: "+self.description)
         self.client.execute(request: self, completionHandler: responseHandler)
     }
     
     func responseHandler(_ response: ESResponse) -> Void {
         if let error = response.error {
-            return completionHandler(nil, error)
+            completionHandler?(nil, error)
+            return
         }
+        
+        guard let data = response.data else {
+            completionHandler?(nil,nil)
+            return
+        }
+        
+        var decodingError : Error? = nil
         do {
-            print("Response : \(String(bytes: response.data!, encoding: .utf8))")
-            let decoded: IndexResponse? = try Serializers.decode(data: response.data!)
-            if decoded?.id != nil {
-                return completionHandler(decoded, nil)
-            } else {
-                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
-                if let decoded = decodedError {
-                    return completionHandler(nil, decoded)
-                }
-            }
+            let decoded = try Serializers.decode(data: data) as IndexResponse
+            completionHandler?(decoded, nil)
+            return
         } catch {
-            return completionHandler(nil, error)
+            decodingError = error
+        }
+        
+        do {
+            let esError = try Serializers.decode(data: data) as ElasticsearchError
+            completionHandler?(nil, esError)
+            return
+        } catch {
+            let message = "Error decoding response with data: " + (String(bytes: data, encoding: .utf8) ?? "nil") + " Underlying error: " + (decodingError?.localizedDescription ?? "nil")
+            let error = RequestConstants.Errors.Response.Deserialization(content: message)
+            completionHandler?(nil, error)
+            return
         }
         
     }
     
     public override var description: String {
         get {
-            return "\(self.method) " + self.endPoint + " " + (String(bytes: self.body, encoding: .utf8) ?? "")
+            var result = "\(self.method) "
+            result += self.endPoint
+            result += "?" + (self.parameters?.description ?? "") + " "
+            result += ((String(bytes: self.body, encoding: .utf8) ?? ""))
+            return result
         }
     }
     
 }
-
-
-enum OpType {
-    case INDEX
-    case CREATE
-}
-

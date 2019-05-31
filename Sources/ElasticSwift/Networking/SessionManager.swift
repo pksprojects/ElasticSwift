@@ -76,7 +76,7 @@ class SessionManager: NSObject, URLSessionDelegate {
     
     func createRequest(method: HTTPMethod, forPath pathComponent: String, witParams queryItems: [QueryParams:String]?) -> Self {
         if let url = url(fromBaseURL: self.url, path: pathComponent, queryItems: queryItems) {
-            var currRequest = URLRequest(url: url.appendingPathComponent(pathComponent))
+            var currRequest = URLRequest(url: url)
             currRequest.httpMethod = method.rawValue
             self.request = currRequest
             debugPrint("URLRequest with body created \(self.request.debugDescription)")
@@ -88,7 +88,7 @@ class SessionManager: NSObject, URLSessionDelegate {
     
     func createRequest(method: HTTPMethod, forPath pathComponent: String, witParams queryItems: [QueryParams:String]?, body: String) -> Self {
         if let url = url(fromBaseURL: self.url, path: pathComponent, queryItems: queryItems) {
-            var currRequest = URLRequest(url: url.appendingPathComponent(pathComponent))
+            var currRequest = URLRequest(url: url)
             currRequest.httpMethod = method.rawValue
             currRequest.httpBody = body.data(using: .utf8)
             self.request = currRequest
@@ -105,7 +105,7 @@ class SessionManager: NSObject, URLSessionDelegate {
             currRequest.httpMethod = method.rawValue
             currRequest.httpBody = body
             self.request = currRequest
-            debugPrint("URLRequest with body created \(self.request.debugDescription)")
+            debugPrint("URLRequest with body created")
         } else {
             print("Impossible to create URLRequest")
         }
@@ -127,16 +127,23 @@ class SessionManager: NSObject, URLSessionDelegate {
             components?.queryItems = query
         }
         
-        return components?.url
+        let result = components?.url
+        debugPrint("URL Created: ",result ?? "NIL")
+        return result
     }
     
     func createDataTask(onCompletion callback: @escaping (_ response: ESResponse) -> Void) -> Self {
-        self.dataTask = self.session?.dataTask(with: self.request!) { data, response, error in
+        guard let request = self.request else {
+            debugPrint("Data Task NOT Created! Request == NIL")
+            return self
+        }
+        
+        self.dataTask = self.session?.dataTask(with: request) { data, response, error in
             let response = ESResponse(data: data, httpResponse: response, error: error)
             return callback(response)
         }
         
-        debugPrint("Data Task Created:", self.dataTask!)
+        debugPrint("Data Task Created")
         return self
     }
     func execute() {
