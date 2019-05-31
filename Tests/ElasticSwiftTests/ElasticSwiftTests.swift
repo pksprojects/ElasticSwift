@@ -5,6 +5,7 @@ import XCTest
 class ElasticSwiftTests: XCTestCase {
     
     var client: RestClient?
+    let restExpectationTimeout = 3.0
     
     override func setUp() {
         super.setUp()
@@ -21,7 +22,7 @@ class ElasticSwiftTests: XCTestCase {
             try deleteIndex { (response, error) in
                 deleteExpectation.fulfill()
             }
-            wait(for: [deleteExpectation], timeout: 1)
+            wait(for: [deleteExpectation], timeout: self.restExpectationTimeout)
         } catch {
             XCTAssertTrue(false)
         }
@@ -35,7 +36,7 @@ class ElasticSwiftTests: XCTestCase {
             try deleteIndex { (response, error) in
                 deleteExpectation.fulfill()
             }
-            wait(for: [deleteExpectation], timeout: 1)
+            wait(for: [deleteExpectation], timeout: self.restExpectationTimeout)
         } catch {
             XCTAssertTrue(false)
         }
@@ -64,15 +65,19 @@ class ElasticSwiftTests: XCTestCase {
         
         let createExpectation = expectation(description: "createIndex")
         
-        createIndex { (response, error) in
-            print("Create Index Handler: \(String(describing: response)) Error: \(String(describing: error))")
-            XCTAssertNil(error)
-            XCTAssertNotNil(response)
-            XCTAssertTrue(response?.acknowledged ?? false)
-            createExpectation.fulfill()
+        do {
+            try createIndex { (response, error) in
+                print("Create Index Handler: \(String(describing: response)) Error: \(String(describing: error))")
+                XCTAssertNil(error)
+                XCTAssertNotNil(response)
+                XCTAssertTrue(response?.acknowledged ?? false)
+                createExpectation.fulfill()
+            }
+        } catch {
+            XCTAssertTrue(false)
         }
         
-        wait(for: [createExpectation], timeout: 1)
+        wait(for: [createExpectation], timeout: self.restExpectationTimeout)
         
         let getExpectation = expectation(description: "getIndex")
         
@@ -88,7 +93,7 @@ class ElasticSwiftTests: XCTestCase {
             XCTAssertTrue(false)
         }
         
-        wait(for: [getExpectation], timeout: 1)
+        wait(for: [getExpectation], timeout: self.restExpectationTimeout)
 
     }
     
@@ -96,15 +101,19 @@ class ElasticSwiftTests: XCTestCase {
         
         let createExpectation = expectation(description: "createIndex")
         
-        createIndex { (response, error) in
-            print("Create Index Handler: \(String(describing: response)) Error: \(String(describing: error))")
-            XCTAssertNil(error)
-            XCTAssertNotNil(response)
-            XCTAssertTrue(response?.acknowledged ?? false)
-            createExpectation.fulfill()
+        do {
+            try createIndex { (response, error) in
+                print("Create Index Handler: \(String(describing: response)) Error: \(String(describing: error))")
+                XCTAssertNil(error)
+                XCTAssertNotNil(response)
+                XCTAssertTrue(response?.acknowledged ?? false)
+                createExpectation.fulfill()
+            }
+        } catch {
+            XCTAssertTrue(false)
         }
         
-        wait(for: [createExpectation], timeout: 1)
+        wait(for: [createExpectation], timeout: self.restExpectationTimeout)
         
         let deleteExpectation = expectation(description: "deleteIndex")
         
@@ -120,11 +129,11 @@ class ElasticSwiftTests: XCTestCase {
             XCTAssertTrue(false)
         }
             
-        wait(for: [deleteExpectation], timeout: 1)
+        wait(for: [deleteExpectation], timeout: self.restExpectationTimeout)
     }
     
-    func createIndex(withCompletionHandler completionHandler: @escaping (CreateIndexResponse?,Error?) -> () ) {
-        let request = self.client?.admin.indices().create()
+    func createIndex(withCompletionHandler completionHandler: @escaping (CreateIndexResponse?,Error?) -> () ) throws {
+        let request = try self.client?.admin.indices().create()
             .set(name: "test")
             .set(completionHandler: completionHandler)
             .build()
@@ -155,8 +164,8 @@ class ElasticSwiftTests: XCTestCase {
             print("Index Handler: \(String(describing: response)) Error: \(String(describing: error))")
             XCTAssertNil(error)
             XCTAssertNotNil(response?.shards)
-            XCTAssertTrue(response!.shards!.failed == 0)
-            XCTAssertTrue(response!.shards!.total ?? 0 > 0)
+            XCTAssertTrue(response!.shards.failed == 0)
+            XCTAssertTrue(response!.shards.total > 0)
             XCTAssertNotNil(response!.result)
             XCTAssertTrue(response!.result == "created")
             indexExpectation.fulfill()
@@ -174,7 +183,7 @@ class ElasticSwiftTests: XCTestCase {
             .build()
         
         request?.execute()
-        wait(for: [indexExpectation], timeout: 1)
+        wait(for: [indexExpectation], timeout: self.restExpectationTimeout)
     }
     
     func testIndexNoId() throws {
@@ -185,8 +194,8 @@ class ElasticSwiftTests: XCTestCase {
             print("Index Handler: \(String(describing: response)) Error: \(String(describing: error))")
             XCTAssertNil(error)
             XCTAssertNotNil(response?.shards)
-            XCTAssertTrue(response!.shards!.failed == 0)
-            XCTAssertTrue(response!.shards!.total ?? 0 > 0)
+            XCTAssertTrue(response!.shards.failed == 0)
+            XCTAssertTrue(response!.shards.total > 0)
             XCTAssertNotNil(response!.result)
             XCTAssertTrue(response!.result == "created")
             indexExpectation.fulfill()
@@ -203,7 +212,7 @@ class ElasticSwiftTests: XCTestCase {
             .build()
         
         request?.execute()
-        wait(for: [indexExpectation], timeout: 1)
+        wait(for: [indexExpectation], timeout: self.restExpectationTimeout)
     }
     
     func testGet() throws {
@@ -216,22 +225,31 @@ class ElasticSwiftTests: XCTestCase {
             print("Get Handler: \(String(describing: response)) Error: \(String(describing: error))")
             XCTAssertNil(error)
             XCTAssertNotNil(response)
-            XCTAssertTrue(response!.found ?? false)
-            XCTAssertTrue(response!.id == "0")
-            XCTAssertNotNil(response!.source)
-            XCTAssertTrue(response!.source!.msg == "Test Message")
+            guard let responseNN = response else {
+                return
+            }
+            
+            XCTAssertTrue(responseNN.found)
+            XCTAssertTrue(responseNN.id == "0")
+            XCTAssertNotNil(responseNN.source)
+            
+            guard let sourceNN = responseNN.source else {
+                return
+            }
+            
+            XCTAssertTrue(sourceNN.msg == "Test Message")
             getExpectation.fulfill()
         }
         
-        let request = self.client?.makeGet()
+        let request = try self.client?.makeGet()
             .set(index: "test")
 //            .set(type: "msg")
             .set(id: "0")
             .set(completionHandler: handler)
             .build()
-        
         request?.execute()
-        wait(for: [getExpectation], timeout: 1)
+        
+        wait(for: [getExpectation], timeout: self.restExpectationTimeout)
     }
     
     func testDelete() throws {
@@ -245,13 +263,13 @@ class ElasticSwiftTests: XCTestCase {
             XCTAssertNil(error)
             XCTAssertNotNil(response)
             XCTAssertNotNil(response?.shards)
-            XCTAssertTrue(response!.shards!.failed == 0)
-            XCTAssertTrue(response!.shards!.total ?? 0 > 0)
+            XCTAssertTrue(response!.shards.failed == 0)
+            XCTAssertTrue(response!.shards.total > 0)
             XCTAssertTrue(response!.result == "deleted")
             deleteExpectation.fulfill()
         }
         
-        let request = self.client?.makeDelete()
+        let request = try self.client?.makeDelete()
             .set(index: "test")
 //            .set(type: "msg")
             .set(id: "0")
@@ -259,7 +277,7 @@ class ElasticSwiftTests: XCTestCase {
             .build()
         
         request?.execute()
-        wait(for: [deleteExpectation], timeout: 1)
+        wait(for: [deleteExpectation], timeout: self.restExpectationTimeout)
     }
     
     func testSearch() throws {
@@ -267,7 +285,6 @@ class ElasticSwiftTests: XCTestCase {
         try testIndex()
         try testIndexNoId()
         
-        sleep(1)
         
         let searchExpectation = expectation(description: "search")
         
@@ -276,8 +293,8 @@ class ElasticSwiftTests: XCTestCase {
             XCTAssertNil(error)
             XCTAssertNotNil(response)
             XCTAssertNotNil(response?.shards)
-            XCTAssertTrue(response!.shards!.failed == 0)
-            XCTAssertTrue(response!.shards!.total ?? 0 > 0)
+            XCTAssertTrue(response!.shards.failed == 0)
+            XCTAssertTrue(response!.shards.total > 0)
             XCTAssertTrue(response?.timedOut ?? true == false)
             XCTAssertTrue(response?.hits?.total?.value == 2)
             
