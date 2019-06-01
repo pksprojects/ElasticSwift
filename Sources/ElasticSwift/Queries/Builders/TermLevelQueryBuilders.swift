@@ -10,6 +10,9 @@ import Foundation
 // MARK:- Term Query Builder
 
 public class TermQueryBuilder: QueryBuilder {
+    var field: String?
+    var value: String?
+    var boost: Double?
     
     public var query: Query {
         get {
@@ -22,6 +25,10 @@ public class TermQueryBuilder: QueryBuilder {
 // MARK:- Terms Query Builder
 
 public class TermsQueryBuilder: QueryBuilder {
+    
+    var field: String?
+    var value: [String]?
+    
     public var query: Query {
         get {
             return TermsQuery(withBuilder: self)
@@ -33,6 +40,18 @@ public class TermsQueryBuilder: QueryBuilder {
 // MARK:- Range Query Builder
 
 public class RangeQueryBuilder: QueryBuilder {
+    
+    var field: String?
+    var gte: String?
+    var gt: String?
+    var lte: String?
+    var lt: String?
+    var format: String?
+    var timeZone: String?
+    var boost: Double?
+    var relation: ShapeRelation?
+    
+    
     public var query: Query {
         get {
             return RangeQuery(withBuilder: self)
@@ -45,6 +64,9 @@ public class RangeQueryBuilder: QueryBuilder {
 // MARK:- Exists Query Builder
 
 public class ExistsQueryBuilder: QueryBuilder {
+    
+    var field: String?
+    
     public var query: Query {
         get {
             return ExistsQuery(withBuilder: self)
@@ -57,6 +79,11 @@ public class ExistsQueryBuilder: QueryBuilder {
 // MARK:- Prefix Query Builder
 
 public class PrefixQueryBuilder: QueryBuilder {
+    
+    var field: String?
+    var value: String?
+    var boost: Double?
+    
     public var query: Query {
         get {
             return PrefixQuery(withBuilder: self)
@@ -69,6 +96,11 @@ public class PrefixQueryBuilder: QueryBuilder {
 // MARK:- Wildcard Query Builder
 
 public class WildCardQueryBuilder: QueryBuilder {
+    
+    var field: String?
+    var value: String?
+    var boost: Double?
+    
     public var query: Query {
         get {
             return WildCardQuery(withBuilder: self)
@@ -80,6 +112,13 @@ public class WildCardQueryBuilder: QueryBuilder {
 // MARK:- Regexp Query Builder
 
 public class RegexpQueryBuilder: QueryBuilder {
+    
+    var field: String?
+    var value: String?
+    var boost: Double?
+    var regexFlags: [RegexFlag]?
+    var maxDeterminizedStates: Int?
+    
     public var query: Query {
         get {
             return RegexpQuery(withBuilder: self)
@@ -91,6 +130,15 @@ public class RegexpQueryBuilder: QueryBuilder {
 // MARK:- Fuzzy Query Builder
 
 public class FuzzyQueryBuilder: QueryBuilder {
+    
+    var field: String?
+    var value: String?
+    var boost: Double?
+    var fuzziness: Int?
+    var prefixLenght: Int?
+    var maxExpansions: Int?
+    var transpositions: Bool?
+    
     public var query: Query {
         get {
             return FuzzyQuery(withBuilder: self)
@@ -102,6 +150,9 @@ public class FuzzyQueryBuilder: QueryBuilder {
 // MARK:- Type Query Builder
 
 public class TypeQueryBuilder: QueryBuilder {
+    
+    var type: String?
+    
     public var query: Query {
         get {
             return TypeQuery(withBuilder: self)
@@ -114,6 +165,10 @@ public class TypeQueryBuilder: QueryBuilder {
 // MARK:- Ids Query Builder
 
 public class IdsQueryBuilder: QueryBuilder {
+    
+    var type: String?
+    var ids: [String]?
+    
     public var query: Query {
         get {
             return IdsQuery(withBuilder: self)

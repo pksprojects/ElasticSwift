@@ -93,3 +93,20 @@ public enum HTTPMethod: String {
     case CONNECT = "CONNECT"
 }
 
+
+public enum ShapeRelation: String {
+    case INTERSECTS = "intersects"
+    case DISJOINT = "disjoint"
+    case WITHIN = "within"
+    case CONTAINS = "contains"
+}
+
+public enum RegexFlag: String {
+    case INTERSECTION = "INTERSECTION"
+    case COMPLEMENT = "COMPLEMENT"
+    case EMPTY = "EMPTY"
+    case ANYSTRING = "ANYSTRING"
+    case INTERVAL = "INTERVAL"
+    case NONE = "NONE"
+    case ALL = "ALL"
+}
