@@ -10,15 +10,19 @@ import Foundation
 
 public class DeleteRequestBuilder: RequestBuilder {
     
-    let client: ESClient
-    var index: String?
-    var type: String?
-    var id: String?
-    var version: Int?
-    var completionHandler: ((DeleteResponse?, Error?) -> ())?
+    public typealias RequestType = DeleteRequest
     
-    init(withClient client: ESClient) {
+    let client: ESClient
+    var index: String
+    var type: String?
+    var id: String
+    var version: Int?
+    public var completionHandler: ((DeleteResponse?, Error?) -> ())?
+    
+    init(withClient client: ESClient, index : String, id: String) {
         self.client = client
+        self.index = index
+        self.id = id
     }
     
     public func set(index: String) -> Self {
@@ -46,44 +50,35 @@ public class DeleteRequestBuilder: RequestBuilder {
         return self
     }
     
-    public func make() throws -> Request {
+    public func make() throws -> DeleteRequest {
         return DeleteRequest(withBuilder: self)
     }
-    
-    public func validate() throws {
-        if index == nil {
-            throw RequestBuilderConstants.Errors.Validation.MissingField(field:"index")
-        }
-        if id == nil {
-            throw RequestBuilderConstants.Errors.Validation.MissingField(field:"id")
-        }
-    }
+
 }
 
 public class DeleteRequest: Request {
+   
+    public typealias ResponseType = DeleteResponse
     
-    let client: ESClient
+    public var completionHandler: ((DeleteResponse?, Error?) -> ())?
+    
+    public let client: ESClient
     let index: String
     let type: String?
     let id: String
     var version: Int?
-    var completionHandler: ((DeleteResponse?, Error?) -> ())?
     
     init(withBuilder builder: DeleteRequestBuilder) {
         self.client = builder.client
-        self.index = builder.index!
-        self.id = builder.id!
+        self.index = builder.index
+        self.id = builder.id
         
         self.type = builder.type
         self.version = builder.version
         self.completionHandler = builder.completionHandler
     }
     
-    public var method: HTTPMethod {
-        get {
-            return .DELETE
-        }
-    }
+    public var method: HTTPMethod = .DELETE
     
     public var endPoint: String {
         get {
@@ -101,70 +96,6 @@ public class DeleteRequest: Request {
         }
     }
     
-    public var body: Data {
-        get {
-            return Data()
-        }
-    }
-    
-    public func execute() {
-        self.client.execute(request: self, completionHandler: responseHandler)
-    }
-    
-    func responseHandler(_ response: ESResponse) {
-        if let error = response.error {
-            completionHandler?(nil, error)
-            return
-        }
-        
-        guard let data = response.data else {
-            completionHandler?(nil,nil)
-            return
-        }
-        
-        var decodingError : Error? = nil
-        do {
-            let decoded = try Serializers.decode(data: data) as DeleteResponse
-            completionHandler?(decoded, nil)
-            return
-        } catch {
-            decodingError = error
-        }
-        
-        do {
-            let esError = try Serializers.decode(data: data) as ElasticsearchError
-            completionHandler?(nil, esError)
-            return
-        } catch {
-            let message = "Error decoding response with data: " + (String(bytes: data, encoding: .utf8) ?? "nil") + " Underlying error: " + (decodingError?.localizedDescription ?? "nil")
-            let error = RequestConstants.Errors.Response.Deserialization(content: message)
-            completionHandler?(nil, error)
-            return
-        }
-        
-    }
-    
 }
 
-public class DeleteResponse: Codable {
-    
-    public var shards: Shards
-    public var index: String
-    public var type: String?
-    public var id: String
-    public var version: Int?
-    public var seqNumber: Int?
-    public var primaryTerm: Int?
-    public var result: String
-    
-    enum CodingKeys: String, CodingKey {
-        case shards = "_shards"
-        case index = "_index"
-        case type = "_type"
-        case id = "_id"
-        case version = "_version"
-        case seqNumber = "_seq_no"
-        case primaryTerm = "_primary_term"
-        case result
-    }
-}
+

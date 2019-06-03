@@ -14,7 +14,7 @@ class ElasticSwiftTests: XCTestCase {
 //        let ssl = SSLConfiguration(certPath: "/usr/local/Cellar/kibana/6.1.2/config/certs/elastic-certificates.der", isSelf: true)
 //        let settings = Settings(forHosts: ["https://localhost:9200"], withCredentials: cred, withSSL: true, sslConfig: ssl)
 //        self.client = RestClient(settings: settings)
-        let settings = Settings(forHost:"http://192.168.250.96:9200")
+        let settings = Settings(forHost:"http://192.168.1.59:9200")
         self.client = RestClient(settings: settings)
         
         do {
@@ -133,27 +133,24 @@ class ElasticSwiftTests: XCTestCase {
     }
     
     func createIndex(withCompletionHandler completionHandler: @escaping (CreateIndexResponse?,Error?) -> () ) throws {
-        let request = try self.client?.admin.indices().create()
-            .set(name: "test")
+        let request = try self.client?.admin.indices().create(withName: "test")
             .set(completionHandler: completionHandler)
             .build()
-        request?.execute()
+        try request?.execute()
     }
     
     func deleteIndex(withCompletionHandler completionHandler: @escaping (DeleteIndexResponse?,Error?) -> () ) throws {
-        let request = try self.client?.admin.indices().delete()
-            .set(name: "test")
+        let request = try self.client?.admin.indices().delete(withName: "test")
             .set(completionHandler: completionHandler)
             .build()
-        request?.execute()
+        try request?.execute()
     }
     
     func getIndex(withCompletionHandler completionHandler: @escaping (GetIndexResponse?,Error?) -> ()) throws {
-        let request = try self.client?.admin.indices().get()
-            .set(name: "test")
+        let request = try self.client?.admin.indices().get(withName: "test")
             .set(completionHandler: completionHandler)
             .build()
-        request?.execute()
+        try request?.execute()
     }
     
     func testIndex() throws {
@@ -173,16 +170,14 @@ class ElasticSwiftTests: XCTestCase {
         let msg = Message()
         msg.msg = "Test Message"
         msg.timestamp = Date().timeIntervalSince1970
-        let request = try self.client?.makeIndex()
-            .set(index: "test")
+        let request = try self.client?.makeIndex(toIndex: "test", source: msg)
 //            .set(type: "msg")
             .set(id: "0")
-            .set(source: msg)
             .set(completionHandler: handler)
             .set(refresh: .WAIT)
             .build()
         
-        request?.execute()
+        try request?.execute()
         wait(for: [indexExpectation], timeout: self.restExpectationTimeout)
     }
     
@@ -203,15 +198,13 @@ class ElasticSwiftTests: XCTestCase {
         let msg = Message()
         msg.msg = "Test Message No Id"
         msg.timestamp = Date().timeIntervalSince1970 + 100
-        let request = try self.client?.makeIndex()
-            .set(index: "test")
+        let request = try self.client?.makeIndex(toIndex: "test", source: msg)
 //            .set(type: "msg")
-            .set(source: msg)
             .set(completionHandler: handler)
             .set(refresh: .WAIT)
             .build()
         
-        request?.execute()
+        try request?.execute()
         wait(for: [indexExpectation], timeout: self.restExpectationTimeout)
     }
     
@@ -241,13 +234,11 @@ class ElasticSwiftTests: XCTestCase {
             getExpectation.fulfill()
         }
         
-        let request = try self.client?.makeGet()
-            .set(index: "test")
+        let request = try self.client?.makeGet(fromIndex: "test", id: "0")
 //            .set(type: "msg")
-            .set(id: "0")
             .set(completionHandler: handler)
             .build()
-        request?.execute()
+        try request?.execute()
         
         wait(for: [getExpectation], timeout: self.restExpectationTimeout)
     }
@@ -269,14 +260,12 @@ class ElasticSwiftTests: XCTestCase {
             deleteExpectation.fulfill()
         }
         
-        let request = try self.client?.makeDelete()
-            .set(index: "test")
+        let request = try self.client?.makeDelete(fromIndex: "test", id: "0")
 //            .set(type: "msg")
-            .set(id: "0")
             .set(completionHandler: handler)
             .build()
         
-        request?.execute()
+        try request?.execute()
         wait(for: [deleteExpectation], timeout: self.restExpectationTimeout)
     }
     
@@ -315,14 +304,13 @@ class ElasticSwiftTests: XCTestCase {
         let sort =  SortBuilders.fieldSort("timestamp")
             .set(order: .desc)
             .build()
-        let request = try self.client?.makeSearch()
-            .set(indices: "test")
+        let request = try self.client?.makeSearch(fromIndex: "test")
 //            .set(types: "msg")
             .set(query: builder.query)
             .set(sort: sort)
             .set(completionHandler: handler)
             .build()
-        request?.execute()
+        try request?.execute()
         wait(for: [searchExpectation], timeout: 10000000)
     }
     

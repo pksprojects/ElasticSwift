@@ -86,11 +86,13 @@ class SessionManager: NSObject, URLSessionDelegate {
         return self
     }
     
-    func createRequest(method: HTTPMethod, forPath pathComponent: String, witParams queryItems: [QueryParams:String]?, body: String) -> Self {
+    func createRequest(method: HTTPMethod, forPath pathComponent: String, witParams queryItems: [QueryParams:String]?, body: String?) -> Self {
         if let url = url(fromBaseURL: self.url, path: pathComponent, queryItems: queryItems) {
             var currRequest = URLRequest(url: url)
             currRequest.httpMethod = method.rawValue
-            currRequest.httpBody = body.data(using: .utf8)
+            if let bd = body {
+                currRequest.httpBody = bd.data(using: .utf8)
+            }
             self.request = currRequest
             debugPrint("URLRequest with body created \(self.request.debugDescription)")
         } else {
@@ -99,11 +101,13 @@ class SessionManager: NSObject, URLSessionDelegate {
         return self
     }
     
-    func createRequest(method: HTTPMethod, forPath pathComponent: String, witParams queryItems: [QueryParams:String]?, body: Data) -> Self {
+    func createRequest(method: HTTPMethod, forPath pathComponent: String, witParams queryItems: [QueryParams:String]?, body: Data?) -> Self {
         if let url = url(fromBaseURL: self.url, path: pathComponent, queryItems: queryItems) {
             var currRequest = URLRequest(url: url)
             currRequest.httpMethod = method.rawValue
-            currRequest.httpBody = body
+            if body != nil {
+                currRequest.httpBody = body
+            }
             self.request = currRequest
             debugPrint("URLRequest with body created")
         } else {

@@ -16,16 +16,16 @@ public class IndiciesAdmin {
         self.client = withClient
     }
     
-    func create() -> CreateIndexRequestBuilder {
-        return CreateIndexRequestBuilder(withClient: self.client)
+    func create(withName name: String) -> CreateIndexRequestBuilder {
+        return CreateIndexRequestBuilder(withClient: self.client, name: name)
     }
     
-    func get() -> GetIndexRequestBuilder {
-        return GetIndexRequestBuilder(withClient: self.client)
+    func get(withName name: String) -> GetIndexRequestBuilder {
+        return GetIndexRequestBuilder(withClient: self.client, name: name)
     }
     
-    func delete() -> DeleteIndexRequestBuilder {
-        return DeleteIndexRequestBuilder(withClient: self.client)
+    func delete(withName name: String) -> DeleteIndexRequestBuilder {
+        return DeleteIndexRequestBuilder(withClient: self.client, name: name)
     }
 }
 

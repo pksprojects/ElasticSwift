@@ -8,15 +8,21 @@
 
 import Foundation
 
-public class UpdateRequestBuilder: RequestBuilder {
+public class UpdateRequestBuilder<T: Codable> : RequestBuilder {
+    
+    public typealias RequestType = UpdateRequest<T>
     
     let client: ESClient
-    var index: String?
+    var index: String
     var type: String?
-    var id: String?
+    var id: String
     
-    init(withClient client: RestClient) {
+    public var completionHandler: ((UpdateResponse?,Error?) -> ())?
+    
+    init(withClient client: RestClient, index : String, id : String) {
         self.client = client
+        self.index = index
+        self.id = id
     }
     
     public func set(index: String) -> Self {
@@ -34,39 +40,35 @@ public class UpdateRequestBuilder: RequestBuilder {
         return self
     }
     
-    public func make() throws -> Request {
-        return UpdateRequest(withBuilder: self)
+    public func set(completionHandler: @escaping (_ response: UpdateResponse?, _ error: Error?) -> ()) -> Self {
+        self.completionHandler = completionHandler
+        return self
     }
     
-    public func validate() throws {
-        if index == nil {
-           throw RequestBuilderConstants.Errors.Validation.MissingField(field:"index")
-        }
-        if id == nil {
-           throw RequestBuilderConstants.Errors.Validation.MissingField(field:"id")
-        }
+    public func make() throws -> UpdateRequest<T> {
+        return UpdateRequest<T>(withBuilder: self)
     }
 }
 
-public class UpdateRequest: Request {
+public class UpdateRequest<T : Codable> : Request {
     
-    let client: ESClient
+    public typealias ResponseType = UpdateResponse
+    
+    public var completionHandler: ((UpdateResponse?,Error?) -> ())?
+    
+    public let client: ESClient
     let index: String
     let type: String?
     let id: String
     
-    init(withBuilder builder: UpdateRequestBuilder) {
+    init(withBuilder builder: UpdateRequestBuilder<T>) {
         self.client = builder.client
-        self.index = builder.index!
+        self.index = builder.index
+        self.id = builder.id
         self.type = builder.type
-        self.id = builder.id!
     }
     
-    public var method: HTTPMethod {
-        get {
-            return .PUT
-        }
-    }
+    public var method: HTTPMethod = .PUT
     
     public var endPoint: String {
         get {
@@ -85,17 +87,4 @@ public class UpdateRequest: Request {
         }
     }
     
-    public var body: Data {
-        get {
-            return Data()
-        }
-    }
-    
-    public func execute() {
-        self.client.execute(request: self, completionHandler: responseHandler)
-    }
-    
-    func responseHandler(_ response: ESResponse) -> Void {
-        
-    }
 }

@@ -10,8 +10,10 @@ import Foundation
 
 public class SearchRequestBuilder<T: Codable>: RequestBuilder {
     
+    public typealias RequestType = SearchRequest<T>
+    
     let client: ESClient
-    var index: String?
+    var index: String
     var type: String?
     var from: Int16?
     var size: Int16?
@@ -20,10 +22,21 @@ public class SearchRequestBuilder<T: Codable>: RequestBuilder {
     var fetchSource: Bool?
     var explain: Bool?
     var minScore: Float?
-    var completionHandler: ((_ response: SearchResponse<T>?,_ error: Error?) -> ())?
+    public var completionHandler: ((SearchResponse<T>?,Error?) -> ())?
     
-    init(withClient client: ESClient) {
+    init(withClient client: ESClient, index: String) {
         self.client = client
+        self.index = index
+    }
+    
+    init(withClient client: ESClient, indices: String...) {
+        self.client = client
+         self.index = indices.compactMap({$0}).joined(separator: ",")
+    }
+    
+    init(withClient client: ESClient, indices: [String]) {
+        self.client = client
+        self.index = indices.compactMap({$0}).joined(separator: ",")
     }
     
     public func set(indices: String...) -> Self {
@@ -76,20 +89,18 @@ public class SearchRequestBuilder<T: Codable>: RequestBuilder {
         return self
     }
     
-    public func make() throws -> Request {
+    public func make() throws -> SearchRequest<T> {
         return try SearchRequest<T>(withBuilder: self)
-    }
-    
-    public func validate() throws {
-        if index == nil {
-            throw RequestBuilderConstants.Errors.Validation.MissingField(field:"index")
-        }
     }
 }
 
-public class SearchRequest<T: Codable>: NSObject, Request {
+public class SearchRequest<T: Codable>: Request {
     
-    let client: ESClient
+    public typealias ResponseType = SearchResponse<T>
+    
+    public var completionHandler: ((SearchResponse<T>?,Error?) -> ())?
+    
+    public let client: ESClient
     var index: String
     var type: String?
     var from: Int16?
@@ -99,14 +110,12 @@ public class SearchRequest<T: Codable>: NSObject, Request {
     var fetchSource: Bool?
     var explain: Bool?
     var minScore: Float?
-    var _builtBody: Data?
-    var completionHandler: ((_ response: SearchResponse<T>?, _ error: Error?) -> ())?
+    
     
     init(withBuilder builder: SearchRequestBuilder<T>) throws {
         self.client = builder.client
-        self.index = builder.index!
-        super.init()
-        self.completionHandler = builder.completionHandler
+        self.index = builder.index
+        
         self.type = builder.type
         self.from = builder.from
         self.size = builder.size
@@ -115,38 +124,10 @@ public class SearchRequest<T: Codable>: NSObject, Request {
         self.fetchSource = builder.fetchSource
         self.explain = builder.explain
         self.minScore = builder.minScore
-        self._builtBody = try makeBody()
+        self.completionHandler = builder.completionHandler
     }
     
-    public var method: HTTPMethod {
-        get {
-            return .POST
-        }
-    }
-    
-    public var endPoint: String {
-        get {
-            var path: String = self.index + "/"
-            
-            if let type = self.type {
-                path += type + "/"
-            }
-            path += "_search"
-            return path
-        }
-    }
-    
-    public var body: Data {
-        get {
-            return self._builtBody!
-        }
-    }
-    
-    public func execute() {
-        self.client.execute(request: self, completionHandler: responseHandler)
-    }
-    
-    func makeBody() throws -> Data {
+    public func getBody() throws -> Data? {
         var dic = [String: Any]()
         if let query = self.query {
             dic["query"] = query.toDic()
@@ -172,43 +153,18 @@ public class SearchRequest<T: Codable>: NSObject, Request {
         return try JSONSerialization.data(withJSONObject: dic, options: [])
     }
     
-    func responseHandler(_ response: ESResponse) -> () {
-        if let error = response.error {
-            completionHandler?(nil, error)
-            return
-        }
-        
-        guard let data = response.data else {
-            completionHandler?(nil,nil)
-            return
-        }
-        
-        var decodingError : Error? = nil
-        do {
-            let decoded = try Serializers.decode(data: data) as SearchResponse<T>
-            completionHandler?(decoded, nil)
-            return
-        } catch {
-            decodingError = error
-        }
-        
-        do {
-            let esError = try Serializers.decode(data: data) as ElasticsearchError
-            completionHandler?(nil, esError)
-            return
-        } catch {
-            let message = "Error decoding response with data: " + (String(bytes: data, encoding: .utf8) ?? "nil") + " Underlying error: " + (decodingError?.localizedDescription ?? "nil")
-            let error = RequestConstants.Errors.Response.Deserialization(content: message)
-            completionHandler?(nil, error)
-            return
+    public var method: HTTPMethod = .POST
+    
+    public var endPoint: String {
+        get {
+            var path: String = self.index + "/"
+            
+            if let type = self.type {
+                path += type + "/"
+            }
+            path += "_search"
+            return path
         }
     }
     
-    public override var debugDescription: String {
-        get {
-            var result = "POST " + self.endPoint + " " + (String(bytes: self.body, encoding: .utf8) ?? "")
-            result += " Params: \(String(describing: self.parameters))"
-            return result
-        }
-    }
 }

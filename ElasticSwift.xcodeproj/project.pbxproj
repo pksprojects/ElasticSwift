@@ -197,11 +197,11 @@
 		OBJ_27 /* Requests */ = {
 			isa = PBXGroup;
 			children = (
+				OBJ_32 /* Request.swift */,
 				OBJ_28 /* DeleteRequest.swift */,
 				OBJ_29 /* GetRequest.swift */,
 				OBJ_30 /* IndexRequest.swift */,
 				OBJ_31 /* IndicesRequests.swift */,
-				OBJ_32 /* Request.swift */,
 				OBJ_33 /* SearchRequest.swift */,
 				OBJ_34 /* UpdateRequest.swift */,
 			);
@@ -375,6 +375,7 @@
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
