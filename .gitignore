@@ -1,6 +1,11 @@
+# Mac OS X
 .DS_Store
+
+## Swift Package Manager
 /.build
 /Packages
+
+# Xcode
 
 ## Build generated
 build/
@@ -21,3 +26,14 @@ xcuserdata/
 *.moved-aside
 *.xccheckout
 *.xcscmblueprint
+
+## Obj-C/Swift specific
+*.hmap
+*.ipa
+
+## Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# Carthage
+Carthage/Build
