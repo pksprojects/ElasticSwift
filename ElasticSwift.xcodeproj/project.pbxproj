@@ -34,6 +34,7 @@
 		0621AEF82082DD200069F6C4 /* SpecializedQueryBuilders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0621AEF72082DD200069F6C4 /* SpecializedQueryBuilders.swift */; };
 		0621AEFA2082EC240069F6C4 /* SpanQueries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0621AEF92082EC240069F6C4 /* SpanQueries.swift */; };
 		0621AEFC2082ED310069F6C4 /* SpanQueryBuilders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0621AEFB2082ED310069F6C4 /* SpanQueryBuilders.swift */; };
+		06C1580D22A27856005CB9E1 /* ScoreFunctionBuilders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06C1580C22A27856005CB9E1 /* ScoreFunctionBuilders.swift */; };
 		06F93C7C20794B57000ACFC3 /* FullTextQueries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06F93C7B20794B57000ACFC3 /* FullTextQueries.swift */; };
 		OBJ_53 /* Admin.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_10 /* Admin.swift */; };
 		OBJ_54 /* Clusters.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* Clusters.swift */; };
@@ -94,6 +95,7 @@
 		0621AEF72082DD200069F6C4 /* SpecializedQueryBuilders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpecializedQueryBuilders.swift; sourceTree = "<group>"; };
 		0621AEF92082EC240069F6C4 /* SpanQueries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanQueries.swift; sourceTree = "<group>"; };
 		0621AEFB2082ED310069F6C4 /* SpanQueryBuilders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanQueryBuilders.swift; sourceTree = "<group>"; };
+		06C1580C22A27856005CB9E1 /* ScoreFunctionBuilders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreFunctionBuilders.swift; sourceTree = "<group>"; };
 		06F93C7B20794B57000ACFC3 /* FullTextQueries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullTextQueries.swift; sourceTree = "<group>"; };
 		"ElasticSwift::ElasticSwift::Product" /* ElasticSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ElasticSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"ElasticSwift::ElasticSwiftTests::Product" /* ElasticSwiftTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = ElasticSwiftTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -190,6 +192,7 @@
 				0621AEF32082D6CE0069F6C4 /* GeoQueryBuilders.swift */,
 				0621AEF72082DD200069F6C4 /* SpecializedQueryBuilders.swift */,
 				0621AEFB2082ED310069F6C4 /* SpanQueryBuilders.swift */,
+				06C1580C22A27856005CB9E1 /* ScoreFunctionBuilders.swift */,
 			);
 			path = Builders;
 			sourceTree = "<group>";
@@ -412,6 +415,7 @@
 				OBJ_63 /* QueryBuilders.swift in Sources */,
 				OBJ_64 /* Query.swift in Sources */,
 				OBJ_65 /* Sort.swift in Sources */,
+				06C1580D22A27856005CB9E1 /* ScoreFunctionBuilders.swift in Sources */,
 				OBJ_66 /* DeleteRequest.swift in Sources */,
 				OBJ_67 /* GetRequest.swift in Sources */,
 				OBJ_68 /* IndexRequest.swift in Sources */,
@@ -505,7 +509,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_SWIFT_FLAGS = "-DXcode";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -552,7 +556,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_SWIFT_FLAGS = "-DXcode";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -613,8 +617,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				LD = /usr/bin/true;
-				OTHER_SWIFT_FLAGS = "-swift-version 4 -I $(TOOLCHAIN_DIR)/usr/lib/swift/pm/4 -target x86_64-apple-macosx10.10 -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk";
-				SWIFT_VERSION = 4.0;
+				OTHER_SWIFT_FLAGS = "-swift-version 5 -I $(TOOLCHAIN_DIR)/usr/lib/swift/pm/4 -target x86_64-apple-macosx10.10 -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -622,8 +626,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				LD = /usr/bin/true;
-				OTHER_SWIFT_FLAGS = "-swift-version 4 -I $(TOOLCHAIN_DIR)/usr/lib/swift/pm/4 -target x86_64-apple-macosx10.10 -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk";
-				SWIFT_VERSION = 4.0;
+				OTHER_SWIFT_FLAGS = "-swift-version 5 -I $(TOOLCHAIN_DIR)/usr/lib/swift/pm/4 -target x86_64-apple-macosx10.10 -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};

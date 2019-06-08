@@ -11,6 +11,9 @@ import Foundation
 
 public class ConstantScoreQueryBuilder: QueryBuilder {
     
+    var queryBuilder: QueryBuilder?
+    var boost: Int?
+    
     public var query: Query {
         return ConstantScoreQuery(withBuilder: self)
     }
@@ -21,7 +24,7 @@ public class ConstantScoreQueryBuilder: QueryBuilder {
 
 public class BoolQueryBuilder: QueryBuilder {
     
-    var boost: Float = 0.0
+    var boost: Float?
     
     private let MUST: String = "must"
     private let MUST_NOT: String = "must_not"
@@ -32,7 +35,7 @@ public class BoolQueryBuilder: QueryBuilder {
     private var mustNotClauses:[QueryBuilder] = []
     private var shouldClauses:[QueryBuilder] = []
     private var filterClauses:[QueryBuilder] = []
-    private var minimumShouldMatch: String = ""
+    private var minimumShouldMatch: Int?
     
     @discardableResult
     public func must<T: QueryBuilder>(query: T) -> BoolQueryBuilder {
@@ -59,17 +62,38 @@ public class BoolQueryBuilder: QueryBuilder {
     }
     
     public func set(minimumShouldMatch: Int) -> BoolQueryBuilder {
-        self.minimumShouldMatch = String(minimumShouldMatch)
+        self.minimumShouldMatch = minimumShouldMatch
         return self
     }
     
-    public func set(boost: Float) -> Self {
+    public func set(boost: Float) -> BoolQueryBuilder {
+        self.boost = boost
         return self
+    }
+    
+    public func getMustClauses() -> [QueryBuilder] {
+        return self.mustClauses
+    }
+    
+    public func getMustNotClauses() -> [QueryBuilder] {
+        return self.mustNotClauses
+    }
+    
+    public func getFilterClauses() -> [QueryBuilder] {
+        return self.filterClauses
+    }
+    
+    public func getShouldClauses() -> [QueryBuilder] {
+        return self.shouldClauses
+    }
+    
+    public func getMinimumShouldMatch() -> Int? {
+        return self.minimumShouldMatch
     }
     
     public var query: Query {
         get {
-            return BoolQuery(must: self.mustClauses, mustnot: self.mustNotClauses, should: self.shouldClauses, filter: self.filterClauses)
+            return BoolQuery(withBuilder: self)
         }
     }
 }
@@ -77,6 +101,15 @@ public class BoolQueryBuilder: QueryBuilder {
 // MARK:- Dis Max Query Builder
 
 public class DisMaxQueryBuilder: QueryBuilder {
+    
+    var tieBreaker: Float?
+    var boost: Float?
+    var queryBuilders: [QueryBuilder] = []
+    
+    public func add(queryBuilder: QueryBuilder) -> DisMaxQueryBuilder {
+        self.queryBuilders.append(queryBuilder)
+        return self
+    }
     
     public var query: Query {
         return DisMaxQuery(withBuilder: self)
@@ -88,6 +121,14 @@ public class DisMaxQueryBuilder: QueryBuilder {
 
 public class FunctionScoreQueryBuilder: QueryBuilder {
     
+    var queryBuilder: QueryBuilder?
+    var boost: Float?
+    var boostMode: BoostMode?
+    var maxBoost: Float?
+    var scoreMode: ScoreMode?
+    var minScore: Float?
+    var functions: [ScoreFunction] = [ScoreFunction]()
+    
     public var query: Query {
         return FunctionScoreQuery(withBuilder: self)
     }
@@ -97,6 +138,10 @@ public class FunctionScoreQueryBuilder: QueryBuilder {
 // MARK:- Boosting Query Builder
 
 public class BoostingQueryBuilder: QueryBuilder {
+    
+    public var negativeQuery: Query?
+    public var positiveQuery: Query?
+    public var negativeBoost: Float?
     
     public var query: Query {
         return BoostingQuery(withBuilder: self)
