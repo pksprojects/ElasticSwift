@@ -1,9 +1,10 @@
 language: objective-c
-osx_image: xcode9.2
+osx_image: xcode10.2
 xcode_project: ElasticSwift.xcodeproj
 xcode_scheme: ElasticSwiftTests
 before_install:
   - brew update
+  - brew cask install homebrew/cask-versions/adoptopenjdk8
   - brew install elasticsearch
   - brew services start elasticsearch
 before_script:
