@@ -176,7 +176,7 @@ public extension SecCertificate {
      * - parameter file: The DER encoded file from which to load the certificate
      * - returns: A `SecCertificate` if it could be loaded, or `nil`
      */
-    static func create(derEncodedFile file: String) -> SecCertificate? {
+    static public func create(derEncodedFile file: String) -> SecCertificate? {
         guard let data = try? Data(contentsOf: URL(fileURLWithPath: file)) else {
             return nil
         }
@@ -189,7 +189,7 @@ public extension SecCertificate {
      *
      * - returns: the data of the certificate
      */
-    var data: Data {
+    public var data: Data {
         return SecCertificateCopyData(self) as Data
     }
     
@@ -199,7 +199,7 @@ public extension SecCertificate {
      *
      * - returns: the public key if possible
      */
-    var publicKey: SecKey? {
+    public var publicKey: SecKey? {
         let policy: SecPolicy = SecPolicyCreateBasicX509()
         var uTrust: SecTrust?
         let resultCode = SecTrustCreateWithCertificates([self] as CFArray, policy, &uTrust)

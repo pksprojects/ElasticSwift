@@ -12,5 +12,7 @@ import Foundation
 public protocol QueryBuilder {
     
     var query: Query { get }
+    
+    func set(boost: Float) -> Self
 
 }
