@@ -93,3 +93,38 @@ public enum HTTPMethod: String {
     case CONNECT = "CONNECT"
 }
 
+
+public enum ShapeRelation: String {
+    case INTERSECTS = "intersects"
+    case DISJOINT = "disjoint"
+    case WITHIN = "within"
+    case CONTAINS = "contains"
+}
+
+public enum RegexFlag: String {
+    case INTERSECTION = "INTERSECTION"
+    case COMPLEMENT = "COMPLEMENT"
+    case EMPTY = "EMPTY"
+    case ANYSTRING = "ANYSTRING"
+    case INTERVAL = "INTERVAL"
+    case NONE = "NONE"
+    case ALL = "ALL"
+}
+
+public enum ScoreMode: String {
+    case FIRST = "first"
+    case AVG = "avg"
+    case MAX = "max"
+    case SUM = "sum"
+    case MIN = "min"
+    case MULTIPLY = "multiply"
+}
+
+public enum BoostMode: String {
+    case MULTIPLY = "multiply"
+    case REPLACE = "replace"
+    case SUM = "sum"
+    case AVG = "avg"
+    case MIN = "min"
+    case MAX = "max"
+}

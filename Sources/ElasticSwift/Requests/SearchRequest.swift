@@ -27,12 +27,12 @@ public class SearchRequestBuilder<T: Codable>: RequestBuilder {
     }
     
     public func set(indices: String...) -> Self {
-        self.index = indices.flatMap({$0}).joined(separator: ",")
+        self.index = indices.compactMap({$0}).joined(separator: ",")
         return self
     }
     
     public func set(types: String...) -> Self {
-        self.type = types.flatMap({$0}).joined(separator: ",")
+        self.type = types.compactMap({$0}).joined(separator: ",")
         return self
     }
     
