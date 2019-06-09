@@ -22,10 +22,12 @@ public final class SortBuilders {
 
 public class ScoreSortBuilder: SortBuilder {
     
+    private static let _SCORE = "_score"
+    
     var sort: Sort
     
     init() {
-        self.sort = Sort(field: "_score")
+        self.sort = Sort(field: ScoreSortBuilder._SCORE)
     }
     
     public func set(order: SortOrder) -> ScoreSortBuilder {
@@ -70,6 +72,9 @@ protocol SortBuilder {
 
 public class Sort {
     
+    private static let ORDER = "order"
+    private static let MODE = "mode"
+    
     let field: String
     var sortOrder: SortOrder = .desc
     var fieldTypeisArray: Bool = false
@@ -93,8 +98,8 @@ public class Sort {
     func toDic() -> [String : Any] {
         return (!self.fieldTypeisArray) ? [self.field: self.sortOrder.rawValue] :
             [self.field : [
-                "order" : self.sortOrder.rawValue,
-                "mode" : self.mode?.rawValue
+                Sort.ORDER : self.sortOrder.rawValue,
+                Sort.MODE : self.mode?.rawValue
                 ]]
     }
 }

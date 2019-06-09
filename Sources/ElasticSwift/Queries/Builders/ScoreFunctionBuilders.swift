@@ -254,6 +254,10 @@ public class WeightScoreFunction: ScoreFunction {
 }
 
 public class RandomScoreFunction: ScoreFunction {
+    
+    private static let SEED = "seed"
+    private static let FIELD = "field"
+    
     public var name: String = "random_score"
     
     var seed: Int
@@ -265,11 +269,15 @@ public class RandomScoreFunction: ScoreFunction {
     }
     
     public func toDic() -> [String : Any] {
-        return [self.name: ["seed": self.seed, "field": self.field]]
+        return [self.name: [RandomScoreFunction.SEED: self.seed, RandomScoreFunction.FIELD: self.field]]
     }
 }
 
 public class ScriptScoreFunction: ScoreFunction {
+    
+    private static let SOURCE = "source"
+    private static let PARAMS = "params"
+    
     public var name: String = "script_score"
     
     var source: String?
@@ -285,10 +293,10 @@ public class ScriptScoreFunction: ScoreFunction {
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [String: Any]()
         if let source = self.source {
-            dic["source"] = source
+            dic[ScriptScoreFunction.SOURCE] = source
         }
         if params.isEmpty {
-            dic["params"] = params
+            dic[ScriptScoreFunction.PARAMS] = params
         }
         return [self.name: dic]
     }
@@ -317,11 +325,11 @@ public class ExponentialDecayScoreFunction: DecayScoreFunction {
 
 public class DecayScoreFunction: ScoreFunction {
     
-    private static let ORIGIN = "origin";
-    private static let SCALE = "scale";
-    private static let OFFSET = "offset";
-    private static let DECAY = "decay";
-    private static let MULTI_VALUE_MODE = "multi_value_mode";
+    private static let ORIGIN = "origin"
+    private static let SCALE = "scale"
+    private static let OFFSET = "offset"
+    private static let DECAY = "decay"
+    private static let MULTI_VALUE_MODE = "multi_value_mode"
     
     public var name: String
     public var field: String
@@ -371,6 +379,12 @@ public class DecayScoreFunction: ScoreFunction {
 }
 
 public class FieldValueScoreFunction: ScoreFunction {
+    
+    private static let FIELD = "field"
+    private static let FACTOR = "factor"
+    private static let MODIFIER = "modifier"
+    private static let MISSING = "missing"
+    
     public var name: String = "field_value_factor"
     
     var field: String
@@ -387,14 +401,14 @@ public class FieldValueScoreFunction: ScoreFunction {
     
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [
-            "field": self.field,
-            "factor": self.factor
+            FieldValueScoreFunction.FIELD: self.field,
+            FieldValueScoreFunction.FACTOR: self.factor
         ]
         if let modifier = self.modifier {
-            dic["modifier"] = modifier.rawValue
+            dic[FieldValueScoreFunction.MODIFIER] = modifier.rawValue
         }
         if let missing = self.missing {
-            dic["missing"] = missing
+            dic[FieldValueScoreFunction.MISSING] = missing
         }
         return [self.name: dic]
     }

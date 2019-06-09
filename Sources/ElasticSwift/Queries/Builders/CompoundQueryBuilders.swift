@@ -35,11 +35,6 @@ public class BoolQueryBuilder: QueryBuilder {
     
     var boost: Decimal?
     
-    private let MUST: String = "must"
-    private let MUST_NOT: String = "must_not"
-    private let SHOULD: String = "should"
-    private let FILTER: String = "filter"
-    
     private var mustClauses:[QueryBuilder] = []
     private var mustNotClauses:[QueryBuilder] = []
     private var shouldClauses:[QueryBuilder] = []

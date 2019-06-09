@@ -18,6 +18,8 @@ public class MatchQueryBuilder: QueryBuilder {
     var `operator`: MatchQueryOperator?
     var zeroTermQuery: ZeroTermQuery?
     var cutoffFrequency: Decimal?
+    var fuzziness: String?
+    var autoGenSynonymnsPhraseQuery: Bool?
     
     typealias BuilderClosure = (MatchQueryBuilder) -> Void
     

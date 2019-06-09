@@ -11,18 +11,23 @@ import Foundation
 
 public class MatchAllQuery: Query {
     
+    private static let BOOST = "boost"
+    
     public let name: String = "match_all"
     
     var boost: Decimal?
     
-    init(withBuilder builder: MatchAllQueryBuilder) {
+    init() {}
+    
+    convenience init(withBuilder builder: MatchAllQueryBuilder) {
+        self.init()
         self.boost = builder.boost
     }
     
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [:]
         if let boost = self.boost {
-            dic["boost"] = boost
+            dic[MatchAllQuery.BOOST] = boost
         }
         return [name : dic]
     }
@@ -34,8 +39,10 @@ public class MatchNoneQuery: Query {
     
     public let name: String = "match_none"
     
-    init(withBuilder builder: MatchNoneQueryBuilder) {
-        
+    init() {}
+    
+    convenience init(withBuilder builder: MatchNoneQueryBuilder) {
+        self.init()
     }
     
     public func toDic() -> [String : Any] {

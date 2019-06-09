@@ -10,6 +10,10 @@ import Foundation
 // MARK:- Constant Score Query
 
 public class ConstantScoreQuery: Query {
+    
+    private static let BOOST = "boost"
+    private static let FILTER = "filter"
+    
     public let name: String = "constant_score"
     
     var queryBuilder: QueryBuilder
@@ -21,7 +25,7 @@ public class ConstantScoreQuery: Query {
     }
     
     public func toDic() -> [String : Any] {
-        return [self.name: ["filter": self.queryBuilder.query, "boost": self.boost]]
+        return [self.name: [ConstantScoreQuery.FILTER: self.queryBuilder.query, ConstantScoreQuery.BOOST: self.boost]]
     }
     
 }
@@ -30,12 +34,15 @@ public class ConstantScoreQuery: Query {
 
 public class BoolQuery: Query {
     
+    private static let BOOST = "boost"
+    private static let MUST: String = "must"
+    private static let MUST_NOT: String = "must_not"
+    private static let SHOULD: String = "should"
+    private static let FILTER: String = "filter"
+    private static let MIN_SHOULD_MATCH = "minimum_should_match"
+    
     public let name: String = "bool"
-    private let MUST: String = "must"
-    private let MUST_NOT: String = "must_not"
-    private let SHOULD: String = "should"
-    private let FILTER: String = "filter"
-    private let MIN_SHOULD_MATCH = "minimum_should_match"
+    
     var mustClauses: [Query]
     var mustNotClauses: [Query]
     var shouldClauses: [Query]
@@ -62,22 +69,22 @@ public class BoolQuery: Query {
     public func toDic() -> [String : Any] {
         var dic: [String : Any] = [:]
         if !self.mustClauses.isEmpty {
-            dic[MUST] = self.mustClauses.map { $0.toDic() }
+            dic[BoolQuery.MUST] = self.mustClauses.map { $0.toDic() }
         }
         if !self.mustNotClauses.isEmpty {
-            dic[MUST_NOT] = self.mustNotClauses.map { $0.toDic() }
+            dic[BoolQuery.MUST_NOT] = self.mustNotClauses.map { $0.toDic() }
         }
         if !self.shouldClauses.isEmpty {
-            dic[SHOULD] = self.shouldClauses.map { $0.toDic() }
+            dic[BoolQuery.SHOULD] = self.shouldClauses.map { $0.toDic() }
         }
         if !self.filterClauses.isEmpty {
-            dic[FILTER] = self.filterClauses.map { $0.toDic() }
+            dic[BoolQuery.FILTER] = self.filterClauses.map { $0.toDic() }
         }
         if let boost = self.boost {
-            dic["boost"] = boost
+            dic[BoolQuery.BOOST] = boost
         }
         if let minimumShouldMatch = self.minimumShouldMatch {
-            dic["minimum_should_match"] = minimumShouldMatch
+            dic[BoolQuery.MIN_SHOULD_MATCH] = minimumShouldMatch
         }
         return [self.name: dic]
     }
@@ -86,6 +93,11 @@ public class BoolQuery: Query {
 // MARK:- Dis Max Query
 
 public class DisMaxQuery: Query {
+    
+    private static let BOOST = "boost"
+    private static let TIE_BREAKER = "tie_breaker"
+    private static let QUERIES = "queries"
+    
     public let name: String = "dis_max"
     
     private static let DEFAULT_TIE_BREAKER: Decimal = 0.0
@@ -104,11 +116,11 @@ public class DisMaxQuery: Query {
     
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [:]
-        dic["tie_breaker"] = self.tieBreaker
+        dic[DisMaxQuery.TIE_BREAKER] = self.tieBreaker
         if let boost = self.boost {
-            dic["boost"] = boost
+            dic[DisMaxQuery.BOOST] = boost
         }
-        dic["queries"] = self.queries.map { $0.toDic() }
+        dic[DisMaxQuery.QUERIES] = self.queries.map { $0.toDic() }
         return [self.name: dic]
     }
     
@@ -118,6 +130,15 @@ public class DisMaxQuery: Query {
 // MARK:- Function Score Query
 
 public class FunctionScoreQuery: Query {
+    
+    private static let QUERY = "query"
+    private static let BOOST = "boost"
+    private static let BOOST_MODE = "boost_mode"
+    private static let MAX_BOOST = "max_boost"
+    private static let SCORE_MODE = "score_mode"
+    private static let MIN_SCORE = "min_score"
+    private static let FUNCTIONS = "functions"
+    
     public let name: String = "function_score"
     
     var queryBuilder: QueryBuilder?
@@ -141,29 +162,29 @@ public class FunctionScoreQuery: Query {
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [:]
         if let query = self.queryBuilder?.query {
-            dic["query"] = query
+            dic[FunctionScoreQuery.QUERY] = query
         }
         if let boost = self.boost {
-            dic["boost"] = boost
+            dic[FunctionScoreQuery.BOOST] = boost
         }
         if let boostMode = self.boostMode {
-            dic["boost_mode"] = boostMode
+            dic[FunctionScoreQuery.BOOST_MODE] = boostMode
         }
         if let maxBoost = self.maxBoost {
-            dic["max_boost"] = maxBoost
+            dic[FunctionScoreQuery.MAX_BOOST] = maxBoost
         }
         if let scoreMode = self.scoreMode {
-            dic["score_mode"] = scoreMode
+            dic[FunctionScoreQuery.SCORE_MODE] = scoreMode
         }
         if let minScore = self.minScore {
-            dic["min_score"] = minScore
+            dic[FunctionScoreQuery.MIN_SCORE] = minScore
         }
         if !functions.isEmpty {
             if functions.count == 1 {
                 let scoreFunction = functions[0]
                 dic[scoreFunction.name] = scoreFunction.toDic()[scoreFunction.name]
             } else {
-                dic["functions"] = functions.map { $0.toDic() }
+                dic[FunctionScoreQuery.FUNCTIONS] = functions.map { $0.toDic() }
             }
         }
         return [self.name: dic]
