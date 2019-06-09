@@ -13,7 +13,7 @@ public class MatchAllQuery: Query {
     
     public let name: String = "match_all"
     
-    var boost: Float?
+    var boost: Decimal?
     
     init(withBuilder builder: MatchAllQueryBuilder) {
         self.boost = builder.boost

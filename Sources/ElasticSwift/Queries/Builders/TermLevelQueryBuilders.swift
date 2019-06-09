@@ -12,7 +12,7 @@ import Foundation
 public class TermQueryBuilder: QueryBuilder {
     var field: String?
     var value: String?
-    var boost: Double?
+    var boost: Decimal?
     
     public var query: Query {
         get {
@@ -48,7 +48,7 @@ public class RangeQueryBuilder: QueryBuilder {
     var lt: String?
     var format: String?
     var timeZone: String?
-    var boost: Double?
+    var boost: Decimal?
     var relation: ShapeRelation?
     
     
@@ -82,7 +82,7 @@ public class PrefixQueryBuilder: QueryBuilder {
     
     var field: String?
     var value: String?
-    var boost: Double?
+    var boost: Decimal?
     
     public var query: Query {
         get {
@@ -99,7 +99,7 @@ public class WildCardQueryBuilder: QueryBuilder {
     
     var field: String?
     var value: String?
-    var boost: Double?
+    var boost: Decimal?
     
     public var query: Query {
         get {
@@ -115,7 +115,7 @@ public class RegexpQueryBuilder: QueryBuilder {
     
     var field: String?
     var value: String?
-    var boost: Double?
+    var boost: Decimal?
     var regexFlags: [RegexFlag]?
     var maxDeterminizedStates: Int?
     
@@ -133,7 +133,7 @@ public class FuzzyQueryBuilder: QueryBuilder {
     
     var field: String?
     var value: String?
-    var boost: Double?
+    var boost: Decimal?
     var fuzziness: Int?
     var prefixLenght: Int?
     var maxExpansions: Int?

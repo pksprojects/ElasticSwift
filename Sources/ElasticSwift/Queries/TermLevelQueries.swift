@@ -14,7 +14,7 @@ public class TermQuery: Query {
     public let name: String = "term"
     var field: String
     var value: String
-    var boost: Double?
+    var boost: Decimal?
     
     public init(withBuilder builder: TermQueryBuilder) {
         self.field = builder.field!
@@ -68,7 +68,7 @@ public class RangeQuery: Query {
     var lt: String?
     var format: String?
     var timeZone: String?
-    var boost: Double?
+    var boost: Decimal?
     var relation: ShapeRelation?
     
     public init(withBuilder builder: RangeQueryBuilder) {
@@ -140,7 +140,7 @@ public class PrefixQuery: Query {
     
     var field: String
     var value: String
-    var boost: Double?
+    var boost: Decimal?
     
     public init(withBuilder builder: PrefixQueryBuilder) {
         self.field = builder.field!
@@ -168,7 +168,7 @@ public class WildCardQuery: Query {
     
     var field: String
     var value: String
-    var boost: Double?
+    var boost: Decimal?
     
     public init(withBuilder builder: WildCardQueryBuilder) {
         self.field = builder.field!
@@ -196,7 +196,7 @@ public class RegexpQuery: Query {
     
     var field: String
     var value: String
-    var boost: Double?
+    var boost: Decimal?
     var regexFlags: String?
     var maxDeterminizedStates: Int?
     
@@ -233,7 +233,7 @@ public class FuzzyQuery: Query {
     
     var field: String
     var value: String
-    var boost: Double?
+    var boost: Decimal?
     var fuzziness: Int?
     var prefixLenght: Int?
     var maxExpansions: Int?

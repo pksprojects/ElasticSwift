@@ -13,7 +13,7 @@ public class ConstantScoreQuery: Query {
     public let name: String = "constant_score"
     
     var queryBuilder: QueryBuilder
-    var boost: Int
+    var boost: Decimal
     
     public init(withBuilder builder: ConstantScoreQueryBuilder) {
         self.queryBuilder = builder.queryBuilder!
@@ -41,7 +41,7 @@ public class BoolQuery: Query {
     var shouldClauses: [Query]
     var filterClauses: [Query]
     var minimumShouldMatch: Int?
-    var boost: Float?
+    var boost: Decimal?
     
     init(must: [QueryBuilder], mustnot: [QueryBuilder], should: [QueryBuilder], filter: [QueryBuilder]) {
         self.mustClauses = must.map { $0.query }
@@ -88,10 +88,10 @@ public class BoolQuery: Query {
 public class DisMaxQuery: Query {
     public let name: String = "dis_max"
     
-    private static let DEFAULT_TIE_BREAKER: Float = 0.0
+    private static let DEFAULT_TIE_BREAKER: Decimal = 0.0
     
-    var tieBreaker: Float = DEFAULT_TIE_BREAKER
-    var boost: Float?
+    var tieBreaker: Decimal = DEFAULT_TIE_BREAKER
+    var boost: Decimal?
     var queries: [Query]
     
     public init(withBuilder builder: DisMaxQueryBuilder) {
@@ -121,11 +121,11 @@ public class FunctionScoreQuery: Query {
     public let name: String = "function_score"
     
     var queryBuilder: QueryBuilder?
-    var boost: Float?
+    var boost: Decimal?
     var boostMode: BoostMode?
-    var maxBoost: Float?
+    var maxBoost: Decimal?
     var scoreMode: ScoreMode?
-    var minScore: Float?
+    var minScore: Decimal?
     var functions: [ScoreFunction]
     
     public init(withBuilder builder: FunctionScoreQueryBuilder) {
@@ -184,7 +184,7 @@ public class BoostingQuery: Query {
     
     public var negativeQuery: Query?
     public var positiveQuery: Query?
-    public var negativeBoost: Float?
+    public var negativeBoost: Decimal?
     
     public init(withBuilder builder: BoostingQueryBuilder) {
         self.negativeQuery = builder.negativeQuery

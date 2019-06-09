@@ -12,7 +12,7 @@ import Foundation
 public class ConstantScoreQueryBuilder: QueryBuilder {
     
     var queryBuilder: QueryBuilder?
-    var boost: Int?
+    var boost: Decimal?
     
     public var query: Query {
         return ConstantScoreQuery(withBuilder: self)
@@ -24,7 +24,7 @@ public class ConstantScoreQueryBuilder: QueryBuilder {
 
 public class BoolQueryBuilder: QueryBuilder {
     
-    var boost: Float?
+    var boost: Decimal?
     
     private let MUST: String = "must"
     private let MUST_NOT: String = "must_not"
@@ -66,7 +66,7 @@ public class BoolQueryBuilder: QueryBuilder {
         return self
     }
     
-    public func set(boost: Float) -> BoolQueryBuilder {
+    public func set(boost: Decimal) -> BoolQueryBuilder {
         self.boost = boost
         return self
     }
@@ -102,8 +102,8 @@ public class BoolQueryBuilder: QueryBuilder {
 
 public class DisMaxQueryBuilder: QueryBuilder {
     
-    var tieBreaker: Float?
-    var boost: Float?
+    var tieBreaker: Decimal?
+    var boost: Decimal?
     var queryBuilders: [QueryBuilder] = []
     
     public func add(queryBuilder: QueryBuilder) -> DisMaxQueryBuilder {
@@ -122,11 +122,11 @@ public class DisMaxQueryBuilder: QueryBuilder {
 public class FunctionScoreQueryBuilder: QueryBuilder {
     
     var queryBuilder: QueryBuilder?
-    var boost: Float?
+    var boost: Decimal?
     var boostMode: BoostMode?
-    var maxBoost: Float?
+    var maxBoost: Decimal?
     var scoreMode: ScoreMode?
-    var minScore: Float?
+    var minScore: Decimal?
     var functions: [ScoreFunction] = [ScoreFunction]()
     
     public var query: Query {
@@ -141,7 +141,7 @@ public class BoostingQueryBuilder: QueryBuilder {
     
     public var negativeQuery: Query?
     public var positiveQuery: Query?
-    public var negativeBoost: Float?
+    public var negativeBoost: Decimal?
     
     public var query: Query {
         return BoostingQuery(withBuilder: self)

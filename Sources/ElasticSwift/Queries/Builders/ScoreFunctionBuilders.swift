@@ -49,7 +49,7 @@ public protocol ScoreFunction {
 
 public class WeightBuilder: ScoreFunctionBuilder {
     
-    var weight: Float?
+    var weight: Decimal?
     
     public var scoreFunction: ScoreFunction {
         return WeightScoreFunction(withBuilder: self)
@@ -84,7 +84,7 @@ public class LinearDecayFunctionBuilder: ScoreFunctionBuilder {
     public var origin: String?
     public var scale: String?
     public var offset: String?
-    public var decay: Double?
+    public var decay: Decimal?
     public var isMultiValue: Bool = false
     public var multiValueMode: DecayScoreFunction.MultiValueMode = .MIN
     
@@ -100,7 +100,7 @@ public class GaussDecayFunctionBuilder: ScoreFunctionBuilder {
     public var origin: String?
     public var scale: String?
     public var offset: String?
-    public var decay: Double?
+    public var decay: Decimal?
     public var isMultiValue: Bool = false
     public var multiValueMode: DecayScoreFunction.MultiValueMode = .MIN
     
@@ -116,7 +116,7 @@ public class ExponentialDecayFunctionBuilder: ScoreFunctionBuilder {
     public var origin: String?
     public var scale: String?
     public var offset: String?
-    public var decay: Double?
+    public var decay: Decimal?
     public var isMultiValue: Bool = false
     public var multiValueMode: DecayScoreFunction.MultiValueMode = .MIN
     
@@ -129,9 +129,9 @@ public class ExponentialDecayFunctionBuilder: ScoreFunctionBuilder {
 public class FieldValueFactorFunctionBuilder: ScoreFunctionBuilder {
     
     var field: String?
-    var factor: Float?
+    var factor: Decimal?
     var modifier: FieldValueScoreFunction.Modifier?
-    var missing: Double?
+    var missing: Decimal?
     
     public var scoreFunction: ScoreFunction {
         return FieldValueScoreFunction(withBuilder: self)
@@ -143,7 +143,7 @@ public class FieldValueFactorFunctionBuilder: ScoreFunctionBuilder {
 public class WeightScoreFunction: ScoreFunction {
     public var name: String = "weight"
     
-    var weight: Float
+    var weight: Decimal
     
     public init(withBuilder builder: WeightBuilder) {
         self.weight = builder.weight!
@@ -232,9 +232,9 @@ public class DecayScoreFunction: ScoreFunction {
     public var origin: String
     public var scale: String
     public var offset: String
-    public var decay: Double
+    public var decay: Decimal
     
-    public init(type: DecayScoreFunctionType, field: String, origin: String, scale: String, offset: String, decay: Double, isMultiValue: Bool, multiValueMode: MultiValueMode) {
+    public init(type: DecayScoreFunctionType, field: String, origin: String, scale: String, offset: String, decay: Decimal, isMultiValue: Bool, multiValueMode: MultiValueMode) {
         self.name = type.rawValue
         self.field = field
         self.origin = origin
@@ -275,9 +275,9 @@ public class FieldValueScoreFunction: ScoreFunction {
     public var name: String = "field_value_factor"
     
     var field: String
-    var factor: Float
+    var factor: Decimal
     var modifier: Modifier?
-    var missing: Double?
+    var missing: Decimal?
     
     public init(withBuilder builder: FieldValueFactorFunctionBuilder) {
         self.field = builder.field!

@@ -19,7 +19,7 @@ public class SearchRequestBuilder<T: Codable>: RequestBuilder {
     var sort: Sort?
     var fetchSource: Bool?
     var explain: Bool?
-    var minScore: Float?
+    var minScore: Decimal?
     var completionHandler: ((_ response: SearchResponse<T>?, _ error: Error?) -> Void)?
     
     init(withClient client: ESClient) {
@@ -66,7 +66,7 @@ public class SearchRequestBuilder<T: Codable>: RequestBuilder {
         return self
     }
     
-    public func set(minScore: Float) -> Self {
+    public func set(minScore: Decimal) -> Self {
         self.minScore = minScore
         return self
     }
@@ -92,7 +92,7 @@ public class SearchRequest<T: Codable>: Request {
     var sort: Sort?
     var fetchSource: Bool?
     var explain: Bool?
-    var minScore: Float?
+    var minScore: Decimal?
     var _builtBody: Data?
     var completionHandler: ((_ response: SearchResponse<T>?, _ error: Error?) -> Void)
     

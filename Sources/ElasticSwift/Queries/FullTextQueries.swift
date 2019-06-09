@@ -17,7 +17,7 @@ public class MatchQuery: Query {
     var value: String
     var `operator`: MatchQueryOperator?
     var zeroTermQuery: ZeroTermQuery?
-    var cutoffFrequency: Float?
+    var cutoffFrequency: Decimal?
     
     init(field: String, value: String) {
         self.field = field
@@ -116,7 +116,7 @@ public class MultiMatchQuery: Query {
     
     var tieBreakerKey = "tie_breaker"
     var typeKey = "type"
-    var tieBreaker: Float?
+    var tieBreaker: Decimal?
     var type: MultiMatchQueryType?
     var query: String
     var fields: [String]
@@ -150,7 +150,7 @@ public class CommonTermsQuery: Query {
     public let name: String = "common"
     
     var value: String
-    var cutoffFrequency: Float
+    var cutoffFrequency: Decimal
     var lowFrequencyOperator: String?
     var highFrequencyOperator: String?
     var minimumShouldMatch: Int?
@@ -208,7 +208,7 @@ public class QueryStringQuery: Query {
     var fuzzyPrefixLength: Int?
     var fuzzyTranspositions: Bool?
     var phraseSlop: Int?
-    var boost: Float?
+    var boost: Decimal?
     var autoGeneratePhraseQueries: Bool?
     var analyzeWildcard: Bool?
     var maxDeterminizedStates: Int?

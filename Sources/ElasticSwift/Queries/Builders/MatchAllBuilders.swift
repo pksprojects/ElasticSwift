@@ -11,7 +11,7 @@ import Foundation
 
 public class MatchAllQueryBuilder: QueryBuilder {
     
-    public var boost: Float?
+    public var boost: Decimal?
     
     public var query: Query {
         get {
@@ -19,7 +19,7 @@ public class MatchAllQueryBuilder: QueryBuilder {
         }
     }
     
-    public func set(boost: Float) -> Self {
+    public func set(boost: Decimal) -> Self {
         self.boost = boost
         return self
     }
