@@ -132,7 +132,7 @@ public class IndexRequest<T: Codable>: Request {
         }
         do {
             let decoded: IndexResponse? = try Serializers.decode(data: response.data!)
-            if decoded?.id == nil {
+            if decoded?.result != nil {
                 return completionHandler(decoded, nil)
             } else {
                 let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
