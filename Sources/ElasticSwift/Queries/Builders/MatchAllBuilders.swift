@@ -13,6 +13,15 @@ public class MatchAllQueryBuilder: QueryBuilder {
     
     public var boost: Decimal?
     
+    typealias BuilderClosure = (MatchAllQueryBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
+    
     public var query: Query {
         get {
             return MatchAllQuery(withBuilder: self)

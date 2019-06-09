@@ -19,6 +19,15 @@ public class MatchQueryBuilder: QueryBuilder {
     var zeroTermQuery: ZeroTermQuery?
     var cutoffFrequency: Decimal?
     
+    typealias BuilderClosure = (MatchQueryBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
+    
     public var query: Query {
         get {
             return MatchQuery(withBuilder: self)
@@ -69,6 +78,15 @@ public class MatchPhraseQueryBuilder: QueryBuilder {
     var value: String?
     var analyzer: String?
     
+    typealias BuilderClosure = (MatchPhraseQueryBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
+    
     public var query: Query {
         get {
             return MatchPhraseQuery(withBuilder: self)
@@ -100,6 +118,15 @@ public class MatchPhrasePrefixQueryBuilder: QueryBuilder {
     var field: String?
     var value: String?
     var maxExpansions: Int?
+    
+    typealias BuilderClosure = (MatchPhrasePrefixQueryBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
 
     public var query: Query {
         get {
@@ -133,6 +160,15 @@ public class MultiMatchQueryBuilder: QueryBuilder {
     var fields: [String]?
     var type: MultiMatchQueryType?
     var tieBreaker: Decimal?
+    
+    typealias BuilderClosure = (MultiMatchQueryBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
     
     public var query: Query {
         get {
@@ -173,6 +209,15 @@ public class CommonTermsQueryBuilder: QueryBuilder {
     var minimumShouldMatch: Int?
     var minimumShouldMatchLowFreq: Int?
     var minimumShouldMatchHighFreq: Int?
+    
+    typealias BuilderClosure = (CommonTermsQueryBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
     
     public var query: Query {
         get {
@@ -246,6 +291,15 @@ public class QueryStringQueryBuilder: QueryBuilder {
     var timeZone: String?
     var quoteFieldSuffix: String?
     var autoGenerateSynonymsPhraseQuery: Bool?
+    
+    typealias BuilderClosure = (QueryStringQueryBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
     
     public var query: Query {
         get {
@@ -371,6 +425,14 @@ public class SimpleQueryStringQueryBuilder: QueryBuilder {
     var quoteFieldSuffix: String?
     var autoGenerateSynonymsPhraseQuery: Bool?
     
+    typealias BuilderClosure = (SimpleQueryStringQueryBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
     
     public var query: Query {
         get {

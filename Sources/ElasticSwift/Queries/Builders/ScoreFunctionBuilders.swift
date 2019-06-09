@@ -15,6 +15,14 @@ public class ScoreFunctionBuilders {
         return LinearDecayFunctionBuilder()
     }
     
+    public static func gaussDecayFunction() -> GaussDecayFunctionBuilder {
+        return GaussDecayFunctionBuilder()
+    }
+    
+    public static func exponentialDecayFunction() -> ExponentialDecayFunctionBuilder {
+        return ExponentialDecayFunctionBuilder()
+    }
+    
     public static func scriptFunction() -> ScriptScoreFunctionBuilder {
         return ScriptScoreFunctionBuilder()
     }
@@ -29,6 +37,34 @@ public class ScoreFunctionBuilders {
     
     public static func fieldValueFactorFunction() -> FieldValueFactorFunctionBuilder {
         return FieldValueFactorFunctionBuilder()
+    }
+    
+    public static func linearDecayFunction(_ builderClosure: (LinearDecayFunctionBuilder) -> Void) -> LinearDecayFunctionBuilder {
+        return LinearDecayFunctionBuilder(builderClosure: builderClosure)
+    }
+    
+    public static func gaussDecayFunction(_ builderClosure: (GaussDecayFunctionBuilder) -> Void) -> GaussDecayFunctionBuilder {
+        return GaussDecayFunctionBuilder(builderClosure: builderClosure)
+    }
+    
+    public static func exponentialDecayFunction(_ builderClosure: (ExponentialDecayFunctionBuilder) -> Void) -> ExponentialDecayFunctionBuilder {
+        return ExponentialDecayFunctionBuilder(builderClosure: builderClosure)
+    }
+    
+    public static func scriptFunction(_ builderClosure: (ScriptScoreFunctionBuilder) -> Void) -> ScriptScoreFunctionBuilder {
+        return ScriptScoreFunctionBuilder(builderClosure: builderClosure)
+    }
+    
+    public static func randomFunction(_ builderClosure: (RandomScoreFunctionBuilder) -> Void) -> RandomScoreFunctionBuilder {
+        return RandomScoreFunctionBuilder(builderClosure: builderClosure)
+    }
+    
+    public static func weightFactorFunction(_ builderClosure: (WeightBuilder) -> Void) -> WeightBuilder {
+        return WeightBuilder(builderClosure: builderClosure)
+    }
+    
+    public static func fieldValueFactorFunction(_ builderClosure: (FieldValueFactorFunctionBuilder) -> Void) -> FieldValueFactorFunctionBuilder {
+        return FieldValueFactorFunctionBuilder(builderClosure: builderClosure)
     }
 }
 
@@ -51,6 +87,15 @@ public class WeightBuilder: ScoreFunctionBuilder {
     
     var weight: Decimal?
     
+    typealias BuilderClosure = (WeightBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
+    
     public var scoreFunction: ScoreFunction {
         return WeightScoreFunction(withBuilder: self)
     }
@@ -62,6 +107,15 @@ public class RandomScoreFunctionBuilder: ScoreFunctionBuilder {
     var seed: Int?
     var field: String?
     
+    typealias BuilderClosure = (RandomScoreFunctionBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
+    
     public var scoreFunction: ScoreFunction {
         return RandomScoreFunction(withBuilder: self)
     }
@@ -71,6 +125,15 @@ public class RandomScoreFunctionBuilder: ScoreFunctionBuilder {
 public class ScriptScoreFunctionBuilder: ScoreFunctionBuilder {
     
     var script: Script?
+    
+    typealias BuilderClosure = (ScriptScoreFunctionBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
     
     public var scoreFunction: ScoreFunction {
         return ScriptScoreFunction(withBuilder: self)
@@ -88,6 +151,15 @@ public class LinearDecayFunctionBuilder: ScoreFunctionBuilder {
     public var isMultiValue: Bool = false
     public var multiValueMode: DecayScoreFunction.MultiValueMode = .MIN
     
+    typealias BuilderClosure = (LinearDecayFunctionBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
+    
     public var scoreFunction: ScoreFunction {
         return LinearDecayScoreFunction(withBuilder: self)
     }
@@ -103,6 +175,15 @@ public class GaussDecayFunctionBuilder: ScoreFunctionBuilder {
     public var decay: Decimal?
     public var isMultiValue: Bool = false
     public var multiValueMode: DecayScoreFunction.MultiValueMode = .MIN
+    
+    typealias BuilderClosure = (GaussDecayFunctionBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
     
     public var scoreFunction: ScoreFunction {
         return GaussScoreFunction(withBuilder: self)
@@ -120,6 +201,15 @@ public class ExponentialDecayFunctionBuilder: ScoreFunctionBuilder {
     public var isMultiValue: Bool = false
     public var multiValueMode: DecayScoreFunction.MultiValueMode = .MIN
     
+    typealias BuilderClosure = (ExponentialDecayFunctionBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
+    
     public var scoreFunction: ScoreFunction {
         return ExponentialDecayScoreFunction(withBuilder: self)
     }
@@ -132,6 +222,15 @@ public class FieldValueFactorFunctionBuilder: ScoreFunctionBuilder {
     var factor: Decimal?
     var modifier: FieldValueScoreFunction.Modifier?
     var missing: Decimal?
+    
+    typealias BuilderClosure = (FieldValueFactorFunctionBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
     
     public var scoreFunction: ScoreFunction {
         return FieldValueScoreFunction(withBuilder: self)
