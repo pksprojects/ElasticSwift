@@ -109,7 +109,7 @@ public class Shards: Codable {
 public class Hits<T: Codable>: Codable {
     
     public var total: Int?
-    public var maxScore: Double?
+    public var maxScore: Decimal?
     public var hits: [SearchHit<T>] = []
     
     init() {
@@ -130,7 +130,7 @@ public class SearchHit<T: Codable>: Codable {
     public var index: String?
     public var type: String?
     public var id: String?
-    public var score: Double?
+    public var score: Decimal?
     public var source: T?
     
     

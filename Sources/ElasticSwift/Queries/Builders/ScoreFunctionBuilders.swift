@@ -15,6 +15,14 @@ public class ScoreFunctionBuilders {
         return LinearDecayFunctionBuilder()
     }
     
+    public static func gaussDecayFunction() -> GaussDecayFunctionBuilder {
+        return GaussDecayFunctionBuilder()
+    }
+    
+    public static func exponentialDecayFunction() -> ExponentialDecayFunctionBuilder {
+        return ExponentialDecayFunctionBuilder()
+    }
+    
     public static func scriptFunction() -> ScriptScoreFunctionBuilder {
         return ScriptScoreFunctionBuilder()
     }
@@ -29,6 +37,34 @@ public class ScoreFunctionBuilders {
     
     public static func fieldValueFactorFunction() -> FieldValueFactorFunctionBuilder {
         return FieldValueFactorFunctionBuilder()
+    }
+    
+    public static func linearDecayFunction(_ builderClosure: (LinearDecayFunctionBuilder) -> Void) -> LinearDecayFunctionBuilder {
+        return LinearDecayFunctionBuilder(builderClosure: builderClosure)
+    }
+    
+    public static func gaussDecayFunction(_ builderClosure: (GaussDecayFunctionBuilder) -> Void) -> GaussDecayFunctionBuilder {
+        return GaussDecayFunctionBuilder(builderClosure: builderClosure)
+    }
+    
+    public static func exponentialDecayFunction(_ builderClosure: (ExponentialDecayFunctionBuilder) -> Void) -> ExponentialDecayFunctionBuilder {
+        return ExponentialDecayFunctionBuilder(builderClosure: builderClosure)
+    }
+    
+    public static func scriptFunction(_ builderClosure: (ScriptScoreFunctionBuilder) -> Void) -> ScriptScoreFunctionBuilder {
+        return ScriptScoreFunctionBuilder(builderClosure: builderClosure)
+    }
+    
+    public static func randomFunction(_ builderClosure: (RandomScoreFunctionBuilder) -> Void) -> RandomScoreFunctionBuilder {
+        return RandomScoreFunctionBuilder(builderClosure: builderClosure)
+    }
+    
+    public static func weightFactorFunction(_ builderClosure: (WeightBuilder) -> Void) -> WeightBuilder {
+        return WeightBuilder(builderClosure: builderClosure)
+    }
+    
+    public static func fieldValueFactorFunction(_ builderClosure: (FieldValueFactorFunctionBuilder) -> Void) -> FieldValueFactorFunctionBuilder {
+        return FieldValueFactorFunctionBuilder(builderClosure: builderClosure)
     }
 }
 
@@ -49,7 +85,16 @@ public protocol ScoreFunction {
 
 public class WeightBuilder: ScoreFunctionBuilder {
     
-    var weight: Float?
+    var weight: Decimal?
+    
+    typealias BuilderClosure = (WeightBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
     
     public var scoreFunction: ScoreFunction {
         return WeightScoreFunction(withBuilder: self)
@@ -62,6 +107,15 @@ public class RandomScoreFunctionBuilder: ScoreFunctionBuilder {
     var seed: Int?
     var field: String?
     
+    typealias BuilderClosure = (RandomScoreFunctionBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
+    
     public var scoreFunction: ScoreFunction {
         return RandomScoreFunction(withBuilder: self)
     }
@@ -71,6 +125,15 @@ public class RandomScoreFunctionBuilder: ScoreFunctionBuilder {
 public class ScriptScoreFunctionBuilder: ScoreFunctionBuilder {
     
     var script: Script?
+    
+    typealias BuilderClosure = (ScriptScoreFunctionBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
     
     public var scoreFunction: ScoreFunction {
         return ScriptScoreFunction(withBuilder: self)
@@ -84,9 +147,18 @@ public class LinearDecayFunctionBuilder: ScoreFunctionBuilder {
     public var origin: String?
     public var scale: String?
     public var offset: String?
-    public var decay: Double?
+    public var decay: Decimal?
     public var isMultiValue: Bool = false
     public var multiValueMode: DecayScoreFunction.MultiValueMode = .MIN
+    
+    typealias BuilderClosure = (LinearDecayFunctionBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
     
     public var scoreFunction: ScoreFunction {
         return LinearDecayScoreFunction(withBuilder: self)
@@ -100,9 +172,18 @@ public class GaussDecayFunctionBuilder: ScoreFunctionBuilder {
     public var origin: String?
     public var scale: String?
     public var offset: String?
-    public var decay: Double?
+    public var decay: Decimal?
     public var isMultiValue: Bool = false
     public var multiValueMode: DecayScoreFunction.MultiValueMode = .MIN
+    
+    typealias BuilderClosure = (GaussDecayFunctionBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
     
     public var scoreFunction: ScoreFunction {
         return GaussScoreFunction(withBuilder: self)
@@ -116,9 +197,18 @@ public class ExponentialDecayFunctionBuilder: ScoreFunctionBuilder {
     public var origin: String?
     public var scale: String?
     public var offset: String?
-    public var decay: Double?
+    public var decay: Decimal?
     public var isMultiValue: Bool = false
     public var multiValueMode: DecayScoreFunction.MultiValueMode = .MIN
+    
+    typealias BuilderClosure = (ExponentialDecayFunctionBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
     
     public var scoreFunction: ScoreFunction {
         return ExponentialDecayScoreFunction(withBuilder: self)
@@ -129,9 +219,18 @@ public class ExponentialDecayFunctionBuilder: ScoreFunctionBuilder {
 public class FieldValueFactorFunctionBuilder: ScoreFunctionBuilder {
     
     var field: String?
-    var factor: Float?
+    var factor: Decimal?
     var modifier: FieldValueScoreFunction.Modifier?
-    var missing: Double?
+    var missing: Decimal?
+    
+    typealias BuilderClosure = (FieldValueFactorFunctionBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
     
     public var scoreFunction: ScoreFunction {
         return FieldValueScoreFunction(withBuilder: self)
@@ -143,7 +242,7 @@ public class FieldValueFactorFunctionBuilder: ScoreFunctionBuilder {
 public class WeightScoreFunction: ScoreFunction {
     public var name: String = "weight"
     
-    var weight: Float
+    var weight: Decimal
     
     public init(withBuilder builder: WeightBuilder) {
         self.weight = builder.weight!
@@ -155,6 +254,10 @@ public class WeightScoreFunction: ScoreFunction {
 }
 
 public class RandomScoreFunction: ScoreFunction {
+    
+    private static let SEED = "seed"
+    private static let FIELD = "field"
+    
     public var name: String = "random_score"
     
     var seed: Int
@@ -166,11 +269,15 @@ public class RandomScoreFunction: ScoreFunction {
     }
     
     public func toDic() -> [String : Any] {
-        return [self.name: ["seed": self.seed, "field": self.field]]
+        return [self.name: [RandomScoreFunction.SEED: self.seed, RandomScoreFunction.FIELD: self.field]]
     }
 }
 
 public class ScriptScoreFunction: ScoreFunction {
+    
+    private static let SOURCE = "source"
+    private static let PARAMS = "params"
+    
     public var name: String = "script_score"
     
     var source: String?
@@ -186,10 +293,10 @@ public class ScriptScoreFunction: ScoreFunction {
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [String: Any]()
         if let source = self.source {
-            dic["source"] = source
+            dic[ScriptScoreFunction.SOURCE] = source
         }
         if params.isEmpty {
-            dic["params"] = params
+            dic[ScriptScoreFunction.PARAMS] = params
         }
         return [self.name: dic]
     }
@@ -218,11 +325,11 @@ public class ExponentialDecayScoreFunction: DecayScoreFunction {
 
 public class DecayScoreFunction: ScoreFunction {
     
-    private static let ORIGIN = "origin";
-    private static let SCALE = "scale";
-    private static let OFFSET = "offset";
-    private static let DECAY = "decay";
-    private static let MULTI_VALUE_MODE = "multi_value_mode";
+    private static let ORIGIN = "origin"
+    private static let SCALE = "scale"
+    private static let OFFSET = "offset"
+    private static let DECAY = "decay"
+    private static let MULTI_VALUE_MODE = "multi_value_mode"
     
     public var name: String
     public var field: String
@@ -232,9 +339,9 @@ public class DecayScoreFunction: ScoreFunction {
     public var origin: String
     public var scale: String
     public var offset: String
-    public var decay: Double
+    public var decay: Decimal
     
-    public init(type: DecayScoreFunctionType, field: String, origin: String, scale: String, offset: String, decay: Double, isMultiValue: Bool, multiValueMode: MultiValueMode) {
+    public init(type: DecayScoreFunctionType, field: String, origin: String, scale: String, offset: String, decay: Decimal, isMultiValue: Bool, multiValueMode: MultiValueMode) {
         self.name = type.rawValue
         self.field = field
         self.origin = origin
@@ -272,12 +379,18 @@ public class DecayScoreFunction: ScoreFunction {
 }
 
 public class FieldValueScoreFunction: ScoreFunction {
+    
+    private static let FIELD = "field"
+    private static let FACTOR = "factor"
+    private static let MODIFIER = "modifier"
+    private static let MISSING = "missing"
+    
     public var name: String = "field_value_factor"
     
     var field: String
-    var factor: Float
+    var factor: Decimal
     var modifier: Modifier?
-    var missing: Double?
+    var missing: Decimal?
     
     public init(withBuilder builder: FieldValueFactorFunctionBuilder) {
         self.field = builder.field!
@@ -288,14 +401,14 @@ public class FieldValueScoreFunction: ScoreFunction {
     
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [
-            "field": self.field,
-            "factor": self.factor
+            FieldValueScoreFunction.FIELD: self.field,
+            FieldValueScoreFunction.FACTOR: self.factor
         ]
         if let modifier = self.modifier {
-            dic["modifier"] = modifier.rawValue
+            dic[FieldValueScoreFunction.MODIFIER] = modifier.rawValue
         }
         if let missing = self.missing {
-            dic["missing"] = missing
+            dic[FieldValueScoreFunction.MISSING] = missing
         }
         return [self.name: dic]
     }

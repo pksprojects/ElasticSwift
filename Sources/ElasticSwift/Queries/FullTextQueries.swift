@@ -11,13 +11,22 @@ import Foundation
 
 public class MatchQuery: Query {
     
+    private static let QUERY = "query"
+    private static let OPERATOR = "operator"
+    private static let FUZZINESS = "fuzziness"
+    private static let ZERO_TERMS_QUERY = "zero_terms_query"
+    private static let CUTOFF_FREQUENCY = "cutoff_frequency"
+    private static let AUTO_GENERATE_SYNONYMS_PHRASE_QUERY = "auto_generate_synonyms_phrase_query"
+    
     public let name: String = "match"
     
     var field: String
     var value: String
     var `operator`: MatchQueryOperator?
     var zeroTermQuery: ZeroTermQuery?
-    var cutoffFrequency: Float?
+    var cutoffFrequency: Decimal?
+    var fuzziness: String?
+    var autoGenSynonymnsPhraseQuery: Bool?
     
     init(field: String, value: String) {
         self.field = field
@@ -29,19 +38,27 @@ public class MatchQuery: Query {
         self.value = builder.value!
         self.`operator` = builder.`operator`
         self.zeroTermQuery = builder.zeroTermQuery
+        self.fuzziness = builder.fuzziness
+        self.autoGenSynonymnsPhraseQuery = builder.autoGenSynonymnsPhraseQuery
     }
     
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [:]
-        dic["query"] = value
+        dic[MatchQuery.QUERY] = value
         if let `operator` = self.`operator` {
-            dic["operator"] = `operator`.rawValue
+            dic[MatchQuery.OPERATOR] = `operator`.rawValue
         }
         if let zeroTermQuery = self.zeroTermQuery {
-            dic["zero_terms_query"] = zeroTermQuery.rawValue
+            dic[MatchQuery.ZERO_TERMS_QUERY] = zeroTermQuery.rawValue
         }
         if let cutoffFrequency = self.cutoffFrequency {
-            dic["cutoff_frequency"] = cutoffFrequency
+            dic[MatchQuery.CUTOFF_FREQUENCY] = cutoffFrequency
+        }
+        if let fuzziness = self.fuzziness {
+            dic[MatchQuery.FUZZINESS] = fuzziness
+        }
+        if let autoGenSynonymnsPhraseQuery = self.autoGenSynonymnsPhraseQuery {
+            dic[MatchQuery.AUTO_GENERATE_SYNONYMS_PHRASE_QUERY] = autoGenSynonymnsPhraseQuery
         }
         return  [name : [field: dic]]
     }
@@ -51,6 +68,9 @@ public class MatchQuery: Query {
 // MARK:- MatchPhraseQuery
 
 public class MatchPhraseQuery: Query {
+    
+    private static let QUERY = "query"
+    private static let ANALYZER = "analyzer"
     
     public let name: String = "match_phrase"
     
@@ -67,8 +87,8 @@ public class MatchPhraseQuery: Query {
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [:]
         if let analyzer = analyzer {
-            dic[name] = [self.field: ["query": self.value,
-                                      "analyzer": analyzer]
+            dic[name] = [self.field: [MatchPhraseQuery.QUERY: self.value,
+                                      MatchPhraseQuery.ANALYZER: analyzer]
             ]
         } else {
             dic[name] = [self.field: self.value]
@@ -81,6 +101,9 @@ public class MatchPhraseQuery: Query {
 // MARK:- MatchPhrasePrefixQuery
 
 public class MatchPhrasePrefixQuery: Query {
+    
+    private static let QUERY = "query"
+    private static let MAX_EXPANSIONS = "max_expansions"
     
     public let name: String = "match_phrase_prefix"
     
@@ -97,8 +120,8 @@ public class MatchPhrasePrefixQuery: Query {
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [:]
         if let maxExpansions = maxExpansions {
-            dic[name] = [self.field: ["query": self.value,
-                                      "max_expansions": maxExpansions]
+            dic[name] = [self.field: [MatchPhrasePrefixQuery.QUERY: self.value,
+                                      MatchPhrasePrefixQuery.MAX_EXPANSIONS: maxExpansions]
             ]
         } else {
             dic[name] = [self.field: self.value]
@@ -112,11 +135,14 @@ public class MatchPhrasePrefixQuery: Query {
 
 public class MultiMatchQuery: Query {
     
+    private static let QUERY = "query"
+    private static let FIELDS = "fields"
+    private static let TIE_BREAKER = "tie_breaker"
+    private static let TYPE = "type"
+    
     public let name: String = "multi_match"
     
-    var tieBreakerKey = "tie_breaker"
-    var typeKey = "type"
-    var tieBreaker: Float?
+    var tieBreaker: Decimal?
     var type: MultiMatchQueryType?
     var query: String
     var fields: [String]
@@ -130,13 +156,13 @@ public class MultiMatchQuery: Query {
     
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [:]
-        dic["query"] = query
-        dic["fields"] = fields
+        dic[MultiMatchQuery.QUERY] = query
+        dic[MultiMatchQuery.FIELDS] = fields
         if let type = self.type {
-            dic[typeKey] = type
+            dic[MultiMatchQuery.TYPE] = type
         }
         if let tieBreaker = self.tieBreaker {
-            dic[tieBreakerKey] = tieBreaker
+            dic[MultiMatchQuery.TIE_BREAKER] = tieBreaker
         }
         return [name: dic]
     }
@@ -147,10 +173,19 @@ public class MultiMatchQuery: Query {
 
 public class CommonTermsQuery: Query {
     
+    private static let QUERY = "query"
+    private static let CUTOFF_FREQUENCY = "cutoff_frequency"
+    private static let LOW_FREQ_OPERATOR = "low_freq_operator"
+    private static let HIGH_FREQ_OPERATOR = "high_freq_operator"
+    private static let MINIMUM_SHOULD_MATCH = "minimum_should_match"
+    private static let LOW_FREQ = "low_freq"
+    private static let HIGH_FREQ = "high_freq"
+    private static let BODY = "body"
+    
     public let name: String = "common"
     
     var value: String
-    var cutoffFrequency: Float
+    var cutoffFrequency: Decimal
     var lowFrequencyOperator: String?
     var highFrequencyOperator: String?
     var minimumShouldMatch: Int?
@@ -169,24 +204,24 @@ public class CommonTermsQuery: Query {
     
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [:]
-        dic["query"] = value
-        dic["cutoff_frequency"] = cutoffFrequency
+        dic[CommonTermsQuery.QUERY] = value
+        dic[CommonTermsQuery.CUTOFF_FREQUENCY] = cutoffFrequency
         if let lowFrequencyOperator = self.lowFrequencyOperator {
-            dic["low_freq_operator"] = lowFrequencyOperator
+            dic[CommonTermsQuery.LOW_FREQ_OPERATOR] = lowFrequencyOperator
         }
         if let highFrequencyOperator = self.highFrequencyOperator {
-            dic["high_freq_operator"] = highFrequencyOperator
+            dic[CommonTermsQuery.HIGH_FREQ_OPERATOR] = highFrequencyOperator
         }
         if let minimumShouldMatch = self.minimumShouldMatch {
-            dic["minimum_should_match"] = minimumShouldMatch
+            dic[CommonTermsQuery.MINIMUM_SHOULD_MATCH] = minimumShouldMatch
         }
         if let minHighFreq = self.minimumShouldMatchHighFreq, let minLowFreq = self.minimumShouldMatchLowFreq {
-            dic["minimum_should_match"] = [
-                "low_freq": minHighFreq,
-                "high_freq": minLowFreq
+            dic[CommonTermsQuery.MINIMUM_SHOULD_MATCH] = [
+                CommonTermsQuery.LOW_FREQ: minHighFreq,
+                CommonTermsQuery.HIGH_FREQ: minLowFreq
             ]
         }
-        return [name: ["body": dic]]
+        return [name: [CommonTermsQuery.BODY: dic]]
     }
     
 }
@@ -194,6 +229,28 @@ public class CommonTermsQuery: Query {
 // MARK:- QueryStringQuery
 
 public class QueryStringQuery: Query {
+    
+    private static let QUERY = "query"
+    private static let DEFAULT_FIELD = "default_field"
+    private static let DEFAULT_OPERATOR = "default_operator"
+    private static let ANALYZER = "analyzer"
+    private static let QUOTE_ANALYZER = "quote_analyzer"
+    private static let ALLOW_LEADING_WILDCARD = "allow_leading_wildcard"
+    private static let ENABLE_POSITION_INCREMENTS = "enable_position_increments"
+    private static let FUZZY_MAX_EXPANSIONS = "fuzzy_max_expansions"
+    private static let FUZZINESS = "fuzziness"
+    private static let FUZZY_PREFIX_LENGTH = "fuzzy_prefix_length"
+    private static let FUZZY_TRANSPOSITIONS = "fuzzy_transpositions"
+    private static let PHRASE_SLOP = "phrase_slop"
+    private static let BOOST = "boost"
+    private static let AUTO_GENERATE_PHRASE_QUERIES = "auto_generate_phrase_queries"
+    private static let ANALYZE_WILDCARD = "analyze_wildcard"
+    private static let MAX_DETERMINIZED_STATES = "max_determinized_states"
+    private static let MIN_SHOULD_MATCH = "minimum_should_match"
+    private static let LENIENT = "lenient"
+    private static let TIME_ZONE = "time_zone"
+    private static let QUOTE_FIELD_SUFFIX = "quote_field_suffix"
+    private static let AUTO_GENERATE_SYNONYMS_PHRASE_QUERY = "auto_generate_synonyms_phrase_query"
     
     public let name: String = "query_string"
     var defaultField: String?
@@ -208,7 +265,7 @@ public class QueryStringQuery: Query {
     var fuzzyPrefixLength: Int?
     var fuzzyTranspositions: Bool?
     var phraseSlop: Int?
-    var boost: Float?
+    var boost: Decimal?
     var autoGeneratePhraseQueries: Bool?
     var analyzeWildcard: Bool?
     var maxDeterminizedStates: Int?
@@ -243,66 +300,66 @@ public class QueryStringQuery: Query {
     
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [:]
-        dic["query"] = value
+        dic[QueryStringQuery.QUERY] = value
         if let defaultField = self.defaultField {
-            dic["default_field"] = defaultField
+            dic[QueryStringQuery.DEFAULT_FIELD] = defaultField
         }
         if let defaultOperator = self.defaultOperator {
-            dic["default_operator"] = defaultOperator
+            dic[QueryStringQuery.DEFAULT_OPERATOR] = defaultOperator
         }
         if let analyzer = self.analyzer {
-            dic["analyzer"] = analyzer
+            dic[QueryStringQuery.ANALYZER] = analyzer
         }
         if let quoteAnalyzer = self.quoteAnalyzer {
-            dic["quote_analyzer"] = quoteAnalyzer
+            dic[QueryStringQuery.QUOTE_ANALYZER] = quoteAnalyzer
         }
         if let allowLeadingWildCard = self.allowLeadingWildcard {
-            dic["allow_leading_wildcard"] = allowLeadingWildCard
+            dic[QueryStringQuery.ALLOW_LEADING_WILDCARD] = allowLeadingWildCard
         }
         if let enablePositionIncrements = self.enablePositionIncrements {
-            dic["enable_position_increments"] = enablePositionIncrements
+            dic[QueryStringQuery.ENABLE_POSITION_INCREMENTS] = enablePositionIncrements
         }
         if let fuzzyMaxExpantions = self.fuzzyMaxExpansions {
-            dic["fuzzy_max_expansions"] = fuzzyMaxExpantions
+            dic[QueryStringQuery.FUZZY_MAX_EXPANSIONS] = fuzzyMaxExpantions
         }
         if let fuzzines = self.fuzziness {
-            dic["fuzziness"] = fuzzines
+            dic[QueryStringQuery.FUZZINESS] = fuzzines
         }
         if let fuzzyPrefixLength = self.fuzzyPrefixLength {
-            dic["fuzzy_prefix_length"] = fuzzyPrefixLength
+            dic[QueryStringQuery.FUZZY_PREFIX_LENGTH] = fuzzyPrefixLength
         }
         if let fuzzyTranspositions = self.fuzzyTranspositions {
-            dic["fuzzy_transpositions"] = fuzzyTranspositions
+            dic[QueryStringQuery.FUZZY_TRANSPOSITIONS] = fuzzyTranspositions
         }
         if let phraseSlop = self.phraseSlop {
-            dic["phrase_slop"] = phraseSlop
+            dic[QueryStringQuery.PHRASE_SLOP] = phraseSlop
         }
         if let boost = self.boost {
-            dic["boost"] = boost
+            dic[QueryStringQuery.BOOST] = boost
         }
         if let autoGeneratePhraseQuries = self.autoGeneratePhraseQueries {
-            dic["auto_generate_phrase_queries"] = autoGeneratePhraseQuries
+            dic[QueryStringQuery.AUTO_GENERATE_PHRASE_QUERIES] = autoGeneratePhraseQuries
         }
         if let analyzeWildCard = self.analyzeWildcard {
-            dic["analyze_wildcard"] = analyzeWildCard
+            dic[QueryStringQuery.ANALYZE_WILDCARD] = analyzeWildCard
         }
         if let maxDeterminedStates = self.maxDeterminizedStates {
-            dic["max_determinized_states"] = maxDeterminedStates
+            dic[QueryStringQuery.MAX_DETERMINIZED_STATES] = maxDeterminedStates
         }
         if let minimumShouldMatch = self.minimumShouldMatch {
-            dic["minimum_should_match"] = minimumShouldMatch
+            dic[QueryStringQuery.MIN_SHOULD_MATCH] = minimumShouldMatch
         }
         if let lenient = self.lenient {
-            dic["lenient"] = lenient
+            dic[QueryStringQuery.LENIENT] = lenient
         }
         if let timeZone = self.timeZone {
-            dic["time_zone"] = timeZone
+            dic[QueryStringQuery.TIME_ZONE] = timeZone
         }
         if let quoteFieldSuffix = self.quoteFieldSuffix {
-            dic["quote_field_suffix"] = quoteFieldSuffix
+            dic[QueryStringQuery.QUOTE_FIELD_SUFFIX] = quoteFieldSuffix
         }
         if let autoGenerateSynonymsPhraseQuery = self.autoGenerateSynonymsPhraseQuery {
-            dic["auto_generate_synonyms_phrase_query"] = autoGenerateSynonymsPhraseQuery
+            dic[QueryStringQuery.AUTO_GENERATE_SYNONYMS_PHRASE_QUERY] = autoGenerateSynonymsPhraseQuery
         }
         return [name: dic]
     }
@@ -312,6 +369,19 @@ public class QueryStringQuery: Query {
 // MARK:- SimpleQueryStringQuery
 
 public class SimpleQueryStringQuery: Query {
+    
+    private static let QUERY = "query"
+    private static let FIELDS = "fields"
+    private static let DEFAULT_OPERATOR = "default_operator"
+    private static let ANALYZER = "analyzer"
+    private static let FLAGS = "flags"
+    private static let FUZZY_MAX_EXPANSIONS = "fuzzy_max_expansions"
+    private static let FUZZY_PREFIX_LENGTH = "fuzzy_prefix_length"
+    private static let FUZZY_TRANSPOSITIONS = "fuzzy_transpositions"
+    private static let MINIMUM_SHOULD_MATCH = "minimum_should_match"
+    private static let LENIENT = "lenient"
+    private static let QUOTE_FIELD_SUFFIX = "quote_field_suffix"
+    private static let AUTO_GENERATE_SYNONYMS_PHRASE_QUERY = "auto_generate_synonyms_phrase_query"
     
     public let name: String = "simple_query_string"
     
@@ -345,36 +415,39 @@ public class SimpleQueryStringQuery: Query {
     
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [:]
-        dic["query"] = value
+        dic[SimpleQueryStringQuery.QUERY] = value
         if let fields = self.fields {
-            dic["fields"] = fields
+            dic[SimpleQueryStringQuery.FIELDS] = fields
         }
         if let defaultOperator = self.defaultOperator {
-            dic["default_operator"] = defaultOperator
+            dic[SimpleQueryStringQuery.DEFAULT_OPERATOR] = defaultOperator
         }
         if let analyzer = self.analyzer {
-            dic["analyzer"] = analyzer
+            dic[SimpleQueryStringQuery.ANALYZER] = analyzer
         }
         if let fuzzyMaxExpantions = self.fuzzyMaxExpansions {
-            dic["fuzzy_max_expansions"] = fuzzyMaxExpantions
+            dic[SimpleQueryStringQuery.FUZZY_MAX_EXPANSIONS] = fuzzyMaxExpantions
         }
         if let fuzzyPrefixLength = self.fuzzyPrefixLength {
-            dic["fuzzy_prefix_length"] = fuzzyPrefixLength
+            dic[SimpleQueryStringQuery.FUZZY_PREFIX_LENGTH] = fuzzyPrefixLength
         }
         if let fuzzyTranspositions = self.fuzzyTranspositions {
-            dic["fuzzy_transpositions"] = fuzzyTranspositions
+            dic[SimpleQueryStringQuery.FUZZY_TRANSPOSITIONS] = fuzzyTranspositions
         }
         if let minimumShouldMatch = self.minimumShouldMatch {
-            dic["minimum_should_match"] = minimumShouldMatch
+            dic[SimpleQueryStringQuery.MINIMUM_SHOULD_MATCH] = minimumShouldMatch
+        }
+        if let flags = self.flags {
+            dic[SimpleQueryStringQuery.FLAGS] = flags
         }
         if let lenient = self.lenient {
-            dic["lenient"] = lenient
+            dic[SimpleQueryStringQuery.LENIENT] = lenient
         }
         if let quoteFieldSuffix = self.quoteFieldSuffix {
-            dic["quote_field_suffix"] = quoteFieldSuffix
+            dic[SimpleQueryStringQuery.QUOTE_FIELD_SUFFIX] = quoteFieldSuffix
         }
         if let autoGenerateSynonymsPhraseQuery = self.autoGenerateSynonymsPhraseQuery {
-            dic["auto_generate_synonyms_phrase_query"] = autoGenerateSynonymsPhraseQuery
+            dic[SimpleQueryStringQuery.AUTO_GENERATE_SYNONYMS_PHRASE_QUERY] = autoGenerateSynonymsPhraseQuery
         }
         return [name: dic]
     }

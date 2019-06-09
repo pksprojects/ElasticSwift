@@ -14,10 +14,21 @@ public class MatchQueryBuilder: QueryBuilder {
     var field: String?
     var value: String?
     var isFuzzy: Bool?
-    var boost: Float?
+    var boost: Decimal?
     var `operator`: MatchQueryOperator?
     var zeroTermQuery: ZeroTermQuery?
-    var cutoffFrequency: Float?
+    var cutoffFrequency: Decimal?
+    var fuzziness: String?
+    var autoGenSynonymnsPhraseQuery: Bool?
+    
+    typealias BuilderClosure = (MatchQueryBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
     
     public var query: Query {
         get {
@@ -35,7 +46,7 @@ public class MatchQueryBuilder: QueryBuilder {
         return self
     }
     
-    public func set(cutoffFrequency: Float) -> Self {
+    public func set(cutoffFrequency: Decimal) -> Self {
         self.cutoffFrequency = cutoffFrequency
         return self
     }
@@ -55,7 +66,7 @@ public class MatchQueryBuilder: QueryBuilder {
         return self
     }
     
-    public func set(boost: Float) -> Self {
+    public func set(boost: Decimal) -> Self {
         self.boost = boost
         return self
     }
@@ -68,6 +79,15 @@ public class MatchPhraseQueryBuilder: QueryBuilder {
     var field: String?
     var value: String?
     var analyzer: String?
+    
+    typealias BuilderClosure = (MatchPhraseQueryBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
     
     public var query: Query {
         get {
@@ -100,6 +120,15 @@ public class MatchPhrasePrefixQueryBuilder: QueryBuilder {
     var field: String?
     var value: String?
     var maxExpansions: Int?
+    
+    typealias BuilderClosure = (MatchPhrasePrefixQueryBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
 
     public var query: Query {
         get {
@@ -132,7 +161,16 @@ public class MultiMatchQueryBuilder: QueryBuilder {
     var value: String?
     var fields: [String]?
     var type: MultiMatchQueryType?
-    var tieBreaker: Float?
+    var tieBreaker: Decimal?
+    
+    typealias BuilderClosure = (MultiMatchQueryBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
     
     public var query: Query {
         get {
@@ -140,7 +178,7 @@ public class MultiMatchQueryBuilder: QueryBuilder {
         }
     }
     
-    public func set(boost: Float) -> Self {
+    public func set(boost: Decimal) -> Self {
         return self
     }
     
@@ -155,7 +193,7 @@ public class MultiMatchQueryBuilder: QueryBuilder {
         return self
     }
     
-    public func set(tieBreaker: Float) -> Self {
+    public func set(tieBreaker: Decimal) -> Self {
         self.tieBreaker = tieBreaker
         return self
     }
@@ -167,12 +205,21 @@ public class MultiMatchQueryBuilder: QueryBuilder {
 public class CommonTermsQueryBuilder: QueryBuilder {
     
     var value: String?
-    var cutoffFrequency: Float?
+    var cutoffFrequency: Decimal?
     var lowFrequencyOperator: String?
     var highFrequencyOperator: String?
     var minimumShouldMatch: Int?
     var minimumShouldMatchLowFreq: Int?
     var minimumShouldMatchHighFreq: Int?
+    
+    typealias BuilderClosure = (CommonTermsQueryBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
     
     public var query: Query {
         get {
@@ -180,7 +227,7 @@ public class CommonTermsQueryBuilder: QueryBuilder {
         }
     }
     
-    public func set(boost: Float) -> Self {
+    public func set(boost: Decimal) -> Self {
         return self
     }
     
@@ -189,7 +236,7 @@ public class CommonTermsQueryBuilder: QueryBuilder {
         return self
     }
     
-    public func set(cutoffFrequency: Float) -> Self {
+    public func set(cutoffFrequency: Decimal) -> Self {
         self.cutoffFrequency = cutoffFrequency
         return self
     }
@@ -237,7 +284,7 @@ public class QueryStringQueryBuilder: QueryBuilder {
     var fuzzyPrefixLength: Int?
     var fuzzyTranspositions: Bool?
     var phraseSlop: Int?
-    var boost: Float?
+    var boost: Decimal?
     var autoGeneratePhraseQueries: Bool?
     var analyzeWildcard: Bool?
     var maxDeterminizedStates: Int?
@@ -246,6 +293,15 @@ public class QueryStringQueryBuilder: QueryBuilder {
     var timeZone: String?
     var quoteFieldSuffix: String?
     var autoGenerateSynonymsPhraseQuery: Bool?
+    
+    typealias BuilderClosure = (QueryStringQueryBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
     
     public var query: Query {
         get {
@@ -347,7 +403,7 @@ public class QueryStringQueryBuilder: QueryBuilder {
         self.defaultOperator = defaultOperator
         return self
     }
-    public func set(boost: Float) -> Self {
+    public func set(boost: Decimal) -> Self {
         self.boost = boost
         return self
     }
@@ -371,6 +427,14 @@ public class SimpleQueryStringQueryBuilder: QueryBuilder {
     var quoteFieldSuffix: String?
     var autoGenerateSynonymsPhraseQuery: Bool?
     
+    typealias BuilderClosure = (SimpleQueryStringQueryBuilder) -> Void
+    
+    init() {}
+    
+    convenience init(builderClosure: BuilderClosure) {
+        self.init()
+        builderClosure(self)
+    }
     
     public var query: Query {
         get {
