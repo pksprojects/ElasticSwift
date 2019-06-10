@@ -94,7 +94,7 @@ public final class QueryBuilders {
         return ConstantScoreQueryBuilder()
     }
     
-    public static func DisMaxQuery() -> DisMaxQueryBuilder {
+    public static func disMaxQuery() -> DisMaxQueryBuilder {
         return DisMaxQueryBuilder()
     }
     
