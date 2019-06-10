@@ -31,7 +31,7 @@ class Transport {
     }
     
     func performRequest(method: HTTPMethod, endPoint: String?, params: [QueryParams], body: Data, completionHandler: @escaping (_ response: ESResponse) -> Void) {
-        print(method, endPoint!, params, body)
+        debugPrint(method, endPoint!, params, body)
         self.sessionPool?.getConnection()?
             .createRequest(method: method, forPath: endPoint!, witParams: params, body: body)
             .createDataTask(onCompletion: completionHandler)
@@ -39,7 +39,7 @@ class Transport {
     }
     
     func perform_request(method: HTTPMethod, endPoint: String?, params: [QueryParams], body: String, completionHandler: @escaping (_ response: ESResponse) -> Void) {
-        print(method, endPoint!, params, body)
+        debugPrint(method, endPoint!, params, body)
         self.sessionPool?.getConnection()?
             .createRequest(method: method, forPath: endPoint!, witParams: params, body: body)
             .createDataTask(onCompletion: completionHandler)
@@ -47,7 +47,7 @@ class Transport {
     }
     
     func perform_request(method: HTTPMethod, endPoint: String?, params: [QueryParams], body: Data, completionHandler: @escaping (_ response: ESResponse) -> Void) {
-        print(method, endPoint!, params, body)
+        debugPrint(method, endPoint!, params, body)
         self.sessionPool?.getConnection()?
             .createRequest(method: method, forPath: endPoint!, witParams: params, body: body)
             .createDataTask(onCompletion: completionHandler)

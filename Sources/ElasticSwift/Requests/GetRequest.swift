@@ -10,6 +10,8 @@ import Foundation
 
 public class GetRequestBuilder<T: Codable>: RequestBuilder {
     
+    typealias BuilderClosure = (GetRequestBuilder) -> Void
+    
     var client: ESClient
     var index: String?
     var type: String?
@@ -20,6 +22,11 @@ public class GetRequestBuilder<T: Codable>: RequestBuilder {
     
     init(withClient client: ESClient) {
         self.client = client
+    }
+    
+    convenience init(withClient client: ESClient, builderClosure: BuilderClosure) {
+        self.init(withClient: client)
+        builderClosure(self)
     }
     
     public func set(index: String) -> Self {

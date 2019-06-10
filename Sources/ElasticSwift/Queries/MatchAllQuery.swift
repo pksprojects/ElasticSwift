@@ -15,13 +15,14 @@ public class MatchAllQuery: Query {
     
     public let name: String = "match_all"
     
-    var boost: Decimal?
+    public let boost: Decimal?
     
-    init() {}
+    init(_ boost: Decimal? = nil) {
+        self.boost = boost
+    }
     
     convenience init(withBuilder builder: MatchAllQueryBuilder) {
-        self.init()
-        self.boost = builder.boost
+        self.init(builder.boost)
     }
     
     public func toDic() -> [String : Any] {

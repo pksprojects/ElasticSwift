@@ -10,6 +10,8 @@ import Foundation
 
 public class SearchRequestBuilder<T: Codable>: RequestBuilder {
     
+    typealias BuilderClosure = (SearchRequestBuilder) -> Void
+    
     let client: ESClient
     var index: String?
     var type: String?
@@ -24,6 +26,11 @@ public class SearchRequestBuilder<T: Codable>: RequestBuilder {
     
     init(withClient client: ESClient) {
         self.client = client
+    }
+    
+    convenience init(withClient client: ESClient, builderClosure: BuilderClosure) {
+        self.init(withClient: client)
+        builderClosure(self)
     }
     
     public func set(indices: String...) -> Self {
@@ -177,7 +184,7 @@ public class SearchRequest<T: Codable>: Request {
             return completionHandler(nil, error)
         }
         do {
-            print(String(data: response.data!, encoding: .utf8)!)
+            debugPrint(String(data: response.data!, encoding: .utf8)!)
             let decoded: SearchResponse<T>? = try Serializers.decode(data: response.data!)
             if decoded?.took != nil {
                 return completionHandler(decoded, nil)

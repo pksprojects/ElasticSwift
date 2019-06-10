@@ -12,12 +12,19 @@ import Foundation
 
 public class CreateIndexRequestBuilder: RequestBuilder {
     
+    typealias BuilderClosure = (CreateIndexRequestBuilder) -> Void
+    
     let client: ESClient
     var name: String?
     var completionHandler: ((_ response: CreateIndexResponse?, _ error: Error?) -> Void)?
     
     init(withClient client: ESClient) {
         self.client = client
+    }
+    
+    convenience init(withClient client: ESClient, builderClosure: BuilderClosure) {
+        self.init(withClient: client)
+        builderClosure(self)
     }
     
     public func set(name: String) -> Self {
@@ -37,12 +44,19 @@ public class CreateIndexRequestBuilder: RequestBuilder {
 
 public class DeleteIndexRequestBuilder: RequestBuilder {
     
+    typealias BuilderClosure = (DeleteIndexRequestBuilder) -> Void
+    
     let client: ESClient
     var name: String?
     var completionHandler: ((_ response: DeleteIndexResponse?, _ error: Error?) -> Void)?
     
     init(withClient client: ESClient) {
         self.client = client
+    }
+    
+    convenience init(withClient client: ESClient, builderClosure: BuilderClosure) {
+        self.init(withClient: client)
+        builderClosure(self)
     }
     
     public func set(name: String) -> Self {
@@ -62,12 +76,19 @@ public class DeleteIndexRequestBuilder: RequestBuilder {
 
 public class GetIndexRequestBuilder: RequestBuilder {
     
+    typealias BuilderClosure = (GetIndexRequestBuilder) -> Void
+    
     let client: ESClient
     var name: String?
     var completionHandler: ((_ response: GetIndexResponse?, _ error: Error?) -> Void)?
     
     init(withClient client: ESClient) {
         self.client = client
+    }
+    
+    convenience init(withClient client: ESClient, builderClosure: BuilderClosure) {
+        self.init(withClient: client)
+        builderClosure(self)
     }
     
     public func set(name: String) -> Self {
@@ -130,7 +151,7 @@ public class CreateIndexRequest: Request {
             return completionHandler(nil, error)
         }
         do {
-            print(String(data: response.data!, encoding: .utf8)!)
+            debugPrint(String(data: response.data!, encoding: .utf8)!)
             let decoded: CreateIndexResponse? = try Serializers.decode(data: response.data!)
             if decoded?.index != nil {
                 return completionHandler(decoded, nil)
@@ -196,7 +217,7 @@ class GetIndexRequest: Request {
             return completionHandler(nil, error)
         }
         do {
-            print(String(data: response.data!, encoding: .utf8)!)
+            debugPrint(String(data: response.data!, encoding: .utf8)!)
             let decoded: GetIndexResponse? = try Serializers.decode(data: response.data!)
             if decoded?.settings != nil {
                 return completionHandler(decoded, nil)
@@ -262,7 +283,7 @@ class DeleteIndexRequest: Request {
             return completionHandler(nil, error)
         }
         do {
-            print(String(data: response.data!, encoding: .utf8)!)
+            debugPrint(String(data: response.data!, encoding: .utf8)!)
             let decoded: DeleteIndexResponse? = try Serializers.decode(data: response.data!)
             if decoded?.acknowledged != nil {
                 return completionHandler(decoded, nil)

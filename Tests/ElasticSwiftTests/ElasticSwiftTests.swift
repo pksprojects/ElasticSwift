@@ -49,7 +49,7 @@ class ElasticSwiftTests: XCTestCase {
             }
             e.fulfill()
         }
-        let request = self.client?.admin.indices().create()
+        let request = self.client?.indicesAdmin().createIndex()
             .set(name: "test")
             .set(completionHandler: handler)
             .build()
@@ -64,7 +64,7 @@ class ElasticSwiftTests: XCTestCase {
             }
             request?.execute()
         }
-        let request1 = try self.client?.admin.indices().delete()
+        let request1 = try self.client?.indicesAdmin().deleteIndex()
             .set(name: "test")
             .set(completionHandler: handler1)
             .build()
@@ -85,7 +85,7 @@ class ElasticSwiftTests: XCTestCase {
             }
             e.fulfill()
         }
-        let request = try self.client?.admin.indices().get()
+        let request = try self.client?.indicesAdmin().getIndex()
             .set(name: "test")
             .set(completionHandler: handler)
             .build()
@@ -293,7 +293,7 @@ class ElasticSwiftTests: XCTestCase {
             }
             e.fulfill()
         }
-        let request = try self.client?.admin.indices().delete()
+        let request = try self.client?.indicesAdmin().deleteIndex()
             .set(name: "test")
             .set(completionHandler: handler)
             .build()
@@ -309,7 +309,7 @@ class ElasticSwiftTests: XCTestCase {
             request?.execute()
         }
         
-        let request1 = self.client?.admin.indices().create()
+        let request1 = self.client?.indicesAdmin().createIndex()
             .set(name: "test")
             .set(completionHandler: handler1)
             .build()
