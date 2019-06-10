@@ -112,95 +112,95 @@ public final class QueryBuilders {
 
 extension QueryBuilders {
     
-    public static func matchAllQuery(closure: (MatchAllQueryBuilder) -> Void) -> MatchAllQueryBuilder {
+    public static func matchAllQuery(_ closure: (MatchAllQueryBuilder) -> Void) -> MatchAllQueryBuilder {
         return MatchAllQueryBuilder(builderClosure: closure)
     }
     
-    public static func matchQuery(closure: (MatchQueryBuilder) -> Void) -> MatchQueryBuilder {
+    public static func matchQuery(_ closure: (MatchQueryBuilder) -> Void) -> MatchQueryBuilder {
         return MatchQueryBuilder(builderClosure: closure)
     }
     
-    public static func matchPhraseQuery(closure: (MatchPhraseQueryBuilder) -> Void) -> MatchPhraseQueryBuilder {
+    public static func matchPhraseQuery(_ closure: (MatchPhraseQueryBuilder) -> Void) -> MatchPhraseQueryBuilder {
         return MatchPhraseQueryBuilder(builderClosure: closure)
     }
     
-    public static func matchPhrasePrefixQuery(closure: (MatchPhrasePrefixQueryBuilder) -> Void) -> MatchPhrasePrefixQueryBuilder {
+    public static func matchPhrasePrefixQuery(_ closure: (MatchPhrasePrefixQueryBuilder) -> Void) -> MatchPhrasePrefixQueryBuilder {
         return MatchPhrasePrefixQueryBuilder(builderClosure: closure)
     }
     
-    public static func multiMatchQuery(closure: (MultiMatchQueryBuilder) -> Void) -> MultiMatchQueryBuilder {
+    public static func multiMatchQuery(_ closure: (MultiMatchQueryBuilder) -> Void) -> MultiMatchQueryBuilder {
         return MultiMatchQueryBuilder(builderClosure: closure)
     }
     
-    public static func commonTermsQuery(closure: (CommonTermsQueryBuilder) -> Void) -> CommonTermsQueryBuilder {
+    public static func commonTermsQuery(_ closure: (CommonTermsQueryBuilder) -> Void) -> CommonTermsQueryBuilder {
         return CommonTermsQueryBuilder(builderClosure: closure)
     }
     
-    public static func queryStringQuery(closure: (QueryStringQueryBuilder) -> Void) -> QueryStringQueryBuilder {
+    public static func queryStringQuery(_ closure: (QueryStringQueryBuilder) -> Void) -> QueryStringQueryBuilder {
         return QueryStringQueryBuilder(builderClosure: closure)
     }
     
-    public static func simpleQueryStringQuery(closure: (SimpleQueryStringQueryBuilder) -> Void) -> SimpleQueryStringQueryBuilder {
+    public static func simpleQueryStringQuery(_ closure: (SimpleQueryStringQueryBuilder) -> Void) -> SimpleQueryStringQueryBuilder {
         return SimpleQueryStringQueryBuilder(builderClosure: closure)
     }
     
-    public static func termQuery(closure: (TermQueryBuilder) -> Void) -> TermQueryBuilder {
+    public static func termQuery(_ closure: (TermQueryBuilder) -> Void) -> TermQueryBuilder {
         return TermQueryBuilder(builderClosure: closure)
     }
     
-    public static func termsQuery(closure: (TermsQueryBuilder) -> Void) -> TermsQueryBuilder {
+    public static func termsQuery(_ closure: (TermsQueryBuilder) -> Void) -> TermsQueryBuilder {
         return TermsQueryBuilder(builderClosure: closure)
     }
     
-    public static func rangeQuery(closure: (RangeQueryBuilder) -> Void) -> RangeQueryBuilder {
+    public static func rangeQuery(_ closure: (RangeQueryBuilder) -> Void) -> RangeQueryBuilder {
         return RangeQueryBuilder(builderClosure: closure)
     }
     
-    public static func existsQuery(closure: (ExistsQueryBuilder) -> Void) -> ExistsQueryBuilder {
+    public static func existsQuery(_ closure: (ExistsQueryBuilder) -> Void) -> ExistsQueryBuilder {
         return ExistsQueryBuilder(builderClosure: closure)
     }
     
-    public static func prefixQuery(closure: (PrefixQueryBuilder) -> Void) -> PrefixQueryBuilder {
+    public static func prefixQuery(_ closure: (PrefixQueryBuilder) -> Void) -> PrefixQueryBuilder {
         return PrefixQueryBuilder(builderClosure: closure)
     }
     
-    public static func wildCardQuery(closure: (WildCardQueryBuilder) -> Void) -> WildCardQueryBuilder {
+    public static func wildCardQuery(_ closure: (WildCardQueryBuilder) -> Void) -> WildCardQueryBuilder {
         return WildCardQueryBuilder(builderClosure: closure)
     }
     
-    public static func regexpQuery(closure: (RegexpQueryBuilder) -> Void) -> RegexpQueryBuilder {
+    public static func regexpQuery(_ closure: (RegexpQueryBuilder) -> Void) -> RegexpQueryBuilder {
         return RegexpQueryBuilder(builderClosure: closure)
     }
     
-    public static func fuzzyQuery(closure: (FuzzyQueryBuilder) -> Void) -> FuzzyQueryBuilder {
+    public static func fuzzyQuery(_ closure: (FuzzyQueryBuilder) -> Void) -> FuzzyQueryBuilder {
         return FuzzyQueryBuilder(builderClosure: closure)
     }
     
-    public static func typeQuery(closure: (TypeQueryBuilder) -> Void) -> TypeQueryBuilder {
+    public static func typeQuery(_ closure: (TypeQueryBuilder) -> Void) -> TypeQueryBuilder {
         return TypeQueryBuilder(builderClosure: closure)
     }
     
-    public static func idsQuery(closure: (IdsQueryBuilder) -> Void) -> IdsQueryBuilder {
+    public static func idsQuery(_ closure: (IdsQueryBuilder) -> Void) -> IdsQueryBuilder {
         return IdsQueryBuilder(builderClosure: closure)
     }
     
-    public static func boolQuery(closure: (BoolQueryBuilder) -> Void) -> BoolQueryBuilder {
+    public static func boolQuery(_ closure: (BoolQueryBuilder) -> Void) -> BoolQueryBuilder {
         return BoolQueryBuilder(builderClosure: closure)
     }
     
-    public static func constantScoreQuery(closure: (ConstantScoreQueryBuilder) -> Void) -> ConstantScoreQueryBuilder {
+    public static func constantScoreQuery(_ closure: (ConstantScoreQueryBuilder) -> Void) -> ConstantScoreQueryBuilder {
         return ConstantScoreQueryBuilder(builderClosure: closure)
     }
     
-    public static func DisMaxQuery(closure: (DisMaxQueryBuilder) -> Void) -> DisMaxQueryBuilder {
+    public static func DisMaxQuery(_ closure: (DisMaxQueryBuilder) -> Void) -> DisMaxQueryBuilder {
         return DisMaxQueryBuilder(builderClosure: closure)
     }
     
-    public static func functionScoreQuery(closure: (FunctionScoreQueryBuilder) -> Void) -> FunctionScoreQueryBuilder {
+    public static func functionScoreQuery(_ closure: (FunctionScoreQueryBuilder) -> Void) -> FunctionScoreQueryBuilder {
         return FunctionScoreQueryBuilder(builderClosure: closure)
     }
     
-    public static func boostingeQuery(closure: (BoostingQueryBuilder) -> Void) -> BoostingQueryBuilder {
+    public static func boostingeQuery(_ closure: (BoostingQueryBuilder) -> Void) -> BoostingQueryBuilder {
         return BoostingQueryBuilder(builderClosure: closure)
     }
 }
