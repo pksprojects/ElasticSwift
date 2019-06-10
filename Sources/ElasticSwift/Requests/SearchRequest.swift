@@ -31,6 +31,7 @@ public class SearchRequestBuilder<T: Codable>: RequestBuilder {
         return self
     }
     
+    @available(*, deprecated, message: "Elasticsearch has deprecated use of custom types and will be remove in 7.0")
     public func set(types: String...) -> Self {
         self.type = types.compactMap({$0}).joined(separator: ",")
         return self
