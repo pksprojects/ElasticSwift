@@ -24,43 +24,44 @@ public class ScoreSortBuilder: SortBuilder {
     
     private static let _SCORE = "_score"
     
-    var sort: Sort
+    var sortOrder: SortOrder?
+    var field = ScoreSortBuilder._SCORE
     
-    init() {
-        self.sort = Sort(field: ScoreSortBuilder._SCORE)
-    }
+    init() {}
     
     public func set(order: SortOrder) -> ScoreSortBuilder {
-        self.sort.sortOrder = order
+        self.sortOrder = order
         return self
     }
     
     public func build() -> Sort {
-        return self.sort
+        return Sort(withBuilder: self)
     }
 
 }
 
 public class FieldSortBuilder: SortBuilder {
-    var sort: Sort
     
-    init(_ field: String) {
-        self.sort = Sort(field: field)
+    var field: String?
+    var sortOrder: SortOrder?
+    var mode: SortMode?
+    
+    public init(_ field: String) {
+        self.field = field
     }
     
     public func set(order: SortOrder) -> FieldSortBuilder {
-        self.sort.sortOrder = order
+        self.sortOrder = order
         return self
     }
     
     public func set(mode: SortMode) -> FieldSortBuilder {
-        self.sort.mode = mode
-        self.sort.fieldTypeisArray = true
+        self.mode = mode
         return self
     }
     
     public func build() -> Sort {
-        return self.sort
+        return Sort(withBuilder: self)
     }
 
 }
@@ -75,24 +76,23 @@ public class Sort {
     private static let ORDER = "order"
     private static let MODE = "mode"
     
-    let field: String
-    var sortOrder: SortOrder = .desc
-    var fieldTypeisArray: Bool = false
-    var mode: SortMode?
+    public let field: String
+    public let sortOrder: SortOrder
+    public let fieldTypeisArray: Bool
+    public let mode: SortMode?
     
-    init(field: String) {
-        self.field = field
+    init(withBuilder builder: ScoreSortBuilder) {
+        self.field = builder.field
+        self.sortOrder = builder.sortOrder ?? .desc
+        self.fieldTypeisArray = false
+        self.mode = nil
     }
     
-    convenience init(field: String, order: SortOrder) {
-        self.init(field: field)
-        self.sortOrder = order
-    }
-    
-    convenience init(field: String, order: SortOrder, mode: SortMode) {
-        self.init(field: field, order: order)
-        self.fieldTypeisArray = true
-        self.mode = mode
+    init(withBuilder builder: FieldSortBuilder) {
+        self.field = builder.field!
+        self.mode = builder.mode
+        self.sortOrder = builder.sortOrder ?? .desc
+        self.fieldTypeisArray = (self.mode != nil) ? true : false
     }
     
     func toDic() -> [String : Any] {
