@@ -20,18 +20,13 @@ public class MatchQuery: Query {
     
     public let name: String = "match"
     
-    var field: String
-    var value: String
-    var `operator`: MatchQueryOperator?
-    var zeroTermQuery: ZeroTermQuery?
-    var cutoffFrequency: Decimal?
-    var fuzziness: String?
-    var autoGenSynonymnsPhraseQuery: Bool?
-    
-    init(field: String, value: String) {
-        self.field = field
-        self.value = value
-    }
+    public let field: String
+    public let value: String
+    public let `operator`: MatchQueryOperator?
+    public let zeroTermQuery: ZeroTermQuery?
+    public let cutoffFrequency: Decimal?
+    public let fuzziness: String?
+    public let autoGenSynonymnsPhraseQuery: Bool?
     
     init(withBuilder builder: MatchQueryBuilder) {
         self.field = builder.field!
@@ -39,6 +34,7 @@ public class MatchQuery: Query {
         self.`operator` = builder.`operator`
         self.zeroTermQuery = builder.zeroTermQuery
         self.fuzziness = builder.fuzziness
+        self.cutoffFrequency = builder.cutoffFrequency
         self.autoGenSynonymnsPhraseQuery = builder.autoGenSynonymnsPhraseQuery
     }
     
@@ -74,9 +70,9 @@ public class MatchPhraseQuery: Query {
     
     public let name: String = "match_phrase"
     
-    var field: String
-    var value: String
-    var analyzer: String?
+    public let field: String
+    public let value: String
+    public let analyzer: String?
     
     public init(withBuilder builder: MatchPhraseQueryBuilder) {
         self.field = builder.field!
@@ -107,9 +103,9 @@ public class MatchPhrasePrefixQuery: Query {
     
     public let name: String = "match_phrase_prefix"
     
-    var field: String
-    var value: String
-    var maxExpansions: Int?
+    public let field: String
+    public let value: String
+    public let maxExpansions: Int?
     
     public init(withBuilder builder: MatchPhrasePrefixQueryBuilder) {
         self.field = builder.field!
@@ -142,10 +138,10 @@ public class MultiMatchQuery: Query {
     
     public let name: String = "multi_match"
     
-    var tieBreaker: Decimal?
-    var type: MultiMatchQueryType?
-    var query: String
-    var fields: [String]
+    public let tieBreaker: Decimal?
+    public let type: MultiMatchQueryType?
+    public let query: String
+    public let fields: [String]
     
     public init(withBuilder builder: MultiMatchQueryBuilder) {
         self.query = builder.value!
@@ -184,13 +180,13 @@ public class CommonTermsQuery: Query {
     
     public let name: String = "common"
     
-    var value: String
-    var cutoffFrequency: Decimal
-    var lowFrequencyOperator: String?
-    var highFrequencyOperator: String?
-    var minimumShouldMatch: Int?
-    var minimumShouldMatchLowFreq: Int?
-    var minimumShouldMatchHighFreq: Int?
+    public let value: String
+    public let cutoffFrequency: Decimal
+    public let lowFrequencyOperator: String?
+    public let highFrequencyOperator: String?
+    public let minimumShouldMatch: Int?
+    public let minimumShouldMatchLowFreq: Int?
+    public let minimumShouldMatchHighFreq: Int?
     
     public init(withBuilder builder: CommonTermsQueryBuilder) {
         self.value = builder.value!
@@ -253,27 +249,27 @@ public class QueryStringQuery: Query {
     private static let AUTO_GENERATE_SYNONYMS_PHRASE_QUERY = "auto_generate_synonyms_phrase_query"
     
     public let name: String = "query_string"
-    var defaultField: String?
-    var value: String
-    var defaultOperator: String?
-    var analyzer: String?
-    var quoteAnalyzer: String?
-    var allowLeadingWildcard: Bool?
-    var enablePositionIncrements: Bool?
-    var fuzzyMaxExpansions: Int?
-    var fuzziness: String?
-    var fuzzyPrefixLength: Int?
-    var fuzzyTranspositions: Bool?
-    var phraseSlop: Int?
-    var boost: Decimal?
-    var autoGeneratePhraseQueries: Bool?
-    var analyzeWildcard: Bool?
-    var maxDeterminizedStates: Int?
-    var minimumShouldMatch: Int?
-    var lenient: Bool?
-    var timeZone: String?
-    var quoteFieldSuffix: String?
-    var autoGenerateSynonymsPhraseQuery: Bool?
+    public let defaultField: String?
+    public let value: String
+    public let defaultOperator: String?
+    public let analyzer: String?
+    public let quoteAnalyzer: String?
+    public let allowLeadingWildcard: Bool?
+    public let enablePositionIncrements: Bool?
+    public let fuzzyMaxExpansions: Int?
+    public let fuzziness: String?
+    public let fuzzyPrefixLength: Int?
+    public let fuzzyTranspositions: Bool?
+    public let phraseSlop: Int?
+    public let boost: Decimal?
+    public let autoGeneratePhraseQueries: Bool?
+    public let analyzeWildcard: Bool?
+    public let maxDeterminizedStates: Int?
+    public let minimumShouldMatch: Int?
+    public let lenient: Bool?
+    public let timeZone: String?
+    public let quoteFieldSuffix: String?
+    public let autoGenerateSynonymsPhraseQuery: Bool?
     
     public init(withBuilder builder: QueryStringQueryBuilder) {
         self.defaultField = builder.defaultField
@@ -292,6 +288,7 @@ public class QueryStringQuery: Query {
         self.autoGeneratePhraseQueries = builder.autoGeneratePhraseQueries
         self.analyzeWildcard = builder.analyzeWildcard
         self.maxDeterminizedStates = builder.maxDeterminizedStates
+        self.minimumShouldMatch = builder.minimumShouldMatch
         self.lenient = builder.lenient
         self.timeZone = builder.timeZone
         self.quoteFieldSuffix = builder.quoteFieldSuffix
@@ -385,18 +382,18 @@ public class SimpleQueryStringQuery: Query {
     
     public let name: String = "simple_query_string"
     
-    var value: String
-    var fields: [String]?
-    var defaultOperator: String?
-    var analyzer: String?
-    var flags: String?
-    var lenient: Bool?
-    var minimumShouldMatch: Int?
-    var fuzzyMaxExpansions: Int?
-    var fuzzyPrefixLength: Int?
-    var fuzzyTranspositions: Bool?
-    var quoteFieldSuffix: String?
-    var autoGenerateSynonymsPhraseQuery: Bool?
+    public let value: String
+    public let fields: [String]?
+    public let defaultOperator: String?
+    public let analyzer: String?
+    public let flags: String?
+    public let lenient: Bool?
+    public let minimumShouldMatch: Int?
+    public let fuzzyMaxExpansions: Int?
+    public let fuzzyPrefixLength: Int?
+    public let fuzzyTranspositions: Bool?
+    public let quoteFieldSuffix: String?
+    public let autoGenerateSynonymsPhraseQuery: Bool?
     
     public init(withBuilder builder: SimpleQueryStringQueryBuilder) {
         self.value = builder.value!

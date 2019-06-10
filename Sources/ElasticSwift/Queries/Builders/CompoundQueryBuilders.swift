@@ -11,8 +11,8 @@ import Foundation
 
 public class ConstantScoreQueryBuilder: QueryBuilder {
     
-    var queryBuilder: QueryBuilder?
-    var boost: Decimal?
+    public var queryBuilder: QueryBuilder?
+    public var boost: Decimal?
     
     typealias BuilderClosure = (ConstantScoreQueryBuilder) -> Void
     
@@ -115,9 +115,9 @@ public class BoolQueryBuilder: QueryBuilder {
 
 public class DisMaxQueryBuilder: QueryBuilder {
     
-    var tieBreaker: Decimal?
-    var boost: Decimal?
-    var queryBuilders: [QueryBuilder] = []
+    public var tieBreaker: Decimal?
+    public var boost: Decimal?
+    public var queryBuilders: [QueryBuilder] = []
     
     typealias BuilderClosure = (DisMaxQueryBuilder) -> Void
     
@@ -143,13 +143,13 @@ public class DisMaxQueryBuilder: QueryBuilder {
 
 public class FunctionScoreQueryBuilder: QueryBuilder {
     
-    var queryBuilder: QueryBuilder?
-    var boost: Decimal?
-    var boostMode: BoostMode?
-    var maxBoost: Decimal?
-    var scoreMode: ScoreMode?
-    var minScore: Decimal?
-    var functions: [ScoreFunction] = [ScoreFunction]()
+    public var queryBuilder: QueryBuilder?
+    public var boost: Decimal?
+    public var boostMode: BoostMode?
+    public var maxBoost: Decimal?
+    public var scoreMode: ScoreMode?
+    public var minScore: Decimal?
+    public var functions: [ScoreFunction] = [ScoreFunction]()
     
     typealias BuilderClosure = (FunctionScoreQueryBuilder) -> Void
     

@@ -15,9 +15,9 @@ public class TermQuery: Query {
     private static let VALUE = "value"
     
     public let name: String = "term"
-    var field: String
-    var value: String
-    var boost: Decimal?
+    public let field: String
+    public let value: String
+    public let boost: Decimal?
     
     public init(withBuilder builder: TermQueryBuilder) {
         self.field = builder.field!
@@ -43,8 +43,8 @@ public class TermQuery: Query {
 public class TermsQuery: Query {
     public let name: String = "terms"
     
-    var field: String
-    var value: [String]
+    public let field: String
+    public let value: [String]
     
     public init(withBuilder builder: TermsQueryBuilder) {
         self.field = builder.field!
@@ -74,21 +74,22 @@ public class RangeQuery: Query {
     
     public let name: String = "range"
     
-    var field: String
-    var gte: String?
-    var gt: String?
-    var lte: String?
-    var lt: String?
-    var format: String?
-    var timeZone: String?
-    var boost: Decimal?
-    var relation: ShapeRelation?
+    public let field: String
+    public let gte: String?
+    public let gt: String?
+    public let lte: String?
+    public let lt: String?
+    public let format: String?
+    public let timeZone: String?
+    public let boost: Decimal?
+    public let relation: ShapeRelation?
     
     public init(withBuilder builder: RangeQueryBuilder) {
         self.field = builder.field!
         self.gt = builder.gt
         self.gte = builder.gte
         self.lt = builder.lt
+        self.lte = builder.lte
         self.format = builder.format
         self.timeZone = builder.timeZone
         self.boost = builder.boost
@@ -135,7 +136,7 @@ public class ExistsQuery: Query {
     
     public let name: String = "exists"
     
-    var field: String
+    public let field: String
     
     public init(withBuilder builder: ExistsQueryBuilder) {
         self.field = builder.field!
@@ -158,9 +159,9 @@ public class PrefixQuery: Query {
     
     public let name: String = "prefix"
     
-    var field: String
-    var value: String
-    var boost: Decimal?
+    public let field: String
+    public let value: String
+    public let boost: Decimal?
     
     public init(withBuilder builder: PrefixQueryBuilder) {
         self.field = builder.field!
@@ -190,9 +191,9 @@ public class WildCardQuery: Query {
     
     public let name: String = "wildcard"
     
-    var field: String
-    var value: String
-    var boost: Decimal?
+    public let field: String
+    public let value: String
+    public let boost: Decimal?
     
     public init(withBuilder builder: WildCardQueryBuilder) {
         self.field = builder.field!
@@ -224,11 +225,11 @@ public class RegexpQuery: Query {
     
     public let name: String = "regexp"
     
-    var field: String
-    var value: String
-    var boost: Decimal?
-    var regexFlags: String?
-    var maxDeterminizedStates: Int?
+    public let field: String
+    public let value: String
+    public let boost: Decimal?
+    public let regexFlags: String?
+    public let maxDeterminizedStates: Int?
     
     public init(withBuilder builder: RegexpQueryBuilder) {
         self.field = builder.field!
@@ -269,13 +270,13 @@ public class FuzzyQuery: Query {
     
     public let name: String = "fuzzy"
     
-    var field: String
-    var value: String
-    var boost: Decimal?
-    var fuzziness: Int?
-    var prefixLenght: Int?
-    var maxExpansions: Int?
-    var transpositions: Bool?
+    public let field: String
+    public let value: String
+    public let boost: Decimal?
+    public let fuzziness: Int?
+    public let prefixLenght: Int?
+    public let maxExpansions: Int?
+    public let transpositions: Bool?
     
     public init(withBuilder builder: FuzzyQueryBuilder) {
         self.field = builder.field!
@@ -320,7 +321,7 @@ public class TypeQuery: Query {
     
     public let name: String = "type"
     
-    var type: String
+    public let type: String
     
     public init(withBuilder builder: TypeQueryBuilder) {
         self.type = builder.type!
@@ -342,8 +343,8 @@ public class IdsQuery: Query {
     
     public let name: String = "ids"
     
-    var type: String?
-    var ids: [String]
+    public let type: String?
+    public let ids: [String]
     
     public init(withBuilder builder: IdsQueryBuilder) {
         self.ids = builder.ids!

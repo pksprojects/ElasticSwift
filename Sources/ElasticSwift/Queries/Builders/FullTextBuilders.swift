@@ -178,7 +178,8 @@ public class MultiMatchQueryBuilder: QueryBuilder {
         }
     }
     
-    public func set(boost: Decimal) -> Self {
+    public func set(value: String) -> Self {
+        self.value = value
         return self
     }
     
@@ -225,10 +226,6 @@ public class CommonTermsQueryBuilder: QueryBuilder {
         get {
             return CommonTermsQuery(withBuilder: self)
         }
-    }
-    
-    public func set(boost: Decimal) -> Self {
-        return self
     }
     
     public func set(value: String) -> Self {
