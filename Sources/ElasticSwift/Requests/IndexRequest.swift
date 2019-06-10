@@ -10,6 +10,8 @@ import Foundation
 
 public class IndexRequestBuilder<T: Codable>: RequestBuilder {
     
+    typealias BuilderClosure = (IndexRequestBuilder) -> Void
+    
     let client: ESClient
     var completionHandler: ((_ response: IndexResponse?, _ error: Error?) -> Void)?
     var index: String?
@@ -23,11 +25,17 @@ public class IndexRequestBuilder<T: Codable>: RequestBuilder {
         self.client = client
     }
     
+    convenience init(withClient client: ESClient, builderClosure: BuilderClosure) {
+        self.init(withClient: client)
+        builderClosure(self)
+    }
+    
     public func set(index: String) -> Self {
         self.index = index
         return self
     }
     
+    @available(*, deprecated, message: "Elasticsearch has deprecated use of custom types and will be remove in 7.0")
     public func set(type: String) -> Self {
         self.type = type
         return self
@@ -132,7 +140,7 @@ public class IndexRequest<T: Codable>: Request {
         }
         do {
             let decoded: IndexResponse? = try Serializers.decode(data: response.data!)
-            if decoded?.id == nil {
+            if decoded?.result != nil {
                 return completionHandler(decoded, nil)
             } else {
                 let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)

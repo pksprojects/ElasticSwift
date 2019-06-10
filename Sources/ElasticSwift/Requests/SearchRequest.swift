@@ -10,6 +10,8 @@ import Foundation
 
 public class SearchRequestBuilder<T: Codable>: RequestBuilder {
     
+    typealias BuilderClosure = (SearchRequestBuilder) -> Void
+    
     let client: ESClient
     var index: String?
     var type: String?
@@ -19,20 +21,26 @@ public class SearchRequestBuilder<T: Codable>: RequestBuilder {
     var sort: Sort?
     var fetchSource: Bool?
     var explain: Bool?
-    var minScore: Float?
+    var minScore: Decimal?
     var completionHandler: ((_ response: SearchResponse<T>?, _ error: Error?) -> Void)?
     
     init(withClient client: ESClient) {
         self.client = client
     }
     
+    convenience init(withClient client: ESClient, builderClosure: BuilderClosure) {
+        self.init(withClient: client)
+        builderClosure(self)
+    }
+    
     public func set(indices: String...) -> Self {
-        self.index = indices.flatMap({$0}).joined(separator: ",")
+        self.index = indices.compactMap({$0}).joined(separator: ",")
         return self
     }
     
+    @available(*, deprecated, message: "Elasticsearch has deprecated use of custom types and will be remove in 7.0")
     public func set(types: String...) -> Self {
-        self.type = types.flatMap({$0}).joined(separator: ",")
+        self.type = types.compactMap({$0}).joined(separator: ",")
         return self
     }
     
@@ -66,7 +74,7 @@ public class SearchRequestBuilder<T: Codable>: RequestBuilder {
         return self
     }
     
-    public func set(minScore: Float) -> Self {
+    public func set(minScore: Decimal) -> Self {
         self.minScore = minScore
         return self
     }
@@ -92,7 +100,7 @@ public class SearchRequest<T: Codable>: Request {
     var sort: Sort?
     var fetchSource: Bool?
     var explain: Bool?
-    var minScore: Float?
+    var minScore: Decimal?
     var _builtBody: Data?
     var completionHandler: ((_ response: SearchResponse<T>?, _ error: Error?) -> Void)
     
@@ -176,7 +184,7 @@ public class SearchRequest<T: Codable>: Request {
             return completionHandler(nil, error)
         }
         do {
-            print(String(data: response.data!, encoding: .utf8)!)
+            debugPrint(String(data: response.data!, encoding: .utf8)!)
             let decoded: SearchResponse<T>? = try Serializers.decode(data: response.data!)
             if decoded?.took != nil {
                 return completionHandler(decoded, nil)
