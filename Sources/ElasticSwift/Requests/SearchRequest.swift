@@ -184,7 +184,7 @@ public class SearchRequest<T: Codable>: Request {
             return completionHandler(nil, error)
         }
         do {
-            print(String(data: response.data!, encoding: .utf8)!)
+            debugPrint(String(data: response.data!, encoding: .utf8)!)
             let decoded: SearchResponse<T>? = try Serializers.decode(data: response.data!)
             if decoded?.took != nil {
                 return completionHandler(decoded, nil)

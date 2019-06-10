@@ -109,7 +109,7 @@ public class DeleteRequest: Request {
             return completionHandler(nil, error)
         }
         do {
-            print(String(data: response.data!, encoding: .utf8)!)
+            debugPrint(String(data: response.data!, encoding: .utf8)!)
             let decoded: DeleteResponse? = try Serializers.decode(data: response.data!)
             if decoded?.id != nil {
                 return completionHandler(decoded, nil)

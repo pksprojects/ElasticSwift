@@ -151,7 +151,7 @@ public class CreateIndexRequest: Request {
             return completionHandler(nil, error)
         }
         do {
-            print(String(data: response.data!, encoding: .utf8)!)
+            debugPrint(String(data: response.data!, encoding: .utf8)!)
             let decoded: CreateIndexResponse? = try Serializers.decode(data: response.data!)
             if decoded?.index != nil {
                 return completionHandler(decoded, nil)
@@ -217,7 +217,7 @@ class GetIndexRequest: Request {
             return completionHandler(nil, error)
         }
         do {
-            print(String(data: response.data!, encoding: .utf8)!)
+            debugPrint(String(data: response.data!, encoding: .utf8)!)
             let decoded: GetIndexResponse? = try Serializers.decode(data: response.data!)
             if decoded?.settings != nil {
                 return completionHandler(decoded, nil)
@@ -283,7 +283,7 @@ class DeleteIndexRequest: Request {
             return completionHandler(nil, error)
         }
         do {
-            print(String(data: response.data!, encoding: .utf8)!)
+            debugPrint(String(data: response.data!, encoding: .utf8)!)
             let decoded: DeleteIndexResponse? = try Serializers.decode(data: response.data!)
             if decoded?.acknowledged != nil {
                 return completionHandler(decoded, nil)
