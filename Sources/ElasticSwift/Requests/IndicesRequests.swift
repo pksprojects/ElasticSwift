@@ -309,14 +309,63 @@ public class CreateIndexResponse: Codable {
 
 public class GetIndexResponse: Codable {
     
-    public let aliases: [String: String]
-    public let mappings: [String: String]
+    public let aliases: [String: AliasMetaData]
+    public let mappings: [String: MappingMetaData]
     public let settings: IndexSettings
     
-    init(aliases: [String: String]=[:], mappings: [String: String]=[:], settings: IndexSettings) {
+    init(aliases: [String: AliasMetaData]=[:], mappings: [String: MappingMetaData]=[:], settings: IndexSettings) {
         self.aliases = aliases
         self.mappings = mappings
         self.settings = settings
+    }
+    
+    private struct CK : CodingKey {
+        
+        var stringValue: String
+        init?(stringValue: String) {
+            self.stringValue = stringValue
+        }
+        var intValue: Int?
+        init?(intValue: Int) {
+            return nil
+        }
+    }
+    
+    private struct GI: Codable {
+        public let aliases: [String: AliasMetaData]
+        public let mappings: Properties
+        public let settings: Settings
+        
+        public init(from decoder: Decoder) throws {
+            
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self.aliases = try container.decode([String: AliasMetaData].self, forKey: .aliases)
+            self.settings = try container.decode(Settings.self, forKey: .settings)
+            do {
+                self.mappings = try container.decode(Properties.self, forKey: .mappings)
+            } catch {
+                let dic = try container.decode(Dictionary<String, Properties>.self, forKey: .mappings)
+                self.mappings = dic.values.first!
+            }
+        }
+    }
+    
+    private struct Properties: Codable {
+        let properties: [String: MappingMetaData]
+    }
+    
+    private struct Settings: Codable {
+        public let index: IndexSettings
+    }
+    
+    required public init(from decoder: Decoder) throws {
+        
+        let container = try decoder.singleValueContainer()
+        let dic = try container.decode(Dictionary<String, GI>.self)
+        let val = dic.values.first!
+        self.aliases = val.aliases
+        self.mappings = val.mappings.properties
+        self.settings = val.settings.index
     }
 }
 
@@ -329,16 +378,48 @@ public class DeleteIndexResponse: Codable {
     }
 }
 
+public class MappingMetaData: Codable {
+    
+    public let type: String?
+    public let fields: Fields?
+    
+    public struct Fields: Codable {
+        public let keyword: Keyword
+        
+        public struct Keyword: Codable {
+            public let type: String
+            public let ignoreAbove: Int?
+            
+            enum CodingKeys: String, CodingKey {
+                case type
+                case ignoreAbove = "ignore_above"
+            }
+        }
+    }
+    
+}
+
+public class AliasMetaData: Codable {
+    
+    public let indexRouting: String?
+    public let searchRouting: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case indexRouting = "index_routing"
+        case searchRouting = "search_routing"
+    }
+}
+
 public class IndexSettings: Codable {
     
-    public let creationDate: Date
+    public let creationDate: String
     public let numberOfShards: String
     public let numberOfReplicas: String
     public let uuid: String
     public let providedName: String
     public let version: IndexVersion
     
-    init(creationDate: Date, numberOfShards: String, numberOfReplicas: String, uuid: String, providedName: String, version: IndexVersion) {
+    init(creationDate: String, numberOfShards: String, numberOfReplicas: String, uuid: String, providedName: String, version: IndexVersion) {
         self.creationDate = creationDate
         self.numberOfShards = numberOfShards
         self.numberOfReplicas = numberOfReplicas
@@ -365,4 +446,3 @@ public class IndexVersion: Codable {
         self.created = created
     }
 }
-
