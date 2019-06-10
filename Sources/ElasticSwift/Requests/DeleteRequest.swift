@@ -26,6 +26,7 @@ public class DeleteRequestBuilder: RequestBuilder {
         return self
     }
     
+    @available(*, deprecated, message: "Elasticsearch has deprecated use of custom types and will be remove in 7.0")
     public func set(type: String) -> Self {
         self.type = type
         return self

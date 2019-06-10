@@ -28,6 +28,7 @@ public class IndexRequestBuilder<T: Codable>: RequestBuilder {
         return self
     }
     
+    @available(*, deprecated, message: "Elasticsearch has deprecated use of custom types and will be remove in 7.0")
     public func set(type: String) -> Self {
         self.type = type
         return self
@@ -132,7 +133,7 @@ public class IndexRequest<T: Codable>: Request {
         }
         do {
             let decoded: IndexResponse? = try Serializers.decode(data: response.data!)
-            if decoded?.id == nil {
+            if decoded?.result != nil {
                 return completionHandler(decoded, nil)
             } else {
                 let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
