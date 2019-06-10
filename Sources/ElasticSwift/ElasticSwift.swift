@@ -38,6 +38,33 @@ public class RestClient: ESClient {
     
 }
 
+extension RestClient {
+    
+    public func makeGet<T: Codable>(closure: (GetRequestBuilder<T>) -> Void) -> GetRequestBuilder<T> {
+        return GetRequestBuilder<T>(withClient: self, builderClosure: closure)
+    }
+    
+    public func makeIndex<T: Codable>(closure: (IndexRequestBuilder<T>) -> Void) -> IndexRequestBuilder<T> {
+        return IndexRequestBuilder<T>(withClient: self, builderClosure: closure)
+    }
+    
+    public func makeSearch<T: Codable>(closure: (SearchRequestBuilder<T>) -> Void) -> SearchRequestBuilder<T> {
+        return SearchRequestBuilder<T>(withClient: self, builderClosure: closure)
+    }
+    
+}
+
+extension RestClient {
+    
+    public func indicesAdmin() -> IndiciesAdmin {
+        return admin.indices()
+    }
+    
+    public func clusterAdmin() -> ClusterAdmin {
+        return admin.cluster()
+    }
+}
+
 
 public class Settings {
     

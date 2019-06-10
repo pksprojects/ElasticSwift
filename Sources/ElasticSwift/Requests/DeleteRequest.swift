@@ -10,6 +10,8 @@ import Foundation
 
 public class DeleteRequestBuilder: RequestBuilder {
     
+    typealias BuilderClosure = (DeleteRequestBuilder) -> Void
+    
     let client: ESClient
     var index: String?
     var type: String?
@@ -19,6 +21,11 @@ public class DeleteRequestBuilder: RequestBuilder {
     
     init(withClient client: ESClient) {
         self.client = client
+    }
+    
+    convenience init(withClient client: ESClient, builderClosure: BuilderClosure) {
+        self.init(withClient: client)
+        builderClosure(self)
     }
     
     public func set(index: String) -> Self {

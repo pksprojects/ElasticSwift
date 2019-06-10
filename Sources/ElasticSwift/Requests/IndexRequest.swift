@@ -10,6 +10,8 @@ import Foundation
 
 public class IndexRequestBuilder<T: Codable>: RequestBuilder {
     
+    typealias BuilderClosure = (IndexRequestBuilder) -> Void
+    
     let client: ESClient
     var completionHandler: ((_ response: IndexResponse?, _ error: Error?) -> Void)?
     var index: String?
@@ -21,6 +23,11 @@ public class IndexRequestBuilder<T: Codable>: RequestBuilder {
     
     init(withClient client: ESClient) {
         self.client = client
+    }
+    
+    convenience init(withClient client: ESClient, builderClosure: BuilderClosure) {
+        self.init(withClient: client)
+        builderClosure(self)
     }
     
     public func set(index: String) -> Self {

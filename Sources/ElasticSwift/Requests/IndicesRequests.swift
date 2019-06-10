@@ -12,12 +12,19 @@ import Foundation
 
 public class CreateIndexRequestBuilder: RequestBuilder {
     
+    typealias BuilderClosure = (CreateIndexRequestBuilder) -> Void
+    
     let client: ESClient
     var name: String?
     var completionHandler: ((_ response: CreateIndexResponse?, _ error: Error?) -> Void)?
     
     init(withClient client: ESClient) {
         self.client = client
+    }
+    
+    convenience init(withClient client: ESClient, builderClosure: BuilderClosure) {
+        self.init(withClient: client)
+        builderClosure(self)
     }
     
     public func set(name: String) -> Self {
@@ -37,12 +44,19 @@ public class CreateIndexRequestBuilder: RequestBuilder {
 
 public class DeleteIndexRequestBuilder: RequestBuilder {
     
+    typealias BuilderClosure = (DeleteIndexRequestBuilder) -> Void
+    
     let client: ESClient
     var name: String?
     var completionHandler: ((_ response: DeleteIndexResponse?, _ error: Error?) -> Void)?
     
     init(withClient client: ESClient) {
         self.client = client
+    }
+    
+    convenience init(withClient client: ESClient, builderClosure: BuilderClosure) {
+        self.init(withClient: client)
+        builderClosure(self)
     }
     
     public func set(name: String) -> Self {
@@ -62,12 +76,19 @@ public class DeleteIndexRequestBuilder: RequestBuilder {
 
 public class GetIndexRequestBuilder: RequestBuilder {
     
+    typealias BuilderClosure = (GetIndexRequestBuilder) -> Void
+    
     let client: ESClient
     var name: String?
     var completionHandler: ((_ response: GetIndexResponse?, _ error: Error?) -> Void)?
     
     init(withClient client: ESClient) {
         self.client = client
+    }
+    
+    convenience init(withClient client: ESClient, builderClosure: BuilderClosure) {
+        self.init(withClient: client)
+        builderClosure(self)
     }
     
     public func set(name: String) -> Self {
