@@ -53,7 +53,7 @@ platform :ios, '10.0'
 use_frameworks!
 
 target '<Your Target Name>' do
-    pod 'ElasticSwift', '~> 1.0.0-alpha.2'
+    pod 'ElasticSwift', '~> 1.0.0-alpha.5'
 end
 ```
 
@@ -71,7 +71,7 @@ Once you have your Swift package set up, adding ElasticSwift as a dependency is 
 
 ```swift
 dependencies: [
-    .Package(url: "https://github.com/pksprojects/ElasticSwift.git", "1.0.0-alpha.2")
+    .package(url: "https://github.com/pksprojects/ElasticSwift.git", "1.0.0-alpha.5")
 ]
 ```
 
@@ -131,7 +131,7 @@ func createHandler(_ response: CreateIndexResponse?, _ error: Error?) -> Void {
 }
 
 // creating index
-let createRequest = self.client?.admin.indices().create()
+let createRequest = self.client?.indicesAdmin().create()
             .set(name: "indexName")
             .set(completionHandler: createHandler)
             .build()
@@ -147,7 +147,7 @@ func deleteHandler(_ response: DeleteIndexResponse?, _ error: Error?) -> Void {
     }
 }
 
-let deleteRequest = try self.client?.admin.indices().delete()
+let deleteRequest = try self.client?.indicesAdmin().delete()
     .set(name: "indexName")
     .set(completionHandler: deleteHandler)
     .build()
@@ -229,7 +229,7 @@ deleteRequest?.execute()
 
 ### Query
 
-Currently only `bool`, `match`, `match_all` and `match_none` are available. Future releases will support more query types.
+Currently not all QueryBuilders are available. Future releases will add support for additional QueryBuilders. Check below for details
 
 ```swift
 
@@ -259,7 +259,7 @@ let builder = QueryBuilders.boolQuery()
 let match = QueryBuilders.matchQuery().match(field: "myField", value: "MySearchValue")
 builder.must(query: match)
 
-let sort =  SortBuilders.fieldSort("msg")
+let sort =  SortBuilders.fieldSort("msg") // use "msg.keyword" as field name in case of text field
     .set(order: .asc)
     .build()
 
@@ -271,5 +271,52 @@ let request = try self.client?.makeSearch()
     .set(completionHandler: handler)
     .build()
 request?.execute()
+
+```
+
+### QueryDSL 
+
+Below Table lists all the available search queries with their corresponding QueryBuilder class name and helper method name in the QueryBuilders utility class.
+
+| Search Query | QueryBuilder Class | Method in QueryBuilders |
+| :---         |     :---      |          :--- |
+| ConstantScoreQuery | ConstantScoreQueryBuilder | QueryBuilders.constantScoreQuery() |
+| BoolQuery | BoolQueryBuilder | QueryBuilders.boolQuery() |
+| DisMaxQuery | DisMaxQueryBuilder | QueryBuilders.disMaxQuery() |
+| FunctionScoreQuery | FunctionScoreQueryBuilder | QueryBuilders.functionScoreQuery() |
+| BoostingQuery | BoostingQueryBuilder | QueryBuilders.boostingeQuery() |
+| MatchQuery | MatchQueryBuilder | QueryBuilders.matchQuery() |
+| MatchPhraseQuery | MatchPhraseQueryBuilder | QueryBuilders.matchPhraseQuery() |
+| MatchPhrasePrefixQuery | MatchPhrasePrefixQueryBuilder | QueryBuilders.matchPhrasePrefixQuery() |
+| MultiMatchQuery | MultiMatchQueryBuilder | QueryBuilders.multiMatchQuery() |
+| CommonTermsQuery | CommonTermsQueryBuilder | QueryBuilders.commonTermsQuery() |
+| QueryStringQuery | QueryStringQueryBuilder | QueryBuilders.queryStringQuery() |
+| SimpleQueryStringQuery | SimpleQueryStringQueryBuilder | QueryBuilders.simpleQueryStringQuery() |
+| MatchAllQuery | MatchAllQueryBuilder | QueryBuilders.matchAllQuery() |
+| MatchNoneQuery | MatchNoneQueryBuilder | QueryBuilders.matchNoneQuery() |
+| TermQuery | TermQueryBuilder | QueryBuilders.termQuery() |
+| TermsQuery | TermsQueryBuilder | QueryBuilders.termsQuery() |
+| RangeQuery | RangeQueryBuilder | QueryBuilders.rangeQuery() |
+| ExistsQuery | ExistsQueryBuilder | QueryBuilders.existsQuery() |
+| PrefixQuery | PrefixQueryBuilder | QueryBuilders.prefixQuery() |
+| WildCardQuery | WildCardQueryBuilder | QueryBuilders.wildCardQuery() |
+| RegexpQuery | RegexpQueryBuilder | QueryBuilders.regexpQuery() |
+| FuzzyQuery | FuzzyQueryBuilder | QueryBuilders.fuzzyQuery() |
+| TypeQuery | TypeQueryBuilder | QueryBuilders.typeQuery() |
+| IdsQuery | IdsQueryBuilder | QueryBuilders.idsQuery() |
+
+#### Note 
+
+An overload for all the helper methods are available which that a closure to set builder properties.
+
+```swift
+
+public static func matchAllQuery() -> MatchAllQueryBuilder
+
+public static func matchAllQuery(_ closure: (MatchAllQueryBuilder) -> Void) -> MatchAllQueryBuilder
+
+let matchAll = QueryBuilders.matchAllQuery { builder in
+    builder.boost = 1.2
+}
 
 ```
