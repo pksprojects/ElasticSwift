@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Logging
 
 public class SearchRequestBuilder<T: Codable>: RequestBuilder {
     
@@ -90,6 +91,8 @@ public class SearchRequestBuilder<T: Codable>: RequestBuilder {
 }
 
 public class SearchRequest<T: Codable>: Request {
+    
+    let logger = Logger(label: "org.pksprojects.ElasticSwift.Requests.SearchRequest")
     
     let client: ESClient
     var index: String?
@@ -184,7 +187,7 @@ public class SearchRequest<T: Codable>: Request {
             return completionHandler(nil, error)
         }
         do {
-            debugPrint(String(data: response.data!, encoding: .utf8)!)
+            logger.debug("\(String(data: response.data!, encoding: .utf8)!)")
             let decoded: SearchResponse<T>? = try Serializers.decode(data: response.data!)
             if decoded?.took != nil {
                 return completionHandler(decoded, nil)

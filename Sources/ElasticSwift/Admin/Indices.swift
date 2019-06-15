@@ -7,10 +7,13 @@
 //
 
 import Foundation
+import Logging
 
 public class IndiciesAdmin {
     
     let client: ESClient
+    
+    let logger = Logger(label: "org.pksprojects.ElasticSwfit.IndiciesAdmin")
     
     init(withClient: ESClient) {
         self.client = withClient

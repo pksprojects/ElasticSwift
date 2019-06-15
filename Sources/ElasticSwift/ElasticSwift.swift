@@ -1,9 +1,12 @@
 import Foundation
+import Logging
 
 public typealias Host = URL
 
 
 public class RestClient: ESClient {
+    
+    let logger = Logger(label: "org.pksprojects.ElasticSwfit.RestClient")
     
     let admin: Admin
     

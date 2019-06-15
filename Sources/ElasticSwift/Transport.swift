@@ -7,11 +7,14 @@
 //
 
 import Foundation
+import Logging
 
 /**
  Class managing connection(URLSession) pool and HTTP requests.
  */
 class Transport {
+    
+    let logger = Logger(label: "org.pksprojects.ElasticSwfit.Transport")
     
     let hosts: [URL]
     
@@ -24,6 +27,7 @@ class Transport {
     }
     
     func performRequest(method: HTTPMethod, endPoint: String?, params: [QueryParams], completionHandler: @escaping (_ response: ESResponse) -> Void) {
+        logger.debug("Method: \(method), Endpoint: \(String(describing: endPoint)), Params: \(params)")
         self.sessionPool?.getConnection()?
             .createRequest(method: method, forPath: endPoint!, witParams: params)
             .createDataTask(onCompletion: completionHandler)
@@ -31,7 +35,7 @@ class Transport {
     }
     
     func performRequest(method: HTTPMethod, endPoint: String?, params: [QueryParams], body: Data, completionHandler: @escaping (_ response: ESResponse) -> Void) {
-        debugPrint(method, endPoint!, params, body)
+        logger.debug("Method: \(method), Endpoint: \(String(describing: endPoint)), Params: \(params), Body: \(body)")
         self.sessionPool?.getConnection()?
             .createRequest(method: method, forPath: endPoint!, witParams: params, body: body)
             .createDataTask(onCompletion: completionHandler)
@@ -39,7 +43,7 @@ class Transport {
     }
     
     func perform_request(method: HTTPMethod, endPoint: String?, params: [QueryParams], body: String, completionHandler: @escaping (_ response: ESResponse) -> Void) {
-        debugPrint(method, endPoint!, params, body)
+        logger.debug("Method: \(method), Endpoint: \(String(describing: endPoint)), Params: \(params), Body: \(body)")
         self.sessionPool?.getConnection()?
             .createRequest(method: method, forPath: endPoint!, witParams: params, body: body)
             .createDataTask(onCompletion: completionHandler)
@@ -47,7 +51,7 @@ class Transport {
     }
     
     func perform_request(method: HTTPMethod, endPoint: String?, params: [QueryParams], body: Data, completionHandler: @escaping (_ response: ESResponse) -> Void) {
-        debugPrint(method, endPoint!, params, body)
+        logger.debug("Method: \(method), Endpoint: \(String(describing: endPoint)), Params: \(params), Body: \(body)")
         self.sessionPool?.getConnection()?
             .createRequest(method: method, forPath: endPoint!, witParams: params, body: body)
             .createDataTask(onCompletion: completionHandler)

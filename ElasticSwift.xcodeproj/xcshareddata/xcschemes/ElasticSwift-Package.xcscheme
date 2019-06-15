@@ -50,15 +50,6 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "ElasticSwift::ElasticSwift"
-            BuildableName = "ElasticSwift.framework"
-            BlueprintName = "ElasticSwift"
-            ReferencedContainer = "container:ElasticSwift.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

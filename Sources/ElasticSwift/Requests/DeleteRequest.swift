@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Logging
 
 public class DeleteRequestBuilder: RequestBuilder {
     
@@ -62,6 +63,8 @@ public class DeleteRequestBuilder: RequestBuilder {
 
 public class DeleteRequest: Request {
     
+    let logger = Logger(label: "org.pksprojects.ElasticSwift.Requests.DeleteRequest")
+    
     let client: ESClient
     let index: String
     let type: String
@@ -109,7 +112,7 @@ public class DeleteRequest: Request {
             return completionHandler(nil, error)
         }
         do {
-            debugPrint(String(data: response.data!, encoding: .utf8)!)
+            logger.debug("\(String(data: response.data!, encoding: .utf8)!)")
             let decoded: DeleteResponse? = try Serializers.decode(data: response.data!)
             if decoded?.id != nil {
                 return completionHandler(decoded, nil)

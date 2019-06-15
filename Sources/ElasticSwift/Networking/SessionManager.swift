@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Logging
 
 /**
  Class maintaining URLSession for a Host
@@ -14,6 +15,8 @@ import Foundation
 
 class SessionManager: NSObject, URLSessionDelegate {
 
+    let logger = Logger(label: "org.pksprojects.ElasticSwift.Networking.SessionManager")
+    
     private var session: URLSession?
     private let url: URL
     private var request: URLRequest?
@@ -76,7 +79,7 @@ class SessionManager: NSObject, URLSessionDelegate {
         var currRequest = URLRequest(url: self.url.appendingPathComponent(pathComponent))
         currRequest.httpMethod = method.rawValue
         self.request = currRequest
-        debugPrint("URLRequest without body created")
+        logger.debug("URLRequest without body created")
         return self
     }
     
@@ -85,7 +88,7 @@ class SessionManager: NSObject, URLSessionDelegate {
         currRequest.httpMethod = method.rawValue
         currRequest.httpBody = body.data(using: .utf8)
         self.request = currRequest
-        debugPrint("URLRequest with body created")
+        logger.debug("URLRequest with body created")
         return self
     }
     
@@ -94,7 +97,7 @@ class SessionManager: NSObject, URLSessionDelegate {
         currRequest.httpMethod = method.rawValue
         currRequest.httpBody = body
         self.request = currRequest
-        debugPrint("URLRequest with body created")
+        logger.debug("URLRequest with body created")
         return self
     }
     
@@ -104,12 +107,12 @@ class SessionManager: NSObject, URLSessionDelegate {
             return callback(response)
         }
         
-        debugPrint("Data Task Created:", self.dataTask!)
+        logger.debug("Data Task Created: \(self.dataTask!)")
         return self
     }
     func execute() {
         self.dataTask?.resume()
-        debugPrint("DataTask Resumed")
+        logger.debug("DataTask Resumed")
     }
     
     /**
@@ -127,7 +130,7 @@ class SessionManager: NSObject, URLSessionDelegate {
     }
     
     deinit {
-        debugPrint("session invalidated")
+        logger.debug("session invalidated")
         self.session?.invalidateAndCancel()
     }
     

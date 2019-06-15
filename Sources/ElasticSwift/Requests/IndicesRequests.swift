@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Logging
 
 // MARK: -  Builders
 
@@ -110,6 +111,8 @@ public class GetIndexRequestBuilder: RequestBuilder {
 
 public class CreateIndexRequest: Request {
     
+    let logger = Logger(label: "org.pksprojects.ElasticSwift.Requests.CreateIndexRequest")
+    
     let client: ESClient
     let name: String
     var completionHandler: ((_ response: CreateIndexResponse?, _ error: Error?) -> Void)
@@ -151,7 +154,7 @@ public class CreateIndexRequest: Request {
             return completionHandler(nil, error)
         }
         do {
-            debugPrint(String(data: response.data!, encoding: .utf8)!)
+            logger.debug("\(String(data: response.data!, encoding: .utf8)!)")
             let decoded: CreateIndexResponse? = try Serializers.decode(data: response.data!)
             if decoded?.index != nil {
                 return completionHandler(decoded, nil)
@@ -175,6 +178,8 @@ public class CreateIndexRequest: Request {
 }
 
 class GetIndexRequest: Request {
+    
+    let logger = Logger(label: "org.pksprojects.ElasticSwift.Requests.GetIndexRequest")
     
     let client: ESClient
     let name: String
@@ -217,7 +222,7 @@ class GetIndexRequest: Request {
             return completionHandler(nil, error)
         }
         do {
-            debugPrint(String(data: response.data!, encoding: .utf8)!)
+            logger.debug("\(String(data: response.data!, encoding: .utf8)!)")
             let decoded: GetIndexResponse? = try Serializers.decode(data: response.data!)
             if decoded?.settings != nil {
                 return completionHandler(decoded, nil)
@@ -241,6 +246,8 @@ class GetIndexRequest: Request {
 }
 
 class DeleteIndexRequest: Request {
+    
+    let logger = Logger(label: "org.pksprojects.ElasticSwift.Requests.DeleteIndexRequest")
     
     let client: ESClient
     let name: String
@@ -283,7 +290,7 @@ class DeleteIndexRequest: Request {
             return completionHandler(nil, error)
         }
         do {
-            debugPrint(String(data: response.data!, encoding: .utf8)!)
+            logger.debug("\(String(data: response.data!, encoding: .utf8)!)")
             let decoded: DeleteIndexResponse? = try Serializers.decode(data: response.data!)
             if decoded?.acknowledged != nil {
                 return completionHandler(decoded, nil)

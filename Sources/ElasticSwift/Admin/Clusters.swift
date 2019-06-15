@@ -7,8 +7,11 @@
 //
 
 import Foundation
+import Logging
 
 public class ClusterAdmin {
+    
+    let logger = Logger(label: "org.pksprojects.ElasticSwfit.ClusterAdmin")
     
     let client: ESClient
     
