@@ -12,8 +12,10 @@ public class SearchRequestBuilder<T: Codable>: RequestBuilder {
     
     typealias BuilderClosure = (SearchRequestBuilder) -> Void
     
+    public typealias RequestType = SearchRequest<T>
+    
     let client: ESClient
-    var index: String?
+    var index: String
     var type: String?
     var from: Int16?
     var size: Int16?
@@ -21,15 +23,27 @@ public class SearchRequestBuilder<T: Codable>: RequestBuilder {
     var sort: Sort?
     var fetchSource: Bool?
     var explain: Bool?
+
     var minScore: Decimal?
-    var completionHandler: ((_ response: SearchResponse<T>?, _ error: Error?) -> Void)?
+    public var completionHandler: ((SearchResponse<T>?,Error?) -> ())?
     
-    init(withClient client: ESClient) {
+    init(withClient client: ESClient, index: String) {
         self.client = client
+        self.index = index
     }
     
-    convenience init(withClient client: ESClient, builderClosure: BuilderClosure) {
-        self.init(withClient: client)
+    init(withClient client: ESClient, indices: String...) {
+        self.client = client
+         self.index = indices.compactMap({$0}).joined(separator: ",")
+    }
+    
+    init(withClient client: ESClient, indices: [String]) {
+        self.client = client
+        self.index = indices.compactMap({$0}).joined(separator: ",")
+    }
+    
+    convenience init(withClient client: ESClient, index: String, builderClosure: BuilderClosure) {
+        self.init(withClient: client, index: index)
         builderClosure(self)
     }
     
@@ -79,20 +93,24 @@ public class SearchRequestBuilder<T: Codable>: RequestBuilder {
         return self
     }
     
-    public func set(completionHandler: @escaping (_ response: SearchResponse<T>?, _ error: Error?) -> Void) -> Self {
+    public func set(completionHandler: @escaping (_ response: SearchResponse<T>?, _ error: Error?) -> ()) -> Self {
         self.completionHandler = completionHandler
         return self
     }
     
-    public func build() throws -> Request {
+    public func make() throws -> SearchRequest<T> {
         return try SearchRequest<T>(withBuilder: self)
     }
 }
 
 public class SearchRequest<T: Codable>: Request {
     
-    let client: ESClient
-    var index: String?
+    public typealias ResponseType = SearchResponse<T>
+    
+    public var completionHandler: ((SearchResponse<T>?,Error?) -> ())?
+    
+    public let client: ESClient
+    var index: String
     var type: String?
     var from: Int16?
     var size: Int16?
@@ -101,12 +119,11 @@ public class SearchRequest<T: Codable>: Request {
     var fetchSource: Bool?
     var explain: Bool?
     var minScore: Decimal?
-    var _builtBody: Data?
-    var completionHandler: ((_ response: SearchResponse<T>?, _ error: Error?) -> Void)
     
     init(withBuilder builder: SearchRequestBuilder<T>) throws {
         self.client = builder.client
         self.index = builder.index
+        
         self.type = builder.type
         self.from = builder.from
         self.size = builder.size
@@ -115,45 +132,10 @@ public class SearchRequest<T: Codable>: Request {
         self.fetchSource = builder.fetchSource
         self.explain = builder.explain
         self.minScore = builder.minScore
-        self.completionHandler = builder.completionHandler!
-        self._builtBody = try makeBody()
+        self.completionHandler = builder.completionHandler
     }
     
-    public var method: HTTPMethod {
-        get {
-            return .POST
-        }
-    }
-    
-    public var endPoint: String {
-        get {
-            return makeEndPoint()
-        }
-    }
-    
-    public var body: Data {
-        get {
-            return self._builtBody!
-        }
-    }
-    
-    public func execute() {
-        self.client.execute(request: self, completionHandler: responseHandler)
-    }
-    
-    func makeEndPoint() -> String {
-        var path: String = ""
-        if let index = self.index {
-            path += index + "/"
-        }
-        if let type = self.type {
-            path += type + "/"
-        }
-        path += "_search"
-        return path
-    }
-    
-    func makeBody() throws -> Data {
+    public func getBody() throws -> Data? {
         var dic = [String: Any]()
         if let query = self.query {
             dic["query"] = query.toDic()
@@ -179,30 +161,18 @@ public class SearchRequest<T: Codable>: Request {
         return try JSONSerialization.data(withJSONObject: dic, options: [])
     }
     
-    func responseHandler(_ response: ESResponse) -> Void {
-        if let error = response.error {
-            return completionHandler(nil, error)
-        }
-        do {
-            debugPrint(String(data: response.data!, encoding: .utf8)!)
-            let decoded: SearchResponse<T>? = try Serializers.decode(data: response.data!)
-            if decoded?.took != nil {
-                return completionHandler(decoded, nil)
-            } else {
-                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
-                if let decoded = decodedError {
-                    return completionHandler(nil, decoded)
-                }
+    public var method: HTTPMethod = .POST
+    
+    public var endPoint: String {
+        get {
+            var path: String = self.index + "/"
+            
+            if let type = self.type {
+                path += type + "/"
             }
-        } catch {
-            do {
-                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
-                if let decoded = decodedError {
-                    return completionHandler(nil, decoded)
-                }
-            } catch {
-                return completionHandler(nil, error)
-            }
+            path += "_search"
+            return path
         }
     }
+    
 }

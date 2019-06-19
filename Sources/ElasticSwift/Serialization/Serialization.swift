@@ -8,12 +8,17 @@
 
 import Foundation
 
-class Serializers {
+public protocol Serializer {
+    func decode<T: Codable>(data: Data) throws -> T
+    func encode<T: Codable>(_ value: T) throws -> Data
+}
+
+class DefaultSerializer : Serializer {
     
-    static let encoder = JSONEncoder()
-    static let decoder = JSONDecoder()
+    let encoder = JSONEncoder()
+    let decoder = JSONDecoder()
     
-    public static func decode<T: Codable>(data: Data) throws -> T? {
+    public func decode<T: Codable>(data: Data) throws -> T {
         do {
             return try decoder.decode(T.self, from: data)
         } catch {
@@ -21,7 +26,7 @@ class Serializers {
         }
     }
     
-    public static func encode<T: Codable>(_ value: T) throws -> Data? {
+    public func encode<T: Codable>(_ value: T) throws -> Data {
         do {
             return try encoder.encode(value)
         } catch {

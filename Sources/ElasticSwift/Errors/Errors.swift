@@ -13,7 +13,15 @@ public class ElasticsearchError: Error, Codable {
     var error: ElasticError?
     var status: Int?
     
-    init() {}
+    static func create(fromESResponse response: ESResponse, withSerializer serializer: Serializer) throws -> ElasticsearchError {
+        
+        guard let data = response.data else {
+            throw ResponseConstants.Errors.ResponseError.NoDataReturned
+        }
+        
+        let decoded = try serializer.decode(data: data) as ElasticsearchError
+        return decoded
+    }
 }
 
 public class ElasticError: Codable {
@@ -40,7 +48,7 @@ public class ElasticError: Codable {
 
 public protocol ESClientError: Error {
     
-    func messgae() -> String
+    func message() -> String
     
 }
 
@@ -52,8 +60,9 @@ public class RequestCreationError: ESClientError {
         self.msg = msg
     }
     
-    public func messgae() -> String {
+    public func message() -> String {
         return msg
     }
     
 }
+

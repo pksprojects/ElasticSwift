@@ -12,21 +12,27 @@ public class IndexRequestBuilder<T: Codable>: RequestBuilder {
     
     typealias BuilderClosure = (IndexRequestBuilder) -> Void
     
+    public typealias RequestType = IndexRequest
+    
     let client: ESClient
-    var completionHandler: ((_ response: IndexResponse?, _ error: Error?) -> Void)?
-    var index: String?
+    var index: String
     var type: String?
     var id: String?
-    var source: T?
+    var source: T
     var routing: String?
     var parent: String?
+    var refresh: IndexRefresh?
     
-    init(withClient client: ESClient) {
+    public var completionHandler: ((IndexResponse?,Error?) -> ())?
+    
+    init(withClient client: ESClient, index : String, source: T) {
         self.client = client
+        self.index = index
+        self.source = source
     }
     
-    convenience init(withClient client: ESClient, builderClosure: BuilderClosure) {
-        self.init(withClient: client)
+    convenience init(withClient client: ESClient, index : String, source: T, builderClosure: BuilderClosure) {
+        self.init(withClient: client, index: index, source: source)
         builderClosure(self)
     }
     
@@ -61,21 +67,51 @@ public class IndexRequestBuilder<T: Codable>: RequestBuilder {
         return self
     }
     
-    public func set(completionHandler: @escaping (_ response: IndexResponse?, _ error: Error?) -> Void) -> Self {
+    public func set(refresh: IndexRefresh) -> Self {
+        self.refresh = refresh
+        return self
+    }
+    
+    public func set(completionHandler: @escaping (IndexResponse?,Error?) -> ()) -> Self {
         self.completionHandler = completionHandler
         return self
     }
     
-    public func build() throws -> Request {
-        return try IndexRequest(withBuilder: self)
+    public func make() throws -> IndexRequest<T> {
+        return try IndexRequest<T>(withBuilder: self)
     }
     
 }
 
 public class IndexRequest<T: Codable>: Request {
     
-    let client: ESClient
-    let completionHandler: ((_ response: IndexResponse?, _ error: Error?) -> Void)
+    public typealias ResponseType = IndexResponse
+    
+    public let completionHandler: ((IndexResponse?,Error?) -> ())?
+    
+    public let client: ESClient
+    var index: String
+    var type: String?
+    var id: String?
+    var source: T
+    var routing: String?
+    var parent: String?
+    var refresh: IndexRefresh?
+    
+    init(withBuilder builder: IndexRequestBuilder<T>) throws {
+        self.client = builder.client
+        self.index = builder.index
+        self.source = builder.source
+        
+        self.type = builder.type
+        self.id = builder.id
+        self.routing = builder.routing
+        self.parent = builder.parent
+        
+        self.refresh = builder.refresh
+        self.completionHandler = builder.completionHandler
+    }
+    
     public var method: HTTPMethod  {
         get {
             if self.id == nil {
@@ -85,80 +121,47 @@ public class IndexRequest<T: Codable>: Request {
         }
     }
     
-    var _builtBody: Data?
-    var index: String?
-    var type: String?
-    var id: String?
-    var source: T?
-    var routing: String?
-    var parent: String?
-    
-    
-    init(withBuilder builder: IndexRequestBuilder<T>) throws {
-        self.client = builder.client
-        self.completionHandler = builder.completionHandler!
-        self.index = builder.index
-        self.type = builder.type
-        self.id = builder.id
-        self.source = builder.source
-        self.routing = builder.routing
-        self.parent = builder.parent
-        self._builtBody = try makeBody()
-    }
-    
-    func makeEndPoint() -> String {
-        var _endPoint = self.index! + "/" + self.type!
-        if let id = self.id {
-            _endPoint = _endPoint + "/" + id
-        }
-        return _endPoint
-    }
-    
     public var endPoint: String {
         get {
-            return makeEndPoint()
-        }
-    }
-    
-    public var body: Data {
-        get {
-            return _builtBody!
-        }
-    }
-    
-    public func makeBody() throws -> Data {
-       return try Serializers.encode(self.source!)!
-    }
-    
-    public func execute() {
-        self.client.execute(request: self, completionHandler: responseHandler)
-    }
-    
-    func responseHandler(_ response: ESResponse) -> Void {
-        if let error = response.error {
-            return completionHandler(nil, error)
-        }
-        do {
-            let decoded: IndexResponse? = try Serializers.decode(data: response.data!)
-            if decoded?.result != nil {
-                return completionHandler(decoded, nil)
+            var result = self.index + "/"
+            
+            if let type = self.type {
+                result += type + "/"
             } else {
-                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
-                if let decoded = decodedError {
-                    return completionHandler(nil, decoded)
-                }
+                result += "_doc/"
             }
-        } catch {
-            return completionHandler(nil, error)
+            
+            if let id = self.id {
+                result += id
+            }
+            
+            return result
         }
-        
+    }
+    
+    public func getBody() throws -> Data? {
+        return try self.serializer.encode(self.source)
+    }
+    
+    public var parameters: [QueryParams : String]? {
+        get {
+            if let refresh = self.refresh {
+                var result = [QueryParams : String]()
+                switch refresh {
+                case .FALSE:
+                    result[QueryParams.refresh] = "false"
+                    break
+                case .TRUE:
+                    result[QueryParams.refresh] = "true"
+                    break
+                case .WAIT:
+                    result[QueryParams.refresh] = "wait_for"
+                    break
+                }
+                return result
+            }
+            return nil
+        }
     }
     
 }
-
-
-enum OpType {
-    case INDEX
-    case CREATE
-}
-
