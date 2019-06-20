@@ -77,7 +77,7 @@ public class IndexRequestBuilder<T: Codable>: RequestBuilder {
         return self
     }
     
-    public func make() throws -> IndexRequest<T> {
+    public func build() throws -> IndexRequest<T> {
         return try IndexRequest<T>(withBuilder: self)
     }
     

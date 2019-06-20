@@ -41,7 +41,7 @@ public class CreateIndexRequestBuilder: RequestBuilder {
         return self
     }
     
-    public func make() -> CreateIndexRequest {
+    public func build() -> CreateIndexRequest {
         return CreateIndexRequest(withBuilder: self)
     }
     
@@ -78,7 +78,7 @@ public class DeleteIndexRequestBuilder: RequestBuilder {
         return self
     }
     
-    public func make() throws -> DeleteIndexRequest {
+    public func build() throws -> DeleteIndexRequest {
         return DeleteIndexRequest(withBuilder: self)
     }
 
@@ -115,7 +115,7 @@ public class GetIndexRequestBuilder: RequestBuilder {
         return self
     }
     
-    public func make() throws -> GetIndexRequest {
+    public func build() throws -> GetIndexRequest {
         return GetIndexRequest(withBuilder: self)
     }
 

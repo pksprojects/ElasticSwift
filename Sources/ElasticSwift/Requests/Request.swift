@@ -31,23 +31,8 @@ public protocol RequestBuilder {
     
     var completionHandler: ((_ response: ResponseType?, _ error: Error?) -> ())? { get }
     
-    func validate() throws
-    
-    func make() throws -> RequestType
     func build() throws -> RequestType
  
-}
-
-extension RequestBuilder {
-
-    public func build() throws -> RequestType {
-        try self.validate()
-        return try make()
-    }
-    
-    public func validate() throws {
-        
-    }
 }
 
 public protocol Request {

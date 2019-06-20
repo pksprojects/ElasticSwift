@@ -98,7 +98,7 @@ public class SearchRequestBuilder<T: Codable>: RequestBuilder {
         return self
     }
     
-    public func make() throws -> SearchRequest<T> {
+    public func build() throws -> SearchRequest<T> {
         return try SearchRequest<T>(withBuilder: self)
     }
 }
