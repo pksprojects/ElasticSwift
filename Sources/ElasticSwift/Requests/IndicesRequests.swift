@@ -78,7 +78,7 @@ public class DeleteIndexRequestBuilder: RequestBuilder {
         return self
     }
     
-    public func build() throws -> DeleteIndexRequest {
+    public func build() -> DeleteIndexRequest {
         return DeleteIndexRequest(withBuilder: self)
     }
 
@@ -115,7 +115,7 @@ public class GetIndexRequestBuilder: RequestBuilder {
         return self
     }
     
-    public func build() throws -> GetIndexRequest {
+    public func build() -> GetIndexRequest {
         return GetIndexRequest(withBuilder: self)
     }
 

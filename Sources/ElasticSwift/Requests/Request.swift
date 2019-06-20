@@ -31,7 +31,7 @@ public protocol RequestBuilder {
     
     var completionHandler: ((_ response: ResponseType?, _ error: Error?) -> ())? { get }
     
-    func build() throws -> RequestType
+    func build() -> RequestType
  
 }
 

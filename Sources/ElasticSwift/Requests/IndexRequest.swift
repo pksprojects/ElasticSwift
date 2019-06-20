@@ -77,8 +77,8 @@ public class IndexRequestBuilder<T: Codable>: RequestBuilder {
         return self
     }
     
-    public func build() throws -> IndexRequest<T> {
-        return try IndexRequest<T>(withBuilder: self)
+    public func build() -> IndexRequest<T> {
+        return IndexRequest<T>(withBuilder: self)
     }
     
 }
@@ -98,7 +98,7 @@ public class IndexRequest<T: Codable>: Request {
     var parent: String?
     var refresh: IndexRefresh?
     
-    init(withBuilder builder: IndexRequestBuilder<T>) throws {
+    init(withBuilder builder: IndexRequestBuilder<T>) {
         self.client = builder.client
         self.index = builder.index
         self.source = builder.source

@@ -53,7 +53,7 @@ public class GetRequestBuilder<T: Codable>: RequestBuilder {
         return self
     }
     
-    public func build() throws -> GetRequest<T> {
+    public func build() -> GetRequest<T> {
         return GetRequest<T>(withBuilder: self)
     }
     

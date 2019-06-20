@@ -46,7 +46,7 @@ public class UpdateRequestBuilder<T: Codable> : RequestBuilder {
         return self
     }
     
-    public func build() throws -> UpdateRequest<T> {
+    public func build() -> UpdateRequest<T> {
         return UpdateRequest<T>(withBuilder: self)
     }
 }

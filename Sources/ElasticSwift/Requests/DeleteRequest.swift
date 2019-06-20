@@ -58,7 +58,7 @@ public class DeleteRequestBuilder: RequestBuilder {
         return self
     }
     
-    public func build() throws -> DeleteRequest {
+    public func build() -> DeleteRequest {
         return DeleteRequest(withBuilder: self)
     }
 

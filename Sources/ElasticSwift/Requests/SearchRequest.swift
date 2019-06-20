@@ -98,8 +98,8 @@ public class SearchRequestBuilder<T: Codable>: RequestBuilder {
         return self
     }
     
-    public func build() throws -> SearchRequest<T> {
-        return try SearchRequest<T>(withBuilder: self)
+    public func build() -> SearchRequest<T> {
+        return SearchRequest<T>(withBuilder: self)
     }
 }
 
@@ -120,7 +120,7 @@ public class SearchRequest<T: Codable>: Request {
     var explain: Bool?
     var minScore: Decimal?
     
-    init(withBuilder builder: SearchRequestBuilder<T>) throws {
+    init(withBuilder builder: SearchRequestBuilder<T>) {
         self.client = builder.client
         self.index = builder.index
         

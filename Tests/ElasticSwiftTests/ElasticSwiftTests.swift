@@ -133,21 +133,21 @@ class ElasticSwiftTests: XCTestCase {
     }
     
     func createIndex(withCompletionHandler completionHandler: @escaping (CreateIndexResponse?,Error?) -> () ) throws {
-        let request = try self.client?.admin.indices().createIndex(withName: "test")
+        let request = self.client?.admin.indices().createIndex(withName: "test")
             .set(completionHandler: completionHandler)
             .build()
         try request?.execute()
     }
     
     func deleteIndex(withCompletionHandler completionHandler: @escaping (DeleteIndexResponse?,Error?) -> () ) throws {
-        let request = try self.client?.admin.indices().deleteIndex(withName: "test")
+        let request = self.client?.admin.indices().deleteIndex(withName: "test")
             .set(completionHandler: completionHandler)
             .build()
         try request?.execute()
     }
     
     func getIndex(withCompletionHandler completionHandler: @escaping (GetIndexResponse?,Error?) -> ()) throws {
-        let request = try self.client?.admin.indices().getIndex(withName: "test")
+        let request = self.client?.admin.indices().getIndex(withName: "test")
             .set(completionHandler: completionHandler)
             .build()
         try request?.execute()
