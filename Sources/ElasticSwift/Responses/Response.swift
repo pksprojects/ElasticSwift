@@ -139,7 +139,9 @@ public class Shards: Codable {
 
 public class Hits<T: Codable>: Response {
     
-    public var total: Total?
+    public var total: Int?
+    //FIXME: Support Elastic 7+
+//    public var total: Total?
     public var maxScore: Decimal?
 
     public var hits: [SearchHit<T>] = []
