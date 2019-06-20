@@ -285,7 +285,7 @@ class ElasticSwiftTests: XCTestCase {
             XCTAssertTrue(response!.shards.failed == 0)
             XCTAssertTrue(response!.shards.total > 0)
             XCTAssertTrue(response?.timedOut ?? true == false)
-            XCTAssertTrue(response?.hits?.total?.value == 2)
+            XCTAssertTrue(response?.hits?.total == 2)
             
             let firstResult = response?.hits?.hits[0]
             let secondResult = response?.hits?.hits[1]
