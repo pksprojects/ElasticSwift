@@ -43,7 +43,7 @@ High-performant means providing end user's response under 100ms not including th
 $ gem install cocoapods
 ```
 
-> CocoaPods 1.2.0+ is required to build ElasticSwift.
+> CocoaPods 1.6.0+ is required to build ElasticSwift.
 
 To integrate Elasticswift into your Xcode project using CocoaPods, specify it in your `Podfile`:
 
@@ -131,11 +131,11 @@ func createHandler(_ response: CreateIndexResponse?, _ error: Error?) -> Void {
 }
 
 // creating index
-let createRequest = self.client?.indicesAdmin().create()
+let createRequest = client.indicesAdmin().create()
             .set(name: "indexName")
             .set(completionHandler: createHandler)
             .build()
-createRequest?.execute() // executes request
+createRequest.execute() // executes request
 
 // delete index
 func deleteHandler(_ response: DeleteIndexResponse?, _ error: Error?) -> Void {
@@ -147,11 +147,11 @@ func deleteHandler(_ response: DeleteIndexResponse?, _ error: Error?) -> Void {
     }
 }
 
-let deleteRequest = try self.client?.indicesAdmin().delete()
+let deleteRequest = try client.indicesAdmin().delete()
     .set(name: "indexName")
     .set(completionHandler: deleteHandler)
     .build()
-deleteRequest?.execute() // executes request
+deleteRequest.execute() // executes request
 
 ```
 
@@ -177,7 +177,7 @@ func indexHandler(_ response: IndexResponse?, _ error:  Error?) -> Void {
 let mySource = MyClass()
 mySource.myField = "My value"
 
-let indexRequest = try self.client?.makeIndex()
+let indexRequest = try client.makeIndex()
     .set(index: "indexName")
     .set(type: "type")
     .set(id: "id")
@@ -185,7 +185,7 @@ let indexRequest = try self.client?.makeIndex()
     .set(completionHandler: indexHandler)
     .build()
 
-indexRequest?.execute()
+indexRequest.execute()
 
 // get document
 func getHandler(_ response: GetResponse<MyClass>?, _ error: Error?) -> Void {
@@ -197,14 +197,14 @@ func getHandler(_ response: GetResponse<MyClass>?, _ error: Error?) -> Void {
     }
 }
 
-let getRequest = self.client?.makeGet()
+let getRequest = client.makeGet()
     .set(index: "indexName")
     .set(type: "type")
     .set(id: "id")
     .set(completionHandler: getHandler)
     .build()
 
-getRequest?.execute()
+getRequest.execute()
 
 // delete document
 func deleteHandler(_ response: DeleteResponse?, _ error:  Error?) -> Void {
@@ -216,14 +216,14 @@ func deleteHandler(_ response: DeleteResponse?, _ error:  Error?) -> Void {
     }
 }
 
-let deleteRequest = self.client?.makeDelete()
+let deleteRequest = client.makeDelete()
     .set(index: "indexName")
     .set(type: "type")
     .set(id: "id")
     .set(completionHandler: deleteHandler)
     .build()
 
-deleteRequest?.execute()
+deleteRequest.execute()
 
 ```
 
@@ -263,14 +263,14 @@ let sort =  SortBuilders.fieldSort("msg") // use "msg.keyword" as field name in 
     .set(order: .asc)
     .build()
 
-let request = try self.client?.makeSearch()
+let request = try client.makeSearch()
     .set(indices: "indexName")
     .set(types: "type")
     .set(query: builder.query)
     .set(sort: sort)
     .set(completionHandler: handler)
     .build()
-request?.execute()
+request.execute()
 
 ```
 
