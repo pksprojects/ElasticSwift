@@ -1,18 +1,24 @@
 import Foundation
 import Logging
+import NIO
+import NIOHTTP1
+import NIOSSL
+import NIOTLS
 
 public typealias Host = URL
 
 
 public class RestClient: ESClient {
     
-    let logger = Logger(label: "org.pksprojects.ElasticSwfit.RestClient")
+    private let logger = Logger(label: "org.pksprojects.ElasticSwfit.RestClient")
     
-    let admin: Admin
+    private var clusterClient: ClusterClient?
+    private var indicesClient: IndicesClient?
     
     public init(settings: Settings) {
-        self.admin = Admin(hosts: settings.hosts, credentials: settings.credentials, sslConfig: settings.sslConfig)
-        super.init(hosts: settings.hosts, credentials: settings.credentials, sslConfig: settings.sslConfig)
+        super.init(hosts: settings.hosts, credentials: settings.credentials, clienAdaptor: settings.clientAdaptor, adaptorConfig: settings.adaptorConfig)
+        self.indicesClient = IndicesClient(withClient: self)
+        self.clusterClient = ClusterClient(withClient: self)
     }
     
     public convenience init() {
@@ -20,23 +26,23 @@ public class RestClient: ESClient {
     }
     
     public func makeGet<T: Codable>() -> GetRequestBuilder<T> {
-        return GetRequestBuilder<T>(withClient: self)
+        return GetRequestBuilder<T>()
     }
     
     public func makeIndex<T: Codable>() -> IndexRequestBuilder<T> {
-        return IndexRequestBuilder<T>(withClient: self)
+        return IndexRequestBuilder<T>()
     }
     
     public func makeDelete() -> DeleteRequestBuilder {
-        return DeleteRequestBuilder(withClient: self)
+        return DeleteRequestBuilder()
     }
     
     public func makeUpdate() -> UpdateRequestBuilder {
-        return UpdateRequestBuilder(withClient: self)
+        return UpdateRequestBuilder()
     }
 
     public func makeSearch<T: Codable>() -> SearchRequestBuilder<T> {
-        return SearchRequestBuilder<T>(withClient: self)
+        return SearchRequestBuilder<T>()
     }
     
 }
@@ -44,27 +50,27 @@ public class RestClient: ESClient {
 extension RestClient {
     
     public func makeGet<T: Codable>(closure: (GetRequestBuilder<T>) -> Void) -> GetRequestBuilder<T> {
-        return GetRequestBuilder<T>(withClient: self, builderClosure: closure)
+        return GetRequestBuilder<T>(builderClosure: closure)
     }
     
     public func makeIndex<T: Codable>(closure: (IndexRequestBuilder<T>) -> Void) -> IndexRequestBuilder<T> {
-        return IndexRequestBuilder<T>(withClient: self, builderClosure: closure)
+        return IndexRequestBuilder<T>(builderClosure: closure)
     }
     
     public func makeSearch<T: Codable>(closure: (SearchRequestBuilder<T>) -> Void) -> SearchRequestBuilder<T> {
-        return SearchRequestBuilder<T>(withClient: self, builderClosure: closure)
+        return SearchRequestBuilder<T>(builderClosure: closure)
     }
     
 }
 
 extension RestClient {
     
-    public func indicesAdmin() -> IndiciesAdmin {
-        return admin.indices()
+    public func indices() -> IndicesClient {
+        return self.indicesClient!
     }
     
-    public func clusterAdmin() -> ClusterAdmin {
-        return admin.cluster()
+    public func cluster() -> ClusterClient {
+        return self.clusterClient!
     }
 }
 
@@ -73,37 +79,87 @@ public class Settings {
     
     var hosts: [Host]
     var credentials: ClientCredential?
-    var sslConfig: SSLConfiguration?
+    var adaptorConfig: HTTPAdaptorConfiguration
+    var clientAdaptor: HTTPClientAdaptor.Type
     
     private convenience init(withCredentials credentials: ClientCredential? = nil) {
         self.init(forHost: Host(string: "http://localhost:9200")!)
         self.credentials = credentials
     }
     
-    public init(forHost host: Host, withCredentials credentials: ClientCredential? = nil) {
+    public init(forHost host: Host, withCredentials credentials: ClientCredential? = nil, adaptor clientAdaptor: HTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self, adaptorConfig: HTTPAdaptorConfiguration = .`default`) {
         hosts = [host]
         self.credentials = credentials
+        self.adaptorConfig = adaptorConfig
+        self.clientAdaptor = clientAdaptor
     }
     
-    public init(forHost host: String, withCredentials credentials: ClientCredential? = nil) {
+    public init(forHost host: String, withCredentials credentials: ClientCredential? = nil, adaptor clientAdaptor: HTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self, adaptorConfig: HTTPAdaptorConfiguration = .`default`) {
         hosts = [URL(string: host)!]
         self.credentials = credentials
+        self.adaptorConfig = adaptorConfig
+        self.clientAdaptor = clientAdaptor
     }
     
-    public init(forHosts hosts: [Host], withCredentials credentials: ClientCredential? = nil) {
+    public init(forHosts hosts: [Host], withCredentials credentials: ClientCredential? = nil, adaptor clientAdaptor: HTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self, adaptorConfig: HTTPAdaptorConfiguration = .`default`) {
         self.hosts = hosts
         self.credentials = credentials
+        self.adaptorConfig = adaptorConfig
+        self.clientAdaptor = clientAdaptor
     }
     
-    public init(forHosts hosts: [String], withCredentials credentials: ClientCredential? = nil, withSSL enableSSL: Bool, sslConfig: SSLConfiguration? = nil) {
+    public init(forHosts hosts: [String], withCredentials credentials: ClientCredential? = nil, adaptor clientAdaptor: HTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self, adaptorConfig: HTTPAdaptorConfiguration = .`default`) {
         self.hosts = hosts.map({ return URL(string: $0)! })
         self.credentials = credentials
-        self.sslConfig = sslConfig
+        self.adaptorConfig = adaptorConfig
+        self.clientAdaptor = clientAdaptor
     }
     
     public static var `default`: Settings {
         get {
             return Settings()
+        }
+    }
+    
+}
+
+
+public class HTTPAdaptorConfiguration {
+    
+    // swift-nio based client ssl config
+    public let sslContext: NIOSSLContext?
+    
+    public let timeouts: Timeouts?
+    
+    public let eventLoopProvider: EventLoopProvider
+    
+    // ssl config for URLSession based clients
+    public var sslConfig: SSLConfiguration?
+    
+    public init(eventLoopProvider: EventLoopProvider = .create(threads: 1), sslContext: NIOSSLContext? = nil, timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS, sslConfig: SSLConfiguration? = nil) {
+        self.eventLoopProvider = eventLoopProvider
+        self.sslContext = sslContext
+        self.timeouts = timeouts
+        self.sslConfig = sslConfig
+    }
+    
+    public init(eventLoopProvider: EventLoopProvider = .create(threads: 1), tlsConfig tlsConfiguration: TLSConfiguration, timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS, sslConfig: SSLConfiguration? = nil) throws {
+        self.eventLoopProvider = eventLoopProvider
+        self.sslContext = try NIOSSLContext(configuration: tlsConfiguration)
+        self.timeouts = timeouts
+        self.sslConfig = sslConfig
+    }
+    
+    public init(eventLoopProvider: EventLoopProvider = .create(threads: 1), sslContext: NIOSSLContext, timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS, sslConfig: SSLConfiguration? = nil) {
+        self.eventLoopProvider = eventLoopProvider
+        self.sslContext = sslContext
+        self.timeouts = timeouts
+        self.sslConfig = sslConfig
+    }
+    
+    public static var `default`: HTTPAdaptorConfiguration {
+        get {
+            return HTTPAdaptorConfiguration()
         }
     }
     
@@ -137,16 +193,98 @@ public class ESClient {
     
     let transport: Transport
     
-    init(hosts: [Host], credentials: ClientCredential? = nil, sslConfig: SSLConfiguration? = nil) {
-        self.transport = Transport(forHosts: hosts, credentials: credentials, sslConfig: sslConfig)
+    private let logger =  Logger(label: "org.pksprojects.ElasticSwift.ESClient")
+    
+    private var credentials: ClientCredential?
+    
+    init(hosts: [Host], credentials: ClientCredential? = nil, clienAdaptor: HTTPClientAdaptor.Type, adaptorConfig: HTTPAdaptorConfiguration) {
+        self.transport = Transport(forHosts: hosts, credentials: credentials, clientAdaptor: clienAdaptor, adaptorConfig: adaptorConfig)
+        self.credentials = credentials
     }
     
-    func execute(request: Request, completionHandler: @escaping (_ response: ESResponse) -> Void) -> Void {
-        if request.method == .GET {
-            self.transport.performRequest(method: request.method, endPoint: request.endPoint, params: [], completionHandler: completionHandler)
-        } else {
-            self.transport.performRequest(method: request.method, endPoint: request.endPoint, params: [], body: request.body, completionHandler: completionHandler)
+    public final func execute<T: Request>(request: T, options: RequestOptions = .`default`, completionHandler: @escaping (_ response: HTTPResponse?, _ error: Error?) -> Void) -> Void {
+        
+        let httpRequest = createHTTPRequest(for: request, with: options)
+        
+        self.transport.performRequest(request: httpRequest, callback: completionHandler)
+    }
+    
+    
+    public final func execute<T: Request>(request: T, options: RequestOptions = .`default`, completionHandler: @escaping (_ response: T.ResponseType?, _ error: Error?) -> Void) -> Void {
+        
+        let httpRequest = createHTTPRequest(for: request, with: options)
+        
+        self.transport.performRequest(request: httpRequest) { response, error in
+            
+            guard error == nil else {
+                return completionHandler(nil, error)
+            }
+            if let response = response {
+                var data: Data?
+                if let bytes = response.body!.readBytes(length: response.body!.readableBytes) {
+                    data = Data(bytes)
+                }
+                
+                guard (!response.status.isError()) else {
+                    do {
+                        let decodedError: ElasticsearchError? = try Serializers.decode(data: data!)
+                        if let decoded = decodedError {
+                            return completionHandler(nil, decoded)
+                        }
+                    } catch {
+                        return completionHandler(nil, error)
+                    }
+                    let error = UnsupportedResponseError(response: response)
+                    return completionHandler(nil, error)
+                }
+                do {
+                    let decodedResponse: T.ResponseType? = try Serializers.decode(data: data!)
+                    if let decoded = decodedResponse {
+                        return completionHandler(decoded, nil)
+                    }
+                } catch {
+                    return completionHandler(nil, error)
+                }
+                let error = UnsupportedResponseError(response: response)
+                return completionHandler(nil, error)
+            }
         }
+    }
+    
+    public final func execute(request: HTTPRequest, completionHandler: @escaping (_ response: HTTPResponse?, _ error: Error?) -> Void) -> Void {
+        return self.transport.performRequest(request: request, callback: completionHandler)
+    }
+    
+    
+    private func createHTTPRequest<T: Request>(for request: T, with options: RequestOptions) -> HTTPRequest {
+        var headers = HTTPHeaders()
+        headers.add(contentsOf: defaultHeaders())
+        headers.add(contentsOf: authHeader())
+        headers.add(contentsOf: request.headers)
+        headers.add(contentsOf: options.headers)
+        
+        var params = [URLQueryItem]()
+        params.append(contentsOf: request.queryParams)
+        params.append(contentsOf: options.queryParams)
+        
+        
+        return HTTPRequest(path: request.endPoint, method: request.method, queryParams: params, headers: headers, body: request.body)
+    }
+    
+    private func defaultHeaders() -> HTTPHeaders {
+        var headers = HTTPHeaders()
+        headers.add(name: "Accept", value: "application/json")
+        headers.add(name: "Content-Type", value: "application/json; charset=utf-8")
+        return headers
+    }
+    
+    private func authHeader() -> HTTPHeaders {
+        var headers = HTTPHeaders()
+        if let credentials = self.credentials {
+            let token = "\(credentials.username):\(credentials.password)".data(using: .utf8)?.base64EncodedString()
+            headers.add(name:"Authorization", value: "Basic \(token!)")
+        }
+        return headers
     }
 }
 

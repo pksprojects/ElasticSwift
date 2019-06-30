@@ -8,6 +8,7 @@
 
 import Foundation
 import Logging
+import NIOHTTP1
 
 /**
  Class maintaining URLSession for a Host
@@ -107,7 +108,7 @@ class SessionManager: NSObject, URLSessionDelegate {
             return callback(response)
         }
         
-        logger.debug("Data Task Created: \(self.dataTask!)")
+        logger.debug("Data Task Created)")
         return self
     }
     func execute() {

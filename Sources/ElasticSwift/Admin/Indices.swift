@@ -9,7 +9,7 @@
 import Foundation
 import Logging
 
-public class IndiciesAdmin {
+public class IndicesClient {
     
     let client: ESClient
     
@@ -20,31 +20,31 @@ public class IndiciesAdmin {
     }
     
     public func createIndex() -> CreateIndexRequestBuilder {
-        return CreateIndexRequestBuilder(withClient: self.client)
+        return CreateIndexRequestBuilder()
     }
     
     public func getIndex() -> GetIndexRequestBuilder {
-        return GetIndexRequestBuilder(withClient: self.client)
+        return GetIndexRequestBuilder()
     }
     
     public func deleteIndex() -> DeleteIndexRequestBuilder {
-        return DeleteIndexRequestBuilder(withClient: self.client)
+        return DeleteIndexRequestBuilder()
     }
     
 }
 
-extension IndiciesAdmin {
+extension IndicesClient {
     
     public func createIndex(name: String) -> CreateIndexRequestBuilder {
-        return CreateIndexRequestBuilder(withClient: self.client).set(name: name)
+        return CreateIndexRequestBuilder().set(name: name)
     }
     
     public func getIndex(name: String) -> GetIndexRequestBuilder {
-        return GetIndexRequestBuilder(withClient: self.client).set(name: name)
+        return GetIndexRequestBuilder().set(name: name)
     }
     
     public func deleteIndex(name: String) -> DeleteIndexRequestBuilder {
-        return DeleteIndexRequestBuilder(withClient: self.client).set(name: name)
+        return DeleteIndexRequestBuilder().set(name: name)
     }
 }
 

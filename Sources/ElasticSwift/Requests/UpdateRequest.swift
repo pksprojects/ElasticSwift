@@ -7,17 +7,17 @@
 //
 
 import Foundation
+import NIOHTTP1
 
 public class UpdateRequestBuilder: RequestBuilder {
     
-    let client: ESClient
+    public typealias RequestType = UpdateRequest
+    
     var index: String?
     var type: String?
     var id: String?
     
-    init(withClient client: RestClient) {
-        self.client = client
-    }
+    init() {}
     
     public func set(index: String) -> Self {
         self.index = index
@@ -35,20 +35,24 @@ public class UpdateRequestBuilder: RequestBuilder {
         return self
     }
     
-    public func build() -> Request {
+    public func build() -> UpdateRequest {
         return UpdateRequest(withBuilder: self)
     }
 }
 
 public class UpdateRequest: Request {
+    public var headers: HTTPHeaders = HTTPHeaders()
     
-    let client: ESClient
+    public var queryParams: [URLQueryItem] = []
+    
+    public typealias ResponseType = UpdateResponse
+    
     let index: String
     let type: String
     let id: String
+    var completionHandler: ((_ response: ESResponse?, _ error: Error?) -> Void)?
     
     init(withBuilder builder: UpdateRequestBuilder) {
-        self.client = builder.client
         self.index = builder.index!
         self.type = builder.type!
         self.id = builder.id!
@@ -72,11 +76,18 @@ public class UpdateRequest: Request {
         }
     }
     
-    public func execute() {
-        self.client.execute(request: self, completionHandler: responseHandler)
-    }
-    
     func responseHandler(_ response: ESResponse) -> Void {
-        
+        if let res = response.httpResponse as? HTTPURLResponse {
+            if res.statusCode != 200 {
+                return self.completionHandler!(nil, ElasticsearchError())
+            }
+        }
     }
+}
+
+
+// MARK:- UPDATE RESPONSE
+
+public class UpdateResponse: Codable {
+    
 }

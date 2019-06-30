@@ -6,16 +6,4 @@
 //
 //
 
-import Foundation
 
-internal class Admin: ESClient {
-    
-    func indices() -> IndiciesAdmin {
-        return IndiciesAdmin(withClient: self)
-    }
-    
-    func cluster() -> ClusterAdmin {
-        return ClusterAdmin(withClient: self)
-    }
-    
-}

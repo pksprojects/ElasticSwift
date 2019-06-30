@@ -8,24 +8,21 @@
 
 import Foundation
 import Logging
+import NIOHTTP1
 
 public class DeleteRequestBuilder: RequestBuilder {
     
-    typealias BuilderClosure = (DeleteRequestBuilder) -> Void
+    public typealias BuilderClosure = (DeleteRequestBuilder) -> Void
+    public typealias RequestType = DeleteRequest
     
-    let client: ESClient
     var index: String?
     var type: String?
     var id: String?
     var version: Int?
-    var completionHandler: ((DeleteResponse?, Error?) -> Void)?
     
-    init(withClient client: ESClient) {
-        self.client = client
-    }
+    init() {}
     
-    convenience init(withClient client: ESClient, builderClosure: BuilderClosure) {
-        self.init(withClient: client)
+    public init(builderClosure: BuilderClosure) {
         builderClosure(self)
     }
     
@@ -50,12 +47,7 @@ public class DeleteRequestBuilder: RequestBuilder {
         return self
     }
     
-    public func set(completionHandler: @escaping (DeleteResponse?, Error?) -> Void) -> Self {
-        self.completionHandler = completionHandler
-        return self
-    }
-    
-    public func build() -> Request {
+    public func build() throws -> RequestType {
         return DeleteRequest(withBuilder: self)
     }
     
@@ -63,22 +55,22 @@ public class DeleteRequestBuilder: RequestBuilder {
 
 public class DeleteRequest: Request {
     
-    let logger = Logger(label: "org.pksprojects.ElasticSwift.Requests.DeleteRequest")
+    public var headers: HTTPHeaders = HTTPHeaders()
     
-    let client: ESClient
+    public var queryParams: [URLQueryItem] = []
+    
+    public typealias ResponseType = DeleteResponse
+    
     let index: String
     let type: String
     let id: String
     var version: Int?
-    var completionHandler: ((DeleteResponse?, Error?) -> Void)
     
     init(withBuilder builder: DeleteRequestBuilder) {
-        self.client = builder.client
         self.index = builder.index!
         self.type = builder.type!
         self.id = builder.id!
         self.version = builder.version
-        self.completionHandler = builder.completionHandler!
     }
     
     public var method: HTTPMethod {
@@ -99,57 +91,22 @@ public class DeleteRequest: Request {
         }
     }
     
-    public func execute() {
-        self.client.execute(request: self, completionHandler: responseHandler)
-    }
-    
     func makeEndPoint() -> String {
         return self.index + "/" + self.type + "/" + self.id
     }
     
-    func responseHandler(_ response: ESResponse) -> Void {
-        if let error = response.error {
-            return completionHandler(nil, error)
-        }
-        do {
-            logger.debug("\(String(data: response.data!, encoding: .utf8)!)")
-            let decoded: DeleteResponse? = try Serializers.decode(data: response.data!)
-            if decoded?.id != nil {
-                return completionHandler(decoded, nil)
-            } else {
-                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
-                if let decoded = decodedError {
-                    return completionHandler(nil, decoded)
-                }
-            }
-        } catch {
-            do {
-                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
-                if let decoded = decodedError {
-                    return completionHandler(nil, decoded)
-                }
-            } catch {
-                return completionHandler(nil, error)
-            }
-        }
-    }
-    
 }
 
-public class DeleteResponse: Codable {
+public struct DeleteResponse: Codable {
     
-    public var shards: Shards?
-    public var index: String?
-    public var type: String?
-    public var id: String?
-    public var version: Int?
-    public var seqNumber: Int?
-    public var primaryTerm: Int?
-    public var result: String?
-    
-    init() {
-        
-    }
+    public let shards: Shards?
+    public let index: String?
+    public let type: String?
+    public let id: String?
+    public let version: Int?
+    public let seqNumber: Int?
+    public let primaryTerm: Int?
+    public let result: String?
     
     enum CodingKeys: String, CodingKey {
         case shards = "_shards"

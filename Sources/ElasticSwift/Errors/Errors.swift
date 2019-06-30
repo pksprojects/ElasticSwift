@@ -38,9 +38,28 @@ public class ElasticError: Codable {
 }
 
 
+public class UnsupportedResponseError: Error {
+    
+    let response: HTTPResponse
+    let msg: String
+    
+    public init(msg: String = "UnsupportedResponseError", response: HTTPResponse) {
+        self.response = response
+        self.msg = msg
+    }
+    
+    public var localizedDescription: String {
+        get {
+            return "\(msg): \(response)"
+        }
+    }
+    
+}
+
+
 public protocol ESClientError: Error {
     
-    func messgae() -> String
+    func message() -> String
     
 }
 
@@ -52,7 +71,7 @@ public class RequestCreationError: ESClientError {
         self.msg = msg
     }
     
-    public func messgae() -> String {
+    public func message() -> String {
         return msg
     }
     

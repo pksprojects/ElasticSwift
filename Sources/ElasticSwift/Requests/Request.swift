@@ -7,8 +7,15 @@
 //
 
 import Foundation
+import NIOHTTP1
 
 public protocol Request {
+    
+    associatedtype ResponseType: Codable
+    
+    var headers: HTTPHeaders { get }
+    
+    var queryParams: [URLQueryItem] { get }
     
     var method: HTTPMethod { get }
     
@@ -16,9 +23,26 @@ public protocol Request {
     
     var body: Data { get }
     
-    func execute() -> Void
-    
 }
+
+
+public class RequestOptions {
+    
+    let headers: HTTPHeaders
+    let queryParams: [URLQueryItem]
+    
+    init(headers: HTTPHeaders = HTTPHeaders(), queryParams: [URLQueryItem] = []) {
+        self.headers = headers
+        self.queryParams = queryParams
+    }
+    
+    public static var `default`: RequestOptions {
+        get {
+            RequestOptions()
+        }
+    }
+}
+
 
 public class Response<T: Codable> {
     
@@ -36,6 +60,8 @@ public class Response<T: Codable> {
 
 public protocol RequestBuilder {
     
-    func build() throws -> Request
+    associatedtype RequestType: Request
+    
+    func build() throws -> RequestType
 }
 
