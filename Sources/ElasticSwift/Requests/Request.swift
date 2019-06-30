@@ -38,7 +38,7 @@ public class RequestOptions {
     
     public static var `default`: RequestOptions {
         get {
-            RequestOptions()
+            return RequestOptions()
         }
     }
 }
