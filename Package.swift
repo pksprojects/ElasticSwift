@@ -17,6 +17,7 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-nio.git", .upToNextMajor(from: "2.2.0")),
         .package(url: "https://github.com/apple/swift-nio-ssl.git", .upToNextMajor(from: "2.1.0")),
         .package(url: "https://github.com/apple/swift-nio-extras.git", .upToNextMajor(from: "1.1.0")),
+        .package(url: "https://github.com/apple/swift-nio-transport-services.git", .upToNextMajor(from: "1.0.3")),
         .package(url: "https://github.com/apple/swift-log.git", .upToNextMajor(from: "1.1.0")),
         .package(url: "https://github.com/apple/swift-metrics.git", .upToNextMajor(from: "1.1.0"))
     ],
@@ -25,7 +26,7 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "ElasticSwift",
-            dependencies: ["Logging", "Metrics", "NIO", "NIOHTTP1", "NIOFoundationCompat", "NIOSSL"]),
+            dependencies: ["Logging", "Metrics", "NIO", "NIOHTTP1", "NIOFoundationCompat", "NIOSSL", "NIOTransportServices"]),
         .testTarget(
             name: "ElasticSwiftTests",
             dependencies: ["ElasticSwift"]),
