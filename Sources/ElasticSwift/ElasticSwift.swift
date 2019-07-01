@@ -77,14 +77,13 @@ extension RestClient {
 
 public class Settings {
     
-    var hosts: [Host]
-    var credentials: ClientCredential?
-    var adaptorConfig: HTTPAdaptorConfiguration
-    var clientAdaptor: HTTPClientAdaptor.Type
+    public let hosts: [Host]
+    public let credentials: ClientCredential?
+    public let adaptorConfig: HTTPAdaptorConfiguration
+    public let clientAdaptor: HTTPClientAdaptor.Type
     
-    private convenience init(withCredentials credentials: ClientCredential? = nil) {
-        self.init(forHost: Host(string: "http://localhost:9200")!)
-        self.credentials = credentials
+    private convenience init(forHost host: String = "http://localhost:9200",  withCredentials credentials: ClientCredential? = nil, adaptor clientAdaptor: HTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self) {
+        self.init(forHost: Host(string: host)!, withCredentials: credentials)
     }
     
     public init(forHost host: Host, withCredentials credentials: ClientCredential? = nil, adaptor clientAdaptor: HTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self, adaptorConfig: HTTPAdaptorConfiguration = .`default`) {
@@ -117,7 +116,23 @@ public class Settings {
     
     public static var `default`: Settings {
         get {
+            #if os(iOS) || os(tvOS) || os(watchOS)
+              return urlSession
+            #else
+              return swiftNIO
+            #endif
+        }
+    }
+    
+    public static var swiftNIO: Settings {
+        get {
             return Settings()
+        }
+    }
+    
+    public static var urlSession: Settings {
+        get {
+            return Settings(adaptor: URLSessionAdaptor.self)
         }
     }
     

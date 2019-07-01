@@ -12,8 +12,10 @@ import NIOHTTP1
 import NIOConcurrencyHelpers
 import NIO
 
+// MARK: - Transport
+
 /**
- Class managing connection(URLSession) pool and HTTP requests.
+ Class managing connection pool and executes HTTP requests.
  */
 internal class Transport {
     
@@ -88,7 +90,63 @@ public class DefaultHTTPClientAdaptor: HTTPClientAdaptor {
     
 }
 
+// MARK: - URLSessionAdaptor
 
+public class URLSessionAdaptor: HTTPClientAdaptor {
+    
+    private let logger = Logger(label: "org.pksprojects.ElasticSwfit.Networking.URLSessionAdaptor")
+    
+    let sessionManager: SessionManager
+    
+    let allocator: ByteBufferAllocator
+    
+    public required init(forHost host: URL, adaptorConfig: HTTPAdaptorConfiguration =  HTTPAdaptorConfiguration()) {
+        self.sessionManager = SessionManager.init(forHost: host, sslConfig: adaptorConfig.sslConfig)
+        self.allocator = ByteBufferAllocator()
+    }
+    
+    public func performRequest(_ request: HTTPRequest, callback: @escaping (_ response: HTTPResponse?, _ error: Error?) -> Void) {
+        let urlRequest = self.sessionManager.createReqeust(request)
+        self.sessionManager.execute(urlRequest) { data, response, error in
+            guard error == nil else {
+                return callback(nil, error)
+            }
+            let responseBuilder =  HTTPResponseBuilder { builder in
+                builder.request = request
+                if let response = response as? HTTPURLResponse {
+                    
+                    builder.status = HTTPResponseStatus.init(statusCode: response.statusCode)
+                    
+                    let headerDic =  response.allHeaderFields as! [String: String]
+                    
+                    var headers = HTTPHeaders()
+                    
+                    for header in headerDic {
+                        headers.add(name: header.key, value: header.value)
+                    }
+                    builder.headers = headers
+                    
+                }
+                if let resData = data {
+                    var buff = self.allocator.buffer(capacity: resData.count)
+                    buff.writeBytes(resData)
+                    builder.body = buff
+                }
+            }
+            
+            do {
+                let httpResponse = try responseBuilder.build()
+                return callback(httpResponse, error)
+            } catch {
+                return callback(nil, error)
+            }
+            
+        }
+    }
+    
+}
+
+// MARK: - RoundRobinQueue
 
 private class RoundRobinQueue<T> {
     
