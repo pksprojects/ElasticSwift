@@ -22,6 +22,7 @@
 
 /* Begin PBXBuildFile section */
 		062666F722CDA26200E32F15 /* IndicesResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 062666F622CDA26200E32F15 /* IndicesResponse.swift */; };
+		062666F922CDFC7300E32F15 /* ResponseConverters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 062666F822CDFC7300E32F15 /* ResponseConverters.swift */; };
 		OBJ_1000 /* cipher.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_275 /* cipher.c */; };
 		OBJ_1001 /* e_aes.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_276 /* e_aes.c */; };
 		OBJ_1002 /* e_des.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_277 /* e_des.c */; };
@@ -1223,6 +1224,7 @@
 
 /* Begin PBXFileReference section */
 		062666F622CDA26200E32F15 /* IndicesResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndicesResponse.swift; sourceTree = "<group>"; };
+		062666F822CDFC7300E32F15 /* ResponseConverters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseConverters.swift; sourceTree = "<group>"; };
 		"ElasticSwift::ElasticSwift::Product" /* ElasticSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ElasticSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"ElasticSwift::ElasticSwiftTests::Product" /* ElasticSwiftTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = ElasticSwiftTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		OBJ_100 /* a_mbstr.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = a_mbstr.c; sourceTree = "<group>"; };
@@ -3026,6 +3028,7 @@
 			isa = PBXGroup;
 			children = (
 				OBJ_56 /* Serialization.swift */,
+				062666F822CDFC7300E32F15 /* ResponseConverters.swift */,
 			);
 			path = Serialization;
 			sourceTree = "<group>";
@@ -4464,6 +4467,7 @@
 				OBJ_1347 /* TermLevelQueryBuilders.swift in Sources */,
 				OBJ_1348 /* CompoundQuries.swift in Sources */,
 				OBJ_1349 /* FullTextQueries.swift in Sources */,
+				062666F922CDFC7300E32F15 /* ResponseConverters.swift in Sources */,
 				OBJ_1350 /* GeoQueries.swift in Sources */,
 				OBJ_1351 /* JoiningQueries.swift in Sources */,
 				OBJ_1352 /* MatchAllQuery.swift in Sources */,

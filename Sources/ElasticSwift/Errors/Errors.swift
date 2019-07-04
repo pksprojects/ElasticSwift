@@ -60,16 +60,30 @@ public class UnsupportedResponseError: Error {
     
 }
 
-public class HTTPRequestCreationError: Error {
+public class RequestConverterError<T: Request>: Error {
     
     public let error: Error
     public let message: String
-    public let request: Any
+    public let request: T
     
-    public init(message: String, error: Error, request: Any) {
+    public init(message: String, error: Error, request: T) {
         self.error = error
         self.message = message
         self.request = request
+    }
+    
+}
+
+public class ResponseConverterError: Error {
+    
+    public let error: Error
+    public let message: String
+    public let response: HTTPResponse
+    
+    public init(message: String, error: Error, response: HTTPResponse) {
+        self.error = error
+        self.message = message
+        self.response = response
     }
     
 }

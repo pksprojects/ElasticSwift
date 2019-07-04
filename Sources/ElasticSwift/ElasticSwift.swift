@@ -242,60 +242,25 @@ public extension ElasticClient {
             let httpRequest = try createHTTPRequest(for: request, with: options)
             self.transport.performRequest(request: httpRequest, callback: completionHandler)
         } catch {
-            let wrappedError = HTTPRequestCreationError(message: "Unable to create HTTPRequest from \(request)", error: error, request: request)
+            let wrappedError = RequestConverterError(message: "Unable to create HTTPRequest from \(request)", error: error, request: request)
             return completionHandler(.failure(wrappedError))
         }
         
     }
     
-    final func execute<T: Request>(request: T, options: RequestOptions = .`default`, completionHandler: @escaping (_ result: Result<T.ResponseType, Error>) -> Void) -> Void {
+//    final func execute<T: Request>(request: T, options: RequestOptions = .`default`, converter: ResponseConverter<T.ResponseType> = ResponseConverters.defaultConverter, completionHandler: @escaping (_ result: Result<T.ResponseType, Error>) -> Void) -> Void {
+//
+//        self.execute(request: request, options: options, converter: converter, completionHandler: completionHandler)
+//    }
+    
+    final func execute<T: Request, R: Codable>(request: T, options: RequestOptions = .`default`, converter: ResponseConverter<R> = ResponseConverters.defaultConverter, completionHandler: @escaping (_ result: Result<R, Error>) -> Void) -> Void {
         
         do {
             let httpRequest = try createHTTPRequest(for: request, with: options)
-            self.transport.performRequest(request: httpRequest, callback: responseConverter(request: request, callback: completionHandler))
+            self.transport.performRequest(request: httpRequest, callback: converter(self.serializer, completionHandler))
         } catch {
-            let wrappedError = HTTPRequestCreationError(message: "Unable to create HTTPRequest from \(request)", error: error, request: request)
+            let wrappedError = RequestConverterError(message: "Unable to create HTTPRequest from \(request)", error: error, request: request)
             return completionHandler(.failure(wrappedError))
-        }
-    }
-    
-    func responseConverter<T: Request>(request: T, callback: @escaping (_ result: Result<T.ResponseType, Error>) -> Void) -> ((_ result: Result<HTTPResponse, Error>) -> Void) {
-        return { result -> Void in
-        
-        switch result {
-        case .failure(let error):
-            return callback(.failure(error))
-        case .success(let response):
-            
-                var data: Data?
-                if let bytes = response.body!.readBytes(length: response.body!.readableBytes) {
-                    data = Data(bytes)
-                }
-                
-                guard (!response.status.isError()) else {
-                    do {
-                        let decodedError: ElasticsearchError? = try self.serializer.decode(data: data!)
-                        if let decoded = decodedError {
-                            return callback(.failure(decoded))
-                        }
-                    } catch {
-                        return callback(.failure(error))
-                    }
-                    let error = UnsupportedResponseError(response: response)
-                    return callback(.failure(error))
-                }
-                do {
-                    let decodedResponse: T.ResponseType? = try self.serializer.decode(data: data!)
-                    if let decoded = decodedResponse {
-                        return callback(.success(decoded))
-                    }
-                } catch {
-                    return callback(.failure(error))
-                }
-                let error = UnsupportedResponseError(response: response)
-                return callback(.failure(error))
-            }
-        
         }
     }
     
