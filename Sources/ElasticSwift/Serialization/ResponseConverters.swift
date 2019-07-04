@@ -29,29 +29,23 @@ public class ResponseConverters {
                 }
                 
                 guard (!response.status.isError()) else {
-                    do {
-                        let decodedError: ElasticsearchError? = try serializer.decode(data: data!)
-                        if let decoded = decodedError {
-                            return callback(.failure(decoded))
-                        }
-                    } catch {
-                        let converterError = ResponseConverterError(message: "Error while converting error response", error: error, response: response)
+                    let decodedError: Result<ElasticsearchError, Error> = serializer.decode(data: data!)
+                    switch decodedError {
+                        case .failure(let error):
+                            let converterError = ResponseConverterError(message: "Error while converting error response", error: error, response: response)
+                            return callback(.failure(converterError))
+                        case .success(let elasticError):
+                            return callback(.failure(elasticError))
+                    }
+                }
+                let decodedResponse: Result<T, Error> = serializer.decode(data: data!)
+                switch decodedResponse {
+                    case .failure(let error):
+                        let converterError = ResponseConverterError(message: "Error while converting response", error: error, response: response)
                         return callback(.failure(converterError))
-                    }
-                    let error = UnsupportedResponseError(response: response)
-                    return callback(.failure(error))
-                }
-                do {
-                    let decodedResponse: T? = try serializer.decode(data: data!)
-                    if let decoded = decodedResponse {
+                    case .success(let decoded):
                         return callback(.success(decoded))
-                    }
-                } catch {
-                    let converterError = ResponseConverterError(message: "Error while converting response", error: error, response: response)
-                    return callback(.failure(converterError))
                 }
-                let error = UnsupportedResponseError(response: response)
-                return callback(.failure(error))
             }
             
         }

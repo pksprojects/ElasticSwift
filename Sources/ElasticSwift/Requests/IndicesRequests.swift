@@ -104,10 +104,6 @@ public class CreateIndexRequest: Request {
         self.name = builder.name!
     }
     
-    func makeEndPoint() -> String {
-        return self.name
-    }
-    
     public var method: HTTPMethod {
         get {
             return .PUT
@@ -116,12 +112,12 @@ public class CreateIndexRequest: Request {
     
     public var endPoint: String {
         get {
-            return makeEndPoint()
+            return self.name
         }
     }
     
-    public func data(_ serializer: Serializer) throws -> Data {
-        return Data()
+    public func makeBody(_ serializer: Serializer) -> Result<Data, Error> {
+        return .success(Data())
     }
 }
 
@@ -144,10 +140,6 @@ public class GetIndexRequest: Request {
         self.name = builder.name!
     }
     
-    func makeEndPoint() -> String {
-        return self.name
-    }
-    
     public var method: HTTPMethod {
         get {
             return .GET
@@ -156,12 +148,12 @@ public class GetIndexRequest: Request {
     
     public var endPoint: String {
         get {
-            return makeEndPoint()
+            return self.name
         }
     }
     
-    public func data(_ serializer: Serializer) throws -> Data {
-        return Data()
+    public func makeBody(_ serializer: Serializer) -> Result<Data, Error> {
+        return .success(Data())
     }
     
 }
@@ -185,10 +177,6 @@ public class DeleteIndexRequest: Request {
         self.name = builder.name!
     }
     
-    func makeEndPoint() -> String {
-        return self.name
-    }
-    
     public var method: HTTPMethod {
         get {
             return .DELETE
@@ -197,12 +185,12 @@ public class DeleteIndexRequest: Request {
     
     public var endPoint: String {
         get {
-            return makeEndPoint()
+            return self.name
         }
     }
     
-    public func data(_ serializer: Serializer) throws -> Data {
-        return Data()
+    public func makeBody(_ serializer: Serializer) -> Result<Data, Error> {
+        return .success(Data())
     }
 }
 
@@ -235,20 +223,16 @@ public class OpenIndexRequest: Request {
     
     public var endPoint: String {
         get {
-            return makeEndPoint()
+            if self.names.count == 1 {
+                return self.names[0] + "/_open"
+            } else {
+                return self.names.joined(separator: ",") + "/_open"
+            }
         }
     }
     
-    func makeEndPoint() -> String {
-        if self.names.count == 1 {
-            return self.names[0] + "/_open"
-        } else {
-            return self.names.joined(separator: ",") + "/_open"
-        }
-    }
-    
-    public func data(_ serializer: Serializer) throws -> Data {
-        return Data()
+    public func makeBody(_ serializer: Serializer) -> Result<Data, Error> {
+        return .success(Data())
     }
 }
 
@@ -292,7 +276,7 @@ public class CloseIndexRequest: Request {
         }
     }
     
-    public func data(_ serializer: Serializer) throws -> Data {
-        return Data()
+    public func makeBody(_ serializer: Serializer) -> Result<Data, Error> {
+        return .success(Data())
     }
 }

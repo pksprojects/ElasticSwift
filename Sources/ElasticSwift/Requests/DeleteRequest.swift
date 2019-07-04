@@ -50,7 +50,7 @@ public class DeleteRequestBuilder: RequestBuilder {
     }
     
     public func build() throws -> RequestType {
-        return DeleteRequest(withBuilder: self)
+        return try DeleteRequest(withBuilder: self)
     }
     
 }
@@ -70,7 +70,14 @@ public class DeleteRequest: Request {
     let id: String
     var version: Int?
     
-    init(withBuilder builder: DeleteRequestBuilder) {
+    public init(index: String, type: String, id: String, version: Int?) {
+        self.index = index
+        self.type = type
+        self.id = id
+        self.version = version
+    }
+    
+    init(withBuilder builder: DeleteRequestBuilder) throws {
         self.index = builder.index!
         self.type = builder.type!
         self.id = builder.id!
@@ -93,8 +100,8 @@ public class DeleteRequest: Request {
         return self.index + "/" + self.type + "/" + self.id
     }
     
-    public func data(_ serializer: Serializer) throws -> Data {
-        return Data()
+    public func makeBody(_ serializer: Serializer) -> Result<Data, Error> {
+        return .success(Data())
     }
     
 }

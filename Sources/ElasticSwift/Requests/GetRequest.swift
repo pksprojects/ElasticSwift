@@ -44,8 +44,8 @@ public class GetRequestBuilder<T: Codable>: RequestBuilder {
         return self
     }
     
-    public func build() -> GetRequest<T> {
-        return GetRequest<T>(withBuilder: self)
+    public func build() throws -> GetRequest<T> {
+        return try GetRequest<T>(withBuilder: self)
     }
     
     
@@ -62,29 +62,35 @@ public class GetRequest<T: Codable>: Request {
     
     public typealias ResponseType = GetResponse<T>
     
-    var index: String?
-    var type: String?
-    var id: String?
+    var index: String
+    var type: String
+    var id: String
     
-    public var method: HTTPMethod = .GET
-    
-    init(withBuilder builder: GetRequestBuilder<T>) {
-        self.index = builder.index
-        self.type = builder.type
-        self.id =  builder.id
+    public var method: HTTPMethod {
+        get {
+            return .GET
+        }
     }
     
-    func makeEndPoint() -> String {
-        return self.index! + "/" + self.type! + "/" + self.id!
+    public init(index: String, type: String, id: String) {
+        self.index = index
+        self.type = type
+        self.id = id
+    }
+    
+    init(withBuilder builder: GetRequestBuilder<T>) throws {
+        self.index = builder.index!
+        self.type = builder.type!
+        self.id =  builder.id!
     }
     
     public var endPoint: String {
         get {
-            return self.makeEndPoint()
+            return self.index + "/" + self.type + "/" + self.id
         }
     }
     
-    public func data(_ serializer: Serializer) throws -> Data {
-        return Data()
+    public func makeBody(_ serializer: Serializer) -> Result<Data, Error> {
+        return .success(Data())
     }
 }
