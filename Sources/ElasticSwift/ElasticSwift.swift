@@ -2,7 +2,6 @@ import Foundation
 import Logging
 import NIO
 import NIOHTTP1
-import NIOSSL
 import NIOTLS
 
 public typealias Host = URL
@@ -141,9 +140,6 @@ public class Settings {
 
 public class HTTPAdaptorConfiguration {
     
-    // swift-nio based client ssl config
-    public let sslContext: NIOSSLContext?
-    
     public let timeouts: Timeouts?
     
     public let eventLoopProvider: EventLoopProvider
@@ -151,23 +147,8 @@ public class HTTPAdaptorConfiguration {
     // ssl config for URLSession based clients
     public var sslConfig: SSLConfiguration?
     
-    public init(eventLoopProvider: EventLoopProvider = .create(threads: 1), sslContext: NIOSSLContext? = nil, timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS, sslConfig: SSLConfiguration? = nil) {
+    public init(eventLoopProvider: EventLoopProvider = .create(threads: 1), timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS, sslConfig: SSLConfiguration? = nil) {
         self.eventLoopProvider = eventLoopProvider
-        self.sslContext = sslContext
-        self.timeouts = timeouts
-        self.sslConfig = sslConfig
-    }
-    
-    public init(eventLoopProvider: EventLoopProvider = .create(threads: 1), tlsConfig tlsConfiguration: TLSConfiguration, timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS, sslConfig: SSLConfiguration? = nil) throws {
-        self.eventLoopProvider = eventLoopProvider
-        self.sslContext = try NIOSSLContext(configuration: tlsConfiguration)
-        self.timeouts = timeouts
-        self.sslConfig = sslConfig
-    }
-    
-    public init(eventLoopProvider: EventLoopProvider = .create(threads: 1), sslContext: NIOSSLContext, timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS, sslConfig: SSLConfiguration? = nil) {
-        self.eventLoopProvider = eventLoopProvider
-        self.sslContext = sslContext
         self.timeouts = timeouts
         self.sslConfig = sslConfig
     }

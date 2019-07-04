@@ -85,7 +85,7 @@ public class DefaultHTTPClientAdaptor: HTTPClientAdaptor {
     
     
     private static func createHttpClientConfig(from adaptorConfig: HTTPAdaptorConfiguration) -> HTTPClientConfiguration {
-        return HTTPClientConfiguration.init(eventLoopProvider: adaptorConfig.eventLoopProvider, sslContext: adaptorConfig.sslContext, timeouts: adaptorConfig.timeouts)
+        return HTTPClientConfiguration(eventLoopProvider: adaptorConfig.eventLoopProvider, timeouts: adaptorConfig.timeouts)
     }
     
 }
