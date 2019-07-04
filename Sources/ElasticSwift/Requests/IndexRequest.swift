@@ -7,13 +7,15 @@
 //
 
 import Foundation
+import NIOHTTP1
+
+//MARK:- Index Requet Builder
 
 public class IndexRequestBuilder<T: Codable>: RequestBuilder {
     
-    typealias BuilderClosure = (IndexRequestBuilder) -> Void
+    public typealias RequestType = IndexRequest<T>
+    public typealias BuilderClosure = (IndexRequestBuilder) -> Void
     
-    let client: ESClient
-    var completionHandler: ((_ response: IndexResponse?, _ error: Error?) -> Void)?
     var index: String?
     var type: String?
     var id: String?
@@ -21,12 +23,9 @@ public class IndexRequestBuilder<T: Codable>: RequestBuilder {
     var routing: String?
     var parent: String?
     
-    init(withClient client: ESClient) {
-        self.client = client
-    }
+    init() {}
     
-    convenience init(withClient client: ESClient, builderClosure: BuilderClosure) {
-        self.init(withClient: client)
+    public init(builderClosure: BuilderClosure) {
         builderClosure(self)
     }
     
@@ -61,21 +60,22 @@ public class IndexRequestBuilder<T: Codable>: RequestBuilder {
         return self
     }
     
-    public func set(completionHandler: @escaping (_ response: IndexResponse?, _ error: Error?) -> Void) -> Self {
-        self.completionHandler = completionHandler
-        return self
-    }
-    
-    public func build() throws -> Request {
-        return try IndexRequest(withBuilder: self)
+    public func build() throws -> IndexRequest<T> {
+        return try IndexRequest<T>(withBuilder: self)
     }
     
 }
 
+//MARK:- Index Request
+
 public class IndexRequest<T: Codable>: Request {
     
-    let client: ESClient
-    let completionHandler: ((_ response: IndexResponse?, _ error: Error?) -> Void)
+    public var headers: HTTPHeaders = HTTPHeaders()
+    
+    public var queryParams: [URLQueryItem] = []
+    
+    public typealias ResponseType = IndexResponse
+    
     public var method: HTTPMethod  {
         get {
             if self.id == nil {
@@ -85,7 +85,6 @@ public class IndexRequest<T: Codable>: Request {
         }
     }
     
-    var _builtBody: Data?
     var index: String?
     var type: String?
     var id: String?
@@ -95,15 +94,12 @@ public class IndexRequest<T: Codable>: Request {
     
     
     init(withBuilder builder: IndexRequestBuilder<T>) throws {
-        self.client = builder.client
-        self.completionHandler = builder.completionHandler!
         self.index = builder.index
         self.type = builder.type
         self.id = builder.id
         self.source = builder.source
         self.routing = builder.routing
         self.parent = builder.parent
-        self._builtBody = try makeBody()
     }
     
     func makeEndPoint() -> String {
@@ -120,38 +116,8 @@ public class IndexRequest<T: Codable>: Request {
         }
     }
     
-    public var body: Data {
-        get {
-            return _builtBody!
-        }
-    }
-    
-    public func makeBody() throws -> Data {
-       return try Serializers.encode(self.source!)!
-    }
-    
-    public func execute() {
-        self.client.execute(request: self, completionHandler: responseHandler)
-    }
-    
-    func responseHandler(_ response: ESResponse) -> Void {
-        if let error = response.error {
-            return completionHandler(nil, error)
-        }
-        do {
-            let decoded: IndexResponse? = try Serializers.decode(data: response.data!)
-            if decoded?.result != nil {
-                return completionHandler(decoded, nil)
-            } else {
-                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
-                if let decoded = decodedError {
-                    return completionHandler(nil, decoded)
-                }
-            }
-        } catch {
-            return completionHandler(nil, error)
-        }
-        
+    public func data(_ serializer: Serializer) throws -> Data {
+        return try serializer.encode(self.source!)!
     }
     
 }

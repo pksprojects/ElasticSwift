@@ -7,6 +7,10 @@
 //
 
 import Foundation
+import Logging
+import NIOHTTP1
+
+// MARK:- SessionManager
 
 /**
  Class maintaining URLSession for a Host
@@ -14,26 +18,19 @@ import Foundation
 
 class SessionManager: NSObject, URLSessionDelegate {
 
+    private let logger = Logger(label: "org.pksprojects.ElasticSwift.Networking.SessionManager")
+    
     private var session: URLSession?
     private let url: URL
-    private var request: URLRequest?
-    private var dataTask: URLSessionDataTask?
-    private var credentials: ClientCredential?
     private var sslConfig: SSLConfiguration?
     
-    init(forHost url: URL, credentials: ClientCredential? = nil, sslConfig: SSLConfiguration? = nil) {
+    init(forHost url: URL, sslConfig: SSLConfiguration? = nil) {
         self.url = url
         super.init()
-        self.credentials = credentials
         self.sslConfig = sslConfig
         let config = URLSessionConfiguration.ephemeral
-        var defaultHeader = defaultHeaders()
-        let authHeader = authHeaders()
-        defaultHeader.merge(authHeader, uniquingKeysWith: {a, b in return a})
-        config.httpAdditionalHeaders = defaultHeader
         let queue = OperationQueue()
         self.session = URLSession(configuration: config, delegate: self, delegateQueue: queue)
-        
     }
     
     func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
@@ -65,51 +62,23 @@ class SessionManager: NSObject, URLSessionDelegate {
         return cert?.data == certificate.data
     }
     
-    func createRequest(method: HTTPMethod) -> Self {
-        var currRequest = URLRequest(url: self.url)
-        currRequest.httpMethod = method.rawValue
-        self.request = currRequest
-        return self
-    }
-    
-    func createRequest(method: HTTPMethod, forPath pathComponent: String, witParams: Any) -> Self {
-        var currRequest = URLRequest(url: self.url.appendingPathComponent(pathComponent))
-        currRequest.httpMethod = method.rawValue
-        self.request = currRequest
-        debugPrint("URLRequest without body created")
-        return self
-    }
-    
-    func createRequest(method: HTTPMethod, forPath pathComponent: String, witParams: Any, body: String) -> Self {
-        var currRequest = URLRequest(url: self.url.appendingPathComponent(pathComponent))
-        currRequest.httpMethod = method.rawValue
-        currRequest.httpBody = body.data(using: .utf8)
-        self.request = currRequest
-        debugPrint("URLRequest with body created")
-        return self
-    }
-    
-    func createRequest(method: HTTPMethod, forPath pathComponent: String, witParams: Any, body: Data) -> Self {
-        var currRequest = URLRequest(url: self.url.appendingPathComponent(pathComponent))
-        currRequest.httpMethod = method.rawValue
-        currRequest.httpBody = body
-        self.request = currRequest
-        debugPrint("URLRequest with body created")
-        return self
-    }
-    
-    func createDataTask(onCompletion callback: @escaping (_ response: ESResponse) -> Void) -> Self {
-        self.dataTask = self.session?.dataTask(with: self.request!) { data, response, error in
-            let response = ESResponse(data: data, httpResponse: response, error: error)
-            return callback(response)
+    func createReqeust(_ httpRequest: HTTPRequest) -> URLRequest {
+        var components =  URLComponents()
+        components.queryItems = httpRequest.queryParams
+        components.path = httpRequest.path
+        let url = components.url(relativeTo: self.url)
+        var request = URLRequest(url: url!)
+        request.httpMethod = httpRequest.method.rawValue
+        request.httpBody = httpRequest.body
+        for header in httpRequest.headers {
+            request.addValue(header.value, forHTTPHeaderField: header.name)
         }
-        
-        debugPrint("Data Task Created:", self.dataTask!)
-        return self
+        return request
     }
-    func execute() {
-        self.dataTask?.resume()
-        debugPrint("DataTask Resumed")
+    
+    func execute(_ request: URLRequest, onCompletion callback: @escaping (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void) -> Void {
+        let dataTask = self.session?.dataTask(with: request, completionHandler: callback)
+        dataTask?.resume()
     }
     
     /**
@@ -127,46 +96,12 @@ class SessionManager: NSObject, URLSessionDelegate {
     }
     
     deinit {
-        debugPrint("session invalidated")
         self.session?.invalidateAndCancel()
-    }
-    
-    func defaultHeaders() -> [String: String] {
-        return ["Content-Type": "application/json; charset=UTF-8"]
-    }
-    
-    func authHeaders() -> [String: String] {
-        if let credentials = self.credentials {
-            let token = "\(credentials.username):\(credentials.password)".data(using: .utf8)?.base64EncodedString()
-            return ["Authorization" : "Basic \(token!)"]
-        }
-        return [:]
+        logger.debug("session invalidated")
     }
 }
 
-/**
- Class maintaining pool of Connections for Host(s)
- */
-class SessionPool {
-    
-    var pool: [URL: SessionManager]
-    
-    init(forHosts hosts: [Host], credentials: ClientCredential? = nil, sslConfig: SSLConfiguration? = nil) {
-        self.pool = [:]
-        for host in hosts {
-            self.pool[host] = SessionManager(forHost: host, credentials: credentials, sslConfig: sslConfig)
-        }
-    }
-    
-    func getConnection(forHost host: Host) -> SessionManager? {
-        return self.pool[host]
-    }
-    
-    func getConnection() -> SessionManager? {
-        return self.pool.first?.value
-    }
-    
-}
+// MARK:- Helper extension
 
 public extension SecCertificate {
     

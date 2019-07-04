@@ -8,6 +8,10 @@
 
 import Foundation
 
+//MARK:- ERRORS
+
+//MARK:- Elasticsearch Default Error
+
 public class ElasticsearchError: Error, Codable {
     
     var error: ElasticError?
@@ -38,9 +42,56 @@ public class ElasticError: Codable {
 }
 
 
+public class UnsupportedResponseError: Error {
+    
+    let response: HTTPResponse
+    let msg: String
+    
+    public init(msg: String = "UnsupportedResponseError", response: HTTPResponse) {
+        self.response = response
+        self.msg = msg
+    }
+    
+    public var localizedDescription: String {
+        get {
+            return "\(msg): \(response)"
+        }
+    }
+    
+}
+
+public class RequestConverterError<T: Request>: Error {
+    
+    public let error: Error
+    public let message: String
+    public let request: T
+    
+    public init(message: String, error: Error, request: T) {
+        self.error = error
+        self.message = message
+        self.request = request
+    }
+    
+}
+
+public class ResponseConverterError: Error {
+    
+    public let error: Error
+    public let message: String
+    public let response: HTTPResponse
+    
+    public init(message: String, error: Error, response: HTTPResponse) {
+        self.error = error
+        self.message = message
+        self.response = response
+    }
+    
+}
+
+
 public protocol ESClientError: Error {
     
-    func messgae() -> String
+    func message() -> String
     
 }
 
@@ -52,7 +103,7 @@ public class RequestCreationError: ESClientError {
         self.msg = msg
     }
     
-    public func messgae() -> String {
+    public func message() -> String {
         return msg
     }
     

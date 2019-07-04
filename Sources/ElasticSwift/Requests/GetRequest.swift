@@ -7,25 +7,24 @@
 //
 
 import Foundation
+import NIOHTTP1
+
+//MARK:- Get Request Builder
 
 public class GetRequestBuilder<T: Codable>: RequestBuilder {
     
-    typealias BuilderClosure = (GetRequestBuilder) -> Void
-    
-    var client: ESClient
+    public typealias BuilderClosure = (GetRequestBuilder) -> Void
+    public typealias RequestType = GetRequest<T>
+
     var index: String?
     var type: String?
     var id: String?
     var source: T?
     var method: HTTPMethod = .GET
-    var completionHandler: ((_ response: GetResponse<T>?, _ error: Error?) -> Void)?
     
-    init(withClient client: ESClient) {
-        self.client = client
-    }
+    init() {}
     
-    convenience init(withClient client: ESClient, builderClosure: BuilderClosure) {
-        self.init(withClient: client)
+    public init(builderClosure: BuilderClosure) {
         builderClosure(self)
     }
     
@@ -45,22 +44,24 @@ public class GetRequestBuilder<T: Codable>: RequestBuilder {
         return self
     }
     
-    public func set(completionHandler: @escaping (_ response: GetResponse<T>?, _ error: Error?) -> Void) -> Self {
-        self.completionHandler = completionHandler
-        return self
-    }
-    
-    public func build() -> Request {
+    public func build() -> GetRequest<T> {
         return GetRequest<T>(withBuilder: self)
     }
     
     
 }
 
+//MARK:- Get Request
+
 public class GetRequest<T: Codable>: Request {
     
-    let client: ESClient
-    let completionHandler: ((_ response: GetResponse<T>?, _ error: Error?) -> Void)
+    public var headers: HTTPHeaders = HTTPHeaders()
+    
+    public var queryParams: [URLQueryItem] = []
+    
+    
+    public typealias ResponseType = GetResponse<T>
+    
     var index: String?
     var type: String?
     var id: String?
@@ -68,15 +69,9 @@ public class GetRequest<T: Codable>: Request {
     public var method: HTTPMethod = .GET
     
     init(withBuilder builder: GetRequestBuilder<T>) {
-        self.client = builder.client
-        self.completionHandler = builder.completionHandler!
         self.index = builder.index
         self.type = builder.type
         self.id =  builder.id
-    }
-    
-    public func execute() -> Void {
-        self.client.execute(request: self, completionHandler: responseHandler)
     }
     
     func makeEndPoint() -> String {
@@ -89,28 +84,7 @@ public class GetRequest<T: Codable>: Request {
         }
     }
     
-    public var body: Data {
-        get {
-            return Data()
-        }
-    }
-    
-    func responseHandler(_ response: ESResponse) -> Void {
-        if let error = response.error {
-            return completionHandler(nil, error)
-        }
-        do {
-            let decoded: GetResponse<T>? = try Serializers.decode(data: response.data!)
-            if let decoded = decoded {
-                return completionHandler(decoded, nil)
-            } else {
-                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
-                if let decoded = decodedError {
-                    return completionHandler(nil, decoded)
-                }
-            }
-        } catch {
-            return completionHandler(nil, error)
-        }
+    public func data(_ serializer: Serializer) throws -> Data {
+        return Data()
     }
 }

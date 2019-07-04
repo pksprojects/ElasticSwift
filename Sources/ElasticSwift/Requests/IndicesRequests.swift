@@ -7,23 +7,21 @@
 //
 
 import Foundation
+import Logging
+import NIOHTTP1
 
 // MARK: -  Builders
 
 public class CreateIndexRequestBuilder: RequestBuilder {
     
-    typealias BuilderClosure = (CreateIndexRequestBuilder) -> Void
+    public typealias RequestType = CreateIndexRequest
+    public typealias BuilderClosure = (CreateIndexRequestBuilder) -> Void
     
-    let client: ESClient
     var name: String?
-    var completionHandler: ((_ response: CreateIndexResponse?, _ error: Error?) -> Void)?
     
-    init(withClient client: ESClient) {
-        self.client = client
-    }
+    init() {}
     
-    convenience init(withClient client: ESClient, builderClosure: BuilderClosure) {
-        self.init(withClient: client)
+    public init(builderClosure: BuilderClosure) {
         builderClosure(self)
     }
     
@@ -32,30 +30,22 @@ public class CreateIndexRequestBuilder: RequestBuilder {
         return self
     }
     
-    public func set(completionHandler: @escaping (_ response: CreateIndexResponse?, _ error: Error?) -> Void) -> Self {
-        self.completionHandler = completionHandler
-        return self
-    }
-    
-    public func build() -> Request {
+    public func build() -> CreateIndexRequest {
         return CreateIndexRequest(withBuilder: self)
     }
 }
 
 public class DeleteIndexRequestBuilder: RequestBuilder {
     
-    typealias BuilderClosure = (DeleteIndexRequestBuilder) -> Void
+    public typealias RequestType = DeleteIndexRequest
     
-    let client: ESClient
+    public typealias BuilderClosure = (DeleteIndexRequestBuilder) -> Void
+    
     var name: String?
-    var completionHandler: ((_ response: DeleteIndexResponse?, _ error: Error?) -> Void)?
     
-    init(withClient client: ESClient) {
-        self.client = client
-    }
+    init() {}
     
-    convenience init(withClient client: ESClient, builderClosure: BuilderClosure) {
-        self.init(withClient: client)
+    public init(builderClosure: BuilderClosure) {
         builderClosure(self)
     }
     
@@ -64,30 +54,22 @@ public class DeleteIndexRequestBuilder: RequestBuilder {
         return self
     }
     
-    public func set(completionHandler: @escaping (_ response: DeleteIndexResponse?, _ error: Error?) -> Void) -> Self {
-        self.completionHandler = completionHandler
-        return self
-    }
-    
-    public func build() throws -> Request {
+    public func build() throws -> DeleteIndexRequest {
         return DeleteIndexRequest(withBuilder: self)
     }
 }
 
 public class GetIndexRequestBuilder: RequestBuilder {
     
-    typealias BuilderClosure = (GetIndexRequestBuilder) -> Void
+    public typealias RequestType = GetIndexRequest
     
-    let client: ESClient
+    public typealias BuilderClosure = (GetIndexRequestBuilder) -> Void
+    
     var name: String?
-    var completionHandler: ((_ response: GetIndexResponse?, _ error: Error?) -> Void)?
     
-    init(withClient client: ESClient) {
-        self.client = client
-    }
+    init() {}
     
-    convenience init(withClient client: ESClient, builderClosure: BuilderClosure) {
-        self.init(withClient: client)
+    public init(builderClosure: BuilderClosure) {
         builderClosure(self)
     }
     
@@ -96,28 +78,30 @@ public class GetIndexRequestBuilder: RequestBuilder {
         return self
     }
     
-    public func set(completionHandler: @escaping (_ response: GetIndexResponse?, _ error: Error?) -> Void) -> Self {
-        self.completionHandler = completionHandler
-        return self
-    }
-    
-    public func build() throws -> Request {
+    public func build() throws -> GetIndexRequest {
         return GetIndexRequest(withBuilder: self)
     }
 }
 
 // MARK: - Requests
 
+//MARK:- Create Index Reqeust
+
 public class CreateIndexRequest: Request {
+    public var headers: HTTPHeaders = HTTPHeaders()
     
-    let client: ESClient
-    let name: String
-    var completionHandler: ((_ response: CreateIndexResponse?, _ error: Error?) -> Void)
+    public var queryParams: [URLQueryItem] = []
+    
+    public typealias ResponseType = CreateIndexResponse
+    
+    public let name: String
+    
+    public init(name: String) {
+        self.name = name
+    }
     
     init(withBuilder builder: CreateIndexRequestBuilder) {
-        self.client = builder.client
         self.name = builder.name!
-        self.completionHandler = builder.completionHandler!
     }
     
     func makeEndPoint() -> String {
@@ -136,54 +120,28 @@ public class CreateIndexRequest: Request {
         }
     }
     
-    public var body: Data {
-        get {
-            return Data()
-        }
-    }
-    
-    public func execute() {
-        self.client.execute(request: self, completionHandler: responseHandler)
-    }
-    
-    func responseHandler(_ response: ESResponse) -> Void {
-        if let error = response.error {
-            return completionHandler(nil, error)
-        }
-        do {
-            debugPrint(String(data: response.data!, encoding: .utf8)!)
-            let decoded: CreateIndexResponse? = try Serializers.decode(data: response.data!)
-            if decoded?.index != nil {
-                return completionHandler(decoded, nil)
-            } else {
-                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
-                if let decoded = decodedError {
-                    return completionHandler(nil, decoded)
-                }
-            }
-        } catch {
-            do {
-                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
-                if let decoded = decodedError {
-                    return completionHandler(nil, decoded)
-                }
-            } catch {
-                return completionHandler(nil, error)
-            }
-        }
+    public func data(_ serializer: Serializer) throws -> Data {
+        return Data()
     }
 }
 
-class GetIndexRequest: Request {
+//MARK:- Get Index Request
+
+public class GetIndexRequest: Request {
+    public var headers: HTTPHeaders = HTTPHeaders()
     
-    let client: ESClient
-    let name: String
-    var completionHandler: ((_ response: GetIndexResponse?, _ error: Error?) -> Void)
+    public var queryParams: [URLQueryItem] = []
+    
+    public typealias ResponseType = GetIndexResponse
+    
+    public let name: String
+    
+    public init(name: String) {
+        self.name = name
+    }
     
     init(withBuilder builder: GetIndexRequestBuilder) {
-        self.client = builder.client
         self.name = builder.name!
-        self.completionHandler = builder.completionHandler!
     }
     
     func makeEndPoint() -> String {
@@ -202,54 +160,29 @@ class GetIndexRequest: Request {
         }
     }
     
-    public var body: Data {
-        get {
-            return Data()
-        }
+    public func data(_ serializer: Serializer) throws -> Data {
+        return Data()
     }
     
-    public func execute() {
-        self.client.execute(request: self, completionHandler: responseHandler)
-    }
-    
-    func responseHandler(_ response: ESResponse) -> Void {
-        if let error = response.error {
-            return completionHandler(nil, error)
-        }
-        do {
-            debugPrint(String(data: response.data!, encoding: .utf8)!)
-            let decoded: GetIndexResponse? = try Serializers.decode(data: response.data!)
-            if decoded?.settings != nil {
-                return completionHandler(decoded, nil)
-            } else {
-                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
-                if let decoded = decodedError {
-                    return completionHandler(nil, decoded)
-                }
-            }
-        } catch {
-            do {
-                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
-                if let decoded = decodedError {
-                    return completionHandler(nil, decoded)
-                }
-            } catch {
-                return completionHandler(nil, error)
-            }
-        }
-    }
 }
 
-class DeleteIndexRequest: Request {
+//MARK:- Delete Index Request
+
+public class DeleteIndexRequest: Request {
+    public var headers: HTTPHeaders = HTTPHeaders()
     
-    let client: ESClient
-    let name: String
-    var completionHandler: ((_ response: DeleteIndexResponse?, _ error: Error?) -> Void)
+    public var queryParams: [URLQueryItem] = []
+    
+    public typealias ResponseType = AcknowledgedResponse
+    
+    public let name: String
+    
+    public init(name: String) {
+        self.name = name
+    }
     
     init(withBuilder builder: DeleteIndexRequestBuilder) {
-        self.client = builder.client
         self.name = builder.name!
-        self.completionHandler = builder.completionHandler!
     }
     
     func makeEndPoint() -> String {
@@ -268,202 +201,98 @@ class DeleteIndexRequest: Request {
         }
     }
     
-    public var body: Data {
+    public func data(_ serializer: Serializer) throws -> Data {
+        return Data()
+    }
+}
+
+//MARK:- Open Index Request
+
+public class OpenIndexRequest: Request {
+    
+    public typealias ResponseType = AcknowledgedResponse
+    
+    public var headers: HTTPHeaders = HTTPHeaders()
+    
+    public var queryParams: [URLQueryItem] = []
+
+    
+    public let names: [String]
+    
+    public init(_ name: String) {
+        self.names = [name]
+    }
+    
+    public init(_ names: [String]) {
+        self.names = names
+    }
+    
+    public var method: HTTPMethod {
         get {
-            return Data()
+            return .POST
         }
     }
     
-    public func execute() {
-        self.client.execute(request: self, completionHandler: responseHandler)
-    }
-    
-    func responseHandler(_ response: ESResponse) -> Void {
-        if let error = response.error {
-            return completionHandler(nil, error)
-        }
-        do {
-            debugPrint(String(data: response.data!, encoding: .utf8)!)
-            let decoded: DeleteIndexResponse? = try Serializers.decode(data: response.data!)
-            if decoded?.acknowledged != nil {
-                return completionHandler(decoded, nil)
-            } else {
-                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
-                if let decoded = decodedError {
-                    return completionHandler(nil, decoded)
-                }
-            }
-        } catch {
-            do {
-                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
-                if let decoded = decodedError {
-                    return completionHandler(nil, decoded)
-                }
-            } catch {
-                return completionHandler(nil, error)
-            }
-        }
-    }
-}
-
-// MARK: - Response
-
-public class CreateIndexResponse: Codable {
-    
-    public let acknowledged: Bool
-    public let shardsAcknowledged: Bool
-    public let index: String
-    
-    init(acknowledged: Bool, shardsAcknowledged: Bool, index: String) {
-        self.acknowledged = acknowledged
-        self.shardsAcknowledged = shardsAcknowledged
-        self.index = index
-    }
-    
-    enum CodingKeys: String, CodingKey {
-        case acknowledged
-        case shardsAcknowledged = "shards_acknowledged"
-        case index
-    }
-    
-}
-
-public class GetIndexResponse: Codable {
-    
-    public let aliases: [String: AliasMetaData]
-    public let mappings: [String: MappingMetaData]
-    public let settings: IndexSettings
-    
-    init(aliases: [String: AliasMetaData]=[:], mappings: [String: MappingMetaData]=[:], settings: IndexSettings) {
-        self.aliases = aliases
-        self.mappings = mappings
-        self.settings = settings
-    }
-    
-    private struct CK : CodingKey {
-        
-        var stringValue: String
-        init?(stringValue: String) {
-            self.stringValue = stringValue
-        }
-        var intValue: Int?
-        init?(intValue: Int) {
-            return nil
+    public var endPoint: String {
+        get {
+            return makeEndPoint()
         }
     }
     
-    private struct GI: Codable {
-        public let aliases: [String: AliasMetaData]
-        public let mappings: Properties
-        public let settings: Settings
-        
-        public init(from decoder: Decoder) throws {
-            
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.aliases = try container.decode([String: AliasMetaData].self, forKey: .aliases)
-            self.settings = try container.decode(Settings.self, forKey: .settings)
-            do {
-                self.mappings = try container.decode(Properties.self, forKey: .mappings)
-            } catch {
-                let dic = try container.decode(Dictionary<String, Properties>.self, forKey: .mappings)
-                self.mappings = dic.values.first!
-            }
+    func makeEndPoint() -> String {
+        if self.names.count == 1 {
+            return self.names[0] + "/_open"
+        } else {
+            return self.names.joined(separator: ",") + "/_open"
         }
     }
     
-    private struct Properties: Codable {
-        let properties: [String: MappingMetaData]
-    }
-    
-    private struct Settings: Codable {
-        public let index: IndexSettings
-    }
-    
-    required public init(from decoder: Decoder) throws {
-        
-        let container = try decoder.singleValueContainer()
-        let dic = try container.decode(Dictionary<String, GI>.self)
-        let val = dic.values.first!
-        self.aliases = val.aliases
-        self.mappings = val.mappings.properties
-        self.settings = val.settings.index
+    public func data(_ serializer: Serializer) throws -> Data {
+        return Data()
     }
 }
 
-public class DeleteIndexResponse: Codable {
-    
-    public let acknowledged: Bool
-    
-    init(acknowledged: Bool) {
-        self.acknowledged = acknowledged
-    }
-}
+//MARK:- Close Index Request
 
-public class MappingMetaData: Codable {
+public class CloseIndexRequest: Request {
     
-    public let type: String?
-    public let fields: Fields?
+    public typealias ResponseType = AcknowledgedResponse
     
-    public struct Fields: Codable {
-        public let keyword: Keyword
-        
-        public struct Keyword: Codable {
-            public let type: String
-            public let ignoreAbove: Int?
-            
-            enum CodingKeys: String, CodingKey {
-                case type
-                case ignoreAbove = "ignore_above"
-            }
+    public var headers: HTTPHeaders = HTTPHeaders()
+    
+    public var queryParams: [URLQueryItem] = []
+    
+    public let names: [String]
+    
+    public init(_ name: String) {
+        self.names = [name]
+    }
+    
+    public init(_ names: [String]) {
+        self.names = names
+    }
+    
+    public var method: HTTPMethod {
+        get {
+            return .POST
         }
     }
     
-}
-
-public class AliasMetaData: Codable {
-    
-    public let indexRouting: String?
-    public let searchRouting: String?
-    
-    enum CodingKeys: String, CodingKey {
-        case indexRouting = "index_routing"
-        case searchRouting = "search_routing"
-    }
-}
-
-public class IndexSettings: Codable {
-    
-    public let creationDate: String
-    public let numberOfShards: String
-    public let numberOfReplicas: String
-    public let uuid: String
-    public let providedName: String
-    public let version: IndexVersion
-    
-    init(creationDate: String, numberOfShards: String, numberOfReplicas: String, uuid: String, providedName: String, version: IndexVersion) {
-        self.creationDate = creationDate
-        self.numberOfShards = numberOfShards
-        self.numberOfReplicas = numberOfReplicas
-        self.uuid = uuid
-        self.providedName = providedName
-        self.version = version
+    public var endPoint: String {
+        get {
+            return makeEndPoint()
+        }
     }
     
-    enum CodingKeys: String, CodingKey {
-        case creationDate = "creation_date"
-        case numberOfShards = "number_of_shards"
-        case numberOfReplicas = "number_of_replicas"
-        case uuid
-        case providedName = "provided_name"
-        case version
+    func makeEndPoint() -> String {
+        if self.names.count == 1 {
+            return self.names[0] + "/_close"
+        } else {
+            return self.names.joined(separator: ",") + "/_close"
+        }
     }
     
-}
-
-public class IndexVersion: Codable {
-    public let created: String
-    
-    init(created: String) {
-        self.created = created
+    public func data(_ serializer: Serializer) throws -> Data {
+        return Data()
     }
 }

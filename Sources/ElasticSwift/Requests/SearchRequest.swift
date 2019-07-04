@@ -7,12 +7,17 @@
 //
 
 import Foundation
+import Logging
+import NIOHTTP1
+
+//MARK:- Search Request Builder
 
 public class SearchRequestBuilder<T: Codable>: RequestBuilder {
     
-    typealias BuilderClosure = (SearchRequestBuilder) -> Void
+    public typealias RequestType = SearchRequest<T>
     
-    let client: ESClient
+    public typealias BuilderClosure = (SearchRequestBuilder) -> Void
+    
     var index: String?
     var type: String?
     var from: Int16?
@@ -22,14 +27,10 @@ public class SearchRequestBuilder<T: Codable>: RequestBuilder {
     var fetchSource: Bool?
     var explain: Bool?
     var minScore: Decimal?
-    var completionHandler: ((_ response: SearchResponse<T>?, _ error: Error?) -> Void)?
     
-    init(withClient client: ESClient) {
-        self.client = client
-    }
+    init() {}
     
-    convenience init(withClient client: ESClient, builderClosure: BuilderClosure) {
-        self.init(withClient: client)
+    public init(builderClosure: BuilderClosure) {
         builderClosure(self)
     }
     
@@ -79,19 +80,20 @@ public class SearchRequestBuilder<T: Codable>: RequestBuilder {
         return self
     }
     
-    public func set(completionHandler: @escaping (_ response: SearchResponse<T>?, _ error: Error?) -> Void) -> Self {
-        self.completionHandler = completionHandler
-        return self
-    }
-    
-    public func build() throws -> Request {
+    public func build() throws -> SearchRequest<T> {
         return try SearchRequest<T>(withBuilder: self)
     }
 }
 
+//MARK:- Search Request
+
 public class SearchRequest<T: Codable>: Request {
+    public var headers: HTTPHeaders = HTTPHeaders()
     
-    let client: ESClient
+    public var queryParams: [URLQueryItem] = []
+    
+    public typealias ResponseType = SearchResponse<T>
+    
     var index: String?
     var type: String?
     var from: Int16?
@@ -101,11 +103,8 @@ public class SearchRequest<T: Codable>: Request {
     var fetchSource: Bool?
     var explain: Bool?
     var minScore: Decimal?
-    var _builtBody: Data?
-    var completionHandler: ((_ response: SearchResponse<T>?, _ error: Error?) -> Void)
     
     init(withBuilder builder: SearchRequestBuilder<T>) throws {
-        self.client = builder.client
         self.index = builder.index
         self.type = builder.type
         self.from = builder.from
@@ -115,8 +114,6 @@ public class SearchRequest<T: Codable>: Request {
         self.fetchSource = builder.fetchSource
         self.explain = builder.explain
         self.minScore = builder.minScore
-        self.completionHandler = builder.completionHandler!
-        self._builtBody = try makeBody()
     }
     
     public var method: HTTPMethod {
@@ -131,16 +128,6 @@ public class SearchRequest<T: Codable>: Request {
         }
     }
     
-    public var body: Data {
-        get {
-            return self._builtBody!
-        }
-    }
-    
-    public func execute() {
-        self.client.execute(request: self, completionHandler: responseHandler)
-    }
-    
     func makeEndPoint() -> String {
         var path: String = ""
         if let index = self.index {
@@ -153,7 +140,8 @@ public class SearchRequest<T: Codable>: Request {
         return path
     }
     
-    func makeBody() throws -> Data {
+    public func data(_ serializer: Serializer) throws -> Data {
+        
         var dic = [String: Any]()
         if let query = self.query {
             dic["query"] = query.toDic()
@@ -177,32 +165,5 @@ public class SearchRequest<T: Codable>: Request {
             dic["min_score"] = minSore
         }
         return try JSONSerialization.data(withJSONObject: dic, options: [])
-    }
-    
-    func responseHandler(_ response: ESResponse) -> Void {
-        if let error = response.error {
-            return completionHandler(nil, error)
-        }
-        do {
-            debugPrint(String(data: response.data!, encoding: .utf8)!)
-            let decoded: SearchResponse<T>? = try Serializers.decode(data: response.data!)
-            if decoded?.took != nil {
-                return completionHandler(decoded, nil)
-            } else {
-                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
-                if let decoded = decodedError {
-                    return completionHandler(nil, decoded)
-                }
-            }
-        } catch {
-            do {
-                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
-                if let decoded = decodedError {
-                    return completionHandler(nil, decoded)
-                }
-            } catch {
-                return completionHandler(nil, error)
-            }
-        }
     }
 }

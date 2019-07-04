@@ -4,18 +4,26 @@ import XCTest
 
 class ElasticSwiftTests: XCTestCase {
     
-    var client: RestClient?
+    var client: ElasticClient?
     
     override func setUp() {
         super.setUp()
-        self.client = RestClient()
+        print("====================TEST=START===============================")
+        self.client = ElasticClient()
 //        let cred = ClientCredential(username: "elastic", password: "elastic")
 //        let ssl = SSLConfiguration(certPath: "/usr/local/Cellar/kibana/6.1.2/config/certs/elastic-certificates.der", isSelf: true)
 //        let settings = Settings(forHosts: ["https://localhost:9200"], withCredentials: cred, withSSL: true, sslConfig: ssl)
 //        self.client = RestClient(settings: settings)
     }
     
+    override func tearDown() {
+        super.tearDown()
+        
+        print("====================TEST=END===============================")
+    }
+    
     func testPlay() {
+        
         //print(JSON(["field":"value"]).rawString()!)
         var query = [String: Any]()
         query["query"] = ["field":"value"]
@@ -26,82 +34,81 @@ class ElasticSwiftTests: XCTestCase {
         sleep(1)
     }
     
-    func testClient() {
+    func test_01_Client() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
         let settings = Settings.default
-        let client = RestClient(settings: settings)
+        let client = ElasticClient(settings: settings)
         XCTAssertNotNil(client)
     }
     
-    func testCreateIndex() throws {
+    func test_02_CreateIndex() throws {
         let e = expectation(description: "execution complete")
-        func handler(_ response: CreateIndexResponse?, _ error: Error?) -> Void {
-            if let error = error {
-                print("Error", error)
-                XCTAssert(false)
-            }
-            if let response = response {
-                print("Response: ", response)
-                XCTAssert(response.acknowledged, "\(response.acknowledged)")
-                XCTAssert(response.index == "test", "\(response.index)")
-                XCTAssert(response.shardsAcknowledged, "\(response.shardsAcknowledged)")
+        func handler(_ result: Result<CreateIndexResponse, Error>) -> Void {
+            
+            switch result {
+                case .failure(let error):
+                    print("Error", error)
+                    XCTAssert(false)
+                case .success(let response):
+                    print("Response: ", response)
+                    XCTAssert(response.acknowledged, "\(response.acknowledged)")
+                    XCTAssert(response.index == "test", "\(response.index)")
+                    XCTAssert(response.shardsAcknowledged, "\(response.shardsAcknowledged)")
             }
             e.fulfill()
         }
-        let request = self.client?.indicesAdmin().createIndex()
-            .set(name: "test")
-            .set(completionHandler: handler)
-            .build()
+        let createIndexRequest = CreateIndexRequest(name: "test")
         
-        
-        func handler1(_ response: DeleteIndexResponse?, _ error: Error?) -> Void {
-            if let error = error {
-                print("Error", error)
+        func handler1(_ result: Result<AcknowledgedResponse, Error>) -> Void {
+            
+            switch result {
+                case .failure(let error):
+                    print("Error", error)
+                case .success(let response):
+                    print("Response", response)
             }
-            if let response = response {
-                print("Response: ", response)
-            }
-            request?.execute()
+            
+            self.client?.indices.create(createIndexRequest, completionHandler: handler)
         }
-        let request1 = try self.client?.indicesAdmin().deleteIndex()
-            .set(name: "test")
-            .set(completionHandler: handler1)
-            .build()
+        let deleteIndexRequest = DeleteIndexRequest(name: "test")
         
-        request1?.execute()
+        self.client?.indices.delete(deleteIndexRequest, completionHandler: handler1)
         
         waitForExpectations(timeout: 10)
     }
     
-    func testGetIndex() throws {
+    func test_03_GetIndex() throws {
         let e = expectation(description: "execution complete")
-        func handler(_ response: GetIndexResponse?, _ error: Error?) -> Void {
-            print("Error: ", error ?? "nil")
-            XCTAssertNil(error)
-            if let response = response {
-                print("Response: ", response)
-                XCTAssert(response.settings.providedName == "test", "Index: \(response.settings.providedName)")
+        func handler(_ result: Result<GetIndexResponse, Error>) -> Void {
+            
+            switch result {
+                case .failure(let error):
+                    print("Error", error)
+                    XCTAssert(false)
+                case .success(let response):
+                    print("Response", response)
+                    XCTAssert(response.settings.providedName == "test", "Index: \(response.settings.providedName)")
             }
             e.fulfill()
         }
-        let request = try self.client?.indicesAdmin().getIndex()
-            .set(name: "test")
-            .set(completionHandler: handler)
-            .build()
-        request?.execute()
+        let request = GetIndexRequest(name: "test")
+        
+        self.client?.indices.get(request, completionHandler: handler)
+        
         waitForExpectations(timeout: 10)
     }
     
-    func testIndex() throws {
+    func test_04_Index() throws {
         let e = expectation(description: "execution complete")
         
-        func handler(_ response: IndexResponse?, _ error:  Error?) -> Void {
-            if let error = error {
+        func handler(_ result: Result<IndexResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
                 print("Error: ", error)
                 XCTAssert(false, error.localizedDescription)
-            }
-            if let response = response {
+            case .success(let response):
                 print("Response: ", response)
                 XCTAssert(response.index == "test", "Index: \(response.index!)")
                 XCTAssert(response.id == "0", "_id \(response.id!)")
@@ -112,27 +119,28 @@ class ElasticSwiftTests: XCTestCase {
         }
         let msg = Message()
         msg.msg = "Test Message"
-        let request = try self.client?.makeIndex()
-            .set(index: "test")
-            .set(type: "_doc")
-            .set(id: "0")
-            .set(source: msg)
-            .set(completionHandler: handler)
-            .build()
+        let request = try IndexRequestBuilder<Message>() { builder in
+            _ = builder.set(index: "test")
+                .set(type: "_doc")
+                .set(id: "0")
+                .set(source: msg)
+        }
+        .build()
         
-        request?.execute()
+        self.client?.execute(request: request, completionHandler: handler)
         waitForExpectations(timeout: 10)
     }
     
-    func testIndexNoId() throws {
+    func test_05_IndexNoId() throws {
         let e = expectation(description: "execution complete")
         
-        func handler(_ response: IndexResponse?, _ error:  Error?) -> Void {
-            if let error = error {
+        func handler(_ result: Result<IndexResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
                 print("Error: ", error)
                 XCTAssert(false, error.localizedDescription)
-            }
-            if let response = response {
+            case .success(let response):
                 print("Response: ", response)
                 XCTAssert(response.index == "test", "Index: \(response.index!)")
                 XCTAssert(response.type == "_doc", "Type: \(response.type!)")
@@ -142,27 +150,28 @@ class ElasticSwiftTests: XCTestCase {
         }
         let msg = Message()
         msg.msg = "Test Message No Id"
-        let request = try self.client?.makeIndex()
-            .set(index: "test")
-            .set(type: "_doc")
-            .set(source: msg)
-            .set(completionHandler: handler)
-            .build()
+        let request = try IndexRequestBuilder<Message>() { builder in
+            _ = builder.set(index: "test")
+                .set(type: "_doc")
+                .set(source: msg)
+        }
+        .build()
         
-        request?.execute()
+        self.client?.execute(request: request, completionHandler: handler)
         waitForExpectations(timeout: 10)
     }
     
-    func testGet() throws {
+    func test_06_Get() throws {
         
          let e = expectation(description: "execution complete")
         
-        func handler(_ response: GetResponse<Message>?, _ error: Error?) -> Void {
-            if let error = error {
+        func handler(_ result: Result<GetResponse<Message>, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
                 print("Error: ", error)
                 XCTAssert(false, error.localizedDescription)
-            }
-            if let response = response {
+            case .success(let response):
                 print("Response: ", response)
                 XCTAssert(response.found!, "Found: \(response.found!)")
                 XCTAssert(response.index! == "test", "Index: \(response.index!)")
@@ -172,48 +181,51 @@ class ElasticSwiftTests: XCTestCase {
             e.fulfill()
         }
         
-        let request = self.client?.makeGet()
-            .set(index: "test")
-            .set(type: "_doc")
-            .set(id: "0")
-            .set(completionHandler: handler)
-            .build()
+        let request = try GetRequestBuilder<Message>() { builder in
+            builder.set(id: "0")
+                .set(index: "test")
+                .set(type: "_doc")
+            
+        }
+        .build()
         
         
         /// make sure doc exists
-        func handler1(_ response: IndexResponse?, _ error:  Error?) -> Void {
-            if let error = error {
-                print(error)
-            }
-            if let response = response {
+        func handler1(_ result: Result<IndexResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                print("Error", error)
+            case .success(let response):
                 print("Found", response.result!)
             }
-            request?.execute()
+            client?.execute(request: request, completionHandler: handler)
         }
         let msg = Message()
         msg.msg = "Test Message"
-        let request1 = try self.client?.makeIndex()
-            .set(index: "test")
-            .set(type: "_doc")
-            .set(id: "0")
-            .set(source: msg)
-            .set(completionHandler: handler1)
-            .build()
+        let request1 = try IndexRequestBuilder<Message>() { builder in
+            _ = builder.set(index: "test")
+                .set(type: "_doc")
+                .set(id: "0")
+                .set(source: msg)
+            
+        } .build()
         
-        request1?.execute()
+        self.client?.execute(request: request1, completionHandler: handler1)
         waitForExpectations(timeout: 10)
     }
     
-    func testDelete() throws {
+    func test_07_Delete() throws {
         
         let e = expectation(description: "execution complete")
         
-        func handler(_ response: DeleteResponse?, _ error:  Error?) -> Void {
-            if let error = error {
+        func handler(_ result: Result<DeleteResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
                 print("Error: ", error)
                 XCTAssert(false, error.localizedDescription)
-            }
-            if let response = response {
+            case .success(let response):
                 print("Respone", response)
                 XCTAssert(response.result == "deleted", "Result: \(response.result!)")
                 XCTAssert(response.id == "0", "_id: \(response.id!)")
@@ -222,113 +234,114 @@ class ElasticSwiftTests: XCTestCase {
             }
             e.fulfill()
         }
-        let request = self.client?.makeDelete()
-            .set(index: "test")
-            .set(type: "_doc")
-            .set(id: "0")
-            .set(completionHandler: handler)
-            .build()
+        let request = try DeleteRequestBuilder() { builder in
+            builder.set(index: "test")
+                .set(type: "_doc")
+                .set(id: "0")
+        } .build()
         
         /// make sure doc exists
-        func handler1(_ response: IndexResponse?, _ error:  Error?) -> Void {
-            if let error = error {
+        func handler1(_ result: Result<IndexResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
                 print("Error: ", error)
-            }
-            if let response = response {
+            case .success(let response):
                 print("Result", response.result!)
             }
-            request?.execute()
+            
+            self.client?.execute(request: request, completionHandler: handler)
         }
         let msg = Message()
         msg.msg = "Test Message"
-        let request1 = try self.client?.makeIndex()
-            .set(index: "test")
-            .set(type: "_doc")
-            .set(id: "0")
-            .set(source: msg)
-            .set(completionHandler: handler1)
-            .build()
-
-        request1?.execute()
+        let request1 =  try IndexRequestBuilder<Message>() { builder in
+            _ = builder.set(index: "test")
+                .set(type: "_doc")
+                .set(id: "0")
+                .set(source: msg)
+            
+        } .build()
+        self.client?.execute(request: request1, completionHandler: handler1)
         
         waitForExpectations(timeout: 10)
     }
     
-    func testSearch() throws {
+    func test_08_Search() throws {
         let e = expectation(description: "execution complete")
         
-        func handler(_ response: SearchResponse<Message>?, _ error: Error?) -> Void {
-            print("Error: ", error ?? "nil")
-            XCTAssertNil(error)
-            XCTAssertNotNil(response?.hits)
+        func handler(_ result: Result<SearchResponse<Message>, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                print("Error: ", error)
+                XCTAssert(false)
+            case .success(let response):
+                XCTAssertNotNil(response.hits)
+            }
+            
             e.fulfill()
         }
-        let builder = QueryBuilders.boolQuery()
+        let queryBuilder = QueryBuilders.boolQuery()
         let match = QueryBuilders.matchQuery().set(field: "msg").set(value: "Message")
-        builder.must(query: match)
+        queryBuilder.must(query: match)
         let sort =  SortBuilders.fieldSort("msg.keyword")
             .set(order: .asc)
             .build()
-        let request = try self.client?.makeSearch()
-            .set(indices: "test")
-            .set(types: "_doc")
-            .set(query: builder.query)
-            .set(sort: sort)
-            .set(completionHandler: handler)
-            .build()
-        request?.execute()
-        waitForExpectations(timeout: 100)
+        let request: SearchRequest<Message> = try SearchRequestBuilder() { builder in
+            builder.set(indices: "test")
+                .set(types: "_doc")
+                .set(query: queryBuilder.query)
+                .set(sort: sort)
+        } .build()
+        self.client?.execute(request: request, completionHandler: handler)
+        waitForExpectations(timeout: 10)
     }
     
-    func testDeleteIndex() throws {
+    func test_09_DeleteIndex() throws {
         let e = expectation(description: "execution complete")
-        func handler(_ response: DeleteIndexResponse?, _ error: Error?) -> Void {
-            if let error = error {
+        func handler(_ result: Result<AcknowledgedResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
                 print("Error", error)
                 XCTAssert(false, error.localizedDescription)
-            }
-            if let response = response {
+            case .success(let response):
                 print("Response: ", response)
                 XCTAssert(response.acknowledged, "Acknowleged: \(response.acknowledged)")
             }
             e.fulfill()
         }
-        let request = try self.client?.indicesAdmin().deleteIndex()
-            .set(name: "test")
-            .set(completionHandler: handler)
-            .build()
+        let request = DeleteIndexRequest(name: "test")
         
         /// make sure index exists
-        func handler1(_ response: CreateIndexResponse?, _ error: Error?) -> Void {
-            if let error = error {
+        func handler1(_ result: Result<CreateIndexResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
                 print("Error", error)
-            }
-            if let response = response {
+            case .success(let response):
                 print("Response: ", response)
             }
-            request?.execute()
+            self.client?.execute(request: request, completionHandler: handler)
         }
         
-        let request1 = self.client?.indicesAdmin().createIndex()
-            .set(name: "test")
-            .set(completionHandler: handler1)
-            .build()
-        request1?.execute()
+        let request1 = CreateIndexRequest(name: "test")
+        self.client?.execute(request: request1, completionHandler: handler1)
         waitForExpectations(timeout: 10)
     }
 
     
-    static var allTests = [
-        ("testPlay", testPlay),
-        ("testClient", testClient),
-        ("testCreateIndex", testCreateIndex),
-        ("testGetIndex", testGetIndex),
-        ("testIndex", testIndex),
-        ("testIndexNoId", testIndexNoId),
-        ("testGet", testGet),
-        ("testDelete", testDelete),
-        ("testDeleteIndex", testDeleteIndex)
-    ]
+//    static var allTests = [
+//        ("testPlay", testPlay),
+//        ("testClient", testClient),
+//        ("testCreateIndex", testCreateIndex),
+//        ("testGetIndex", testGetIndex),
+//        ("testIndex", testIndex),
+//        ("testIndexNoId", testIndexNoId),
+//        ("testGet", testGet),
+//        ("testDelete", testDelete),
+//        ("testDeleteIndex", testDeleteIndex)
+//    ]
 }
 
 class Message: Codable {

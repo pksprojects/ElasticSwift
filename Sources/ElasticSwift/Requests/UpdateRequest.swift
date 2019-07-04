@@ -7,16 +7,24 @@
 //
 
 import Foundation
+import NIOHTTP1
+
+//MARK:- Update Request Builder
 
 public class UpdateRequestBuilder: RequestBuilder {
     
-    let client: ESClient
+    public typealias RequestType = UpdateRequest
+    
+    public typealias BuilderClosure = (UpdateRequestBuilder) -> Void
+    
     var index: String?
     var type: String?
     var id: String?
     
-    init(withClient client: RestClient) {
-        self.client = client
+    init() {}
+    
+    public init(builderClosure: BuilderClosure) {
+        builderClosure(self)
     }
     
     public func set(index: String) -> Self {
@@ -35,20 +43,25 @@ public class UpdateRequestBuilder: RequestBuilder {
         return self
     }
     
-    public func build() -> Request {
+    public func build() -> UpdateRequest {
         return UpdateRequest(withBuilder: self)
     }
 }
 
+//MARK:- Update Request
+
 public class UpdateRequest: Request {
+    public var headers: HTTPHeaders = HTTPHeaders()
     
-    let client: ESClient
+    public var queryParams: [URLQueryItem] = []
+    
+    public typealias ResponseType = UpdateResponse
+    
     let index: String
     let type: String
     let id: String
     
     init(withBuilder builder: UpdateRequestBuilder) {
-        self.client = builder.client
         self.index = builder.index!
         self.type = builder.type!
         self.id = builder.id!
@@ -66,17 +79,14 @@ public class UpdateRequest: Request {
         }
     }
     
-    public var body: Data {
-        get {
-            return Data()
-        }
+    public func data(_ serializer: Serializer) throws -> Data {
+        return Data()
     }
+}
+
+
+// MARK:- UPDATE RESPONSE
+
+public class UpdateResponse: Codable {
     
-    public func execute() {
-        self.client.execute(request: self, completionHandler: responseHandler)
-    }
-    
-    func responseHandler(_ response: ESResponse) -> Void {
-        
-    }
 }

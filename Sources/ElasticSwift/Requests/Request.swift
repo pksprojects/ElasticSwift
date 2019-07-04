@@ -7,35 +7,52 @@
 //
 
 import Foundation
+import NIOHTTP1
 
+//MARK:- Reqeust Protocol
+
+/// Represents High Level Elasticsearch Reqeust
 public protocol Request {
+    
+    associatedtype ResponseType: Codable
+    
+    var headers: HTTPHeaders { get }
+    
+    var queryParams: [URLQueryItem] { get }
     
     var method: HTTPMethod { get }
     
     var endPoint: String { get }
     
-    var body: Data { get }
-    
-    func execute() -> Void
+    func data(_ serializer: Serializer) throws -> Data
     
 }
 
-public class Response<T: Codable> {
+//MARK:- Request options
+
+/// Represents Additional options for Elasticsearch Reqeust like queryParam and/or header
+public class RequestOptions {
     
-    public let data: T?
-    public let httpResponse: URLResponse?
-    public let error: Error?
+    let headers: HTTPHeaders
+    let queryParams: [URLQueryItem]
     
-    init(data: T? ,httpResponse: URLResponse?, error: Error?) {
-        self.data = data
-        self.httpResponse = httpResponse
-        self.error = error
+    init(headers: HTTPHeaders = HTTPHeaders(), queryParams: [URLQueryItem] = []) {
+        self.headers = headers
+        self.queryParams = queryParams
+    }
+    
+    public static var `default`: RequestOptions {
+        get {
+            return RequestOptions()
+        }
     }
 }
 
 
 public protocol RequestBuilder {
     
-    func build() throws -> Request
+    associatedtype RequestType: Request
+    
+    func build() throws -> RequestType
 }
 

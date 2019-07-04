@@ -73,26 +73,10 @@ enum EndPointPath: String {
     case `default` = ""
 }
 
-enum URLScheme: String {
+public enum URLScheme: String {
     case HTTP = "http"
     case HTTPS = "https"
 }
-
-/**
- Helper Enum holding corresponding String value of HTTPMethods
- */
-public enum HTTPMethod: String {
-    case OPTIONS = "OPTIONS"
-    case GET     = "GET"
-    case HEAD    = "HEAD"
-    case POST    = "POST"
-    case PUT     = "PUT"
-    case PATCH   = "PATCH"
-    case DELETE  = "DELETE"
-    case TRACE   = "TRACE"
-    case CONNECT = "CONNECT"
-}
-
 
 public enum ShapeRelation: String {
     case INTERSECTS = "intersects"

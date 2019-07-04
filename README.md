@@ -2,30 +2,13 @@
 
 ## Project Status
 
-This project is very early in developement, more information will be made available as project progresses.
+This project is actively in developement, more information will be made available as project progresses.
 
 If you'd like to contribute contact me via <support@pksprojects.org>
 
-High level implementation Plan:
-
-* Initial version of Transport Layer (Connections & Connection pool).
-
-* Initial version of elasticsearch Request, Response & Exception Objects.
-
-* Adding support for elasticsearch API's not necessarily in oder:
-  * cat
-  * cluster
-  * indices
-  * ingest
-  * nodes
-  * snapshot
-  * task
-
-* Stabilizing package and API's
-
 * Platform support for macOS, iOS & linux.
 
-* Query DSL builders and helpers similar to elasticsearch Java client.
+* Query DSL builders and helpers similar to elasticsearch Java client. Check the table below to see full list of avaiable QueryBuilders
 
 ## Project Goal
 
@@ -53,7 +36,7 @@ platform :ios, '10.0'
 use_frameworks!
 
 target '<Your Target Name>' do
-    pod 'ElasticSwift', '~> 1.0.0-alpha.5'
+    pod 'ElasticSwift', '~> 1.0.0-alpha.6'
 end
 ```
 
@@ -71,7 +54,7 @@ Once you have your Swift package set up, adding ElasticSwift as a dependency is 
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/pksprojects/ElasticSwift.git", "1.0.0-alpha.5")
+    .package(url: "https://github.com/pksprojects/ElasticSwift.git", "1.0.0-alpha.6")
 ]
 ```
 
@@ -79,15 +62,15 @@ dependencies: [
 
 ### Client
 
-Creating `RestClient`.
+Creating `ElasticClient`.
 
 ```swift
 import ElasticSwift
 
 var settings = Settings.default // Creates default settings for client
-var client = RestClient(settings: settings) // Creates client with specified settings
+var client = ElasticClient(settings: settings) // Creates client with specified settings
 
-var client = RestClient() // Creates client with default settings
+var client = ElasticClient() // Creates client with default settings
 
 ```
 
@@ -121,37 +104,31 @@ When creating default settings it creates settings for `http://localhost:9200`.
 Create and Delete Index
 
 ```swift
-func createHandler(_ response: CreateIndexResponse?, _ error: Error?) -> Void {
-    if let error = error {
-      print("Error", error)
-    }
-    if let response = response {
-        print("Response", response)
+func createHandler(_ result: Result<CreateIndexResponse, Error>) -> Void {
+    switch result {
+        case .failure(let error):
+            print("Error", error)
+        case .success(let response):
+            print("Response", response)
     }
 }
 
 // creating index
-let createRequest = client.indicesAdmin().create()
-            .set(name: "indexName")
-            .set(completionHandler: createHandler)
-            .build()
-createRequest.execute() // executes request
+let createIndexRequest = CreateIndexRequest(name: "indexName")
+client.indices.create(createIndexRequest, completionHandler: createHandler) // executes request
 
 // delete index
 func deleteHandler(_ response: DeleteIndexResponse?, _ error: Error?) -> Void {
-    if let error = error {
-        print("Error", error)
-    }
-    if let response = response {
-        print("Response", response)
+    switch result {
+        case .failure(let error):
+            print("Error", error)
+        case .success(let response):
+            print("Response", response)
     }
 }
 
-let deleteRequest = try client.indicesAdmin().delete()
-    .set(name: "indexName")
-    .set(completionHandler: deleteHandler)
-    .build()
-deleteRequest.execute() // executes request
+let deleteIndexRequest = DeleteIndexRequest(name: "indexName")
+client.indices.delete(deleteIndexRequest, completionHandler: deleteHandler) // executes request
 
 ```
 
@@ -165,65 +142,64 @@ class MyClass: Codable {
 }
 
 // index document
-func indexHandler(_ response: IndexResponse?, _ error:  Error?) -> Void {
-    if let error = error {
-        print(error)
-    }
-    if let response = response {
-        print("Response", response)
+func indexHandler(_ result: Result<IndexResponse, Error>) -> Void {
+    switch result {
+        case .failure(let error):
+            print("Error", error)
+        case .success(let response):
+            print("Response", response)
     }
 }
 
 let mySource = MyClass()
 mySource.myField = "My value"
 
-let indexRequest = try client.makeIndex()
-    .set(index: "indexName")
-    .set(type: "type")
-    .set(id: "id")
-    .set(source: mySource)
-    .set(completionHandler: indexHandler)
-    .build()
+let indexRequest = try IndexRequestBuilder<MyClass>() { builder in
+            _ = builder.set(index: "indexName")
+                .set(type: "type")
+                .set(id: "id")
+                .set(source: mySource)
+        }
+        .build()
 
-indexRequest.execute()
+client.index(indexRequest, completionHandler: indexHandler)
 
 // get document
-func getHandler(_ response: GetResponse<MyClass>?, _ error: Error?) -> Void {
-    if let error = error {
-        print(error)
-    }
-    if let response = response {
-        print("Response", response)
+func getHandler(_ result: Result<GetResponse<MyClass>, Error>) -> Void {
+    switch result {
+        case .failure(let error):
+            print("Error", error)
+        case .success(let response):
+            print("Response", response)
     }
 }
 
-let getRequest = client.makeGet()
-    .set(index: "indexName")
-    .set(type: "type")
-    .set(id: "id")
-    .set(completionHandler: getHandler)
-    .build()
+let getRequest = GetRequestBuilder<MyClass>() { builder in
+            builder.set(id: "id")
+                .set(index: "indexName")
+                .set(type: "type")
+        }
+        .build()
 
-getRequest.execute()
+client.get(getRequest, completionHandler: getHandler)
 
 // delete document
-func deleteHandler(_ response: DeleteResponse?, _ error:  Error?) -> Void {
-    if let error = error {
-        print(error)
-    }
-    if let response = response {
-        print("Response", response)
+func deleteHandler(_ result: Result<DeleteResponse, Error>) -> Void {
+    switch result {
+        case .failure(let error):
+            print("Error", error)
+        case .success(let response):
+            print("Response", response)
     }
 }
 
-let deleteRequest = client.makeDelete()
-    .set(index: "indexName")
-    .set(type: "type")
-    .set(id: "id")
-    .set(completionHandler: deleteHandler)
-    .build()
+let deleteRequest = try DeleteRequestBuilder() { builder in
+        builder.set(index: "indexName")
+                .set(type: "type")
+                .set(id: "id")
+    } .build()
 
-deleteRequest.execute()
+client.delete(deleteRequest, completionHandler: deleteHandler)
 
 ```
 
@@ -248,29 +224,30 @@ Creating simple search request.
 ```swift
 
 func handler(_ response: SearchResponse<MyClass>?, _ error: Error?) -> Void {
-    if let error = error {
-        print("Error", error)
-        return
+    switch result {
+        case .failure(let error):
+            print("Error", error)
+        case .success(let response):
+            print("Response", response)
     }
-    print(response?.hits as Any)
 }
 
-let builder = QueryBuilders.boolQuery()
+let queryBuilder = QueryBuilders.boolQuery()
 let match = QueryBuilders.matchQuery().match(field: "myField", value: "MySearchValue")
-builder.must(query: match)
+queryBuilder.must(query: match)
 
 let sort =  SortBuilders.fieldSort("msg") // use "msg.keyword" as field name in case of text field
     .set(order: .asc)
     .build()
 
-let request = try client.makeSearch()
-    .set(indices: "indexName")
-    .set(types: "type")
-    .set(query: builder.query)
-    .set(sort: sort)
-    .set(completionHandler: handler)
-    .build()
-request.execute()
+let request = ry SearchRequestBuilder() { builder in
+            builder.set(indices: "indexName")
+                .set(types: "type")
+                .set(query: queryBuilder.query)
+                .set(sort: sort)
+        } .build()
+
+client.search(deleteRequest, completionHandler: deleteHandler)
 
 ```
 
