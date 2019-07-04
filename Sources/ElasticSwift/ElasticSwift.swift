@@ -3,6 +3,9 @@ import Logging
 import NIO
 import NIOHTTP1
 import NIOTLS
+#if canImport(NIOSSL)
+import NIOSSL
+#endif
 
 public typealias Host = URL
 
@@ -145,13 +148,28 @@ public class HTTPAdaptorConfiguration {
     public let eventLoopProvider: EventLoopProvider
     
     // ssl config for URLSession based clients
-    public var sslConfig: SSLConfiguration?
+    public let sslConfig: SSLConfiguration?
+    
+    #if canImport(NIOSSL)
+    // ssl config for swift-nio-ssl based clients
+    public let sslcontext: NIOSSLContext?
+
+    public init(eventLoopProvider: EventLoopProvider = .create(threads: 1), timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS, sslConfig: SSLConfiguration? = nil, sslContext: NIOSSLContext? = nil) {
+        self.eventLoopProvider = eventLoopProvider
+        self.timeouts = timeouts
+        self.sslConfig = sslConfig
+        self.sslcontext = sslContext
+    }
+    
+    #else
     
     public init(eventLoopProvider: EventLoopProvider = .create(threads: 1), timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS, sslConfig: SSLConfiguration? = nil) {
         self.eventLoopProvider = eventLoopProvider
         self.timeouts = timeouts
         self.sslConfig = sslConfig
     }
+    
+    #endif
     
     public static var `default`: HTTPAdaptorConfiguration {
         get {

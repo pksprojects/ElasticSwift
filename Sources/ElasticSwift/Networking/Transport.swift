@@ -11,6 +11,9 @@ import Logging
 import NIOHTTP1
 import NIOConcurrencyHelpers
 import NIO
+#if canImport(NIOSSL)
+import NIOSSL
+#endif
 
 // MARK: - Transport
 
@@ -51,7 +54,7 @@ public protocol HTTPClientAdaptor {
 
 // MARK: - DefaultHTTPClientAdaptor
 
-public class DefaultHTTPClientAdaptor: HTTPClientAdaptor {
+public final class DefaultHTTPClientAdaptor: HTTPClientAdaptor {
     
     private let logger = Logger(label: "org.pksprojects.ElasticSwfit.Networking.DefaultHTTPClientAdaptor")
     
@@ -85,14 +88,18 @@ public class DefaultHTTPClientAdaptor: HTTPClientAdaptor {
     
     
     private static func createHttpClientConfig(from adaptorConfig: HTTPAdaptorConfiguration) -> HTTPClientConfiguration {
+        #if canImport(NIOSSL)
+        return HTTPClientConfiguration(eventLoopProvider: adaptorConfig.eventLoopProvider, sslContext: adaptorConfig.sslcontext, timeouts: adaptorConfig.timeouts)
+        #else
         return HTTPClientConfiguration(eventLoopProvider: adaptorConfig.eventLoopProvider, timeouts: adaptorConfig.timeouts)
+        #endif
     }
     
 }
 
 // MARK: - URLSessionAdaptor
 
-public class URLSessionAdaptor: HTTPClientAdaptor {
+public final class URLSessionAdaptor: HTTPClientAdaptor {
     
     private let logger = Logger(label: "org.pksprojects.ElasticSwfit.Networking.URLSessionAdaptor")
     
@@ -101,7 +108,7 @@ public class URLSessionAdaptor: HTTPClientAdaptor {
     let allocator: ByteBufferAllocator
     
     public required init(forHost host: URL, adaptorConfig: HTTPAdaptorConfiguration =  HTTPAdaptorConfiguration()) {
-        self.sessionManager = SessionManager.init(forHost: host, sslConfig: adaptorConfig.sslConfig)
+        self.sessionManager = SessionManager(forHost: host, sslConfig: adaptorConfig.sslConfig)
         self.allocator = ByteBufferAllocator()
     }
     
