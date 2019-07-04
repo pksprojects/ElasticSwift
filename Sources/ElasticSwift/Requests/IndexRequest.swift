@@ -9,6 +9,8 @@
 import Foundation
 import NIOHTTP1
 
+//MARK:- Index Requet Builder
+
 public class IndexRequestBuilder<T: Codable>: RequestBuilder {
     
     public typealias RequestType = IndexRequest<T>
@@ -64,7 +66,10 @@ public class IndexRequestBuilder<T: Codable>: RequestBuilder {
     
 }
 
+//MARK:- Index Request
+
 public class IndexRequest<T: Codable>: Request {
+    
     public var headers: HTTPHeaders = HTTPHeaders()
     
     public var queryParams: [URLQueryItem] = []
@@ -80,7 +85,6 @@ public class IndexRequest<T: Codable>: Request {
         }
     }
     
-    var _builtBody: Data?
     var index: String?
     var type: String?
     var id: String?
@@ -96,7 +100,6 @@ public class IndexRequest<T: Codable>: Request {
         self.source = builder.source
         self.routing = builder.routing
         self.parent = builder.parent
-        self._builtBody = try makeBody()
     }
     
     func makeEndPoint() -> String {
@@ -113,14 +116,8 @@ public class IndexRequest<T: Codable>: Request {
         }
     }
     
-    public var body: Data {
-        get {
-            return _builtBody!
-        }
-    }
-    
-    public func makeBody() throws -> Data {
-       return try Serializers.encode(self.source!)!
+    public func data(_ serializer: Serializer) throws -> Data {
+        return try serializer.encode(self.source!)!
     }
     
 }

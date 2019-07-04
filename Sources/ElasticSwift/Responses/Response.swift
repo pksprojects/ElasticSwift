@@ -21,6 +21,8 @@ public class ESResponse {
     }
 }
 
+//MARK:- Get Response
+
 public class GetResponse<T: Codable>: Codable {
     
     public var index: String?
@@ -45,6 +47,8 @@ public class GetResponse<T: Codable>: Codable {
         case found
     }
 }
+
+//MARK:- Index Response
 
 public class IndexResponse: Codable {
     
@@ -72,6 +76,8 @@ public class IndexResponse: Codable {
         case result
     }
 }
+
+//MARK:- Search Response
 
 public class SearchResponse<T: Codable>: Codable {
     
@@ -144,5 +150,30 @@ public class SearchHit<T: Codable>: Codable {
         case id = "_id"
         case score = "_score"
         case source = "_source"
+    }
+}
+
+//MARK:- Delete Response
+
+public struct DeleteResponse: Codable {
+    
+    public let shards: Shards?
+    public let index: String?
+    public let type: String?
+    public let id: String?
+    public let version: Int?
+    public let seqNumber: Int?
+    public let primaryTerm: Int?
+    public let result: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case shards = "_shards"
+        case index = "_index"
+        case type = "_type"
+        case id = "_id"
+        case version = "_version"
+        case seqNumber = "_seq_no"
+        case primaryTerm = "_primary_term"
+        case result
     }
 }

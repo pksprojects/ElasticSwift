@@ -10,6 +10,8 @@ import Foundation
 import Logging
 import NIOHTTP1
 
+//MARK:- Search Request Builder
+
 public class SearchRequestBuilder<T: Codable>: RequestBuilder {
     
     public typealias RequestType = SearchRequest<T>
@@ -28,7 +30,7 @@ public class SearchRequestBuilder<T: Codable>: RequestBuilder {
     
     init() {}
     
-    init(builderClosure: BuilderClosure) {
+    public init(builderClosure: BuilderClosure) {
         builderClosure(self)
     }
     
@@ -83,6 +85,8 @@ public class SearchRequestBuilder<T: Codable>: RequestBuilder {
     }
 }
 
+//MARK:- Search Request
+
 public class SearchRequest<T: Codable>: Request {
     public var headers: HTTPHeaders = HTTPHeaders()
     
@@ -99,7 +103,6 @@ public class SearchRequest<T: Codable>: Request {
     var fetchSource: Bool?
     var explain: Bool?
     var minScore: Decimal?
-    var _builtBody: Data?
     
     init(withBuilder builder: SearchRequestBuilder<T>) throws {
         self.index = builder.index
@@ -111,7 +114,6 @@ public class SearchRequest<T: Codable>: Request {
         self.fetchSource = builder.fetchSource
         self.explain = builder.explain
         self.minScore = builder.minScore
-        self._builtBody = try makeBody()
     }
     
     public var method: HTTPMethod {
@@ -123,12 +125,6 @@ public class SearchRequest<T: Codable>: Request {
     public var endPoint: String {
         get {
             return makeEndPoint()
-        }
-    }
-    
-    public var body: Data {
-        get {
-            return self._builtBody!
         }
     }
     
@@ -144,7 +140,8 @@ public class SearchRequest<T: Codable>: Request {
         return path
     }
     
-    func makeBody() throws -> Data {
+    public func data(_ serializer: Serializer) throws -> Data {
+        
         var dic = [String: Any]()
         if let query = self.query {
             dic["query"] = query.toDic()

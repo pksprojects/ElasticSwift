@@ -9,6 +9,9 @@
 import Foundation
 import NIOHTTP1
 
+//MARK:- Reqeust Protocol
+
+/// Represents High Level Elasticsearch Reqeust
 public protocol Request {
     
     associatedtype ResponseType: Codable
@@ -21,11 +24,13 @@ public protocol Request {
     
     var endPoint: String { get }
     
-    var body: Data { get }
+    func data(_ serializer: Serializer) throws -> Data
     
 }
 
+//MARK:- Request options
 
+/// Represents Additional options for Elasticsearch Reqeust like queryParam and/or header
 public class RequestOptions {
     
     let headers: HTTPHeaders
@@ -40,20 +45,6 @@ public class RequestOptions {
         get {
             return RequestOptions()
         }
-    }
-}
-
-
-public class Response<T: Codable> {
-    
-    public let data: T?
-    public let httpResponse: URLResponse?
-    public let error: Error?
-    
-    init(data: T? ,httpResponse: URLResponse?, error: Error?) {
-        self.data = data
-        self.httpResponse = httpResponse
-        self.error = error
     }
 }
 

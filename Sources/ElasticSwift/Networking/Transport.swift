@@ -37,7 +37,7 @@ internal class Transport {
         self.clientsQueue = RoundRobinQueue(clients)
     }
     
-    func performRequest(request: HTTPRequest, callback: @escaping (_ response: HTTPResponse?, _ error: Error?) -> Void) -> Void {
+    func performRequest(request: HTTPRequest, callback: @escaping (_ result: Result<HTTPResponse, Error>) -> Void) -> Void {
         return self.clientsQueue.next().performRequest(request, callback: callback)
     }
 }
@@ -48,7 +48,7 @@ public protocol HTTPClientAdaptor {
     
     init(forHost host: URL, adaptorConfig: HTTPAdaptorConfiguration)
     
-    func performRequest(_ request: HTTPRequest, callback: @escaping (_ response: HTTPResponse?, _ error: Error?) -> Void)
+    func performRequest(_ request: HTTPRequest, callback: @escaping (_ result: Result<HTTPResponse, Error>) -> Void)
 }
 
 
@@ -65,7 +65,7 @@ public final class DefaultHTTPClientAdaptor: HTTPClientAdaptor {
         self.client = HTTPClient(forHost: host, configuration: httpClientConfig)
     }
     
-    public func performRequest(_ request: HTTPRequest, callback: @escaping (_ response: HTTPResponse?, _ error: Error?) -> Void) {
+    public func performRequest(_ request: HTTPRequest, callback: @escaping (_ result: Result<HTTPResponse, Error>) -> Void ) {
         self.client.execute(request: request).map { parts in
             var responseHead: HTTPResponseHead? = nil
             var responseBody: ByteBuffer? = nil
@@ -77,15 +77,14 @@ public final class DefaultHTTPClientAdaptor: HTTPClientAdaptor {
                     responseBody = buffer
                 case .end(_):
                     let response = HTTPResponse(request: request, status: responseHead!.status, headers: responseHead!.headers, body: responseBody)
-                    callback(response, nil)
+                    return callback(.success(response))
                 }
             }
             
-            }.recover { error  in
-                callback(nil, error)
-            }.whenSuccess({})
+        }.recover { error  in
+            return callback(.failure(error))
+        }.whenSuccess({})
     }
-    
     
     private static func createHttpClientConfig(from adaptorConfig: HTTPAdaptorConfiguration) -> HTTPClientConfiguration {
         #if canImport(NIOSSL)
@@ -112,11 +111,11 @@ public final class URLSessionAdaptor: HTTPClientAdaptor {
         self.allocator = ByteBufferAllocator()
     }
     
-    public func performRequest(_ request: HTTPRequest, callback: @escaping (_ response: HTTPResponse?, _ error: Error?) -> Void) {
+    public func performRequest(_ request: HTTPRequest, callback: @escaping (Result<HTTPResponse, Error>) -> Void) {
         let urlRequest = self.sessionManager.createReqeust(request)
         self.sessionManager.execute(urlRequest) { data, response, error in
             guard error == nil else {
-                return callback(nil, error)
+                return callback(.failure(error!))
             }
             let responseBuilder =  HTTPResponseBuilder { builder in
                 builder.request = request
@@ -143,9 +142,9 @@ public final class URLSessionAdaptor: HTTPClientAdaptor {
             
             do {
                 let httpResponse = try responseBuilder.build()
-                return callback(httpResponse, error)
+                return callback(.success(httpResponse))
             } catch {
-                return callback(nil, error)
+                return callback(.failure(error))
             }
             
         }

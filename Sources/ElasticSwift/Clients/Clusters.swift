@@ -11,11 +11,11 @@ import Logging
 
 public class ClusterClient {
     
-    let logger = Logger(label: "org.pksprojects.ElasticSwfit.ClusterAdmin")
+    private let logger = Logger(label: "org.pksprojects.ElasticSwfit.Clients.ClusterClient")
     
-    let client: ESClient
+    let client: ElasticClient
     
-    init(withClient: ESClient) {
+    init(withClient: ElasticClient) {
         self.client = withClient
     }
 }

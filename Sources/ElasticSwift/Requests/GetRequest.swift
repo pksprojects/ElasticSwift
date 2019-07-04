@@ -9,6 +9,8 @@
 import Foundation
 import NIOHTTP1
 
+//MARK:- Get Request Builder
+
 public class GetRequestBuilder<T: Codable>: RequestBuilder {
     
     public typealias BuilderClosure = (GetRequestBuilder) -> Void
@@ -49,6 +51,8 @@ public class GetRequestBuilder<T: Codable>: RequestBuilder {
     
 }
 
+//MARK:- Get Request
+
 public class GetRequest<T: Codable>: Request {
     
     public var headers: HTTPHeaders = HTTPHeaders()
@@ -80,9 +84,7 @@ public class GetRequest<T: Codable>: Request {
         }
     }
     
-    public var body: Data {
-        get {
-            return Data()
-        }
+    public func data(_ serializer: Serializer) throws -> Data {
+        return Data()
     }
 }

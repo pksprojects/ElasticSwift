@@ -9,15 +9,23 @@
 import Foundation
 import NIOHTTP1
 
+//MARK:- Update Request Builder
+
 public class UpdateRequestBuilder: RequestBuilder {
     
     public typealias RequestType = UpdateRequest
+    
+    public typealias BuilderClosure = (UpdateRequestBuilder) -> Void
     
     var index: String?
     var type: String?
     var id: String?
     
     init() {}
+    
+    public init(builderClosure: BuilderClosure) {
+        builderClosure(self)
+    }
     
     public func set(index: String) -> Self {
         self.index = index
@@ -40,6 +48,8 @@ public class UpdateRequestBuilder: RequestBuilder {
     }
 }
 
+//MARK:- Update Request
+
 public class UpdateRequest: Request {
     public var headers: HTTPHeaders = HTTPHeaders()
     
@@ -50,7 +60,6 @@ public class UpdateRequest: Request {
     let index: String
     let type: String
     let id: String
-    var completionHandler: ((_ response: ESResponse?, _ error: Error?) -> Void)?
     
     init(withBuilder builder: UpdateRequestBuilder) {
         self.index = builder.index!
@@ -70,18 +79,8 @@ public class UpdateRequest: Request {
         }
     }
     
-    public var body: Data {
-        get {
-            return Data()
-        }
-    }
-    
-    func responseHandler(_ response: ESResponse) -> Void {
-        if let res = response.httpResponse as? HTTPURLResponse {
-            if res.statusCode != 200 {
-                return self.completionHandler!(nil, ElasticsearchError())
-            }
-        }
+    public func data(_ serializer: Serializer) throws -> Data {
+        return Data()
     }
 }
 

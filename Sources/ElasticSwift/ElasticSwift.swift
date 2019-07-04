@@ -10,15 +10,21 @@ import NIOSSL
 public typealias Host = URL
 
 
-public class RestClient: ESClient {
+public class ElasticClient {
     
     private let logger = Logger(label: "org.pksprojects.ElasticSwfit.RestClient")
+    
+    let transport: Transport
+    let serializer: Serializer
+    
+    private var credentials: ClientCredential?
     
     private var clusterClient: ClusterClient?
     private var indicesClient: IndicesClient?
     
     public init(settings: Settings) {
-        super.init(hosts: settings.hosts, credentials: settings.credentials, clienAdaptor: settings.clientAdaptor, adaptorConfig: settings.adaptorConfig)
+        self.transport = Transport(forHosts: settings.hosts, credentials: settings.credentials, clientAdaptor: settings.clientAdaptor, adaptorConfig: settings.adaptorConfig)
+        self.serializer = settings.serializer
         self.indicesClient = IndicesClient(withClient: self)
         self.clusterClient = ClusterClient(withClient: self)
     }
@@ -27,95 +33,120 @@ public class RestClient: ESClient {
         self.init(settings: Settings.default)
     }
     
-    public func makeGet<T: Codable>() -> GetRequestBuilder<T> {
-        return GetRequestBuilder<T>()
+    public func get<T: Codable>(_ getRequest: GetRequest<T>, completionHandler: @escaping (_ result: Result<GetResponse<T>, Error>) -> Void) -> Void {
+        return self.execute(request: getRequest, options: .default, completionHandler: completionHandler)
     }
     
-    public func makeIndex<T: Codable>() -> IndexRequestBuilder<T> {
-        return IndexRequestBuilder<T>()
+    public func index<T: Codable>(_ indexRequest: IndexRequest<T>, completionHandler: @escaping (_ result: Result<IndexResponse, Error>) -> Void) -> Void {
+        return self.execute(request: indexRequest, options: .default, completionHandler: completionHandler)
     }
     
-    public func makeDelete() -> DeleteRequestBuilder {
-        return DeleteRequestBuilder()
+    public func delete(_ deleteRequest: DeleteRequest, completionHandler: @escaping (_ result: Result<DeleteResponse, Error>) -> Void) -> Void {
+        return self.execute(request: deleteRequest, options: .default, completionHandler: completionHandler)
     }
     
-    public func makeUpdate() -> UpdateRequestBuilder {
-        return UpdateRequestBuilder()
-    }
-
-    public func makeSearch<T: Codable>() -> SearchRequestBuilder<T> {
-        return SearchRequestBuilder<T>()
+    public func update(_ updateRequest: UpdateRequest, completionHandler: @escaping (_ result: Result<UpdateResponse, Error>) -> Void) -> Void {
+        return self.execute(request: updateRequest, options: .default, completionHandler: completionHandler)
     }
     
-}
-
-extension RestClient {
-    
-    public func makeGet<T: Codable>(closure: (GetRequestBuilder<T>) -> Void) -> GetRequestBuilder<T> {
-        return GetRequestBuilder<T>(builderClosure: closure)
-    }
-    
-    public func makeIndex<T: Codable>(closure: (IndexRequestBuilder<T>) -> Void) -> IndexRequestBuilder<T> {
-        return IndexRequestBuilder<T>(builderClosure: closure)
-    }
-    
-    public func makeSearch<T: Codable>(closure: (SearchRequestBuilder<T>) -> Void) -> SearchRequestBuilder<T> {
-        return SearchRequestBuilder<T>(builderClosure: closure)
+    public func search<T: Codable>(_ serachRequest: SearchRequest<T>, completionHandler: @escaping (_ result: Result<SearchResponse<T>, Error>) -> Void) -> Void {
+        return self.execute(request: serachRequest, options: .default, completionHandler: completionHandler)
     }
     
 }
 
-extension RestClient {
+extension ElasticClient {
     
-    public func indices() -> IndicesClient {
-        return self.indicesClient!
+    public func get<T: Codable>(_ getRequest: GetRequest<T>, with options: RequestOptions, completionHandler: @escaping (_ result: Result<GetResponse<T>, Error>) -> Void) -> Void {
+        return self.execute(request: getRequest, options: options, completionHandler: completionHandler)
     }
     
-    public func cluster() -> ClusterClient {
-        return self.clusterClient!
+    public func index<T: Codable>(_ indexRequest: IndexRequest<T>, with options: RequestOptions, completionHandler: @escaping (_ result: Result<IndexResponse, Error>) -> Void) -> Void {
+        return self.execute(request: indexRequest, options: options, completionHandler: completionHandler)
+    }
+    
+    public func delete(_ deleteRequest: DeleteRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<DeleteResponse, Error>) -> Void) -> Void {
+        return self.execute(request: deleteRequest, options: options, completionHandler: completionHandler)
+    }
+    
+    public func update(_ updateRequest: UpdateRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<UpdateResponse, Error>) -> Void) -> Void {
+        return self.execute(request: updateRequest, options: options, completionHandler: completionHandler)
+    }
+    
+    public func search<T: Codable>(_ serachRequest: SearchRequest<T>, with options: RequestOptions, completionHandler: @escaping (_ result: Result<SearchResponse<T>, Error>) -> Void) -> Void {
+        return self.execute(request: serachRequest, options: options, completionHandler: completionHandler)
+    }
+    
+}
+
+extension ElasticClient {
+    
+    public var indices: IndicesClient {
+        get {
+            return self.indicesClient!
+        }
+    }
+    
+    public var cluster: ClusterClient {
+        get {
+            return self.clusterClient!
+        }
     }
 }
 
+//MARK:- Settings
 
+/// Elasticsearch ElasticClient Settings
 public class Settings {
     
+    /// elasticsearch nodes
     public let hosts: [Host]
+    /// elasticsearch credentials
     public let credentials: ClientCredential?
+    /// configuration that is passed to http adaptor
     public let adaptorConfig: HTTPAdaptorConfiguration
+    /// http client adaptor Type
     public let clientAdaptor: HTTPClientAdaptor.Type
+    public let serializer: Serializer
     
+    /// convenience initializer for localhost/development use
     private convenience init(forHost host: String = "http://localhost:9200",  withCredentials credentials: ClientCredential? = nil, adaptor clientAdaptor: HTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self) {
         self.init(forHost: Host(string: host)!, withCredentials: credentials)
     }
     
-    public init(forHost host: Host, withCredentials credentials: ClientCredential? = nil, adaptor clientAdaptor: HTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self, adaptorConfig: HTTPAdaptorConfiguration = .`default`) {
+    public init(forHost host: Host, withCredentials credentials: ClientCredential? = nil, adaptor clientAdaptor: HTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self, adaptorConfig: HTTPAdaptorConfiguration = .`default`, serializer: Serializer = DefaultSerializer()) {
         hosts = [host]
         self.credentials = credentials
         self.adaptorConfig = adaptorConfig
         self.clientAdaptor = clientAdaptor
+        self.serializer = serializer
     }
     
-    public init(forHost host: String, withCredentials credentials: ClientCredential? = nil, adaptor clientAdaptor: HTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self, adaptorConfig: HTTPAdaptorConfiguration = .`default`) {
+    public init(forHost host: String, withCredentials credentials: ClientCredential? = nil, adaptor clientAdaptor: HTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self, adaptorConfig: HTTPAdaptorConfiguration = .`default`, serializer: Serializer = DefaultSerializer()) {
         hosts = [URL(string: host)!]
         self.credentials = credentials
         self.adaptorConfig = adaptorConfig
         self.clientAdaptor = clientAdaptor
+        self.serializer = serializer
     }
     
-    public init(forHosts hosts: [Host], withCredentials credentials: ClientCredential? = nil, adaptor clientAdaptor: HTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self, adaptorConfig: HTTPAdaptorConfiguration = .`default`) {
+    public init(forHosts hosts: [Host], withCredentials credentials: ClientCredential? = nil, adaptor clientAdaptor: HTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self, adaptorConfig: HTTPAdaptorConfiguration = .`default`, serializer: Serializer = DefaultSerializer()) {
         self.hosts = hosts
         self.credentials = credentials
         self.adaptorConfig = adaptorConfig
         self.clientAdaptor = clientAdaptor
+        self.serializer = serializer
     }
     
-    public init(forHosts hosts: [String], withCredentials credentials: ClientCredential? = nil, adaptor clientAdaptor: HTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self, adaptorConfig: HTTPAdaptorConfiguration = .`default`) {
+    public init(forHosts hosts: [String], withCredentials credentials: ClientCredential? = nil, adaptor clientAdaptor: HTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self, adaptorConfig: HTTPAdaptorConfiguration = .`default`, serializer: Serializer = DefaultSerializer()) {
         self.hosts = hosts.map({ return URL(string: $0)! })
         self.credentials = credentials
         self.adaptorConfig = adaptorConfig
         self.clientAdaptor = clientAdaptor
+        self.serializer = serializer
     }
     
+    /// default settings for ElasticClient
     public static var `default`: Settings {
         get {
             #if os(iOS) || os(tvOS) || os(watchOS)
@@ -203,37 +234,39 @@ public class SSLConfiguration {
 }
 
 
-public class ESClient {
+public extension ElasticClient {
     
-    let transport: Transport
-    
-    private let logger =  Logger(label: "org.pksprojects.ElasticSwift.ESClient")
-    
-    private var credentials: ClientCredential?
-    
-    init(hosts: [Host], credentials: ClientCredential? = nil, clienAdaptor: HTTPClientAdaptor.Type, adaptorConfig: HTTPAdaptorConfiguration) {
-        self.transport = Transport(forHosts: hosts, credentials: credentials, clientAdaptor: clienAdaptor, adaptorConfig: adaptorConfig)
-        self.credentials = credentials
+    final func execute<T: Request>(request: T, options: RequestOptions = .`default`, completionHandler: @escaping (_ result: Result<HTTPResponse, Error>) -> Void) -> Void {
+        
+        do {
+            let httpRequest = try createHTTPRequest(for: request, with: options)
+            self.transport.performRequest(request: httpRequest, callback: completionHandler)
+        } catch {
+            let wrappedError = HTTPRequestCreationError(message: "Unable to create HTTPRequest from \(request)", error: error, request: request)
+            return completionHandler(.failure(wrappedError))
+        }
+        
     }
     
-    public final func execute<T: Request>(request: T, options: RequestOptions = .`default`, completionHandler: @escaping (_ response: HTTPResponse?, _ error: Error?) -> Void) -> Void {
+    final func execute<T: Request>(request: T, options: RequestOptions = .`default`, completionHandler: @escaping (_ result: Result<T.ResponseType, Error>) -> Void) -> Void {
         
-        let httpRequest = createHTTPRequest(for: request, with: options)
-        
-        self.transport.performRequest(request: httpRequest, callback: completionHandler)
+        do {
+            let httpRequest = try createHTTPRequest(for: request, with: options)
+            self.transport.performRequest(request: httpRequest, callback: responseConverter(request: request, callback: completionHandler))
+        } catch {
+            let wrappedError = HTTPRequestCreationError(message: "Unable to create HTTPRequest from \(request)", error: error, request: request)
+            return completionHandler(.failure(wrappedError))
+        }
     }
     
-    
-    public final func execute<T: Request>(request: T, options: RequestOptions = .`default`, completionHandler: @escaping (_ response: T.ResponseType?, _ error: Error?) -> Void) -> Void {
+    func responseConverter<T: Request>(request: T, callback: @escaping (_ result: Result<T.ResponseType, Error>) -> Void) -> ((_ result: Result<HTTPResponse, Error>) -> Void) {
+        return { result -> Void in
         
-        let httpRequest = createHTTPRequest(for: request, with: options)
-        
-        self.transport.performRequest(request: httpRequest) { response, error in
+        switch result {
+        case .failure(let error):
+            return callback(.failure(error))
+        case .success(let response):
             
-            guard error == nil else {
-                return completionHandler(nil, error)
-            }
-            if let response = response {
                 var data: Data?
                 if let bytes = response.body!.readBytes(length: response.body!.readableBytes) {
                     data = Data(bytes)
@@ -241,36 +274,36 @@ public class ESClient {
                 
                 guard (!response.status.isError()) else {
                     do {
-                        let decodedError: ElasticsearchError? = try Serializers.decode(data: data!)
+                        let decodedError: ElasticsearchError? = try self.serializer.decode(data: data!)
                         if let decoded = decodedError {
-                            return completionHandler(nil, decoded)
+                            return callback(.failure(decoded))
                         }
                     } catch {
-                        return completionHandler(nil, error)
+                        return callback(.failure(error))
                     }
                     let error = UnsupportedResponseError(response: response)
-                    return completionHandler(nil, error)
+                    return callback(.failure(error))
                 }
                 do {
-                    let decodedResponse: T.ResponseType? = try Serializers.decode(data: data!)
+                    let decodedResponse: T.ResponseType? = try self.serializer.decode(data: data!)
                     if let decoded = decodedResponse {
-                        return completionHandler(decoded, nil)
+                        return callback(.success(decoded))
                     }
                 } catch {
-                    return completionHandler(nil, error)
+                    return callback(.failure(error))
                 }
                 let error = UnsupportedResponseError(response: response)
-                return completionHandler(nil, error)
+                return callback(.failure(error))
             }
+        
         }
     }
     
-    public final func execute(request: HTTPRequest, completionHandler: @escaping (_ response: HTTPResponse?, _ error: Error?) -> Void) -> Void {
+    final func execute(request: HTTPRequest, completionHandler: @escaping (_ result: Result<HTTPResponse, Error>) -> Void) -> Void {
         return self.transport.performRequest(request: request, callback: completionHandler)
     }
     
-    
-    private func createHTTPRequest<T: Request>(for request: T, with options: RequestOptions) -> HTTPRequest {
+    private func createHTTPRequest<T: Request>(for request: T, with options: RequestOptions) throws -> HTTPRequest {
         var headers = HTTPHeaders()
         headers.add(contentsOf: defaultHeaders())
         headers.add(contentsOf: authHeader())
@@ -282,7 +315,7 @@ public class ESClient {
         params.append(contentsOf: options.queryParams)
         
         
-        return HTTPRequest(path: request.endPoint, method: request.method, queryParams: params, headers: headers, body: request.body)
+        return HTTPRequest(path: request.endPoint, method: request.method, queryParams: params, headers: headers, body: try request.data(self.serializer))
     }
     
     private func defaultHeaders() -> HTTPHeaders {

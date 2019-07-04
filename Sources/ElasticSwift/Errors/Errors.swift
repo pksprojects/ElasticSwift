@@ -8,6 +8,10 @@
 
 import Foundation
 
+//MARK:- ERRORS
+
+//MARK:- Elasticsearch Default Error
+
 public class ElasticsearchError: Error, Codable {
     
     var error: ElasticError?
@@ -52,6 +56,20 @@ public class UnsupportedResponseError: Error {
         get {
             return "\(msg): \(response)"
         }
+    }
+    
+}
+
+public class HTTPRequestCreationError: Error {
+    
+    public let error: Error
+    public let message: String
+    public let request: Any
+    
+    public init(message: String, error: Error, request: Any) {
+        self.error = error
+        self.message = message
+        self.request = request
     }
     
 }

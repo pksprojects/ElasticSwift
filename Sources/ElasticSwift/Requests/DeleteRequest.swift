@@ -10,6 +10,8 @@ import Foundation
 import Logging
 import NIOHTTP1
 
+//MARK:- Delete Request Builder
+
 public class DeleteRequestBuilder: RequestBuilder {
     
     public typealias BuilderClosure = (DeleteRequestBuilder) -> Void
@@ -53,6 +55,8 @@ public class DeleteRequestBuilder: RequestBuilder {
     
 }
 
+//MARK:- Delete Request
+
 public class DeleteRequest: Request {
     
     public var headers: HTTPHeaders = HTTPHeaders()
@@ -85,37 +89,12 @@ public class DeleteRequest: Request {
         }
     }
     
-    public var body: Data {
-        get {
-            return Data()
-        }
-    }
-    
     func makeEndPoint() -> String {
         return self.index + "/" + self.type + "/" + self.id
     }
     
-}
-
-public struct DeleteResponse: Codable {
-    
-    public let shards: Shards?
-    public let index: String?
-    public let type: String?
-    public let id: String?
-    public let version: Int?
-    public let seqNumber: Int?
-    public let primaryTerm: Int?
-    public let result: String?
-    
-    enum CodingKeys: String, CodingKey {
-        case shards = "_shards"
-        case index = "_index"
-        case type = "_type"
-        case id = "_id"
-        case version = "_version"
-        case seqNumber = "_seq_no"
-        case primaryTerm = "_primary_term"
-        case result
+    public func data(_ serializer: Serializer) throws -> Data {
+        return Data()
     }
+    
 }
