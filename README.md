@@ -36,7 +36,7 @@ platform :ios, '10.0'
 use_frameworks!
 
 target '<Your Target Name>' do
-    pod 'ElasticSwift', '~> 1.0.0-alpha.6'
+    pod 'ElasticSwift', '~> 1.0.0-alpha.7'
 end
 ```
 
@@ -54,7 +54,7 @@ Once you have your Swift package set up, adding ElasticSwift as a dependency is 
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/pksprojects/ElasticSwift.git", "1.0.0-alpha.6")
+    .package(url: "https://github.com/pksprojects/ElasticSwift.git", "1.0.0-alpha.7")
 ]
 ```
 
