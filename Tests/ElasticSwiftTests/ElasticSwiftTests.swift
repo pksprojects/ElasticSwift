@@ -329,6 +329,70 @@ class ElasticSwiftTests: XCTestCase {
         self.client?.execute(request: request1, completionHandler: handler1)
         waitForExpectations(timeout: 10)
     }
+    
+    func test_10_IndexExists() throws {
+        let e = expectation(description: "execution complete")
+        
+        let existsRequest = IndexExistsRequest(name: "test")
+        
+        let getIndexRequest = GetIndexRequest(name: "test")
+        
+        func existsFalseHander(_ result: Result<IndexExistsResponse, Error>) -> Void {
+            switch result {
+            case .failure(let error):
+                print("Error: ", error)
+                XCTAssert(false, error.localizedDescription)
+            case .success(let response):
+                print("Response: ", response)
+                XCTAssert(!response.exists, "IndexExists: \(response.exists)")
+            }
+            e.fulfill()
+        }
+        
+        
+        func handler(_ result: Result<AcknowledgedResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                print("Error", error)
+                XCTAssert(false, error.localizedDescription)
+            case .success(let response):
+                print("Response: ", response)
+                XCTAssert(response.acknowledged, "Acknowleged: \(response.acknowledged)")
+            }
+            self.client?.indices.exists(getIndexRequest, completionHandler: existsFalseHander)
+        }
+        let deleteRequest = DeleteIndexRequest(name: "test")
+        
+        func existsTrueHander(_ result: Result<IndexExistsResponse, Error>) -> Void {
+            switch result {
+            case .failure(let error):
+                print("Error: ", error)
+                XCTAssert(false, error.localizedDescription)
+            case .success(let response):
+                print("Response: ", response)
+                XCTAssert(response.exists, "IndexExists: \(response.exists)")
+            }
+            self.client?.indices.delete(deleteRequest, completionHandler: handler)
+        }
+        
+        
+        /// make sure index exists
+        func createIndexRequestHandler(_ result: Result<CreateIndexResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                print("Error", error)
+            case .success(let response):
+                print("Response: ", response)
+            }
+            self.client?.indices.exists(existsRequest, completionHandler: existsTrueHander)
+        }
+        
+        let createIndexRequest = CreateIndexRequest(name: "test")
+        self.client?.indices.create(createIndexRequest, completionHandler: createIndexRequestHandler)
+        waitForExpectations(timeout: 10)
+    }
 
     
 //    static var allTests = [

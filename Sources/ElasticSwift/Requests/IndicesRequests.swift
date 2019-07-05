@@ -85,6 +85,40 @@ public class GetIndexRequestBuilder: RequestBuilder {
 
 // MARK: - Requests
 
+
+//MARK:- Index Exists Request
+
+public class IndexExistsRequest: Request {
+    public var headers: HTTPHeaders = HTTPHeaders()
+    
+    public var queryParams: [URLQueryItem] = []
+    
+    public typealias ResponseType = IndexExistsResponse
+    
+    public let name: String
+    
+    public init(name: String) {
+        self.name = name
+    }
+    
+    public var method: HTTPMethod {
+        get {
+            return .HEAD
+        }
+    }
+    
+    public var endPoint: String {
+        get {
+            return self.name
+        }
+    }
+    
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        return .failure(.noBodyForRequest)
+    }
+}
+
+
 //MARK:- Create Index Reqeust
 
 public class CreateIndexRequest: Request {

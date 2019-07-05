@@ -27,6 +27,14 @@ public class IndicesClient {
         self.client.execute(request: getReqeust, options: .default, completionHandler: completionHandler)
     }
     
+    public func exists(_ getReqeust: GetIndexRequest, completionHandler: @escaping (_ result: Result<IndexExistsResponse, Error>) -> Void) -> Void {
+        self.client.execute(request: getReqeust, options: .default, converter: ResponseConverters.indexExistsResponseConverter, completionHandler: completionHandler)
+    }
+    
+    public func exists(_ existsReqeust: IndexExistsRequest, completionHandler: @escaping (_ result: Result<IndexExistsResponse, Error>) -> Void) -> Void {
+        self.client.execute(request: existsReqeust, options: .default, converter: ResponseConverters.indexExistsResponseConverter, completionHandler: completionHandler)
+    }
+    
     public func delete(_ deleteReqeust: DeleteIndexRequest, completionHandler: @escaping (_ result: Result<AcknowledgedResponse, Error>) -> Void) -> Void {
         self.client.execute(request: deleteReqeust, options: .default, completionHandler: completionHandler)
     }
@@ -49,6 +57,14 @@ extension IndicesClient {
     
     public func get(_ getReqeust: GetIndexRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<GetIndexResponse, Error>) -> Void) -> Void {
         self.client.execute(request: getReqeust, options: options, completionHandler: completionHandler)
+    }
+    
+    public func exists(_ getReqeust: GetIndexRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<IndexExistsResponse, Error>) -> Void) -> Void {
+        self.client.execute(request: getReqeust, options: options, converter: ResponseConverters.indexExistsResponseConverter, completionHandler: completionHandler)
+    }
+    
+    public func exists(_ existsReqeust: IndexExistsRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<IndexExistsResponse, Error>) -> Void) -> Void {
+        self.client.execute(request: existsReqeust, options: options, converter: ResponseConverters.indexExistsResponseConverter, completionHandler: completionHandler)
     }
     
     public func delete(_ deleteReqeust: DeleteIndexRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<AcknowledgedResponse, Error>) -> Void) -> Void {

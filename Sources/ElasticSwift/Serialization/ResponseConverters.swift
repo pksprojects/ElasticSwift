@@ -53,4 +53,38 @@ public class ResponseConverters {
     }
 
     
+    public static func indexExistsResponseConverter(serializer: Serializer, callback: @escaping ResultCallback<IndexExistsResponse>) -> HTTPResponseHandler {
+        return { result -> Void in
+            
+            switch result {
+            case .failure(let error):
+                return callback(.failure(error))
+            case .success(let response):
+                
+                guard (response.status.is2xxSuccessful() || response.status == .notFound) else {
+                    if var body = response.body, let bytes = body.readBytes(length: body.readableBytes) {
+                        let data = Data(bytes)
+                        let decodedError: Result<ElasticsearchError, Error> = serializer.decode(data: data)
+                        switch decodedError {
+                        case .failure(let error):
+                            let converterError = ResponseConverterError(message: "Error while converting error response", error: error, response: response)
+                            return callback(.failure(converterError))
+                        case .success(let elasticError):
+                            return callback(.failure(elasticError))
+                        }
+                    }
+                    let error =  UnsupportedResponseError(msg: "Unknown status code \(response.status) in indexExistsResponseConverter", response: response)
+                    return callback(.failure(error))
+                }
+                
+                if response.status.is2xxSuccessful() {
+                    return callback(.success(IndexExistsResponse(true)))
+                } else if response.status == .notFound {
+                    return callback(.success(IndexExistsResponse(false)))
+                }
+            }
+            
+        }
+    }
+    
 }
