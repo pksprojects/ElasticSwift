@@ -15,16 +15,15 @@ public class ElasticClient {
     private let logger = Logger(label: "org.pksprojects.ElasticSwfit.RestClient")
     
     let transport: Transport
-    let serializer: Serializer
     
-    private var credentials: ClientCredential?
+    private let _settings: Settings
     
     private var clusterClient: ClusterClient?
     private var indicesClient: IndicesClient?
     
     public init(settings: Settings) {
         self.transport = Transport(forHosts: settings.hosts, credentials: settings.credentials, clientAdaptor: settings.clientAdaptor, adaptorConfig: settings.adaptorConfig)
-        self.serializer = settings.serializer
+        self._settings = settings
         self.indicesClient = IndicesClient(withClient: self)
         self.clusterClient = ClusterClient(withClient: self)
     }
@@ -32,6 +31,22 @@ public class ElasticClient {
     public convenience init() {
         self.init(settings: Settings.default)
     }
+    
+    private var credentials: ClientCredential? {
+        get {
+            return self._settings.credentials
+        }
+    }
+    
+    private var serializer: Serializer {
+        get {
+            return _settings.serializer
+        }
+    }
+    
+}
+
+extension ElasticClient {
     
     public func get<T: Codable>(_ getRequest: GetRequest<T>, completionHandler: @escaping (_ result: Result<GetResponse<T>, Error>) -> Void) -> Void {
         return self.execute(request: getRequest, options: .default, completionHandler: completionHandler)
@@ -52,7 +67,6 @@ public class ElasticClient {
     public func search<T: Codable>(_ serachRequest: SearchRequest<T>, completionHandler: @escaping (_ result: Result<SearchResponse<T>, Error>) -> Void) -> Void {
         return self.execute(request: serachRequest, options: .default, completionHandler: completionHandler)
     }
-    
 }
 
 extension ElasticClient {
