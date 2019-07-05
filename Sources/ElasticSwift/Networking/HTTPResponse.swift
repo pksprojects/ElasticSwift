@@ -40,7 +40,7 @@ extension HTTPResponseStatus {
     }
     
     public func is2xxSuccessful() -> Bool {
-        return self.code >= 100 && self.code < 200
+        return self.code >= 200 && self.code < 300
     }
     
     public func is3xxRedirection() -> Bool {
