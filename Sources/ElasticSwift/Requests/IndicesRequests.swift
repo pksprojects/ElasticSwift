@@ -116,8 +116,8 @@ public class CreateIndexRequest: Request {
         }
     }
     
-    public func makeBody(_ serializer: Serializer) -> Result<Data, Error> {
-        return .success(Data())
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        return .failure(.noBodyForRequest)
     }
 }
 
@@ -152,8 +152,8 @@ public class GetIndexRequest: Request {
         }
     }
     
-    public func makeBody(_ serializer: Serializer) -> Result<Data, Error> {
-        return .success(Data())
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        return .failure(.noBodyForRequest)
     }
     
 }
@@ -189,8 +189,8 @@ public class DeleteIndexRequest: Request {
         }
     }
     
-    public func makeBody(_ serializer: Serializer) -> Result<Data, Error> {
-        return .success(Data())
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        return .failure(.noBodyForRequest)
     }
 }
 
@@ -231,8 +231,8 @@ public class OpenIndexRequest: Request {
         }
     }
     
-    public func makeBody(_ serializer: Serializer) -> Result<Data, Error> {
-        return .success(Data())
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        return .failure(.noBodyForRequest)
     }
 }
 
@@ -276,7 +276,7 @@ public class CloseIndexRequest: Request {
         }
     }
     
-    public func makeBody(_ serializer: Serializer) -> Result<Data, Error> {
-        return .success(Data())
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        return .failure(.noBodyForRequest)
     }
 }

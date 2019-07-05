@@ -120,8 +120,8 @@ public class IndexRequest<T: Codable>: Request {
         }
     }
     
-    public func makeBody(_ serializer: Serializer) -> Result<Data, Error> {
-        return serializer.encode(self.source)
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        return serializer.encode(self.source).flatMapError { error in return .failure(.wrapped(error)) }
     }
     
 }

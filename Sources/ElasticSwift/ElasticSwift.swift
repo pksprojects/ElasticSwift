@@ -287,7 +287,12 @@ public extension ElasticClient {
         case .success(let data):
             return .success(HTTPRequest(path: request.endPoint, method: request.method, queryParams: params, headers: headers, body: data))
         case .failure(let error):
-            return .failure(error)
+            switch error {
+            case .noBodyForRequest:
+                return .success(HTTPRequest(path: request.endPoint, method: request.method, queryParams: params, headers: headers, body: nil))
+            default:
+                return .failure(error)
+            }
         }
     }
     

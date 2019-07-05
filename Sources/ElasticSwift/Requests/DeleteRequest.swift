@@ -100,8 +100,8 @@ public class DeleteRequest: Request {
         return self.index + "/" + self.type + "/" + self.id
     }
     
-    public func makeBody(_ serializer: Serializer) -> Result<Data, Error> {
-        return .success(Data())
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        return .failure(.noBodyForRequest)
     }
     
 }

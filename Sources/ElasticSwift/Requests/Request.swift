@@ -24,7 +24,7 @@ public protocol Request {
     
     var endPoint: String { get }
     
-    func makeBody(_ serializer: Serializer) -> Result<Data, Error>
+    func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError>
     
 }
 

@@ -140,7 +140,7 @@ public class SearchRequest<T: Codable>: Request {
         return path
     }
     
-    public func makeBody(_ serializer: Serializer) -> Result<Data, Error> {
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
         
         var dic = [String: Any]()
         if let query = self.query {
@@ -168,7 +168,7 @@ public class SearchRequest<T: Codable>: Request {
             let data = try JSONSerialization.data(withJSONObject: dic, options: [])
             return .success(data)
         } catch {
-            return .failure(error)
+            return .failure(.wrapped(error))
         }
     }
 }
