@@ -23,29 +23,30 @@ public class ResponseConverters {
                 return callback(.failure(error))
             case .success(let response):
                 
-                var data: Data?
-                if let bytes = response.body!.readBytes(length: response.body!.readableBytes) {
-                    data = Data(bytes)
-                }
-                
-                guard (!response.status.isError()) else {
-                    let decodedError: Result<ElasticsearchError, Error> = serializer.decode(data: data!)
-                    switch decodedError {
+                if var body = response.body, let bytes = body.readBytes(length: body.readableBytes) {
+                    let data = Data(bytes)
+                    guard (!response.status.isError()) else {
+                        let decodedError: Result<ElasticsearchError, Error> = serializer.decode(data: data)
+                        switch decodedError {
                         case .failure(let error):
                             let converterError = ResponseConverterError(message: "Error while converting error response", error: error, response: response)
                             return callback(.failure(converterError))
                         case .success(let elasticError):
                             return callback(.failure(elasticError))
+                        }
                     }
-                }
-                let decodedResponse: Result<T, Error> = serializer.decode(data: data!)
-                switch decodedResponse {
+                    let decodedResponse: Result<T, Error> = serializer.decode(data: data)
+                    switch decodedResponse {
                     case .failure(let error):
                         let converterError = ResponseConverterError(message: "Error while converting response", error: error, response: response)
                         return callback(.failure(converterError))
                     case .success(let decoded):
                         return callback(.success(decoded))
+                    }
                 }
+                let error =  UnsupportedResponseError(msg: "Unknown response \(response) in defaultConverter", response: response)
+                return callback(.failure(error))
+                
             }
             
         }
