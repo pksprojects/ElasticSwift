@@ -16,40 +16,44 @@ public class RestClient: ESClient {
         self.init(settings: Settings.default)
     }
     
-    public func makeGet<T: Codable>() -> GetRequestBuilder<T> {
-        return GetRequestBuilder<T>(withClient: self)
+    public func makeGet<T: Codable>(fromIndex index: String, id: String) -> GetRequestBuilder<T> {
+        return GetRequestBuilder<T>(withClient: self, index: index, id: id)
     }
     
-    public func makeIndex<T: Codable>() -> IndexRequestBuilder<T> {
-        return IndexRequestBuilder<T>(withClient: self)
+    public func makeIndex<T: Codable>(toIndex index: String, source: T) -> IndexRequestBuilder<T> {
+        return IndexRequestBuilder<T>(withClient: self, index: index, source: source)
     }
     
-    public func makeDelete() -> DeleteRequestBuilder {
-        return DeleteRequestBuilder(withClient: self)
+    public func makeDelete(fromIndex index: String, id: String) -> DeleteRequestBuilder {
+        return DeleteRequestBuilder(withClient: self, index: index, id: id)
     }
     
-    public func makeUpdate() -> UpdateRequestBuilder {
-        return UpdateRequestBuilder(withClient: self)
+    public func makeUpdate<T: Codable>(toIndex index: String, id: String) -> UpdateRequestBuilder<T> {
+        return UpdateRequestBuilder(withClient: self, index: index, id: id)
     }
 
-    public func makeSearch<T: Codable>() -> SearchRequestBuilder<T> {
-        return SearchRequestBuilder<T>(withClient: self)
+    public func makeSearch<T: Codable>(fromIndex index: String) -> SearchRequestBuilder<T> {
+        return SearchRequestBuilder<T>(withClient: self, index: index)
+    }
+    
+    public func makeSearch<T: Codable>(fromIndices indices: String...) -> SearchRequestBuilder<T> {
+        return SearchRequestBuilder<T>(withClient: self, indices: indices)
     }
     
 }
 
 extension RestClient {
     
-    public func makeGet<T: Codable>(closure: (GetRequestBuilder<T>) -> Void) -> GetRequestBuilder<T> {
-        return GetRequestBuilder<T>(withClient: self, builderClosure: closure)
+    public func makeGet<T: Codable>(fromIndex index: String, id: String, closure: (GetRequestBuilder<T>) -> Void) -> GetRequestBuilder<T> {
+        return GetRequestBuilder<T>(withClient: self, index: index, id: id, builderClosure: closure)
     }
     
-    public func makeIndex<T: Codable>(closure: (IndexRequestBuilder<T>) -> Void) -> IndexRequestBuilder<T> {
-        return IndexRequestBuilder<T>(withClient: self, builderClosure: closure)
+    public func makeIndex<T: Codable>(toIndex index: String, source: T, closure: (IndexRequestBuilder<T>) -> Void) -> IndexRequestBuilder<T> {
+        return IndexRequestBuilder<T>(withClient: self, index: index, source: source, builderClosure: closure)
     }
     
-    public func makeSearch<T: Codable>(closure: (SearchRequestBuilder<T>) -> Void) -> SearchRequestBuilder<T> {
-        return SearchRequestBuilder<T>(withClient: self, builderClosure: closure)
+    public func makeSearch<T: Codable>(fromIndex index: String, closure: (SearchRequestBuilder<T>) -> Void) -> SearchRequestBuilder<T> {
+        return SearchRequestBuilder<T>(withClient: self, index: index, builderClosure: closure)
     }
     
 }
@@ -129,6 +133,14 @@ public class SSLConfiguration {
     }
 }
 
+struct ESClientConstants {
+    struct Errors  {
+        enum ESClientError : Error {
+            case InvalidBody
+        }
+    }
+}
+
 
 public class ESClient {
     
@@ -138,11 +150,18 @@ public class ESClient {
         self.transport = Transport(forHosts: hosts, credentials: credentials, sslConfig: sslConfig)
     }
     
-    func execute(request: Request, completionHandler: @escaping (_ response: ESResponse) -> Void) -> Void {
+    func execute<R : Request>(request: R, completionHandler: @escaping (_ response: ESResponse) -> ()) throws {
         if request.method == .GET {
-            self.transport.performRequest(method: request.method, endPoint: request.endPoint, params: [], completionHandler: completionHandler)
+            self.transport.performRequest(method: request.method, endPoint: request.endPoint, params: request.parameters, completionHandler: completionHandler)
         } else {
-            self.transport.performRequest(method: request.method, endPoint: request.endPoint, params: [], body: request.body, completionHandler: completionHandler)
+            
+            do {
+                let body = try request.getBody()
+                self.transport.performRequest(method: request.method, endPoint: request.endPoint, params: request.parameters, body: body, completionHandler: completionHandler)
+            } catch {
+                throw ESClientConstants.Errors.ESClientError.InvalidBody
+            }
+            
         }
     }
 }

@@ -9,23 +9,26 @@
 import Foundation
 
 public class GetRequestBuilder<T: Codable>: RequestBuilder {
+
+    public typealias RequestType = GetRequest<T>
     
     typealias BuilderClosure = (GetRequestBuilder) -> Void
     
     var client: ESClient
-    var index: String?
+    var index: String
     var type: String?
-    var id: String?
-    var source: T?
-    var method: HTTPMethod = .GET
-    var completionHandler: ((_ response: GetResponse<T>?, _ error: Error?) -> Void)?
+    var id: String
+
+    public var completionHandler: ((GetResponse<T>?,Error?) -> ())?
     
-    init(withClient client: ESClient) {
+    init(withClient client: ESClient, index : String, id: String) {
         self.client = client
+        self.index = index
+        self.id = id
     }
     
-    convenience init(withClient client: ESClient, builderClosure: BuilderClosure) {
-        self.init(withClient: client)
+    convenience init(withClient client: ESClient, index : String, id: String, builderClosure: BuilderClosure) {
+        self.init(withClient: client, index: index, id: id)
         builderClosure(self)
     }
     
@@ -45,12 +48,12 @@ public class GetRequestBuilder<T: Codable>: RequestBuilder {
         return self
     }
     
-    public func set(completionHandler: @escaping (_ response: GetResponse<T>?, _ error: Error?) -> Void) -> Self {
+    public func set(completionHandler: @escaping (GetResponse<T>?,Error?) -> ()) -> Self {
         self.completionHandler = completionHandler
         return self
     }
     
-    public func build() -> Request {
+    public func build() -> GetRequest<T> {
         return GetRequest<T>(withBuilder: self)
     }
     
@@ -58,59 +61,42 @@ public class GetRequestBuilder<T: Codable>: RequestBuilder {
 }
 
 public class GetRequest<T: Codable>: Request {
+
+    public typealias ResponseType = GetResponse
     
-    let client: ESClient
-    let completionHandler: ((_ response: GetResponse<T>?, _ error: Error?) -> Void)
-    var index: String?
+    public let completionHandler: ((GetResponse<T>?,Error?) -> ())?
+    
+    public let client: ESClient
+    var index: String
     var type: String?
-    var id: String?
-    
-    public var method: HTTPMethod = .GET
+    let id: String
     
     init(withBuilder builder: GetRequestBuilder<T>) {
         self.client = builder.client
-        self.completionHandler = builder.completionHandler!
         self.index = builder.index
-        self.type = builder.type
         self.id =  builder.id
+        
+        self.type = builder.type
+        self.completionHandler = builder.completionHandler
     }
     
-    public func execute() -> Void {
-        self.client.execute(request: self, completionHandler: responseHandler)
-    }
-    
-    func makeEndPoint() -> String {
-        return self.index! + "/" + self.type! + "/" + self.id!
-    }
+    public var method: HTTPMethod = .GET
     
     public var endPoint: String {
         get {
-            return self.makeEndPoint()
-        }
-    }
-    
-    public var body: Data {
-        get {
-            return Data()
-        }
-    }
-    
-    func responseHandler(_ response: ESResponse) -> Void {
-        if let error = response.error {
-            return completionHandler(nil, error)
-        }
-        do {
-            let decoded: GetResponse<T>? = try Serializers.decode(data: response.data!)
-            if let decoded = decoded {
-                return completionHandler(decoded, nil)
+            var result = self.index + "/"
+            
+            if let type = self.type {
+                result += type + "/"
             } else {
-                let decodedError: ElasticsearchError? = try Serializers.decode(data: response.data!)
-                if let decoded = decodedError {
-                    return completionHandler(nil, decoded)
-                }
+                result += "_doc/"
             }
-        } catch {
-            return completionHandler(nil, error)
+            
+            result += self.id
+            
+            return result
         }
     }
+    
+
 }
