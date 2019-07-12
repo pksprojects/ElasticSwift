@@ -223,7 +223,7 @@ Creating simple search request.
 
 ```swift
 
-func handler(_ response: SearchResponse<MyClass>?, _ error: Error?) -> Void {
+func handler(_ result: Result<SearchResponse<Message>, Error>) -> Void {
     switch result {
         case .failure(let error):
             print("Error", error)
@@ -240,14 +240,14 @@ let sort =  SortBuilders.fieldSort("msg") // use "msg.keyword" as field name in 
     .set(order: .asc)
     .build()
 
-let request = ry SearchRequestBuilder() { builder in
+let request = try SearchRequestBuilder() { builder in
             builder.set(indices: "indexName")
                 .set(types: "type")
                 .set(query: queryBuilder.query)
                 .set(sort: sort)
         } .build()
 
-client.search(deleteRequest, completionHandler: deleteHandler)
+client.search(request, completionHandler: handler)
 
 ```
 
