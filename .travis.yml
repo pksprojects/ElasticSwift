@@ -15,5 +15,5 @@ script:
   - swift build
   - swift test
 after_success:
-  - xcodebuild -scheme ElasticSwift-Package build test
+  - xcodebuild -quiet -scheme ElasticSwift-Package build test
   - bash <(curl -s https://codecov.io/bash)
