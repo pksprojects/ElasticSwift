@@ -1,4 +1,4 @@
-language: objective-c
+language: swift
 osx_image: xcode10.2
 xcode_project: ElasticSwift.xcodeproj
 xcode_scheme: ElasticSwiftTests
