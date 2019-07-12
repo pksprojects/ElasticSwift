@@ -10,7 +10,9 @@ before_install:
 before_script:
   - sleep 10
 env:
-  - TOOLCHAINS=swift
+  secure: lLg4DzQjwjHo92aDSw7TWFfofK2TS/qlG6yzLUYD+/SfLCLzT4CItdEJM9HZR4axPPF+zxG57wKOd6R9XNYbOGibdpeMPSvD1ZqMzbJ1SfqzL2mSy5+/FQANElwSJcscd7Aje3yTRP/fdfgR0BBmre/5y7mg9vqPvvJTJjfRNh64T0/talFN8qCul54409KfHF4YwD3FA36ku5/rIEs2iuJ7J4Z58gQ7OK/RiUkBWP/MWUwKcH9mdmvhEW2va2hgWTIyzVUaiqxiCN61srQyrUn09We22d2u5pdBcZSCiL6FajVmVh0eR31p2J1sCO3SPuxGVo5SQUG5jMzAbvLJOknQm/sarK0acZLa737BEsWG1TnE32m0jKZDZeHuvUUeG363mOZ8SxiYbqbyeDzfjMilGYMvnk6gAje2rjWpOcFC6wVi+qvQZtIabKpZXtiGomIun6HsAR+9FilhgZofPgKF6Xg1uLaJjUK7oNb9GSJHO3PpI7cxNpioc2PcdMAHQUeQJMTIYAyjg1RUim5AEpgjeNP+o/kIkDyKrXks/XiTvAaQX9h3U+vewK3Dqg8z5jsCitYZNzG+9CjjqqGL4ZeFR8l8SKRihwup8wP91UFo6JjR3N6zqabQQ0/C0b4CAsCaMhyNEHawwd6MdzVcKupaxfN4Rh4AB5lfNT38DTk=
 script:
   - swift build
   - swift test
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
