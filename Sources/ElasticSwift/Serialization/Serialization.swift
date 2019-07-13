@@ -10,9 +10,9 @@ import Foundation
 
 public protocol Serializer {
     
-    func decode<T>(data: Data) -> Result<T, Error> where T: Decodable
+    func decode<T>(data: Data) -> Result<T, DecodingError> where T: Decodable
     
-    func encode<T>(_ value: T) -> Result<Data, Error> where T: Encodable
+    func encode<T>(_ value: T) -> Result<Data, EncodingError> where T: Encodable
     
 }
 
@@ -26,21 +26,21 @@ public class DefaultSerializer: Serializer {
         self.decoder = JSONDecoder()
     }
     
-    public func decode<T>(data: Data) -> Result<T, Error> where T: Decodable {
+    public func decode<T>(data: Data) -> Result<T, DecodingError> where T: Decodable {
         do {
             let decoded = try decoder.decode(T.self, from: data)
             return .success(decoded)
         } catch {
-            return .failure(error)
+            return .failure(DecodingError(T.self, data: data, error: error))
         }
     }
     
-    public func encode<T>(_ value: T) -> Result<Data, Error> where T: Encodable {
+    public func encode<T>(_ value: T) -> Result<Data, EncodingError> where T: Encodable {
         do {
             let encoded = try encoder.encode(value)
             return .success(encoded)
         } catch {
-            return .failure(error)
+            return .failure(EncodingError(value: value, error: error))
         }
     }
 }
