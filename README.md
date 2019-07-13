@@ -1,5 +1,8 @@
 # ElasticSwift
 
+[![Build Status](https://travis-ci.org/pksprojects/ElasticSwift.svg?branch=master)](https://travis-ci.org/pksprojects/ElasticSwift)
+[![codecov](https://codecov.io/gh/pksprojects/ElasticSwift/branch/master/graph/badge.svg)](https://codecov.io/gh/pksprojects/ElasticSwift)
+
 ## Project Status
 
 This project is actively in developement, more information will be made available as project progresses.
