@@ -23,6 +23,7 @@
 /* Begin PBXBuildFile section */
 		062666F722CDA26200E32F15 /* IndicesResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 062666F622CDA26200E32F15 /* IndicesResponse.swift */; };
 		062666F922CDFC7300E32F15 /* ResponseConverters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 062666F822CDFC7300E32F15 /* ResponseConverters.swift */; };
+		06E1332522D997D500C5230F /* SerializationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06E1332422D997D500C5230F /* SerializationTests.swift */; };
 		OBJ_1000 /* cipher.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_275 /* cipher.c */; };
 		OBJ_1001 /* e_aes.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_276 /* e_aes.c */; };
 		OBJ_1002 /* e_des.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_277 /* e_des.c */; };
@@ -1225,6 +1226,7 @@
 /* Begin PBXFileReference section */
 		062666F622CDA26200E32F15 /* IndicesResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndicesResponse.swift; sourceTree = "<group>"; };
 		062666F822CDFC7300E32F15 /* ResponseConverters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseConverters.swift; sourceTree = "<group>"; };
+		06E1332422D997D500C5230F /* SerializationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SerializationTests.swift; sourceTree = "<group>"; };
 		"ElasticSwift::ElasticSwift::Product" /* ElasticSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ElasticSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"ElasticSwift::ElasticSwiftTests::Product" /* ElasticSwiftTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = ElasticSwiftTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		OBJ_100 /* a_mbstr.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = a_mbstr.c; sourceTree = "<group>"; };
@@ -2117,6 +2119,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		06E1332322D9979300C5230F /* Serialization */ = {
+			isa = PBXGroup;
+			children = (
+				06E1332422D997D500C5230F /* SerializationTests.swift */,
+			);
+			path = Serialization;
+			sourceTree = "<group>";
+		};
 		OBJ_122 /* base64 */ = {
 			isa = PBXGroup;
 			children = (
@@ -2916,7 +2926,7 @@
 			path = x509;
 			sourceTree = "<group>";
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -2929,7 +2939,6 @@
 				OBJ_825 /* LICENSE */,
 				OBJ_826 /* README.md */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_502 /* x509v3 */ = {
@@ -3182,6 +3191,7 @@
 		OBJ_60 /* ElasticSwiftTests */ = {
 			isa = PBXGroup;
 			children = (
+				06E1332322D9979300C5230F /* Serialization */,
 				OBJ_61 /* ElasticSwiftTests.swift */,
 				OBJ_62 /* Query */,
 			);
@@ -4366,7 +4376,7 @@
 				English,
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_805 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -4502,6 +4512,7 @@
 			buildActionMask = 0;
 			files = (
 				OBJ_1423 /* ElasticSwiftTests.swift in Sources */,
+				06E1332522D997D500C5230F /* SerializationTests.swift in Sources */,
 				OBJ_1424 /* MatchAllQueryTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

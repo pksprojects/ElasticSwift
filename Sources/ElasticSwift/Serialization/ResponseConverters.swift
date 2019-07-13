@@ -26,7 +26,7 @@ public class ResponseConverters {
                 if var body = response.body, let bytes = body.readBytes(length: body.readableBytes) {
                     let data = Data(bytes)
                     guard (!response.status.isError()) else {
-                        let decodedError: Result<ElasticsearchError, Error> = serializer.decode(data: data)
+                        let decodedError: Result<ElasticsearchError, DecodingError> = serializer.decode(data: data)
                         switch decodedError {
                         case .failure(let error):
                             let converterError = ResponseConverterError(message: "Error while converting error response", error: error, response: response)
@@ -35,7 +35,7 @@ public class ResponseConverters {
                             return callback(.failure(elasticError))
                         }
                     }
-                    let decodedResponse: Result<T, Error> = serializer.decode(data: data)
+                    let decodedResponse: Result<T, DecodingError> = serializer.decode(data: data)
                     switch decodedResponse {
                     case .failure(let error):
                         let converterError = ResponseConverterError(message: "Error while converting response", error: error, response: response)
@@ -64,7 +64,7 @@ public class ResponseConverters {
                 guard (response.status.is2xxSuccessful() || response.status == .notFound) else {
                     if var body = response.body, let bytes = body.readBytes(length: body.readableBytes) {
                         let data = Data(bytes)
-                        let decodedError: Result<ElasticsearchError, Error> = serializer.decode(data: data)
+                        let decodedError: Result<ElasticsearchError, DecodingError> = serializer.decode(data: data)
                         switch decodedError {
                         case .failure(let error):
                             let converterError = ResponseConverterError(message: "Error while converting error response", error: error, response: response)
