@@ -85,6 +85,40 @@ public class GetIndexRequestBuilder: RequestBuilder {
 
 // MARK: - Requests
 
+
+//MARK:- Index Exists Request
+
+public class IndexExistsRequest: Request {
+    public var headers: HTTPHeaders = HTTPHeaders()
+    
+    public var queryParams: [URLQueryItem] = []
+    
+    public typealias ResponseType = IndexExistsResponse
+    
+    public let name: String
+    
+    public init(name: String) {
+        self.name = name
+    }
+    
+    public var method: HTTPMethod {
+        get {
+            return .HEAD
+        }
+    }
+    
+    public var endPoint: String {
+        get {
+            return self.name
+        }
+    }
+    
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        return .failure(.noBodyForRequest)
+    }
+}
+
+
 //MARK:- Create Index Reqeust
 
 public class CreateIndexRequest: Request {
@@ -104,10 +138,6 @@ public class CreateIndexRequest: Request {
         self.name = builder.name!
     }
     
-    func makeEndPoint() -> String {
-        return self.name
-    }
-    
     public var method: HTTPMethod {
         get {
             return .PUT
@@ -116,12 +146,12 @@ public class CreateIndexRequest: Request {
     
     public var endPoint: String {
         get {
-            return makeEndPoint()
+            return self.name
         }
     }
     
-    public func data(_ serializer: Serializer) throws -> Data {
-        return Data()
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        return .failure(.noBodyForRequest)
     }
 }
 
@@ -144,10 +174,6 @@ public class GetIndexRequest: Request {
         self.name = builder.name!
     }
     
-    func makeEndPoint() -> String {
-        return self.name
-    }
-    
     public var method: HTTPMethod {
         get {
             return .GET
@@ -156,12 +182,12 @@ public class GetIndexRequest: Request {
     
     public var endPoint: String {
         get {
-            return makeEndPoint()
+            return self.name
         }
     }
     
-    public func data(_ serializer: Serializer) throws -> Data {
-        return Data()
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        return .failure(.noBodyForRequest)
     }
     
 }
@@ -185,10 +211,6 @@ public class DeleteIndexRequest: Request {
         self.name = builder.name!
     }
     
-    func makeEndPoint() -> String {
-        return self.name
-    }
-    
     public var method: HTTPMethod {
         get {
             return .DELETE
@@ -197,12 +219,12 @@ public class DeleteIndexRequest: Request {
     
     public var endPoint: String {
         get {
-            return makeEndPoint()
+            return self.name
         }
     }
     
-    public func data(_ serializer: Serializer) throws -> Data {
-        return Data()
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        return .failure(.noBodyForRequest)
     }
 }
 
@@ -235,20 +257,16 @@ public class OpenIndexRequest: Request {
     
     public var endPoint: String {
         get {
-            return makeEndPoint()
+            if self.names.count == 1 {
+                return self.names[0] + "/_open"
+            } else {
+                return self.names.joined(separator: ",") + "/_open"
+            }
         }
     }
     
-    func makeEndPoint() -> String {
-        if self.names.count == 1 {
-            return self.names[0] + "/_open"
-        } else {
-            return self.names.joined(separator: ",") + "/_open"
-        }
-    }
-    
-    public func data(_ serializer: Serializer) throws -> Data {
-        return Data()
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        return .failure(.noBodyForRequest)
     }
 }
 
@@ -292,7 +310,7 @@ public class CloseIndexRequest: Request {
         }
     }
     
-    public func data(_ serializer: Serializer) throws -> Data {
-        return Data()
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        return .failure(.noBodyForRequest)
     }
 }

@@ -177,3 +177,16 @@ public struct IndexVersion: Codable {
         self.created = created
     }
 }
+
+
+//MARK:- INDEX Exists Response
+
+public class IndexExistsResponse: Codable {
+    
+    public let exists: Bool
+    
+    public init(_ exists: Bool) {
+        self.exists = exists
+    }
+    
+}

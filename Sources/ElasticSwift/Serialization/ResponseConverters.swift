@@ -23,39 +23,68 @@ public class ResponseConverters {
                 return callback(.failure(error))
             case .success(let response):
                 
-                var data: Data?
-                if let bytes = response.body!.readBytes(length: response.body!.readableBytes) {
-                    data = Data(bytes)
-                }
-                
-                guard (!response.status.isError()) else {
-                    do {
-                        let decodedError: ElasticsearchError? = try serializer.decode(data: data!)
-                        if let decoded = decodedError {
-                            return callback(.failure(decoded))
+                if var body = response.body, let bytes = body.readBytes(length: body.readableBytes) {
+                    let data = Data(bytes)
+                    guard (!response.status.isError()) else {
+                        let decodedError: Result<ElasticsearchError, Error> = serializer.decode(data: data)
+                        switch decodedError {
+                        case .failure(let error):
+                            let converterError = ResponseConverterError(message: "Error while converting error response", error: error, response: response)
+                            return callback(.failure(converterError))
+                        case .success(let elasticError):
+                            return callback(.failure(elasticError))
                         }
-                    } catch {
-                        let converterError = ResponseConverterError(message: "Error while converting error response", error: error, response: response)
-                        return callback(.failure(converterError))
                     }
-                    let error = UnsupportedResponseError(response: response)
-                    return callback(.failure(error))
-                }
-                do {
-                    let decodedResponse: T? = try serializer.decode(data: data!)
-                    if let decoded = decodedResponse {
+                    let decodedResponse: Result<T, Error> = serializer.decode(data: data)
+                    switch decodedResponse {
+                    case .failure(let error):
+                        let converterError = ResponseConverterError(message: "Error while converting response", error: error, response: response)
+                        return callback(.failure(converterError))
+                    case .success(let decoded):
                         return callback(.success(decoded))
                     }
-                } catch {
-                    let converterError = ResponseConverterError(message: "Error while converting response", error: error, response: response)
-                    return callback(.failure(converterError))
                 }
-                let error = UnsupportedResponseError(response: response)
+                let error =  UnsupportedResponseError(msg: "Unknown response \(response) in defaultConverter", response: response)
                 return callback(.failure(error))
+                
             }
             
         }
     }
 
+    
+    public static func indexExistsResponseConverter(serializer: Serializer, callback: @escaping ResultCallback<IndexExistsResponse>) -> HTTPResponseHandler {
+        return { result -> Void in
+            
+            switch result {
+            case .failure(let error):
+                return callback(.failure(error))
+            case .success(let response):
+                
+                guard (response.status.is2xxSuccessful() || response.status == .notFound) else {
+                    if var body = response.body, let bytes = body.readBytes(length: body.readableBytes) {
+                        let data = Data(bytes)
+                        let decodedError: Result<ElasticsearchError, Error> = serializer.decode(data: data)
+                        switch decodedError {
+                        case .failure(let error):
+                            let converterError = ResponseConverterError(message: "Error while converting error response", error: error, response: response)
+                            return callback(.failure(converterError))
+                        case .success(let elasticError):
+                            return callback(.failure(elasticError))
+                        }
+                    }
+                    let error =  UnsupportedResponseError(msg: "Unknown status code \(response.status) in indexExistsResponseConverter", response: response)
+                    return callback(.failure(error))
+                }
+                
+                if response.status.is2xxSuccessful() {
+                    return callback(.success(IndexExistsResponse(true)))
+                } else if response.status == .notFound {
+                    return callback(.success(IndexExistsResponse(false)))
+                }
+            }
+            
+        }
+    }
     
 }

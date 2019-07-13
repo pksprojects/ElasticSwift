@@ -108,3 +108,10 @@ public class RequestCreationError: ESClientError {
     }
     
 }
+
+public enum MakeBodyError: Error {
+    
+    case noBodyForRequest
+    case wrapped(Error)
+    
+}

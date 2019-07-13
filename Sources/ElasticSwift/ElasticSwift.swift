@@ -15,16 +15,15 @@ public class ElasticClient {
     private let logger = Logger(label: "org.pksprojects.ElasticSwfit.RestClient")
     
     let transport: Transport
-    let serializer: Serializer
     
-    private var credentials: ClientCredential?
+    private let _settings: Settings
     
     private var clusterClient: ClusterClient?
     private var indicesClient: IndicesClient?
     
     public init(settings: Settings) {
         self.transport = Transport(forHosts: settings.hosts, credentials: settings.credentials, clientAdaptor: settings.clientAdaptor, adaptorConfig: settings.adaptorConfig)
-        self.serializer = settings.serializer
+        self._settings = settings
         self.indicesClient = IndicesClient(withClient: self)
         self.clusterClient = ClusterClient(withClient: self)
     }
@@ -32,6 +31,22 @@ public class ElasticClient {
     public convenience init() {
         self.init(settings: Settings.default)
     }
+    
+    private var credentials: ClientCredential? {
+        get {
+            return self._settings.credentials
+        }
+    }
+    
+    private var serializer: Serializer {
+        get {
+            return _settings.serializer
+        }
+    }
+    
+}
+
+extension ElasticClient {
     
     public func get<T: Codable>(_ getRequest: GetRequest<T>, completionHandler: @escaping (_ result: Result<GetResponse<T>, Error>) -> Void) -> Void {
         return self.execute(request: getRequest, options: .default, completionHandler: completionHandler)
@@ -52,7 +67,6 @@ public class ElasticClient {
     public func search<T: Codable>(_ serachRequest: SearchRequest<T>, completionHandler: @escaping (_ result: Result<SearchResponse<T>, Error>) -> Void) -> Void {
         return self.execute(request: serachRequest, options: .default, completionHandler: completionHandler)
     }
-    
 }
 
 extension ElasticClient {
@@ -238,12 +252,14 @@ public extension ElasticClient {
     
     final func execute<T: Request>(request: T, options: RequestOptions = .`default`, completionHandler: @escaping (_ result: Result<HTTPResponse, Error>) -> Void) -> Void {
         
-        do {
-            let httpRequest = try createHTTPRequest(for: request, with: options)
-            self.transport.performRequest(request: httpRequest, callback: completionHandler)
-        } catch {
+        
+        let httpRequestResult = createHTTPRequest(for: request, with: options)
+        switch httpRequestResult {
+        case .failure(let error):
             let wrappedError = RequestConverterError(message: "Unable to create HTTPRequest from \(request)", error: error, request: request)
             return completionHandler(.failure(wrappedError))
+        case .success(let httpRequest):
+            self.transport.performRequest(request: httpRequest, callback: completionHandler)
         }
         
     }
@@ -255,12 +271,13 @@ public extension ElasticClient {
     
     final func execute<T: Request, R: Codable>(request: T, options: RequestOptions = .`default`, converter: ResponseConverter<R> = ResponseConverters.defaultConverter, completionHandler: @escaping (_ result: Result<R, Error>) -> Void) -> Void {
         
-        do {
-            let httpRequest = try createHTTPRequest(for: request, with: options)
-            self.transport.performRequest(request: httpRequest, callback: converter(self.serializer, completionHandler))
-        } catch {
+        let httpRequestResult = createHTTPRequest(for: request, with: options)
+        switch httpRequestResult {
+        case .failure(let error):
             let wrappedError = RequestConverterError(message: "Unable to create HTTPRequest from \(request)", error: error, request: request)
             return completionHandler(.failure(wrappedError))
+        case .success(let httpRequest):
+            self.transport.performRequest(request: httpRequest, callback: converter(self.serializer, completionHandler))
         }
     }
     
@@ -268,7 +285,7 @@ public extension ElasticClient {
         return self.transport.performRequest(request: request, callback: completionHandler)
     }
     
-    private func createHTTPRequest<T: Request>(for request: T, with options: RequestOptions) throws -> HTTPRequest {
+    private func createHTTPRequest<T: Request>(for request: T, with options: RequestOptions) -> Result<HTTPRequest, Error> {
         var headers = HTTPHeaders()
         headers.add(contentsOf: defaultHeaders())
         headers.add(contentsOf: authHeader())
@@ -279,8 +296,18 @@ public extension ElasticClient {
         params.append(contentsOf: request.queryParams)
         params.append(contentsOf: options.queryParams)
         
-        
-        return HTTPRequest(path: request.endPoint, method: request.method, queryParams: params, headers: headers, body: try request.data(self.serializer))
+        let bodyResult = request.makeBody(self.serializer)
+        switch bodyResult {
+        case .success(let data):
+            return .success(HTTPRequest(path: request.endPoint, method: request.method, queryParams: params, headers: headers, body: data))
+        case .failure(let error):
+            switch error {
+            case .noBodyForRequest:
+                return .success(HTTPRequest(path: request.endPoint, method: request.method, queryParams: params, headers: headers, body: nil))
+            default:
+                return .failure(error)
+            }
+        }
     }
     
     private func defaultHeaders() -> HTTPHeaders {

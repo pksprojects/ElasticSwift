@@ -85,39 +85,43 @@ public class IndexRequest<T: Codable>: Request {
         }
     }
     
-    var index: String?
+    var index: String
     var type: String?
     var id: String?
-    var source: T?
+    var source: T
     var routing: String?
     var parent: String?
     
-    
-    init(withBuilder builder: IndexRequestBuilder<T>) throws {
-        self.index = builder.index
-        self.type = builder.type
-        self.id = builder.id
-        self.source = builder.source
-        self.routing = builder.routing
-        self.parent = builder.parent
+    public init(index: String, type: String?, id: String?, source: T, routing: String?, parent: String?) {
+        self.index = index
+        self.type = type
+        self.id = id
+        self.source = source
+        self.routing = routing
+        self.parent = parent
     }
     
-    func makeEndPoint() -> String {
-        var _endPoint = self.index! + "/" + self.type!
-        if let id = self.id {
-            _endPoint = _endPoint + "/" + id
-        }
-        return _endPoint
+    convenience init(withBuilder builder: IndexRequestBuilder<T>) throws {
+        
+        self.init(index: builder.index!, type: builder.type, id: builder.id, source: builder.source!, routing: builder.routing, parent: builder.parent)
+
     }
     
     public var endPoint: String {
         get {
-            return makeEndPoint()
+            var _endPoint = self.index
+            if let type = self.type {
+                _endPoint = _endPoint + "/" + type
+            }
+            if let id = self.id {
+                _endPoint = _endPoint + "/" + id
+            }
+            return _endPoint
         }
     }
     
-    public func data(_ serializer: Serializer) throws -> Data {
-        return try serializer.encode(self.source!)!
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        return serializer.encode(self.source).flatMapError { error in return .failure(.wrapped(error)) }
     }
     
 }

@@ -79,8 +79,8 @@ public class UpdateRequest: Request {
         }
     }
     
-    public func data(_ serializer: Serializer) throws -> Data {
-        return Data()
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        return .failure(.noBodyForRequest)
     }
 }
 
