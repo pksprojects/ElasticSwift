@@ -27,6 +27,9 @@ enum QueryParams: String {
     case detailed = "detailed"
     case nodeId = "node_id"
     case parentNode = "parent_node"
+    case version
+    case versionType = "version_type"
+    case refresh
     case parentTask = "parent_task"
 }
 
@@ -111,4 +114,17 @@ public enum BoostMode: String {
     case AVG = "avg"
     case MIN = "min"
     case MAX = "max"
+}
+
+public enum VersionType: String {
+    case `internal`
+    case external
+    case externalGte = "external_gte"
+    case force
+}
+
+public enum IndexRefresh: String {
+    case `true`
+    case `false`
+    case waitFor = "wait_for"
 }
