@@ -23,6 +23,7 @@
 /* Begin PBXBuildFile section */
 		062666F722CDA26200E32F15 /* IndicesResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 062666F622CDA26200E32F15 /* IndicesResponse.swift */; };
 		062666F922CDFC7300E32F15 /* ResponseConverters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 062666F822CDFC7300E32F15 /* ResponseConverters.swift */; };
+		06DF10F222DA959A00B691A2 /* CodableUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06DF10F122DA959A00B691A2 /* CodableUtils.swift */; };
 		06E1332522D997D500C5230F /* SerializationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06E1332422D997D500C5230F /* SerializationTests.swift */; };
 		OBJ_1000 /* cipher.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_275 /* cipher.c */; };
 		OBJ_1001 /* e_aes.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_276 /* e_aes.c */; };
@@ -1226,6 +1227,7 @@
 /* Begin PBXFileReference section */
 		062666F622CDA26200E32F15 /* IndicesResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndicesResponse.swift; sourceTree = "<group>"; };
 		062666F822CDFC7300E32F15 /* ResponseConverters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseConverters.swift; sourceTree = "<group>"; };
+		06DF10F122DA959A00B691A2 /* CodableUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableUtils.swift; sourceTree = "<group>"; };
 		06E1332422D997D500C5230F /* SerializationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SerializationTests.swift; sourceTree = "<group>"; };
 		"ElasticSwift::ElasticSwift::Product" /* ElasticSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ElasticSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"ElasticSwift::ElasticSwiftTests::Product" /* ElasticSwiftTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = ElasticSwiftTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -3046,6 +3048,7 @@
 			isa = PBXGroup;
 			children = (
 				OBJ_58 /* Utils.swift */,
+				06DF10F122DA959A00B691A2 /* CodableUtils.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -4470,6 +4473,7 @@
 				062666F722CDA26200E32F15 /* IndicesResponse.swift in Sources */,
 				OBJ_1341 /* MatchAllBuilders.swift in Sources */,
 				OBJ_1342 /* QueryBuilder.swift in Sources */,
+				06DF10F222DA959A00B691A2 /* CodableUtils.swift in Sources */,
 				OBJ_1343 /* QueryBuilders.swift in Sources */,
 				OBJ_1344 /* ScoreFunctionBuilders.swift in Sources */,
 				OBJ_1345 /* SpanQueryBuilders.swift in Sources */,
