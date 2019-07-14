@@ -94,22 +94,22 @@ public class SearchRequest<T: Codable>: Request {
     
     public typealias ResponseType = SearchResponse<T>
     
-    var index: String?
-    var type: String?
-    var from: Int16?
-    var size: Int16?
-    var query: Query?
-    var sort: Sort?
-    var fetchSource: Bool?
-    var explain: Bool?
-    var minScore: Decimal?
+    public let index: String
+    public let type: String?
+    public let from: Int16?
+    public let size: Int16?
+    public let query: Query?
+    public let sort: Sort?
+    public let fetchSource: Bool?
+    public let explain: Bool?
+    public let minScore: Decimal?
     
     init(withBuilder builder: SearchRequestBuilder<T>) throws {
-        self.index = builder.index
+        self.index = builder.index ?? "_all"
         self.type = builder.type
+        self.query = builder.query
         self.from = builder.from
         self.size = builder.size
-        self.query = builder.query
         self.sort = builder.sort
         self.fetchSource = builder.fetchSource
         self.explain = builder.explain
@@ -124,20 +124,12 @@ public class SearchRequest<T: Codable>: Request {
     
     public var endPoint: String {
         get {
-            return makeEndPoint()
+            var path = self.index
+            if let type = self.type {
+                path += "/" + type
+            }
+            return  path + "/_search"
         }
-    }
-    
-    func makeEndPoint() -> String {
-        var path: String = ""
-        if let index = self.index {
-            path += index + "/"
-        }
-        if let type = self.type {
-            path += type + "/"
-        }
-        path += "_search"
-        return path
     }
     
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
