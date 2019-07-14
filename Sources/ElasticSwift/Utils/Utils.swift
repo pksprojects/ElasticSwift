@@ -39,6 +39,7 @@ enum QueryParams: String {
     case ifPrimaryTerm = "if_primary_term"
     case pipeline
     case includeTypeName = "include_type_name"
+    case parent
 }
 
 enum EndPointCategory: String {
@@ -135,4 +136,9 @@ public enum IndexRefresh: String {
     case `true`
     case `false`
     case waitFor = "wait_for"
+}
+
+public enum OpType: String {
+    case index
+    case create
 }
