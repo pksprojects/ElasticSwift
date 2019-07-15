@@ -23,19 +23,16 @@ public class ESResponse {
 
 //MARK:- Get Response
 
-public class GetResponse<T: Codable>: Codable {
+public struct GetResponse<T: Codable>: Codable {
     
-    public var index: String?
-    public var type: String?
-    public var id: String?
-    public var version: Int?
-    public var found: Bool?
-    
-    public var source: T?
-    
-    init() {
-        
-    }
+    public let index: String
+    public let type: String
+    public let id: String
+    public let version: Int?
+    public let found: Bool
+    public let source: T?
+    public let seqNo: Int?
+    public let primaryTerm: Int?
     
     enum CodingKeys: String, CodingKey {
         case index = "_index"
@@ -43,8 +40,9 @@ public class GetResponse<T: Codable>: Codable {
         case id = "_id"
         case version = "_version"
         case source = "_source"
-        
         case found
+        case seqNo = "_seq_no"
+        case primaryTerm = "_primary_term"
     }
 }
 

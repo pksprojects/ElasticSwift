@@ -169,14 +169,14 @@ class ElasticSwiftTests: XCTestCase {
             
             switch result {
             case .failure(let error):
-                print("Error: ", error)
-                XCTAssert(false, error.localizedDescription)
+                print("Error: ", String(reflecting: error))
+                XCTAssert(false, String(reflecting: error))
             case .success(let response):
                 print("Response: ", response)
-                XCTAssert(response.found!, "Found: \(response.found!)")
-                XCTAssert(response.index! == "test", "Index: \(response.index!)")
-                XCTAssert(response.id! == "0", "_id: \(response.id!)")
-                XCTAssert(response.type! == "_doc", "Found: \(response.type!)")
+                XCTAssert(response.found, "Found: \(response.found)")
+                XCTAssert(response.index == "test", "Index: \(response.index)")
+                XCTAssert(response.id == "0", "_id: \(response.id)")
+                XCTAssert(response.type == "_doc", "Found: \(response.type)")
             }
             e.fulfill()
         }
