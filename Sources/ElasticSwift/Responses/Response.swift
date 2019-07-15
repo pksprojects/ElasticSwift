@@ -73,16 +73,12 @@ public struct IndexResponse: Codable {
 
 //MARK:- Search Response
 
-public class SearchResponse<T: Codable>: Codable {
+public struct SearchResponse<T: Codable>: Codable {
     
-    public var took: Int?
-    public var timedOut: Bool?
-    public var shards: Shards?
-    public var hits: Hits<T>?
-    
-    init() {
-        
-    }
+    public let took: Int
+    public let timedOut: Bool
+    public let shards: Shards
+    public let hits: Hits<T>
     
     enum CodingKeys: String, CodingKey {
         case took
@@ -94,23 +90,19 @@ public class SearchResponse<T: Codable>: Codable {
 
 public struct Shards: Codable {
     
-    public var total: Int
-    public var successful: Int
-    public var skipped: Int?
-    public var failed: Int
+    public let total: Int
+    public let successful: Int
+    public let skipped: Int?
+    public let failed: Int
     
 }
 
 
-public class Hits<T: Codable>: Codable {
+public struct Hits<T: Codable>: Codable {
     
-    public var total: Int?
-    public var maxScore: Decimal?
-    public var hits: [SearchHit<T>] = []
-    
-    init() {
-        
-    }
+    public let total: Int
+    public let maxScore: Decimal?
+    public let hits: [SearchHit<T>] = []
     
     enum CodingKeys: String, CodingKey {
         case total
@@ -121,18 +113,13 @@ public class Hits<T: Codable>: Codable {
 }
 
 
-public class SearchHit<T: Codable>: Codable {
+public struct SearchHit<T: Codable>: Codable {
     
-    public var index: String?
-    public var type: String?
-    public var id: String?
-    public var score: Decimal?
-    public var source: T?
-    
-    
-    init() {
-        
-    }
+    public let index: String
+    public let type: String
+    public let id: String
+    public let score: Decimal
+    public let source: T?
     
     enum CodingKeys: String, CodingKey {
         case index = "_index"
