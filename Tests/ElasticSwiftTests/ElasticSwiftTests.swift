@@ -227,10 +227,10 @@ class ElasticSwiftTests: XCTestCase {
                 XCTAssert(false, error.localizedDescription)
             case .success(let response):
                 print("Respone", response)
-                XCTAssert(response.result == "deleted", "Result: \(response.result!)")
-                XCTAssert(response.id == "0", "_id: \(response.id!)")
-                XCTAssert(response.index == "test", "index: \(response.index!)")
-                XCTAssert(response.type == "_doc", "Type: \(response.type!)")
+                XCTAssert(response.result == "deleted", "Result: \(response.result)")
+                XCTAssert(response.id == "0", "_id: \(response.id)")
+                XCTAssert(response.index == "test", "index: \(response.index)")
+                XCTAssert(response.type == "_doc", "Type: \(response.type)")
             }
             e.fulfill()
         }

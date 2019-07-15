@@ -134,14 +134,14 @@ public struct SearchHit<T: Codable>: Codable {
 
 public struct DeleteResponse: Codable {
     
-    public let shards: Shards?
-    public let index: String?
-    public let type: String?
-    public let id: String?
-    public let version: Int?
-    public let seqNumber: Int?
-    public let primaryTerm: Int?
-    public let result: String?
+    public let shards: Shards
+    public let index: String
+    public let type: String
+    public let id: String
+    public let version: Int
+    public let seqNumber: Int
+    public let primaryTerm: Int
+    public let result: String
     
     enum CodingKeys: String, CodingKey {
         case shards = "_shards"
