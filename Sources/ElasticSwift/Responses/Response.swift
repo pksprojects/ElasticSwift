@@ -48,20 +48,16 @@ public struct GetResponse<T: Codable>: Codable {
 
 //MARK:- Index Response
 
-public class IndexResponse: Codable {
+public struct IndexResponse: Codable {
     
-    public var shards: Shards?
-    public var index: String?
-    public var type: String?
-    public var id: String?
-    public var version: Int?
-    public var seqNumber: Int?
-    public var primaryTerm: Int?
-    public var result: String?
-    
-    init() {
-        
-    }
+    public let shards: Shards
+    public let index: String
+    public let type: String
+    public let id: String
+    public let version: Int
+    public let seqNumber: Int
+    public let primaryTerm: Int
+    public let result: String
     
     enum CodingKeys: String, CodingKey {
         case shards = "_shards"
@@ -96,16 +92,12 @@ public class SearchResponse<T: Codable>: Codable {
     }
 }
 
-public class Shards: Codable {
+public struct Shards: Codable {
     
-    public var total: Int?
-    public var successful: Int?
+    public var total: Int
+    public var successful: Int
     public var skipped: Int?
-    public var failed: Int?
-    
-    init() {
-        
-    }
+    public var failed: Int
     
 }
 
