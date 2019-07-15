@@ -31,7 +31,7 @@ public struct GetResponse<T: Codable>: Codable {
     public let version: Int?
     public let found: Bool
     public let source: T?
-    public let seqNo: Int?
+    public let seqNumber: Int?
     public let primaryTerm: Int?
     
     enum CodingKeys: String, CodingKey {
@@ -41,7 +41,7 @@ public struct GetResponse<T: Codable>: Codable {
         case version = "_version"
         case source = "_source"
         case found
-        case seqNo = "_seq_no"
+        case seqNumber = "_seq_no"
         case primaryTerm = "_primary_term"
     }
 }
