@@ -55,7 +55,7 @@ public class HTTPRequest {
             if self.queryParams.isEmpty {
                 return ""
             } else {
-                return queryParams.map { $0.name + "=" + ($0.value ?? "") }.joined(separator: "&")
+                return "?" + queryParams.map { $0.name + "=" + ($0.value ?? "") }.joined(separator: "&")
             }
         }
     }

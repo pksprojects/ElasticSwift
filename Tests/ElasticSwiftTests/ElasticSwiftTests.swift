@@ -110,10 +110,10 @@ class ElasticSwiftTests: XCTestCase {
                 XCTAssert(false, error.localizedDescription)
             case .success(let response):
                 print("Response: ", response)
-                XCTAssert(response.index == "test", "Index: \(response.index!)")
-                XCTAssert(response.id == "0", "_id \(response.id!)")
-                XCTAssert(response.type == "_doc", "Type: \(response.type!)")
-                XCTAssert(response.result != nil, "Resule: \(response.result!)")
+                XCTAssert(response.index == "test", "Index: \(response.index)")
+                XCTAssert(response.id == "0", "_id \(response.id)")
+                XCTAssert(response.type == "_doc", "Type: \(response.type)")
+                XCTAssert(!response.result.isEmpty, "Resule: \(response.result)")
             }
             e.fulfill()
         }
@@ -142,9 +142,9 @@ class ElasticSwiftTests: XCTestCase {
                 XCTAssert(false, error.localizedDescription)
             case .success(let response):
                 print("Response: ", response)
-                XCTAssert(response.index == "test", "Index: \(response.index!)")
-                XCTAssert(response.type == "_doc", "Type: \(response.type!)")
-                XCTAssert(response.result != nil, "Resule: \(response.result!)")
+                XCTAssert(response.index == "test", "Index: \(response.index)")
+                XCTAssert(response.type == "_doc", "Type: \(response.type)")
+                XCTAssert(!response.result.isEmpty, "Resule: \(response.result)")
             }
             e.fulfill()
         }
@@ -169,14 +169,14 @@ class ElasticSwiftTests: XCTestCase {
             
             switch result {
             case .failure(let error):
-                print("Error: ", error)
-                XCTAssert(false, error.localizedDescription)
+                print("Error: ", String(reflecting: error))
+                XCTAssert(false, String(reflecting: error))
             case .success(let response):
                 print("Response: ", response)
-                XCTAssert(response.found!, "Found: \(response.found!)")
-                XCTAssert(response.index! == "test", "Index: \(response.index!)")
-                XCTAssert(response.id! == "0", "_id: \(response.id!)")
-                XCTAssert(response.type! == "_doc", "Found: \(response.type!)")
+                XCTAssert(response.found, "Found: \(response.found)")
+                XCTAssert(response.index == "test", "Index: \(response.index)")
+                XCTAssert(response.id == "0", "_id: \(response.id)")
+                XCTAssert(response.type == "_doc", "Found: \(response.type)")
             }
             e.fulfill()
         }
@@ -197,7 +197,7 @@ class ElasticSwiftTests: XCTestCase {
             case .failure(let error):
                 print("Error", error)
             case .success(let response):
-                print("Found", response.result!)
+                print("Found", response.result)
             }
             client?.execute(request: request, completionHandler: handler)
         }
@@ -227,10 +227,10 @@ class ElasticSwiftTests: XCTestCase {
                 XCTAssert(false, error.localizedDescription)
             case .success(let response):
                 print("Respone", response)
-                XCTAssert(response.result == "deleted", "Result: \(response.result!)")
-                XCTAssert(response.id == "0", "_id: \(response.id!)")
-                XCTAssert(response.index == "test", "index: \(response.index!)")
-                XCTAssert(response.type == "_doc", "Type: \(response.type!)")
+                XCTAssert(response.result == "deleted", "Result: \(response.result)")
+                XCTAssert(response.id == "0", "_id: \(response.id)")
+                XCTAssert(response.index == "test", "index: \(response.index)")
+                XCTAssert(response.type == "_doc", "Type: \(response.type)")
             }
             e.fulfill()
         }
@@ -247,7 +247,7 @@ class ElasticSwiftTests: XCTestCase {
             case .failure(let error):
                 print("Error: ", error)
             case .success(let response):
-                print("Result", response.result!)
+                print("Result", response.result)
             }
             
             self.client?.execute(request: request, completionHandler: handler)

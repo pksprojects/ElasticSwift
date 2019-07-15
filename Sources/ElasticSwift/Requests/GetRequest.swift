@@ -19,7 +19,6 @@ public class GetRequestBuilder<T: Codable>: RequestBuilder {
     var index: String?
     var type: String?
     var id: String?
-    var source: T?
     var method: HTTPMethod = .GET
     
     init() {}
@@ -28,23 +27,35 @@ public class GetRequestBuilder<T: Codable>: RequestBuilder {
         builderClosure(self)
     }
     
+    @discardableResult
     public func set(index: String) -> Self {
         self.index = index
         return self
     }
     
+    @discardableResult
     @available(*, deprecated, message: "Elasticsearch has deprecated use of custom types and will be remove in 7.0")
     public func set(type: String) -> Self {
         self.type = type
         return self
     }
     
+    @discardableResult
     public func set(id: String) -> Self {
         self.id = id
         return self
     }
     
     public func build() throws -> GetRequest<T> {
+        
+        guard self.index != nil else {
+            throw RequestBuilderError.missingRequiredField("index")
+        }
+        
+        guard self.id != nil else {
+            throw RequestBuilderError.missingRequiredField("id")
+        }
+        
         return try GetRequest<T>(withBuilder: self)
     }
     
@@ -62,9 +73,9 @@ public class GetRequest<T: Codable>: Request {
     
     public typealias ResponseType = GetResponse<T>
     
-    var index: String
-    var type: String
-    var id: String
+    public let index: String
+    public let type: String
+    public let id: String
     
     public var method: HTTPMethod {
         get {
@@ -72,7 +83,7 @@ public class GetRequest<T: Codable>: Request {
         }
     }
     
-    public init(index: String, type: String, id: String) {
+    public init(index: String, type: String = "_doc", id: String) {
         self.index = index
         self.type = type
         self.id = id
@@ -80,7 +91,7 @@ public class GetRequest<T: Codable>: Request {
     
     init(withBuilder builder: GetRequestBuilder<T>) throws {
         self.index = builder.index!
-        self.type = builder.type!
+        self.type = builder.type ?? "_doc"
         self.id =  builder.id!
     }
     

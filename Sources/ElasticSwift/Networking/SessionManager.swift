@@ -33,35 +33,6 @@ class SessionManager: NSObject, URLSessionDelegate {
         self.session = URLSession(configuration: config, delegate: self, delegateQueue: queue)
     }
     
-    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        guard challenge.previousFailureCount == 0 else {
-            challenge.sender?.cancel(challenge)
-            // Inform the user that the user name and password are incorrect
-            completionHandler(.cancelAuthenticationChallenge, nil)
-            return
-        }
-        
-        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust {
-            if let secTrust = challenge.protectionSpace.serverTrust {
-                if sslConfig == nil {
-                    return completionHandler(.cancelAuthenticationChallenge, nil)
-                }
-                let derCert = SecCertificate.create(derEncodedFile: (sslConfig?.certPath)!)
-                guard matchCerts(trust: secTrust, certificate: derCert!) else {
-                    return completionHandler(.cancelAuthenticationChallenge, nil)
-                }
-                let proposedCredentials = URLCredential(trust: secTrust)
-                completionHandler(.useCredential, proposedCredentials)
-            }
-            completionHandler(.performDefaultHandling, nil)
-        }
-    }
-    
-    func matchCerts(trust: SecTrust, certificate: SecCertificate) -> Bool {
-        let cert = SecTrustGetCertificateAtIndex(trust, 0)
-        return cert?.data == certificate.data
-    }
-    
     func createReqeust(_ httpRequest: HTTPRequest) -> URLRequest {
         var components =  URLComponents()
         components.queryItems = httpRequest.queryParams
@@ -101,8 +72,45 @@ class SessionManager: NSObject, URLSessionDelegate {
     }
 }
 
+
+#if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
+// URLSession basic SSL support for apple platform
+extension SessionManager {
+    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        guard challenge.previousFailureCount == 0 else {
+            challenge.sender?.cancel(challenge)
+            // Inform the user that the user name and password are incorrect
+            completionHandler(.cancelAuthenticationChallenge, nil)
+            return
+        }
+        
+        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust {
+            if let secTrust = challenge.protectionSpace.serverTrust {
+                if sslConfig == nil {
+                    return completionHandler(.cancelAuthenticationChallenge, nil)
+                }
+                let derCert = SecCertificate.create(derEncodedFile: (sslConfig?.certPath)!)
+                guard matchCerts(trust: secTrust, certificate: derCert!) else {
+                    return completionHandler(.cancelAuthenticationChallenge, nil)
+                }
+                let proposedCredentials = URLCredential(trust: secTrust)
+                completionHandler(.useCredential, proposedCredentials)
+            }
+            completionHandler(.performDefaultHandling, nil)
+        }
+    }
+    
+    func matchCerts(trust: SecTrust, certificate: SecCertificate) -> Bool {
+        let cert = SecTrustGetCertificateAtIndex(trust, 0)
+        return cert?.data == certificate.data
+    }
+}
+
+#endif
+
 // MARK:- Helper extension
 
+#if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
 public extension SecCertificate {
     
     /**
@@ -146,3 +154,4 @@ public extension SecCertificate {
     }
     
 }
+#endif

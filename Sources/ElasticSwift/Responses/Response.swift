@@ -23,19 +23,16 @@ public class ESResponse {
 
 //MARK:- Get Response
 
-public class GetResponse<T: Codable>: Codable {
+public struct GetResponse<T: Codable>: Codable {
     
-    public var index: String?
-    public var type: String?
-    public var id: String?
-    public var version: Int?
-    public var found: Bool?
-    
-    public var source: T?
-    
-    init() {
-        
-    }
+    public let index: String
+    public let type: String
+    public let id: String
+    public let version: Int?
+    public let found: Bool
+    public let source: T?
+    public let seqNumber: Int?
+    public let primaryTerm: Int?
     
     enum CodingKeys: String, CodingKey {
         case index = "_index"
@@ -43,27 +40,24 @@ public class GetResponse<T: Codable>: Codable {
         case id = "_id"
         case version = "_version"
         case source = "_source"
-        
         case found
+        case seqNumber = "_seq_no"
+        case primaryTerm = "_primary_term"
     }
 }
 
 //MARK:- Index Response
 
-public class IndexResponse: Codable {
+public struct IndexResponse: Codable {
     
-    public var shards: Shards?
-    public var index: String?
-    public var type: String?
-    public var id: String?
-    public var version: Int?
-    public var seqNumber: Int?
-    public var primaryTerm: Int?
-    public var result: String?
-    
-    init() {
-        
-    }
+    public let shards: Shards
+    public let index: String
+    public let type: String
+    public let id: String
+    public let version: Int
+    public let seqNumber: Int
+    public let primaryTerm: Int
+    public let result: String
     
     enum CodingKeys: String, CodingKey {
         case shards = "_shards"
@@ -79,16 +73,12 @@ public class IndexResponse: Codable {
 
 //MARK:- Search Response
 
-public class SearchResponse<T: Codable>: Codable {
+public struct SearchResponse<T: Codable>: Codable {
     
-    public var took: Int?
-    public var timedOut: Bool?
-    public var shards: Shards?
-    public var hits: Hits<T>?
-    
-    init() {
-        
-    }
+    public let took: Int
+    public let timedOut: Bool
+    public let shards: Shards
+    public let hits: Hits<T>
     
     enum CodingKeys: String, CodingKey {
         case took
@@ -98,29 +88,21 @@ public class SearchResponse<T: Codable>: Codable {
     }
 }
 
-public class Shards: Codable {
+public struct Shards: Codable {
     
-    public var total: Int?
-    public var successful: Int?
-    public var skipped: Int?
-    public var failed: Int?
-    
-    init() {
-        
-    }
+    public let total: Int
+    public let successful: Int
+    public let skipped: Int?
+    public let failed: Int
     
 }
 
 
-public class Hits<T: Codable>: Codable {
+public struct Hits<T: Codable>: Codable {
     
-    public var total: Int?
-    public var maxScore: Decimal?
-    public var hits: [SearchHit<T>] = []
-    
-    init() {
-        
-    }
+    public let total: Int
+    public let maxScore: Decimal?
+    public let hits: [SearchHit<T>] = []
     
     enum CodingKeys: String, CodingKey {
         case total
@@ -131,18 +113,13 @@ public class Hits<T: Codable>: Codable {
 }
 
 
-public class SearchHit<T: Codable>: Codable {
+public struct SearchHit<T: Codable>: Codable {
     
-    public var index: String?
-    public var type: String?
-    public var id: String?
-    public var score: Decimal?
-    public var source: T?
-    
-    
-    init() {
-        
-    }
+    public let index: String
+    public let type: String
+    public let id: String
+    public let score: Decimal
+    public let source: T?
     
     enum CodingKeys: String, CodingKey {
         case index = "_index"
@@ -157,14 +134,14 @@ public class SearchHit<T: Codable>: Codable {
 
 public struct DeleteResponse: Codable {
     
-    public let shards: Shards?
-    public let index: String?
-    public let type: String?
-    public let id: String?
-    public let version: Int?
-    public let seqNumber: Int?
-    public let primaryTerm: Int?
-    public let result: String?
+    public let shards: Shards
+    public let index: String
+    public let type: String
+    public let id: String
+    public let version: Int
+    public let seqNumber: Int
+    public let primaryTerm: Int
+    public let result: String
     
     enum CodingKeys: String, CodingKey {
         case shards = "_shards"

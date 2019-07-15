@@ -17,7 +17,7 @@ public class MatchAllQuery: Query {
     
     public let boost: Decimal?
     
-    init(_ boost: Decimal? = nil) {
+    public init(_ boost: Decimal? = nil) {
         self.boost = boost
     }
     
@@ -40,7 +40,7 @@ public class MatchNoneQuery: Query {
     
     public let name: String = "match_none"
     
-    init() {}
+    public init() {}
     
     convenience init(withBuilder builder: MatchNoneQueryBuilder) {
         self.init()

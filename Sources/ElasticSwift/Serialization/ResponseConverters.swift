@@ -26,6 +26,18 @@ public class ResponseConverters {
                 if var body = response.body, let bytes = body.readBytes(length: body.readableBytes) {
                     let data = Data(bytes)
                     guard (!response.status.isError()) else {
+                        
+                        /// handle GetResponse 404
+                        if response.status == .notFound {
+                            let decodedResponse: Result<T, DecodingError> = serializer.decode(data: data)
+                            switch decodedResponse {
+                            case .success(let result):
+                                return callback(.success(result))
+                            default:
+                                break;
+                            }
+                        }
+                        
                         let decodedError: Result<ElasticsearchError, DecodingError> = serializer.decode(data: data)
                         switch decodedError {
                         case .failure(let error):

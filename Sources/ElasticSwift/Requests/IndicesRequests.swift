@@ -18,6 +18,10 @@ public class CreateIndexRequestBuilder: RequestBuilder {
     public typealias BuilderClosure = (CreateIndexRequestBuilder) -> Void
     
     var name: String?
+    var settings: [String: CodableValue]?
+    var mappings: [String: MappingMetaData]?
+    var aliases: [IndexAlias]?
+    
     
     init() {}
     
@@ -30,7 +34,27 @@ public class CreateIndexRequestBuilder: RequestBuilder {
         return self
     }
     
-    public func build() -> CreateIndexRequest {
+    public func set(settings: [String: CodableValue]) -> Self {
+        self.settings = settings
+        return self
+    }
+    
+    public func set(mappings: [String: MappingMetaData]) -> Self {
+        self.mappings = mappings
+        return self
+    }
+    
+    public func set(aliases: [IndexAlias]) -> Self {
+        self.aliases = aliases
+        return self
+    }
+    
+    public func build() throws -> CreateIndexRequest {
+        
+        guard self.name != nil else {
+            throw RequestBuilderError.missingRequiredField("name")
+        }
+        
         return CreateIndexRequest(withBuilder: self)
     }
 }
@@ -121,21 +145,30 @@ public class IndexExistsRequest: Request {
 
 //MARK:- Create Index Reqeust
 
-public class CreateIndexRequest: Request {
+public class CreateIndexRequest: Request, Encodable {
     public var headers: HTTPHeaders = HTTPHeaders()
-    
-    public var queryParams: [URLQueryItem] = []
     
     public typealias ResponseType = CreateIndexResponse
     
     public let name: String
+    public let aliases: [IndexAlias]?
+    public let mappings: [String: MappingMetaData]?
+    public let settings: [String: CodableValue]?
     
-    public init(name: String) {
+    public var includeTypeName: Bool?
+    
+    public init(name: String, aliases: [IndexAlias]? = nil, mappings: [String: MappingMetaData]? = nil, settings: [String: CodableValue]? = nil) {
         self.name = name
+        self.aliases = aliases
+        self.mappings = mappings
+        self.settings = settings
     }
     
     init(withBuilder builder: CreateIndexRequestBuilder) {
         self.name = builder.name!
+        self.aliases = builder.aliases
+        self.mappings = builder.mappings
+        self.settings = builder.settings
     }
     
     public var method: HTTPMethod {
@@ -150,8 +183,40 @@ public class CreateIndexRequest: Request {
         }
     }
     
+    public var queryParams: [URLQueryItem] {
+        get {
+            var params = [URLQueryItem]()
+            if let includeTypeName = self.includeTypeName {
+                params.append(URLQueryItem(name: QueryParams.includeTypeName.rawValue, value: "\(includeTypeName)"))
+            }
+            return params
+        }
+    }
+    
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-        return .failure(.noBodyForRequest)
+        guard self.aliases != nil || self.mappings != nil || self.settings != nil else {
+            return .failure(.noBodyForRequest)
+        }
+        return serializer.encode(self).mapError {
+            error -> MakeBodyError in
+            return .wrapped(error)
+        }
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(self.mappings, forKey: .mappings)
+        try container.encodeIfPresent(self.settings, forKey: .settings)
+        if let aliases = self.aliases {
+            let dic = Dictionary(uniqueKeysWithValues: aliases.map{ ($0.name, $0.metaData)})
+            try container.encode(dic, forKey: .aliases)
+        }
+    }
+    
+    enum CodingKeys: CodingKey {
+        case aliases
+        case mappings
+        case settings
     }
 }
 
