@@ -12,15 +12,13 @@ import Foundation
 
 //MARK:- Elasticsearch Default Error
 
-public class ElasticsearchError: Error, Codable {
+public struct ElasticsearchError: Error, Codable {
     
-    var error: ElasticError?
-    var status: Int?
-    
-    init() {}
+    var error: ElasticError
+    var status: Int
 }
 
-public class ElasticError: Codable {
+public struct ElasticError: Codable {
     
     var type: String?
     var index: String?
@@ -28,8 +26,6 @@ public class ElasticError: Codable {
     var reason: String?
     var indexUUID: String?
     var rootCause: [ElasticError]?
-    
-    init() {}
     
     enum CodingKeys: String, CodingKey {
         case rootCause = "root_cause"
@@ -74,7 +70,7 @@ public class RequestConverterError<T: Request>: Error {
     
 }
 
-public class ResponseConverterError: Error {
+public class ResponseConverterError: Error, CustomStringConvertible, CustomDebugStringConvertible {
     
     public let error: Error
     public let message: String
@@ -84,6 +80,18 @@ public class ResponseConverterError: Error {
         self.error = error
         self.message = message
         self.response = response
+    }
+    
+    public var description: String {
+        get {
+            return "ResponseConverterError: \(message) Response: \(String(describing: response)) with Error: \(String(describing: error))"
+        }
+    }
+    
+    public var debugDescription: String {
+        get {
+            return "ResponseConverterError: \(message) Response: \(String(reflecting: response)) with Error: \(String(reflecting: error))"
+        }
     }
     
 }
@@ -162,13 +170,13 @@ public class DecodingError: Error, CustomStringConvertible, CustomDebugStringCon
     
     public var description: String {
         get {
-            return "DecodingError: Unable to decode \(self.type) from \(data.description) with Error: \(error.localizedDescription)"
+            return "DecodingError: Unable to decode \(String(describing: self.type)) from \(String(describing: self.data)) with Error: \(String(describing: self.error))"
         }
     }
     
     public var debugDescription: String {
         get {
-            return "DecodingError: Unable to decode \(self.type) from \(data.debugDescription) with Error: \(error.localizedDescription)"
+            return "DecodingError: Unable to decode \(self.type) from \(String(reflecting: self.data)) with Error: \(String(reflecting: self.error))"
         }
     }
     
