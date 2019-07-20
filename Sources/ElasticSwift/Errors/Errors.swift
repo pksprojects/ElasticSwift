@@ -185,4 +185,5 @@ public class DecodingError: Error, CustomStringConvertible, CustomDebugStringCon
 
 public enum RequestBuilderError: Error {
     case missingRequiredField(String)
+    case atleastOneFieldRequired([String])
 }

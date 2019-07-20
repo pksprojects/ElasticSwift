@@ -297,40 +297,7 @@ class ElasticSwiftTests: XCTestCase {
         waitForExpectations(timeout: 10)
     }
     
-    func test_09_DeleteIndex() throws {
-        let e = expectation(description: "execution complete")
-        func handler(_ result: Result<AcknowledgedResponse, Error>) -> Void {
-            
-            switch result {
-            case .failure(let error):
-                print("Error", error)
-                XCTAssert(false, error.localizedDescription)
-            case .success(let response):
-                print("Response: ", response)
-                XCTAssert(response.acknowledged, "Acknowleged: \(response.acknowledged)")
-            }
-            e.fulfill()
-        }
-        let request = DeleteIndexRequest(name: "test")
-        
-        /// make sure index exists
-        func handler1(_ result: Result<CreateIndexResponse, Error>) -> Void {
-            
-            switch result {
-            case .failure(let error):
-                print("Error", error)
-            case .success(let response):
-                print("Response: ", response)
-            }
-            self.client?.execute(request: request, completionHandler: handler)
-        }
-        
-        let request1 = CreateIndexRequest(name: "test")
-        self.client?.execute(request: request1, completionHandler: handler1)
-        waitForExpectations(timeout: 10)
-    }
-    
-    func test_10_IndexExists() throws {
+    func test_09_IndexExists() throws {
         let e = expectation(description: "execution complete")
         
         let existsRequest = IndexExistsRequest(name: "test")
@@ -393,7 +360,278 @@ class ElasticSwiftTests: XCTestCase {
         self.client?.indices.create(createIndexRequest, completionHandler: createIndexRequestHandler)
         waitForExpectations(timeout: 10)
     }
+    
+    func test_10_UpdateRequest() throws {
+        
+        let e = expectation(description: "execution complete")
+        
+        let params: [String: CodableValue] = ["msg": "Updated Message"]
+        let script = Script("ctx._source.msg = params.msg", lang: "painless", params: params)
+        let updateRequest = try UpdateRequestBuilder { builder in
+            builder.set(id: "0")
+                .set(index: "test")
+                .set(script: script)
+        }.build()
+        
+        let msg = Message("Test Message")
+        let indexRequest = IndexRequest(index: "test", id: "0", source: msg)
+        
+        self.client?.index(indexRequest) { result in
+            switch result {
+            case .success(let response):
+                print("Response:", response)
+            case .failure(let error):
+                print("Error: ", error)
+            }
+            self.client?.update(updateRequest) { result in
+                switch result {
+                case .success(let response):
+                    print("Updated Response: ", response)
+                    XCTAssertTrue(response.id == "0", "id: \(response.id)")
+                    XCTAssertTrue(response.result == "updated", "result: \(response.result)")
+                case .failure(let error):
+                    print("Error: ", error)
+                    XCTAssertTrue(false)
+                }
+                e.fulfill()
+            }
+        }
+        
+        waitForExpectations(timeout: 10)
+    }
+    
+    func test_11_UpdateRequest() throws {
+            
+        let e = expectation(description: "execution complete")
+        
+        let script = Script("ctx._source.msg = 'hello'")
+        let updateRequest = try UpdateRequestBuilder { builder in
+            builder.set(id: "1")
+                .set(index: "test")
+                .set(script: script)
+        }.build()
+        
+        let msg = Message("Test Message")
+        let indexRequest = IndexRequest(index: "test", id: "1", source: msg)
+        
+        self.client?.index(indexRequest) { result in
+            switch result {
+            case .success(let response):
+                print("Response:", response)
+            case .failure(let error):
+                print("Error: ", error)
+            }
+            self.client?.update(updateRequest) { result in
+                switch result {
+                case .success(let response):
+                    print("Updated Response: ", response)
+                    XCTAssertTrue(response.id == "1", "id: \(response.id)")
+                    XCTAssertTrue(response.result == "updated", "result: \(response.result)")
+                case .failure(let error):
+                    print("Error: ", error)
+                    XCTAssertTrue(false)
+                }
+                e.fulfill()
+            }
+        }
+        
+        waitForExpectations(timeout: 10)
+    }
+    
+    func test_12_UpdateRequest_noop() throws {
+                
+        let e = expectation(description: "execution complete")
+        
+        let updateRequest = try UpdateRequestBuilder { builder in
+            builder.set(id: "2")
+                .set(index: "test")
+                .set(doc: ["msg": "Test Message"])
+        }.build()
+        
+        let msg = Message("Test Message")
+        let indexRequest = IndexRequest(index: "test", id: "2", source: msg)
+        
+        self.client?.index(indexRequest) { result in
+            switch result {
+            case .success(let response):
+                print("Response:", response)
+            case .failure(let error):
+                print("Error: ", error)
+            }
+            self.client?.update(updateRequest) { result in
+                switch result {
+                case .success(let response):
+                    print("Updated Response: ", response)
+                    XCTAssertTrue(response.id == "2", "id: \(response.id)")
+                    XCTAssertTrue(response.result == "noop", "result: \(response.result)")
+                case .failure(let error):
+                    print("Error: ", error)
+                    XCTAssertTrue(false)
+                }
+                e.fulfill()
+            }
+        }
+        
+        waitForExpectations(timeout: 10)
+    }
+    
+    func test_13_UpdateRequest_noop_2() throws {
+                    
+        let e = expectation(description: "execution complete")
+        
+        let updateRequest = try UpdateRequestBuilder { builder in
+            builder.set(id: "3")
+                .set(index: "test")
+                .set(doc: ["msg": "Test Message"])
+                .set(detectNoop: false)
+        }.build()
+        
+        let msg = Message("Test Message")
+        let indexRequest = IndexRequest(index: "test", id: "3", source: msg)
+        
+        self.client?.index(indexRequest) { result in
+            switch result {
+            case .success(let response):
+                print("Response:", response)
+            case .failure(let error):
+                print("Error: ", error)
+            }
+            self.client?.update(updateRequest) { result in
+                switch result {
+                case .success(let response):
+                    print("Updated Response: ", response)
+                    XCTAssertTrue(response.id == "3", "id: \(response.id)")
+                    XCTAssertTrue(response.result != "noop", "result: \(response.result)")
+                case .failure(let error):
+                    print("Error: ", error)
+                    XCTAssertTrue(false)
+                }
+                e.fulfill()
+            }
+        }
+        
+        waitForExpectations(timeout: 10)
+    }
 
+    func test_14_UpdateRequest_upsert_script() throws {
+                        
+        let e = expectation(description: "execution complete")
+        
+        let script = Script("ctx._source.msg = params.msg", lang: "painless", params: ["msg": "upsert script"])
+        let updateRequest = try UpdateRequestBuilder { builder in
+            builder.set(id: "abcdef")
+                .set(index: "test")
+                .set(script: script)
+                .set(upsert: ["msg": "Test Message"])
+        }.build()
+        
+        self.client?.update(updateRequest) { result in
+            switch result {
+            case .success(let response):
+                print("Updated Response: ", response)
+                XCTAssertTrue(response.id == "abcdef", "id: \(response.id)")
+                XCTAssertTrue(response.result == "created", "result: \(response.result)")
+            case .failure(let error):
+                print("Error: ", error)
+                XCTAssertTrue(false)
+            }
+            e.fulfill()
+        }
+        
+        waitForExpectations(timeout: 10)
+    }
+    
+    func test_15_UpdateRequest_scripted_upsert() throws {
+                        
+        let e = expectation(description: "execution complete")
+        
+        let script = Script("ctx._source.msg = params.msg", lang: "painless", params: ["msg": "scripted upsert"])
+        
+        let updateRequest = try UpdateRequestBuilder { builder in
+            builder.set(id: "abcdefg")
+                .set(index: "test")
+                .set(script: script)
+                .set(scriptedUpsert: true)
+                .set(upsert: [:])
+        }.build()
+        
+        self.client?.update(updateRequest) { result in
+            switch result {
+            case .success(let response):
+                print("Updated Response: ", response)
+                XCTAssertTrue(response.id == "abcdefg", "id: \(response.id)")
+                XCTAssertTrue(response.result == "created", "result: \(response.result)")
+            case .failure(let error):
+                print("Error: ", error)
+                XCTAssertTrue(false)
+            }
+            e.fulfill()
+        }
+        
+        waitForExpectations(timeout: 10)
+    }
+    
+    
+    func test_16_UpdateRequest_doc_as_upsert() throws {
+                        
+        let e = expectation(description: "execution complete")
+        
+        let updateRequest = try UpdateRequestBuilder { builder in
+            builder.set(id: "3docAsUpsert")
+                .set(index: "test")
+                .set(doc: ["msg": "Test Message"])
+                .set(docAsUpsert: true)
+        }.build()
+        
+        self.client?.update(updateRequest) { result in
+            switch result {
+            case .success(let response):
+                print("Updated Response: ", response)
+                XCTAssertTrue(response.id == "3docAsUpsert", "id: \(response.id)")
+                XCTAssertTrue(response.result == "created", "result: \(response.result)")
+            case .failure(let error):
+                print("Error: ", error)
+                XCTAssertTrue(false)
+            }
+            e.fulfill()
+        }
+
+
+        waitForExpectations(timeout: 10)
+    }
+    
+    func test_17_DeleteIndex() throws {
+        let e = expectation(description: "execution complete")
+        func handler(_ result: Result<AcknowledgedResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                print("Error", error)
+                XCTAssert(false, error.localizedDescription)
+            case .success(let response):
+                print("Response: ", response)
+                XCTAssert(response.acknowledged, "Acknowleged: \(response.acknowledged)")
+            }
+            e.fulfill()
+        }
+        let request = DeleteIndexRequest(name: "test")
+        
+        /// make sure index exists
+        func handler1(_ result: Result<CreateIndexResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                print("Error", error)
+            case .success(let response):
+                print("Response: ", response)
+            }
+            self.client?.execute(request: request, completionHandler: handler)
+        }
+        
+        let request1 = CreateIndexRequest(name: "test")
+        self.client?.execute(request: request1, completionHandler: handler1)
+        waitForExpectations(timeout: 10)
+    }
     
 //    static var allTests = [
 //        ("testPlay", testPlay),
@@ -411,7 +649,9 @@ class ElasticSwiftTests: XCTestCase {
 class Message: Codable {
     var msg: String?
     
-    init() {
-        
+    init() {}
+    
+    init(_ msg: String) {
+        self.msg = msg
     }
 }
