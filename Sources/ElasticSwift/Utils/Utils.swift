@@ -40,6 +40,12 @@ enum QueryParams: String {
     case pipeline
     case includeTypeName = "include_type_name"
     case parent
+    case retryOnConflict = "retry_on_conflict"
+    case fields
+    case lang
+    case source = "_source"
+    case sourceIncludes = "_source_includes"
+    case sourceExcludes = "_source_excludes"
 }
 
 enum EndPointCategory: String {

@@ -427,18 +427,18 @@ public class FieldValueScoreFunction: ScoreFunction {
     }
 }
 
-public class Script {
-    
-    public let source: String
-    public let params: [String: Any]
-    
-    convenience public init(source: String) {
-        self.init(source: source, params: [String: Any]())
-    }
-    
-    public init(source: String, params: [String: Any]) {
-        self.source = source
-        self.params = params
-    }
-    
-}
+//public class Script {
+//    
+//    public let source: String
+//    public let params: [String: Any]
+//
+//    convenience public init(source: String) {
+//        self.init(source: source, params: [String: Any]())
+//    }
+//
+//    public init(source: String, params: [String: Any]) {
+//        self.source = source
+//        self.params = params
+//    }
+//
+//}
