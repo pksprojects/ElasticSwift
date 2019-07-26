@@ -19,7 +19,7 @@ public struct RequestBuilderConstants {
 public struct RequestConstants {
     public struct Errors {
         public enum Response : Error {
-            case Deserialization(content:String)
+            case Deserialization(content:String, underlyingError: Error?)
         }
     }
 }
