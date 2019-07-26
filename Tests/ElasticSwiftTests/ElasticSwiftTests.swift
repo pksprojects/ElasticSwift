@@ -14,9 +14,9 @@ class ElasticSwiftTests: XCTestCase {
 //        let ssl = SSLConfiguration(certPath: "/usr/local/Cellar/kibana/6.1.2/config/certs/elastic-certificates.der", isSelf: true)
 //        let settings = Settings(forHosts: ["https://localhost:9200"], withCredentials: cred, withSSL: true, sslConfig: ssl)
 //        self.client = RestClient(settings: settings)
-//        let settings = Settings(forHost:"http://192.168.1.51:9200")
-//        self.client = RestClient(settings: settings)
-//        
+        let settings = Settings(forHost:"http://192.168.1.53:9200")
+        self.client = RestClient(settings: settings)
+//
         do {
             let deleteExpectation = expectation(description: "deleteIndex")
             try deleteIndex { (response, error) in
@@ -114,6 +114,24 @@ class ElasticSwiftTests: XCTestCase {
         }
         
         wait(for: [createExpectation], timeout: self.restExpectationTimeout)
+
+        //FIXME: The creation_date is a String and not a Double as expected. Verify and fix. (ES 6.x and 7.X)
+//        let getExpectation = expectation(description: "getIndex")
+//
+//        do {
+//            try getIndex { (response, error) in
+//                print("Get Index Handler: \(String(describing: response)) Error: \(String(describing: error))")
+//                XCTAssertNil(error)
+//                XCTAssertNotNil(response)
+//                XCTAssertNotNil(response?.settings)
+//                getExpectation.fulfill()
+//            }
+//        } catch {
+//            XCTAssertTrue(false)
+//        }
+//
+//        wait(for: [getExpectation], timeout: self.restExpectationTimeout)
+        
         
         let deleteExpectation = expectation(description: "deleteIndex")
         
@@ -134,9 +152,39 @@ class ElasticSwiftTests: XCTestCase {
     
     func createIndex(withCompletionHandler completionHandler: @escaping (CreateIndexResponse?,Error?) -> () ) throws {
         let request = self.client?.admin.indices().createIndex(withName: "test")
+            .set(mappings: setupIndexMapping())
+            .set(settings: setupIndexSettings())
             .set(completionHandler: completionHandler)
             .build()
         try request?.execute()
+    }
+    
+    func setupIndexMapping() -> CreateIndexMappings {
+        let keywordMultifieldProperty = IndexMappingMultiField(type: .keyword, ignore_above: 256, analyzer: nil, fielddata: nil)
+        let listMultifieldProperty = IndexMappingMultiField(type: .text, ignore_above: nil, analyzer: "custom_list_analyzer", fielddata: true)
+        let textMultifieldProperty = IndexMappingMultiField(type: .text, ignore_above: nil, analyzer: "custom_words", fielddata: true)
+        
+        let identifierProperty = IndexMappingProperty(properties: nil, type: .text, format: nil, fields: ["keyword":keywordMultifieldProperty])
+        let startDateProperty = IndexMappingProperty(properties: nil, type: .date, format: "basic_date_time", fields: nil)
+        let endDateProperty = IndexMappingProperty(properties: nil, type: .date, format: "basic_date_time", fields: nil)
+        let actionProperty = IndexMappingProperty(properties: nil, type: .text, format: nil, fields: ["keyword":keywordMultifieldProperty])
+        let typeProperty = IndexMappingProperty(properties: nil, type: .text, format: nil, fields: ["keyword":keywordMultifieldProperty])
+        let userProperty = IndexMappingProperty(properties: nil, type: .text, format: nil, fields: ["keyword":keywordMultifieldProperty])
+        let valueProperty = IndexMappingProperty(properties: nil, type: .text, format: nil, fields: ["keyword":keywordMultifieldProperty,"list":listMultifieldProperty,"text":textMultifieldProperty])
+        let valueDoubleProperty = IndexMappingProperty(properties: nil, type: .double, format: nil, fields: nil)
+        let valueIndexProperty = IndexMappingProperty(properties: nil, type: .integer, format: nil, fields: nil)
+        
+        let mappings = CreateIndexMappings(properties: ["identifier":identifierProperty,"startDate":startDateProperty,"endDate":endDateProperty,"action":actionProperty,"type":typeProperty,"user":userProperty,"value":valueProperty,"valueDouble":valueDoubleProperty,"valueIndex":valueIndexProperty])
+        return mappings
+    }
+    
+    func setupIndexSettings() -> CreateIndexSettings {
+        let custom_list_analyzer = IndexSettingsAnalyzer(type: "custom", stopwords: nil, filter: ["trim"], tokenizer: "pipe")
+        let custom_words = IndexSettingsAnalyzer(type: "standard", stopwords: "_italian_", filter: nil, tokenizer: nil)
+        let pipe_tokenizer = IndexSettingsTokenizer(type: "simple_pattern_split", pattern: "|")
+        let analysis = IndexSettingsAnalysis(analyzer: ["custom_words":custom_words,"custom_list_analyzer":custom_list_analyzer], tokenizer: ["pipe":pipe_tokenizer])
+        let settings = CreateIndexSettings(analysis: analysis)
+        return settings
     }
     
     func deleteIndex(withCompletionHandler completionHandler: @escaping (DeleteIndexResponse?,Error?) -> () ) throws {
@@ -170,7 +218,7 @@ class ElasticSwiftTests: XCTestCase {
         let msg = Message()
         msg.msg = "Test Message"
         msg.timestamp = Date().timeIntervalSince1970
-        let request = try self.client?.makeIndex(toIndex: "test", source: msg)
+        let request = self.client?.makeIndex(toIndex: "test", source: msg)
 //            .set(type: "msg")
             .set(id: "0")
             .set(completionHandler: handler)
@@ -198,7 +246,7 @@ class ElasticSwiftTests: XCTestCase {
         let msg = Message()
         msg.msg = "Test Message No Id"
         msg.timestamp = Date().timeIntervalSince1970 + 100
-        let request = try self.client?.makeIndex(toIndex: "test", source: msg)
+        let request = self.client?.makeIndex(toIndex: "test", source: msg)
 //            .set(type: "msg")
             .set(completionHandler: handler)
             .set(refresh: .WAIT)
@@ -234,7 +282,7 @@ class ElasticSwiftTests: XCTestCase {
             getExpectation.fulfill()
         }
         
-        let request = try self.client?.makeGet(fromIndex: "test", id: "0")
+        let request = self.client?.makeGet(fromIndex: "test", id: "0")
 //            .set(type: "msg")
             .set(completionHandler: handler)
             .build()
@@ -260,7 +308,7 @@ class ElasticSwiftTests: XCTestCase {
             deleteExpectation.fulfill()
         }
         
-        let request = try self.client?.makeDelete(fromIndex: "test", id: "0")
+        let request = self.client?.makeDelete(fromIndex: "test", id: "0")
 //            .set(type: "msg")
             .set(completionHandler: handler)
             .build()
@@ -304,7 +352,7 @@ class ElasticSwiftTests: XCTestCase {
         let sort =  SortBuilders.fieldSort("timestamp")
             .set(order: .desc)
             .build()
-        let request = try self.client?.makeSearch(fromIndex: "test")
+        let request = self.client?.makeSearch(fromIndex: "test")
 //            .set(types: "msg")
             .set(query: builder.query)
             .set(sort: sort)

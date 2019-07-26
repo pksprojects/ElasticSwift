@@ -112,7 +112,7 @@ public class IndexResponse: Response {
     }
 }
 
-public class SearchResponse<T: Codable>: Response {
+open class SearchResponse<T: Codable>: Response {
     
     public var took: Int
     public var timedOut: Bool
@@ -345,6 +345,7 @@ public class AliasMetaData: Codable {
 
 public class IndexSettings: Codable {
     
+    //FIXME: The creation_date is a String and not a Double as expected. Verify and fix. (ES 6.x and 7.X)
     public let creationDate: Date
     public let numberOfShards: String
     public let numberOfReplicas: String
