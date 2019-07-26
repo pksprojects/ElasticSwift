@@ -14,8 +14,8 @@ class ElasticSwiftTests: XCTestCase {
 //        let ssl = SSLConfiguration(certPath: "/usr/local/Cellar/kibana/6.1.2/config/certs/elastic-certificates.der", isSelf: true)
 //        let settings = Settings(forHosts: ["https://localhost:9200"], withCredentials: cred, withSSL: true, sslConfig: ssl)
 //        self.client = RestClient(settings: settings)
-        let settings = Settings(forHost:"http://192.168.1.53:9200")
-        self.client = RestClient(settings: settings)
+//        let settings = Settings(forHost:"http://192.168.1.53:9200")
+//        self.client = RestClient(settings: settings)
 //
         do {
             let deleteExpectation = expectation(description: "deleteIndex")
