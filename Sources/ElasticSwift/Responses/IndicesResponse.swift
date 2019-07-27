@@ -33,7 +33,6 @@ public struct CreateIndexResponse: Codable {
 }
 
 //MARK:- Get Index Response
-
 public struct GetIndexResponse: Codable {
     
     public let aliases: [IndexAlias]
@@ -264,7 +263,6 @@ public struct IndexAlias: Codable {
 
 
 //MARK:- INDEX Exists Response
-
 public class IndexExistsResponse: Codable {
     
     public let exists: Bool

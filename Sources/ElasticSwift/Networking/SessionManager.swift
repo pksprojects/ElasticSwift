@@ -19,11 +19,11 @@ import NIOHTTP1
 class SessionManager: NSObject, URLSessionDelegate {
 
     private let logger = Logger(label: "org.pksprojects.ElasticSwift.Networking.SessionManager")
-
+    
     private var session: URLSession?
     private let url: URL
     private var sslConfig: SSLConfiguration?
-
+    
     init(forHost url: URL, sslConfig: SSLConfiguration? = nil) {
         self.url = url
         super.init()
@@ -32,7 +32,7 @@ class SessionManager: NSObject, URLSessionDelegate {
         let queue = OperationQueue()
         self.session = URLSession(configuration: config, delegate: self, delegateQueue: queue)
     }
-
+    
     func createReqeust(_ httpRequest: HTTPRequest) -> URLRequest {
         var components =  URLComponents()
         components.queryItems = httpRequest.queryParams
@@ -46,26 +46,26 @@ class SessionManager: NSObject, URLSessionDelegate {
         }
         return request
     }
-
+    
     func execute(_ request: URLRequest, onCompletion callback: @escaping (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void) -> Void {
         let dataTask = self.session?.dataTask(with: request, completionHandler: callback)
         dataTask?.resume()
     }
-
+    
     /**
      Closes current URLSession after finishing any outstanding tasks.
     */
     func close() {
         self.session?.finishTasksAndInvalidate()
     }
-
+    
     /**
      Terminates current URLSession without finishing any outstanding tasks.
      */
     func forceClose() {
         self.session?.invalidateAndCancel()
     }
-
+    
     deinit {
         self.session?.invalidateAndCancel()
         logger.debug("session invalidated")
@@ -83,7 +83,7 @@ extension SessionManager {
             completionHandler(.cancelAuthenticationChallenge, nil)
             return
         }
-
+        
         if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust {
             if let secTrust = challenge.protectionSpace.serverTrust {
                 if sslConfig == nil {
@@ -99,7 +99,7 @@ extension SessionManager {
             completionHandler(.performDefaultHandling, nil)
         }
     }
-
+    
     func matchCerts(trust: SecTrust, certificate: SecCertificate) -> Bool {
         let cert = SecTrustGetCertificateAtIndex(trust, 0)
         return cert?.data == certificate.data
@@ -109,10 +109,9 @@ extension SessionManager {
 #endif
 
 // MARK:- Helper extension
-
 #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
 public extension SecCertificate {
-
+    
     /**
      * Loads a certificate from a DER encoded file. Wraps `SecCertificateCreateWithData`.
      *
@@ -126,7 +125,7 @@ public extension SecCertificate {
         let cfData = CFDataCreateWithBytesNoCopy(nil, (data as NSData).bytes.bindMemory(to: UInt8.self, capacity: data.count), data.count, kCFAllocatorNull)
         return SecCertificateCreateWithData(kCFAllocatorDefault, cfData!)
     }
-
+    
     /**
      * Returns the data of the certificate by calling `SecCertificateCopyData`.
      *
@@ -135,7 +134,7 @@ public extension SecCertificate {
     var data: Data {
         return SecCertificateCopyData(self) as Data
     }
-
+    
     /**
      * Tries to return the public key of this certificate. Wraps `SecTrustCopyPublicKey`.
      * Uses `SecTrustCreateWithCertificates` with `SecPolicyCreateBasicX509()` policy.
@@ -152,6 +151,6 @@ public extension SecCertificate {
         let trust: SecTrust = uTrust!
         return SecTrustCopyPublicKey(trust)
     }
-
+    
 }
 #endif

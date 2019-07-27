@@ -11,14 +11,12 @@ import NIOHTTP1
 
 //MARK:- Update Request Builder
 
-public class UpdateRequestBuilder<T: Codable> : RequestBuilder {
-
-    public typealias RequestType = UpdateRequest<T>
-
+public class UpdateRequestBuilder: RequestBuilder {
+    
     public typealias RequestType = UpdateRequest
-
+    
     public typealias BuilderClosure = (UpdateRequestBuilder) -> Void
-
+    
     var index: String?
     var type: String?
     var id: String?
@@ -28,93 +26,92 @@ public class UpdateRequestBuilder<T: Codable> : RequestBuilder {
     var docAsUpsert: Bool?
     var doc: EncodableValue?
     var scriptedUpsert: Bool?
-
+    
     init() {}
-
+    
     public init(builderClosure: BuilderClosure) {
         builderClosure(self)
     }
-
+    
     @discardableResult
     public func set(index: String) -> Self {
         self.index = index
         return self
     }
-
+    
     @discardableResult
     @available(*, deprecated, message: "Elasticsearch has deprecated use of custom types and will be remove in 7.0")
     public func set(type: String) -> Self {
         self.type = type
         return self
     }
-
+    
     @discardableResult
     public func set(id: String) -> Self {
         self.id = id
         return self
     }
-
+    
     @discardableResult
     public func set(doc: EncodableValue) -> Self {
         self.doc = doc
         return self
     }
-
+    
     @discardableResult
     public func set(upsert: EncodableValue) -> Self {
         self.upsert = upsert
         return self
     }
-
+    
     @discardableResult
     public func set(scriptedUpsert: Bool) -> Self {
         self.scriptedUpsert = scriptedUpsert
         return self
     }
-
+    
     @discardableResult
     public func set(docAsUpsert: Bool) -> Self {
         self.docAsUpsert = docAsUpsert
         return self
     }
-
+    
     @discardableResult
     public func set(detectNoop: Bool) -> Self {
         self.detectNoop = detectNoop
         return self
     }
-
+    
     @discardableResult
     public func set(script: Script) -> Self {
         self.script = script
         return self
     }
-
+    
     public func build() throws -> UpdateRequest {
         guard self.index != nil else {
             throw RequestBuilderError.missingRequiredField("index")
         }
-
+        
         guard self.id != nil else {
             throw RequestBuilderError.missingRequiredField("id")
         }
-
+        
         guard self.doc != nil || self.script != nil else {
             throw RequestBuilderError.atleastOneFieldRequired(["doc", "script"])
         }
-
+        
         return UpdateRequest(withBuilder: self)
     }
 }
 
 //MARK:- Update Request
-
 public class UpdateRequest: Request, Encodable {
-
+    
     public var headers: HTTPHeaders = HTTPHeaders()
-
+    
     public typealias ResponseType = UpdateResponse
-
+    
     public let index: String
     public let type: String
     public let id: String
@@ -124,7 +121,7 @@ public class UpdateRequest: Request, Encodable {
     public let docAsUpsert: Bool?
     public let doc: EncodableValue?
     public let scriptedUpsert: Bool?
-
+    
     public var version: String?
     /// only internal and force vertionType supported
     public var versionType: VersionType?
@@ -140,7 +137,7 @@ public class UpdateRequest: Request, Encodable {
     /// A comma seperated list of fields to return in response as string
     public var fields: String?
     public var source: Bool?
-
+    
     init(withBuilder builder: UpdateRequestBuilder) {
         self.index = builder.index!
         self.type = builder.type ?? "_doc"
@@ -152,19 +149,19 @@ public class UpdateRequest: Request, Encodable {
         self.doc = builder.doc
         self.scriptedUpsert = builder.scriptedUpsert
     }
-
+    
     public var method: HTTPMethod {
         get {
             return .POST
         }
     }
-
+    
     public var endPoint: String {
         get {
             return index + "/" + type + "/" + id + "/_update"
         }
     }
-
+    
     public var queryParams: [URLQueryItem] {
         get {
             var params = [URLQueryItem]()
@@ -207,13 +204,13 @@ public class UpdateRequest: Request, Encodable {
             return params
         }
     }
-
+    
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
         return serializer.encode(self).mapError { error -> MakeBodyError in
             return MakeBodyError.wrapped(error)
         }
     }
-
+    
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(self.script, forKey: .script)
@@ -223,7 +220,7 @@ public class UpdateRequest: Request, Encodable {
         try container.encodeIfPresent(self.doc, forKey: .doc)
         try container.encodeIfPresent(self.scriptedUpsert, forKey: .scriptedUpsert)
     }
-
+    
     private enum CodingKeys: String, CodingKey {
         case script
         case upsert
@@ -236,17 +233,16 @@ public class UpdateRequest: Request, Encodable {
 
 
 // MARK:- UPDATE RESPONSE
-
 public struct UpdateResponse: Codable {
-
+    
     public let shards: Shards
     public let index: String
     public let type: String
     public let id: String
     public let version: Int
     public let result: String
-
-
+    
+    
     private enum CodingKeys: String, CodingKey {
         case shards = "_shards"
         case index = "_index"
@@ -255,23 +251,22 @@ public struct UpdateResponse: Codable {
         case version = "_version"
         case result
     }
-
+    
 }
 
 // MARK:- SCRIPT
-
 public struct Script: Codable {
-
+    
     public let source: String
     public let lang: String?
     public let params: [String: CodableValue]?
-
+    
     public init(_ source: String, lang: String? = nil, params: [String: CodableValue]? = nil) {
         self.source = source
         self.lang = lang
         self.params = params
     }
-
+    
     public func encode(_ encoder: Encoder) throws {
         if self.lang == nil && self.params == nil {
             var container = encoder.singleValueContainer()

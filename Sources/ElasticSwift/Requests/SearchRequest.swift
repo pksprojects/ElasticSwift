@@ -13,11 +13,11 @@ import NIOHTTP1
 //MARK:- Search Request Builder
 
 public class SearchRequestBuilder<T: Codable>: RequestBuilder {
-
+    
     public typealias RequestType = SearchRequest<T>
-
+    
     public typealias BuilderClosure = (SearchRequestBuilder) -> Void
-
+    
     var index: String?
     var type: String?
     var from: Int16?
@@ -26,75 +26,73 @@ public class SearchRequestBuilder<T: Codable>: RequestBuilder {
     var sort: Sort?
     var fetchSource: Bool?
     var explain: Bool?
-
     var minScore: Decimal?
-
+    
     init() {}
-
+    
     public init(builderClosure: BuilderClosure) {
         builderClosure(self)
     }
-
+    
     public func set(indices: String...) -> Self {
         self.index = indices.compactMap({$0}).joined(separator: ",")
         return self
     }
-
+    
     @available(*, deprecated, message: "Elasticsearch has deprecated use of custom types and will be remove in 7.0")
     public func set(types: String...) -> Self {
         self.type = types.compactMap({$0}).joined(separator: ",")
         return self
     }
-
+    
     public func set(from: Int16) -> Self {
         self.from = from
         return self
     }
-
+    
     public func set(size: Int16) -> Self {
         self.size = size
         return self
     }
-
+    
     public func set(query: Query) -> Self {
         self.query = query
         return self
     }
-
+    
     public func set(sort: Sort) -> Self {
         self.sort = sort
         return self
     }
-
+    
     public func fetchSource(_ fetchSource: Bool) -> Self {
         self.fetchSource = fetchSource
         return self
     }
-
+    
     public func explain(_ explain: Bool) -> Self {
         self.explain = explain
         return self
     }
-
+    
     public func set(minScore: Decimal) -> Self {
         self.minScore = minScore
         return self
     }
-
+    
     public func build() throws -> SearchRequest<T> {
         return try SearchRequest<T>(withBuilder: self)
     }
 }
 
 //MARK:- Search Request
-
 public class SearchRequest<T: Codable>: Request {
     public var headers: HTTPHeaders = HTTPHeaders()
-
+    
     public var queryParams: [URLQueryItem] = []
-
+    
     public typealias ResponseType = SearchResponse<T>
-
+    
     public let index: String
     public let type: String?
     public let from: Int16?
@@ -104,7 +102,7 @@ public class SearchRequest<T: Codable>: Request {
     public let fetchSource: Bool?
     public let explain: Bool?
     public let minScore: Decimal?
-
+    
     init(withBuilder builder: SearchRequestBuilder<T>) throws {
         self.index = builder.index ?? "_all"
         self.type = builder.type
@@ -116,13 +114,13 @@ public class SearchRequest<T: Codable>: Request {
         self.explain = builder.explain
         self.minScore = builder.minScore
     }
-
+    
     public var method: HTTPMethod {
         get {
             return .POST
         }
     }
-
+    
     public var endPoint: String {
         get {
             var path = self.index
@@ -132,9 +130,9 @@ public class SearchRequest<T: Codable>: Request {
             return  path + "/_search"
         }
     }
-
+    
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-
+        
         var dic = [String: Any]()
         if let query = self.query {
             dic["query"] = query.toDic()
@@ -164,5 +162,4 @@ public class SearchRequest<T: Codable>: Request {
             return .failure(.wrapped(error))
         }
     }
-
 }

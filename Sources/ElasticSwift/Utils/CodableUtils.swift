@@ -176,7 +176,6 @@ extension CodableValue: Equatable {
 
 
 //MARK:- DecodableValue
-
 public protocol DecodableWrapper: Decodable {
     
     var value: Decodable { get }
@@ -334,7 +333,6 @@ extension DecodableValue: Equatable {
 }
 
 //MARK:- EncodableValue
-
 public protocol EncodableWrapper: Encodable {
     
     var value: Encodable { get }

@@ -12,108 +12,107 @@ import NIOHTTP1
 //MARK:- Index Requet Builder
 
 public class IndexRequestBuilder<T: Codable>: RequestBuilder {
-
+    
     public typealias RequestType = IndexRequest<T>
     public typealias BuilderClosure = (IndexRequestBuilder) -> Void
-
+    
     var index: String?
     var type: String?
     var id: String?
-    var source: T
+    var source: T?
     var routing: String?
     var parent: String?
     var version: String?
     var versionType: VersionType?
     var refresh: IndexRefresh?
-
+    
     init() {}
-
+    
     public init(builderClosure: BuilderClosure) {
         builderClosure(self)
     }
-
+    
     @discardableResult
     public func set(index: String) -> Self {
         self.index = index
         return self
     }
-
+    
     @discardableResult
     @available(*, deprecated, message: "Elasticsearch has deprecated use of custom types and will be remove in 7.0")
     public func set(type: String) -> Self {
         self.type = type
         return self
     }
-
+    
     @discardableResult
     public func set(id: String) -> Self {
         self.id = id
         return self
     }
-
+    
     @discardableResult
     public func set(routing: String) -> Self {
         self.routing = routing
         return self
     }
-
+    
     @discardableResult
     public func set(parent: String) -> Self {
         self.parent = parent
         return self
     }
-
+    
     @discardableResult
     public func set(source: T) -> Self {
         self.source = source
         return self
     }
-
+    
     @discardableResult
     public func set(version: String) -> Self {
         self.version = version
         return self
     }
-
+    
     @discardableResult
     public func set(versionType: VersionType) -> Self {
         self.versionType = versionType
         return self
     }
-
+    
     @discardableResult
     public func set(refresh: IndexRefresh) -> Self {
         self.refresh = refresh
         return self
     }
-
+    
     public func build() throws -> IndexRequest<T> {
-
+        
         guard self.index != nil else {
             throw RequestBuilderError.missingRequiredField("index")
         }
-
+        
         guard self.source != nil else {
             throw RequestBuilderError.missingRequiredField("source")
         }
-
+        
         guard (self.version != nil && self.versionType != nil) || (self.version == nil && self.versionType == nil) else {
             throw RequestBuilderError.missingRequiredField("source")
         }
-
+        
         return try IndexRequest<T>(withBuilder: self)
     }
-
+    
 }
 
 //MARK:- Index Request
-
 public class IndexRequest<T: Codable>: Request {
-
+    
     public var headers: HTTPHeaders = HTTPHeaders()
-
+    
     public typealias ResponseType = IndexResponse
-
+    
     public var method: HTTPMethod  {
         get {
             if self.id == nil {
@@ -122,7 +121,7 @@ public class IndexRequest<T: Codable>: Request {
             return .PUT
         }
     }
-
+    
     public let index: String
     public let type: String
     public let id: String?
@@ -132,14 +131,14 @@ public class IndexRequest<T: Codable>: Request {
     public var version: String?
     public var versionType: VersionType?
     public var refresh: IndexRefresh?
-
+    
     public init(index: String, type: String = "_doc", id: String?, source: T) {
         self.index = index
         self.type = type
         self.id = id
         self.source = source
     }
-
+    
     public init(index: String, type: String = "_doc", id: String?, source: T, routing: String?, parent: String?, refresh: IndexRefresh?, version: String, versionType: VersionType) {
         self.index = index
         self.type = type
@@ -151,7 +150,7 @@ public class IndexRequest<T: Codable>: Request {
         self.version = version
         self.versionType = versionType
     }
-
+    
     init(withBuilder builder: IndexRequestBuilder<T>) throws {
         self.index = builder.index!
         self.id = builder.id
@@ -163,8 +162,8 @@ public class IndexRequest<T: Codable>: Request {
         self.versionType = builder.versionType
         self.refresh = builder.refresh
     }
-
-    public var method: HTTPMethod  {
+    
+    public var endPoint: String {
         get {
             var _endPoint = self.index + "/" + type
             if let id = self.id {
@@ -173,11 +172,11 @@ public class IndexRequest<T: Codable>: Request {
             return _endPoint
         }
     }
-
+    
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
         return serializer.encode(self.source).flatMapError { error in return .failure(.wrapped(error)) }
     }
-
+    
     public var queryParams: [URLQueryItem] {
         get {
             var queryItems = [URLQueryItem]()
@@ -197,5 +196,5 @@ public class IndexRequest<T: Codable>: Request {
             return queryItems
         }
     }
-
+    
 }

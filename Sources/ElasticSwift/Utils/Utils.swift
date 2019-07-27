@@ -113,7 +113,6 @@ public enum RegexFlag: String {
     case ALL = "ALL"
 }
 
-
 public enum ScoreMode: String {
     case FIRST = "first"
     case AVG = "avg"
