@@ -7,191 +7,377 @@
 //
 
 import Foundation
+import Logging
+import NIOHTTP1
 
 // MARK: -  Builders
 
 public class CreateIndexRequestBuilder: RequestBuilder {
-    
-    typealias BuilderClosure = (CreateIndexRequestBuilder) -> Void
 
     public typealias RequestType = CreateIndexRequest
-    
-    let client: ESClient
-    var name: String
-    
-    public var completionHandler: ((CreateIndexResponse?,Error?) -> ())?
-    
-    init(withClient client: ESClient, name : String) {
-        self.client = client
-        self.name = name
-    }
-    
-    convenience init(withClient client: ESClient, name : String, builderClosure: BuilderClosure) {
-        self.init(withClient: client, name: name)
+    public typealias BuilderClosure = (CreateIndexRequestBuilder) -> Void
+
+    var name: String?
+    var settings: [String: CodableValue]?
+    var mappings: [String: MappingMetaData]?
+    var aliases: [IndexAlias]?
+
+
+    init() {}
+
+    public init(builderClosure: BuilderClosure) {
         builderClosure(self)
     }
-    
+
     public func set(name: String) -> Self {
         self.name = name
         return self
     }
-    
-    public func set(completionHandler: @escaping (CreateIndexResponse?,Error?) -> ()) -> Self {
-        self.completionHandler = completionHandler
+
+    public func set(settings: [String: CodableValue]) -> Self {
+        self.settings = settings
         return self
     }
-    
-    public func build() -> CreateIndexRequest {
+
+    public func set(mappings: [String: MappingMetaData]) -> Self {
+        self.mappings = mappings
+        return self
+    }
+
+    public func set(aliases: [IndexAlias]) -> Self {
+        self.aliases = aliases
+        return self
+    }
+
+    public func build() throws -> CreateIndexRequest {
+
+        guard self.name != nil else {
+            throw RequestBuilderError.missingRequiredField("name")
+        }
+
         return CreateIndexRequest(withBuilder: self)
     }
-    
+
 }
 
 public class DeleteIndexRequestBuilder: RequestBuilder {
-    
-    typealias BuilderClosure = (DeleteIndexRequestBuilder) -> Void
 
     public typealias RequestType = DeleteIndexRequest
-    
-    public var completionHandler: ((DeleteIndexResponse?,Error?) -> ())?
-    
-    let client: ESClient
-    var name: String
-    
-    init(withClient client: ESClient, name : String) {
-        self.client = client
-        self.name = name
-    }
-    
-    convenience init(withClient client: ESClient, name : String, builderClosure: BuilderClosure) {
-        self.init(withClient: client, name: name)
+
+    public typealias BuilderClosure = (DeleteIndexRequestBuilder) -> Void
+
+    var name: String?
+
+    init() {}
+
+    public init(builderClosure: BuilderClosure) {
         builderClosure(self)
     }
-    
+
     public func set(name: String) -> Self {
         self.name = name
         return self
     }
-    
-    public func set(completionHandler: @escaping (DeleteIndexResponse?,Error?) -> ()) -> Self {
-        self.completionHandler = completionHandler
-        return self
-    }
-    
-    public func build() -> DeleteIndexRequest {
+
+    public func build() throws -> DeleteIndexRequest {
         return DeleteIndexRequest(withBuilder: self)
     }
 
 }
 
 public class GetIndexRequestBuilder: RequestBuilder {
-    
+
     public typealias RequestType = GetIndexRequest
-    
-    typealias BuilderClosure = (GetIndexRequestBuilder) -> Void
-    
-    let client: ESClient
-    var name: String
-    public var completionHandler: ((GetIndexResponse?,Error?) -> ())?
-    
-    
-    init(withClient client: ESClient, name : String) {
-        self.client = client
-        self.name = name
-    }
-    
-    convenience init(withClient client: ESClient, name : String, builderClosure: BuilderClosure) {
-        self.init(withClient: client, name: name)
+
+    public typealias BuilderClosure = (GetIndexRequestBuilder) -> Void
+
+    var name: String?
+
+    init() {}
+
+    public init(builderClosure: BuilderClosure) {
         builderClosure(self)
     }
-    
+
     public func set(name: String) -> Self {
         self.name = name
         return self
     }
-    
-    public func set(completionHandler: @escaping (GetIndexResponse?,Error?) -> Void) -> Self {
-        self.completionHandler = completionHandler
-        return self
-    }
-    
-    public func build() -> GetIndexRequest {
+
+    public func build() throws -> GetIndexRequest {
         return GetIndexRequest(withBuilder: self)
     }
 
 }
 
-public class CreateIndexRequest: Request {
-    
-    public typealias ResponseType = CreateIndexResponse
-    
-    public var completionHandler: ((CreateIndexResponse?,Error?) -> ())?
-    
-    public let client: ESClient
-    let name: String
-    
-    init(withBuilder builder: CreateIndexRequestBuilder) {
-        self.client = builder.client
-        self.name = builder.name
-        self.completionHandler = builder.completionHandler
+
+//MARK:- Index Exists Request
+
+public class IndexExistsRequest: Request {
+    public var headers: HTTPHeaders = HTTPHeaders()
+
+    public var queryParams: [URLQueryItem] = []
+
+    public typealias ResponseType = IndexExistsResponse
+
+    public let name: String
+
+    public init(name: String) {
+        self.name = name
     }
-    
-    public var method: HTTPMethod = .PUT
-    
+
+    public var method: HTTPMethod {
+        get {
+            return .HEAD
+        }
+    }
+
     public var endPoint: String {
         get {
             return self.name
         }
     }
 
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        return .failure(.noBodyForRequest)
+    }
+
 }
+
+
+//MARK:- Create Index Reqeust
+
+public class CreateIndexRequest: Request, Encodable {
+    public var headers: HTTPHeaders = HTTPHeaders()
+
+    public typealias ResponseType = CreateIndexResponse
+
+    public let name: String
+    public let aliases: [IndexAlias]?
+    public let mappings: [String: MappingMetaData]?
+    public let settings: [String: CodableValue]?
+
+    public var includeTypeName: Bool?
+
+    public init(name: String, aliases: [IndexAlias]? = nil, mappings: [String: MappingMetaData]? = nil, settings: [String: CodableValue]? = nil) {
+        self.name = name
+        self.aliases = aliases
+        self.mappings = mappings
+        self.settings = settings
+    }
+
+    init(withBuilder builder: CreateIndexRequestBuilder) {
+        self.name = builder.name!
+        self.aliases = builder.aliases
+        self.mappings = builder.mappings
+        self.settings = builder.settings
+    }
+
+    public var method: HTTPMethod {
+        get {
+            return .PUT
+        }
+    }
+
+    public var endPoint: String {
+        get {
+            return self.name
+        }
+    }
+
+    public var queryParams: [URLQueryItem] {
+        get {
+            var params = [URLQueryItem]()
+            if let includeTypeName = self.includeTypeName {
+                params.append(URLQueryItem(name: QueryParams.includeTypeName.rawValue, value: "\(includeTypeName)"))
+            }
+            return params
+        }
+    }
+
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        guard self.aliases != nil || self.mappings != nil || self.settings != nil else {
+            return .failure(.noBodyForRequest)
+        }
+        return serializer.encode(self).mapError {
+            error -> MakeBodyError in
+            return .wrapped(error)
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(self.mappings, forKey: .mappings)
+        try container.encodeIfPresent(self.settings, forKey: .settings)
+        if let aliases = self.aliases {
+            let dic = Dictionary(uniqueKeysWithValues: aliases.map{ ($0.name, $0.metaData)})
+            try container.encode(dic, forKey: .aliases)
+        }
+    }
+
+    enum CodingKeys: CodingKey {
+        case aliases
+        case mappings
+        case settings
+    }
+}
+
+//MARK:- Get Index Request
 
 public class GetIndexRequest: Request {
-    
+    public var headers: HTTPHeaders = HTTPHeaders()
+
+    public var queryParams: [URLQueryItem] = []
+
     public typealias ResponseType = GetIndexResponse
-    
-    public var completionHandler: ((GetIndexResponse?,Error?) -> ())?
-    
-    public let client: ESClient
-    let name: String
-    
-    init(withBuilder builder: GetIndexRequestBuilder) {
-        self.client = builder.client
-        self.name = builder.name
-        self.completionHandler = builder.completionHandler
+
+    public let name: String
+
+    public init(name: String) {
+        self.name = name
     }
-    
-    public var method: HTTPMethod = .GET
-    
+
+    init(withBuilder builder: GetIndexRequestBuilder) {
+        self.name = builder.name!
+    }
+
+    public var method: HTTPMethod {
+        get {
+            return .GET
+        }
+    }
+
     public var endPoint: String {
         get {
             return self.name
         }
+    }
+
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        return .failure(.noBodyForRequest)
+    }
+
+}
+
+//MARK:- Delete Index Request
+
+public class DeleteIndexRequest: Request {
+    public var headers: HTTPHeaders = HTTPHeaders()
+
+    public var queryParams: [URLQueryItem] = []
+
+    public typealias ResponseType = AcknowledgedResponse
+
+    public let name: String
+
+    public init(name: String) {
+        self.name = name
+    }
+
+    init(withBuilder builder: DeleteIndexRequestBuilder) {
+        self.name = builder.name!
+    }
+
+    public var method: HTTPMethod {
+        get {
+            return .DELETE
+        }
+    }
+
+    public var endPoint: String {
+        get {
+            return self.name
+        }
+    }
+
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        return .failure(.noBodyForRequest)
     }
 }
 
-public class DeleteIndexRequest: Request {
-    
-    public typealias ResponseType = DeleteIndexResponse
-    
-    public var completionHandler: ((DeleteIndexResponse?,Error?) -> ())?
-    
-    public let client: ESClient
-    let name: String
-    
-    init(withBuilder builder: DeleteIndexRequestBuilder) {
-        self.client = builder.client
-        self.name = builder.name
-        self.completionHandler = builder.completionHandler
+//MARK:- Open Index Request
+
+public class OpenIndexRequest: Request {
+
+    public typealias ResponseType = AcknowledgedResponse
+
+    public var headers: HTTPHeaders = HTTPHeaders()
+
+    public var queryParams: [URLQueryItem] = []
+
+
+    public let names: [String]
+
+    public init(_ name: String) {
+        self.names = [name]
     }
-    
-   
-    public var method: HTTPMethod = .DELETE
-    
-    public var endPoint: String {
+
+    public init(_ names: [String]) {
+        self.names = names
+    }
+
+    public var method: HTTPMethod {
         get {
-            return self.name
+            return .POST
         }
     }
-    
+
+    public var endPoint: String {
+        get {
+            if self.names.count == 1 {
+                return self.names[0] + "/_open"
+            } else {
+                return self.names.joined(separator: ",") + "/_open"
+            }
+        }
+    }
+
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        return .failure(.noBodyForRequest)
+    }
+}
+
+//MARK:- Close Index Request
+
+public class CloseIndexRequest: Request {
+
+    public typealias ResponseType = AcknowledgedResponse
+
+    public var headers: HTTPHeaders = HTTPHeaders()
+
+    public var queryParams: [URLQueryItem] = []
+
+    public let names: [String]
+
+    public init(_ name: String) {
+        self.names = [name]
+    }
+
+    public init(_ names: [String]) {
+        self.names = names
+    }
+
+    public var method: HTTPMethod {
+        get {
+            return .POST
+        }
+    }
+
+    public var endPoint: String {
+        get {
+            return makeEndPoint()
+        }
+    }
+
+    func makeEndPoint() -> String {
+        if self.names.count == 1 {
+            return self.names[0] + "/_close"
+        } else {
+            return self.names.joined(separator: ",") + "/_close"
+        }
+    }
+
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        return .failure(.noBodyForRequest)
+    }
 }

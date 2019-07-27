@@ -7,111 +7,113 @@
 //
 
 import Foundation
+import NIOHTTP1
+
+//MARK:- Index Requet Builder
 
 public class IndexRequestBuilder<T: Codable>: RequestBuilder {
-    
-    typealias BuilderClosure = (IndexRequestBuilder) -> Void
-    
-    public typealias RequestType = IndexRequest
-    
-    let client: ESClient
-    var index: String
+
+    public typealias RequestType = IndexRequest<T>
+    public typealias BuilderClosure = (IndexRequestBuilder) -> Void
+
+    var index: String?
     var type: String?
     var id: String?
     var source: T
     var routing: String?
     var parent: String?
+    var version: String?
+    var versionType: VersionType?
     var refresh: IndexRefresh?
-    
-    public var completionHandler: ((IndexResponse?,Error?) -> ())?
-    
-    init(withClient client: ESClient, index : String, source: T) {
-        self.client = client
-        self.index = index
-        self.source = source
-    }
-    
-    convenience init(withClient client: ESClient, index : String, source: T, builderClosure: BuilderClosure) {
-        self.init(withClient: client, index: index, source: source)
+
+    init() {}
+
+    public init(builderClosure: BuilderClosure) {
         builderClosure(self)
     }
-    
+
+    @discardableResult
     public func set(index: String) -> Self {
         self.index = index
         return self
     }
-    
+
+    @discardableResult
     @available(*, deprecated, message: "Elasticsearch has deprecated use of custom types and will be remove in 7.0")
     public func set(type: String) -> Self {
         self.type = type
         return self
     }
-    
+
+    @discardableResult
     public func set(id: String) -> Self {
         self.id = id
         return self
     }
-    
+
+    @discardableResult
     public func set(routing: String) -> Self {
         self.routing = routing
         return self
     }
-    
+
+    @discardableResult
     public func set(parent: String) -> Self {
         self.parent = parent
         return self
     }
-    
+
+    @discardableResult
     public func set(source: T) -> Self {
         self.source = source
         return self
     }
-    
+
+    @discardableResult
+    public func set(version: String) -> Self {
+        self.version = version
+        return self
+    }
+
+    @discardableResult
+    public func set(versionType: VersionType) -> Self {
+        self.versionType = versionType
+        return self
+    }
+
+    @discardableResult
     public func set(refresh: IndexRefresh) -> Self {
         self.refresh = refresh
         return self
     }
-    
-    public func set(completionHandler: @escaping (IndexResponse?,Error?) -> ()) -> Self {
-        self.completionHandler = completionHandler
-        return self
+
+    public func build() throws -> IndexRequest<T> {
+
+        guard self.index != nil else {
+            throw RequestBuilderError.missingRequiredField("index")
+        }
+
+        guard self.source != nil else {
+            throw RequestBuilderError.missingRequiredField("source")
+        }
+
+        guard (self.version != nil && self.versionType != nil) || (self.version == nil && self.versionType == nil) else {
+            throw RequestBuilderError.missingRequiredField("source")
+        }
+
+        return try IndexRequest<T>(withBuilder: self)
     }
-    
-    public func build() -> IndexRequest<T> {
-        return IndexRequest<T>(withBuilder: self)
-    }
-    
+
 }
 
+//MARK:- Index Request
+
 public class IndexRequest<T: Codable>: Request {
-    
+
+    public var headers: HTTPHeaders = HTTPHeaders()
+
     public typealias ResponseType = IndexResponse
-    
-    public let completionHandler: ((IndexResponse?,Error?) -> ())?
-    
-    public let client: ESClient
-    var index: String
-    var type: String?
-    var id: String?
-    var source: T
-    var routing: String?
-    var parent: String?
-    var refresh: IndexRefresh?
-    
-    init(withBuilder builder: IndexRequestBuilder<T>) {
-        self.client = builder.client
-        self.index = builder.index
-        self.source = builder.source
-        
-        self.type = builder.type
-        self.id = builder.id
-        self.routing = builder.routing
-        self.parent = builder.parent
-        
-        self.refresh = builder.refresh
-        self.completionHandler = builder.completionHandler
-    }
-    
+
     public var method: HTTPMethod  {
         get {
             if self.id == nil {
@@ -120,48 +122,80 @@ public class IndexRequest<T: Codable>: Request {
             return .PUT
         }
     }
-    
-    public var endPoint: String {
+
+    public let index: String
+    public let type: String
+    public let id: String?
+    public let source: T
+    public var routing: String?
+    public var parent: String?
+    public var version: String?
+    public var versionType: VersionType?
+    public var refresh: IndexRefresh?
+
+    public init(index: String, type: String = "_doc", id: String?, source: T) {
+        self.index = index
+        self.type = type
+        self.id = id
+        self.source = source
+    }
+
+    public init(index: String, type: String = "_doc", id: String?, source: T, routing: String?, parent: String?, refresh: IndexRefresh?, version: String, versionType: VersionType) {
+        self.index = index
+        self.type = type
+        self.id = id
+        self.source = source
+        self.routing = routing
+        self.parent = parent
+        self.refresh = refresh
+        self.version = version
+        self.versionType = versionType
+    }
+
+    init(withBuilder builder: IndexRequestBuilder<T>) throws {
+        self.index = builder.index!
+        self.id = builder.id
+        self.type = builder.type ?? "_doc"
+        self.source = builder.source!
+        self.routing = builder.routing
+        self.parent = builder.parent
+        self.version = builder.version
+        self.versionType = builder.versionType
+        self.refresh = builder.refresh
+    }
+
+    public var method: HTTPMethod  {
         get {
-            var result = self.index + "/"
-            
-            if let type = self.type {
-                result += type + "/"
-            } else {
-                result += "_doc/"
-            }
-            
+            var _endPoint = self.index + "/" + type
             if let id = self.id {
-                result += id
+                _endPoint = _endPoint + "/" + id
             }
-            
-            return result
+            return _endPoint
         }
     }
-    
-    public func getBody() throws -> Data? {
-        return try self.serializer.encode(self.source)
+
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        return serializer.encode(self.source).flatMapError { error in return .failure(.wrapped(error)) }
     }
-    
-    public var parameters: [QueryParams : String]? {
+
+    public var queryParams: [URLQueryItem] {
         get {
-            if let refresh = self.refresh {
-                var result = [QueryParams : String]()
-                switch refresh {
-                case .FALSE:
-                    result[QueryParams.refresh] = "false"
-                    break
-                case .TRUE:
-                    result[QueryParams.refresh] = "true"
-                    break
-                case .WAIT:
-                    result[QueryParams.refresh] = "wait_for"
-                    break
-                }
-                return result
+            var queryItems = [URLQueryItem]()
+            if let routing = self.routing {
+                queryItems.append(URLQueryItem(name: QueryParams.routing.rawValue, value: routing))
             }
-            return nil
+            if let version = self.version, let versionType = self.versionType {
+                queryItems.append(URLQueryItem(name: QueryParams.version.rawValue, value: version))
+                queryItems.append(URLQueryItem(name: QueryParams.versionType.rawValue, value: versionType.rawValue))
+            }
+            if let refresh = self.refresh {
+                queryItems.append(URLQueryItem(name: QueryParams.refresh.rawValue, value: refresh.rawValue))
+            }
+            if let parentId = self.parent {
+                queryItems.append(URLQueryItem(name: QueryParams.parent.rawValue, value: parentId))
+            }
+            return queryItems
         }
     }
-    
+
 }

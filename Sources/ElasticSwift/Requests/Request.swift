@@ -7,87 +7,57 @@
 //
 
 import Foundation
+import NIOHTTP1
 
-public struct RequestBuilderConstants {
-    public struct Errors {
-        public enum Validation : Error {
-            case MissingField(field:String)
-        }
-    }
-}
+//MARK:- Reqeust Protocol
 
-public struct RequestConstants {
-    public struct Errors {
-        public enum Response : Error {
-            case Deserialization(content:String)
-        }
-    }
-}
-
-public protocol RequestBuilder {
-    
-    associatedtype RequestType : Request
-    associatedtype ResponseType : Response
-    
-    var completionHandler: ((_ response: ResponseType?, _ error: Error?) -> ())? { get }
-    
-    func build() -> RequestType
- 
-}
-
+/// Represents High Level Elasticsearch Reqeust
 public protocol Request {
 
     associatedtype ResponseType : Response
-    
+
     var client: ESClient { get }
-    
+
     var serializer : Serializer { get }
-    
+
+    associatedtype ResponseType: Codable
+
+    var headers: HTTPHeaders { get }
+
+    var queryParams: [URLQueryItem] { get }
+
     var method: HTTPMethod { get }
-    
+
     var endPoint: String { get }
-    
-    var parameters: [QueryParams:String]? { get }
-    
-    func getBody() throws -> Data?
-    
-    var completionHandler: ((_ response: ResponseType?, _ error: Error?) -> ())? { get }
-    
-    func execute() throws
-    
+
+    func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError>
+
 }
 
-extension Request {
-    
-    public var serializer : Serializer {
-        return DefaultSerializer()
+//MARK:- Request options
+
+/// Represents Additional options for Elasticsearch Reqeust like queryParam and/or header
+public class RequestOptions {
+
+    let headers: HTTPHeaders
+    let queryParams: [URLQueryItem]
+
+    init(headers: HTTPHeaders = HTTPHeaders(), queryParams: [URLQueryItem] = []) {
+        self.headers = headers
+        self.queryParams = queryParams
     }
-    
-    public var parameters: [QueryParams:String]? {
-        return nil
-    }
-    
-    public func getBody() throws -> Data? {
-        return nil
-    }
-    
-    public func execute() throws {
-        try self.client.execute(request: self, completionHandler: responseHandler)
-    }
-    
-    func responseHandler(_ response: ESResponse) {
-        
-        do {
-            let decoded = try ResponseType.create(fromESResponse: response, withSerializer: self.serializer)
-            completionHandler?(decoded, nil)
-            return
-        } catch {
-            completionHandler?(nil,error)
-            return
+
+    public static var `default`: RequestOptions {
+        get {
+            return RequestOptions()
         }
     }
 }
 
 
+public protocol RequestBuilder {
 
+    associatedtype RequestType: Request
 
+    func build() throws -> RequestType
+}

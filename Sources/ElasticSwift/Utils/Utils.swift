@@ -8,27 +8,44 @@
 
 import Foundation
 
-public enum QueryParams: String {
-    case format = "format"
-    case h = "h"
-    case help = "help"
-    case local = "local"
+enum QueryParams: String {
+    case format
+    case h
+    case help
+    case local
     case masterTimeout = "master_timeout"
-    case s = "s"
-    case v = "v"
-    case ts = "ts"
-    case bytes = "bytes"
-    case health = "health"
-    case pri = "pri"
+    case s
+    case v
+    case ts
+    case bytes
+    case health
+    case pri
     case fullId = "full_id"
-    case size = "size"
+    case size
     case ignoreUnavailable = "ignore_unavailable"
-    case actions = "actions"
-    case detailed = "detailed"
+    case actions
+    case detailed
     case nodeId = "node_id"
     case parentNode = "parent_node"
+    case version
+    case versionType = "version_type"
+    case refresh
     case parentTask = "parent_task"
-    case refresh = "refresh"
+    case waitForActiveShards = "wait_for_active_shards"
+    case opType = "op_type"
+    case routing
+    case timeout
+    case ifSeqNo = "if_seq_no"
+    case ifPrimaryTerm = "if_primary_term"
+    case pipeline
+    case includeTypeName = "include_type_name"
+    case parent
+    case retryOnConflict = "retry_on_conflict"
+    case fields
+    case lang
+    case source = "_source"
+    case sourceIncludes = "_source_includes"
+    case sourceExcludes = "_source_excludes"
 }
 
 enum EndPointCategory: String {
@@ -74,26 +91,10 @@ enum EndPointPath: String {
     case `default` = ""
 }
 
-enum URLScheme: String {
+public enum URLScheme: String {
     case HTTP = "http"
     case HTTPS = "https"
 }
-
-/**
- Helper Enum holding corresponding String value of HTTPMethods
- */
-public enum HTTPMethod: String {
-    case OPTIONS = "OPTIONS"
-    case GET     = "GET"
-    case HEAD    = "HEAD"
-    case POST    = "POST"
-    case PUT     = "PUT"
-    case PATCH   = "PATCH"
-    case DELETE  = "DELETE"
-    case TRACE   = "TRACE"
-    case CONNECT = "CONNECT"
-}
-
 
 public enum ShapeRelation: String {
     case INTERSECTS = "intersects"
@@ -131,9 +132,20 @@ public enum BoostMode: String {
     case MAX = "max"
 }
 
-public enum IndexRefresh: String {
-    case TRUE = "true"
-    case FALSE = "false"
-    case WAIT = "wait_for"
+public enum VersionType: String {
+    case `internal`
+    case external
+    case externalGte = "external_gte"
+    case force
 }
 
+public enum IndexRefresh: String {
+    case `true`
+    case `false`
+    case waitFor = "wait_for"
+}
+
+public enum OpType: String {
+    case index
+    case create
+}
