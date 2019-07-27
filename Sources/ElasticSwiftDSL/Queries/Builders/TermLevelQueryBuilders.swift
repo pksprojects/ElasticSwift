@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import ElasticSwiftCore
 
 // MARK:- Term Query Builder
 

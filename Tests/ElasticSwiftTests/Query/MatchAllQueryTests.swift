@@ -8,6 +8,7 @@
 import XCTest
 
 @testable import ElasticSwift
+@testable import ElasticSwiftDSL
 
 class MatchAllQueryTests: XCTestCase {
 

@@ -33,8 +33,8 @@ public protocol Request {
 /// Represents Additional options for Elasticsearch Reqeust like queryParam and/or header
 public class RequestOptions {
     
-    let headers: HTTPHeaders
-    let queryParams: [URLQueryItem]
+    public let headers: HTTPHeaders
+    public let queryParams: [URLQueryItem]
     
     init(headers: HTTPHeaders = HTTPHeaders(), queryParams: [URLQueryItem] = []) {
         self.headers = headers

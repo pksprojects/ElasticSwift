@@ -9,6 +9,8 @@
 import Foundation
 import Logging
 import NIOHTTP1
+import ElasticSwiftCore
+import ElasticSwiftCodableUtils
 
 // MARK: -  Builders
 

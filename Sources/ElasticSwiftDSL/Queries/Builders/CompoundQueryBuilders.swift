@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import ElasticSwiftCore
 
 // MARK:- Constant Score Query Builder
 

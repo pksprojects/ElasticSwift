@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import ElasticSwiftCore
 
 /// Class to get instances of various Query Builders.
 
@@ -102,7 +103,7 @@ public final class QueryBuilders {
         return FunctionScoreQueryBuilder()
     }
     
-    public static func boostingeQuery() -> BoostingQueryBuilder {
+    public static func boostingQuery() -> BoostingQueryBuilder {
         return BoostingQueryBuilder()
     }
     

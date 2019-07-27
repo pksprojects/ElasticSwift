@@ -1,19 +1,19 @@
 //
-//  JoiningQueries.swift
+//  SpecializedQuries.swift
 //  ElasticSwift
 //
 //  Created by Prafull Kumar Soni on 4/14/18.
 //
 
 import Foundation
+import ElasticSwiftCore
 
+// MARK:- MoreLikeThis Query
 
-// MARK:- Nested Query
-
-public class NestedQuery: Query {
+public class MoreLikeThisQuery: Query {
     public let name: String = ""
     
-    public init(withBuilder builder: NestedQueryBuilder) {
+    public init(withBuilder builder: MoreLikeThisQueryBuilder) {
         
     }
     
@@ -25,12 +25,12 @@ public class NestedQuery: Query {
     
 }
 
-// MARK:- HasChild Query
+// MARK:- Script Query
 
-public class HasChildQuery: Query {
+public class ScriptQuery: Query {
     public let name: String = ""
     
-    public init(withBuilder builder: HasChildQueryBuilder) {
+    public init(withBuilder builder: ScriptQueryBuilder) {
         
     }
     
@@ -42,12 +42,12 @@ public class HasChildQuery: Query {
     
 }
 
-// MARK:- HasParent Query
+// MARK:- Percolate Query
 
-public class HasParentQuery: Query {
+public class PercoloteQuery: Query {
     public let name: String = ""
     
-    public init(withBuilder builder: HasParentQueryBuilder) {
+    public init(withBuilder builder: PercoloteQueryBuilder) {
         
     }
     
@@ -59,12 +59,12 @@ public class HasParentQuery: Query {
     
 }
 
-// MARK:- ParentId Query
+// MARK:- Wrapper Query
 
-public class ParentIdQuery: Query {
+public class WrapperQuery: Query {
     public let name: String = ""
     
-    public init(withBuilder builder: ParentIdQueryBuilder) {
+    public init(withBuilder builder: WrapperQueryBuilder) {
         
     }
     

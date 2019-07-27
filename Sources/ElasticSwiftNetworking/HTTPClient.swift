@@ -12,6 +12,7 @@ import NIOHTTP1
 import NIOSSL
 #endif
 import Logging
+import ElasticSwiftCore
 
 // MARK:- HTTPCLIENT
 

@@ -1,6 +1,8 @@
 import XCTest
 
 @testable import ElasticSwift
+@testable import ElasticSwiftDSL
+@testable import ElasticSwiftCodableUtils
 
 class ElasticSwiftTests: XCTestCase {
     

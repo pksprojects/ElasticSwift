@@ -7,14 +7,9 @@
 //
 
 import Foundation
+import ElasticSwiftCore
 
-public protocol Serializer {
-    
-    func decode<T>(data: Data) -> Result<T, DecodingError> where T: Decodable
-    
-    func encode<T>(_ value: T) -> Result<Data, EncodingError> where T: Encodable
-    
-}
+//MARK:- DefaultSerializer
 
 public class DefaultSerializer: Serializer {
     

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import ElasticSwiftCore
 
 /// Builder for MatchAll query.
 

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import ElasticSwiftCore
 
 
 public final class SortBuilders {
@@ -95,7 +96,7 @@ public class Sort {
         self.fieldTypeisArray = (self.mode != nil) ? true : false
     }
     
-    func toDic() -> [String : Any] {
+    public func toDic() -> [String : Any] {
         return (!self.fieldTypeisArray) ? [self.field: self.sortOrder.rawValue] :
             [self.field : [
                 Sort.ORDER : self.sortOrder.rawValue,

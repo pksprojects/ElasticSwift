@@ -10,6 +10,18 @@ let package = Package(
         .library(
             name: "ElasticSwift",
             targets: ["ElasticSwift"]),
+        .library(
+            name: "ElasticSwiftDSL",
+            targets: ["ElasticSwiftDSL"]),
+        .library(
+            name: "ElasticSwiftNetworking",
+            targets: ["ElasticSwiftNetworking"]),
+        .library(
+            name: "ElasticSwiftCore",
+            targets: ["ElasticSwiftCore"]),
+        .library(
+            name: "ElasticSwiftCodableUtils",
+            targets: ["ElasticSwiftCodableUtils"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -24,9 +36,21 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "ElasticSwift",
+            dependencies: ["ElasticSwiftCore", "ElasticSwiftDSL", "ElasticSwiftNetworking", "ElasticSwiftCodableUtils", "Logging", "NIO", "NIOHTTP1", "NIOFoundationCompat", "NIOSSL", "NIOTransportServices"]),
+        .target(
+            name: "ElasticSwiftDSL",
+            dependencies: ["ElasticSwiftCore", "ElasticSwiftCodableUtils", "Logging", "NIO", "NIOHTTP1", "NIOFoundationCompat", "NIOSSL", "NIOTransportServices"]),
+        .target(
+            name: "ElasticSwiftNetworking",
+            dependencies: ["ElasticSwiftCore", "Logging", "NIO", "NIOHTTP1", "NIOFoundationCompat", "NIOSSL", "NIOTransportServices"]),
+        .target(
+            name: "ElasticSwiftCore",
+            dependencies: ["Logging", "NIO", "NIOHTTP1", "NIOFoundationCompat", "NIOSSL", "NIOTransportServices"]),
+        .target(
+            name: "ElasticSwiftCodableUtils",
             dependencies: ["Logging", "NIO", "NIOHTTP1", "NIOFoundationCompat", "NIOSSL", "NIOTransportServices"]),
         .testTarget(
             name: "ElasticSwiftTests",
-            dependencies: ["ElasticSwift"]),
+            dependencies: ["ElasticSwift", "ElasticSwiftDSL", "ElasticSwiftNetworking", "ElasticSwiftCore", "ElasticSwiftCodableUtils"]),
     ]
 )
