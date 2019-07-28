@@ -10,6 +10,9 @@ import NIO
 import NIOHTTP1
 import Logging
 
+//MARK:- HTTPResponse
+
+/// Represents a HTTPResponse returned from Elasticsearch
 public class HTTPResponse {
     
     public let request: HTTPRequest
@@ -33,35 +36,9 @@ public class HTTPResponse {
     }
 }
 
-extension HTTPResponseStatus {
-    
-    public func is1xxInformational() -> Bool {
-        return self.code >= 100 && self.code < 200
-    }
-    
-    public func is2xxSuccessful() -> Bool {
-        return self.code >= 200 && self.code < 300
-    }
-    
-    public func is3xxRedirection() -> Bool {
-        return self.code >= 300 && self.code < 400
-    }
-    
-    public func is4xxClientError() -> Bool {
-        return self.code >= 400 && self.code < 500
-    }
-    
-    public func is5xxServerError() -> Bool {
-        return self.code >= 500 && self.code < 600
-    }
-    
-    public func isError() -> Bool {
-        return self.is4xxClientError() || self.is5xxServerError()
-    }
-    
-}
+//MARK:- HTTPResponseBuilder
 
-
+/// Builder for `HTTPResponse`
 public class HTTPResponseBuilder {
     
     public typealias BuilderClosure = (HTTPResponseBuilder) -> Void
@@ -95,17 +72,33 @@ public class HTTPResponseBuilder {
     }
 }
 
+//MARK:- HTTPResponseStatus
 
-public class HTTPResponseBuilderError: Error {
+/// Helper extention for HTTPResponseStatus
+extension HTTPResponseStatus {
     
-    private let msg: String
-    
-    public init(_ msg: String) {
-        self.msg = msg
+    public func is1xxInformational() -> Bool {
+        return self.code >= 100 && self.code < 200
     }
     
-    public func message() -> String {
-        return self.msg
+    public func is2xxSuccessful() -> Bool {
+        return self.code >= 200 && self.code < 300
+    }
+    
+    public func is3xxRedirection() -> Bool {
+        return self.code >= 300 && self.code < 400
+    }
+    
+    public func is4xxClientError() -> Bool {
+        return self.code >= 400 && self.code < 500
+    }
+    
+    public func is5xxServerError() -> Bool {
+        return self.code >= 500 && self.code < 600
+    }
+    
+    public func isError() -> Bool {
+        return self.is4xxClientError() || self.is5xxServerError()
     }
     
 }

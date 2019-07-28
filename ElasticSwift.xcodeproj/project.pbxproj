@@ -23,10 +23,10 @@
 /* Begin PBXBuildFile section */
 		062E449C22EC92BF006335CE /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_22 /* Request.swift */; };
 		062E449E22EC9319006335CE /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_14 /* Errors.swift */; };
-		062E449F22EC94AC006335CE /* QueryBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_46 /* QueryBuilder.swift */; };
-		062E44A122EC94C1006335CE /* Query.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_57 /* Query.swift */; };
+		062E44A122EC94C1006335CE /* QueryDSL.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_57 /* QueryDSL.swift */; };
 		062E44A222EC97D9006335CE /* HTTPRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_66 /* HTTPRequest.swift */; };
 		062E44A322EC97DF006335CE /* HTTPResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_67 /* HTTPResponse.swift */; };
+		062E44A522EDE9AB006335CE /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 062E44A422EDE9AB006335CE /* Errors.swift */; };
 		OBJ_1000 /* ctx.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_267 /* ctx.c */; };
 		OBJ_1001 /* div.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_268 /* div.c */; };
 		OBJ_1002 /* div_extra.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_269 /* div_extra.c */; };
@@ -1798,6 +1798,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		062E44A422EDE9AB006335CE /* Errors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
 		"ElasticSwift::ElasticSwift::Product" /* ElasticSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ElasticSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"ElasticSwift::ElasticSwiftCodableUtils::Product" /* ElasticSwiftCodableUtils.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ElasticSwiftCodableUtils.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"ElasticSwift::ElasticSwiftCore::Product" /* ElasticSwiftCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ElasticSwiftCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2128,7 +2129,6 @@
 		OBJ_454 /* stack.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = stack.c; sourceTree = "<group>"; };
 		OBJ_458 /* fp-armv8.ios.aarch64.S */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = "fp-armv8.ios.aarch64.S"; sourceTree = "<group>"; };
 		OBJ_459 /* fp-armv8.linux.aarch64.S */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = "fp-armv8.linux.aarch64.S"; sourceTree = "<group>"; };
-		OBJ_46 /* QueryBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryBuilder.swift; sourceTree = "<group>"; };
 		OBJ_460 /* fp-x86_64.linux.x86_64.S */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = "fp-x86_64.linux.x86_64.S"; sourceTree = "<group>"; };
 		OBJ_461 /* fp-x86_64.mac.x86_64.S */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = "fp-x86_64.mac.x86_64.S"; sourceTree = "<group>"; };
 		OBJ_462 /* thread.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = thread.c; sourceTree = "<group>"; };
@@ -2246,7 +2246,7 @@
 		OBJ_567 /* ssl_buffer.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ssl_buffer.cc; sourceTree = "<group>"; };
 		OBJ_568 /* ssl_cert.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ssl_cert.cc; sourceTree = "<group>"; };
 		OBJ_569 /* ssl_cipher.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ssl_cipher.cc; sourceTree = "<group>"; };
-		OBJ_57 /* Query.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Query.swift; sourceTree = "<group>"; };
+		OBJ_57 /* QueryDSL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryDSL.swift; sourceTree = "<group>"; };
 		OBJ_570 /* ssl_file.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ssl_file.cc; sourceTree = "<group>"; };
 		OBJ_571 /* ssl_key_share.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ssl_key_share.cc; sourceTree = "<group>"; };
 		OBJ_572 /* ssl_lib.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ssl_lib.cc; sourceTree = "<group>"; };
@@ -2339,7 +2339,7 @@
 		OBJ_657 /* stack.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = stack.h; sourceTree = "<group>"; };
 		OBJ_658 /* des.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = des.h; sourceTree = "<group>"; };
 		OBJ_659 /* ec.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ec.h; sourceTree = "<group>"; };
-		OBJ_66 /* HTTPRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HTTPRequest.swift; path = ../ElasticSwiftNetworking/HTTPRequest.swift; sourceTree = "<group>"; };
+		OBJ_66 /* HTTPRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPRequest.swift; sourceTree = "<group>"; };
 		OBJ_660 /* hrss.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hrss.h; sourceTree = "<group>"; };
 		OBJ_661 /* ecdh.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ecdh.h; sourceTree = "<group>"; };
 		OBJ_662 /* rand.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rand.h; sourceTree = "<group>"; };
@@ -2350,7 +2350,7 @@
 		OBJ_667 /* ripemd.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ripemd.h; sourceTree = "<group>"; };
 		OBJ_668 /* curve25519.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = curve25519.h; sourceTree = "<group>"; };
 		OBJ_669 /* tls1.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tls1.h; sourceTree = "<group>"; };
-		OBJ_67 /* HTTPResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HTTPResponse.swift; path = ../ElasticSwiftNetworking/HTTPResponse.swift; sourceTree = "<group>"; };
+		OBJ_67 /* HTTPResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPResponse.swift; sourceTree = "<group>"; };
 		OBJ_670 /* dsa.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dsa.h; sourceTree = "<group>"; };
 		OBJ_671 /* srtp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = srtp.h; sourceTree = "<group>"; };
 		OBJ_672 /* asn1t.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = asn1t.h; sourceTree = "<group>"; };
@@ -2803,6 +2803,39 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		062E44A622EDE9B1006335CE /* Errors */ = {
+			isa = PBXGroup;
+			children = (
+				062E44A422EDE9AB006335CE /* Errors.swift */,
+			);
+			path = Errors;
+			sourceTree = "<group>";
+		};
+		062E44A722EDEA48006335CE /* Http */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_67 /* HTTPResponse.swift */,
+				OBJ_66 /* HTTPRequest.swift */,
+			);
+			path = Http;
+			sourceTree = "<group>";
+		};
+		062E44A822EDEA5B006335CE /* QueryDSL */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_57 /* QueryDSL.swift */,
+			);
+			path = QueryDSL;
+			sourceTree = "<group>";
+		};
+		062E44A922EDEAD8006335CE /* Requests */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_22 /* Request.swift */,
+			);
+			path = Requests;
+			sourceTree = "<group>";
+		};
 		OBJ_100 /* swift-nio-ssl 2.2.0 */ = {
 			isa = PBXGroup;
 			children = (
@@ -3458,12 +3491,11 @@
 		OBJ_35 /* ElasticSwiftCore */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_67 /* HTTPResponse.swift */,
-				OBJ_66 /* HTTPRequest.swift */,
-				OBJ_57 /* Query.swift */,
-				OBJ_46 /* QueryBuilder.swift */,
-				OBJ_22 /* Request.swift */,
+				062E44A722EDEA48006335CE /* Http */,
+				062E44A822EDEA5B006335CE /* QueryDSL */,
+				062E44A922EDEAD8006335CE /* Requests */,
 				OBJ_36 /* ElasticSwiftCore.swift */,
+				062E44A622EDE9B1006335CE /* Errors */,
 			);
 			name = ElasticSwiftCore;
 			path = Sources/ElasticSwiftCore;
@@ -3784,7 +3816,7 @@
 			path = x509;
 			sourceTree = "<group>";
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -3797,7 +3829,6 @@
 				OBJ_844 /* LICENSE */,
 				OBJ_845 /* README.md */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_516 /* x509v3 */ = {
@@ -5251,7 +5282,7 @@
 				English,
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_820 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -5365,11 +5396,11 @@
 			buildActionMask = 0;
 			files = (
 				062E44A322EC97DF006335CE /* HTTPResponse.swift in Sources */,
-				062E44A122EC94C1006335CE /* Query.swift in Sources */,
-				062E449F22EC94AC006335CE /* QueryBuilder.swift in Sources */,
+				062E44A122EC94C1006335CE /* QueryDSL.swift in Sources */,
 				062E44A222EC97D9006335CE /* HTTPRequest.swift in Sources */,
 				OBJ_1455 /* ElasticSwiftCore.swift in Sources */,
 				062E449C22EC92BF006335CE /* Request.swift in Sources */,
+				062E44A522EDE9AB006335CE /* Errors.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

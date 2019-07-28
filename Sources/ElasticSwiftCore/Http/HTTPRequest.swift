@@ -10,7 +10,9 @@ import NIO
 import NIOHTTP1
 import Logging
 
+//MARK:- HTTPRequest
 
+/// Class representing HTTP request for Elasticsearch
 public class HTTPRequest {
     
     public let version: HTTPVersion
@@ -68,7 +70,9 @@ public class HTTPRequest {
     
 }
 
+//MARK:- HTTPReqeustBuilder
 
+/// Builder for `HTTPRequest`
 public class HTTPRequestBuilder {
     
     public typealias BuilderClosure = (HTTPRequestBuilder) -> Void
@@ -99,19 +103,4 @@ public class HTTPRequestBuilder {
         
         return HTTPRequest(withBuilder: self)
     }
-}
-
-
-public class HTTPRequestBuilderError: Error {
-    
-    private let msg: String
-    
-    public init(_ msg: String) {
-        self.msg = msg
-    }
-    
-    public func message() -> String {
-        return self.msg
-    }
-    
 }
