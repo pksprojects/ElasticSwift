@@ -165,6 +165,6 @@ enum EndPointPath: String {
 }
 
 public enum URLScheme: String {
-    case HTTP = "http"
-    case HTTPS = "https"
+    case http
+    case https
 }
