@@ -16,9 +16,9 @@ public class DefaultSerializer: Serializer {
     public let encoder: JSONEncoder
     public let decoder: JSONDecoder
     
-    public init() {
-        self.encoder = JSONEncoder()
-        self.decoder = JSONDecoder()
+    public init(encoder: JSONEncoder = JSONEncoder(), decoder: JSONDecoder = JSONDecoder()) {
+        self.encoder = encoder
+        self.decoder = decoder
     }
     
     public func decode<T>(data: Data) -> Result<T, DecodingError> where T: Decodable {
