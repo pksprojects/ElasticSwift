@@ -10,6 +10,18 @@ let package = Package(
         .library(
             name: "ElasticSwift",
             targets: ["ElasticSwift"]),
+        .library(
+            name: "ElasticSwiftQueryDSL",
+            targets: ["ElasticSwiftQueryDSL"]),
+        .library(
+            name: "ElasticSwiftNetworking",
+            targets: ["ElasticSwiftNetworking"]),
+        .library(
+            name: "ElasticSwiftCore",
+            targets: ["ElasticSwiftCore"]),
+        .library(
+            name: "ElasticSwiftCodableUtils",
+            targets: ["ElasticSwiftCodableUtils"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -24,9 +36,21 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "ElasticSwift",
-            dependencies: ["Logging", "NIO", "NIOHTTP1", "NIOFoundationCompat", "NIOSSL", "NIOTransportServices"]),
+            dependencies: ["ElasticSwiftCore", "ElasticSwiftQueryDSL", "ElasticSwiftNetworking", "ElasticSwiftCodableUtils", "Logging", "NIO", "NIOHTTP1", "NIOFoundationCompat", "NIOSSL", "NIOTransportServices"]),
+        .target(
+            name: "ElasticSwiftQueryDSL",
+            dependencies: ["ElasticSwiftCore", "ElasticSwiftCodableUtils", "Logging"]),
+        .target(
+            name: "ElasticSwiftNetworking",
+            dependencies: ["ElasticSwiftCore", "Logging", "NIO", "NIOHTTP1", "NIOFoundationCompat", "NIOSSL", "NIOTransportServices"]),
+        .target(
+            name: "ElasticSwiftCore",
+            dependencies: ["Logging", "NIO", "NIOHTTP1"]),
+        .target(
+            name: "ElasticSwiftCodableUtils",
+            dependencies: []),
         .testTarget(
             name: "ElasticSwiftTests",
-            dependencies: ["ElasticSwift"]),
+            dependencies: ["ElasticSwift", "ElasticSwiftQueryDSL", "ElasticSwiftNetworking", "ElasticSwiftCore", "ElasticSwiftCodableUtils"]),
     ]
 )

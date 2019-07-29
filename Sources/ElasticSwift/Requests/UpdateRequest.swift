@@ -8,6 +8,9 @@
 
 import Foundation
 import NIOHTTP1
+import ElasticSwiftCore
+import ElasticSwiftQueryDSL
+import ElasticSwiftCodableUtils
 
 //MARK:- Update Request Builder
 
@@ -253,32 +256,4 @@ public struct UpdateResponse: Codable {
         case version = "_version"
         case result
     }
-    
 }
-
-// MARK:- SCRIPT
-
-public struct Script: Codable {
-    
-    public let source: String
-    public let lang: String?
-    public let params: [String: CodableValue]?
-    
-    public init(_ source: String, lang: String? = nil, params: [String: CodableValue]? = nil) {
-        self.source = source
-        self.lang = lang
-        self.params = params
-    }
-    
-    public func encode(_ encoder: Encoder) throws {
-        if self.lang == nil && self.params == nil {
-            var container = encoder.singleValueContainer()
-            try container.encode(self.source)
-        }
-        var container = encoder.container(keyedBy: Script.CodingKeys.self)
-        try container.encode(self.source, forKey: .source)
-        try container.encodeIfPresent(self.lang, forKey: .lang)
-        try container.encodeIfPresent(self.params, forKey: .params)
-    }
-}
-

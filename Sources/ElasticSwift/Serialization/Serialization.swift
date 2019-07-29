@@ -7,23 +7,18 @@
 //
 
 import Foundation
+import ElasticSwiftCore
 
-public protocol Serializer {
-    
-    func decode<T>(data: Data) -> Result<T, DecodingError> where T: Decodable
-    
-    func encode<T>(_ value: T) -> Result<Data, EncodingError> where T: Encodable
-    
-}
+//MARK:- DefaultSerializer
 
 public class DefaultSerializer: Serializer {
     
     public let encoder: JSONEncoder
     public let decoder: JSONDecoder
     
-    public init() {
-        self.encoder = JSONEncoder()
-        self.decoder = JSONDecoder()
+    public init(encoder: JSONEncoder = JSONEncoder(), decoder: JSONDecoder = JSONDecoder()) {
+        self.encoder = encoder
+        self.decoder = decoder
     }
     
     public func decode<T>(data: Data) -> Result<T, DecodingError> where T: Decodable {

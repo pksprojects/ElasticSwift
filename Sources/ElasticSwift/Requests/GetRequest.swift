@@ -8,6 +8,7 @@
 
 import Foundation
 import NIOHTTP1
+import ElasticSwiftCore
 
 //MARK:- Get Request Builder
 

@@ -8,6 +8,7 @@
 import XCTest
 
 @testable import ElasticSwift
+@testable import ElasticSwiftCore
 
 class SerializationTests: XCTestCase {
 

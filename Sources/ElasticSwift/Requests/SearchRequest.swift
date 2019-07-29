@@ -7,8 +7,9 @@
 //
 
 import Foundation
-import Logging
 import NIOHTTP1
+import ElasticSwiftCore
+import ElasticSwiftQueryDSL
 
 //MARK:- Search Request Builder
 

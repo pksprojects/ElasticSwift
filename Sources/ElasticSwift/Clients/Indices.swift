@@ -8,6 +8,7 @@
 
 import Foundation
 import Logging
+import ElasticSwiftCore
 
 public class IndicesClient {
     

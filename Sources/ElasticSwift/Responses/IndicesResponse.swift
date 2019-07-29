@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+import ElasticSwiftCodableUtils
 
 // MARK: - Response
 
