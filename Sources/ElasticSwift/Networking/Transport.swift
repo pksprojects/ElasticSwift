@@ -10,7 +10,6 @@ import Foundation
 import Logging
 import NIOConcurrencyHelpers
 import ElasticSwiftCore
-import ElasticSwiftNetworking
 
 // MARK: - Transport
 
@@ -25,11 +24,17 @@ internal class Transport {
     
     private let clientsQueue: RoundRobinQueue<HTTPClientAdaptor>
     
-    init(forHosts urls: [URL], credentials: ClientCredential? = nil, clientAdaptor: HTTPClientAdaptor.Type, adaptorConfig: HTTPAdaptorConfiguration) {
+    init(forHosts urls: [URL], httpSettings: HTTPSettings) {
         self.hosts = urls
         var clients = [HTTPClientAdaptor]()
-        for url in urls {
-            clients.append(clientAdaptor.init(forHost: url, adaptorConfig: adaptorConfig))
+        
+        switch httpSettings {
+        case .managed(let adaptorConfig):
+            for url in urls {
+                clients.append(adaptorConfig.adaptor.init(forHost: url, adaptorConfig: adaptorConfig))
+            }
+        case .independent(let adaptor):
+            clients.append(adaptor)
         }
         self.clientsQueue = RoundRobinQueue(clients)
     }

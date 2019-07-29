@@ -18,6 +18,23 @@ public protocol Serializer {
     
 }
 
+//MARK:- HTTPSettings
+
+public enum HTTPSettings {
+    
+    case managed(adaptorConfig: HTTPAdaptorConfiguration)
+    case independent(adaptor: HTTPClientAdaptor)
+    
+}
+
+//MARK:- ClientCredential
+
+public protocol ClientCredential {
+    
+    var token: String { get }
+    
+}
+
 //MARK:- QueryParams enums
 
 /// Enum QueryParams represent all the query params supported by ElasticSearch.

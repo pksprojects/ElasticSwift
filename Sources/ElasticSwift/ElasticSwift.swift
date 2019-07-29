@@ -24,7 +24,7 @@ public class ElasticClient {
     private var indicesClient: IndicesClient?
     
     public init(settings: Settings) {
-        self.transport = Transport(forHosts: settings.hosts, credentials: settings.credentials, clientAdaptor: settings.clientAdaptor, adaptorConfig: settings.adaptorConfig)
+        self.transport = Transport(forHosts: settings.hosts, httpSettings: settings.httpSettings)
         self._settings = settings
         self.indicesClient = IndicesClient(withClient: self)
         self.clusterClient = ClusterClient(withClient: self)
@@ -119,82 +119,71 @@ public class Settings {
     public let hosts: [Host]
     /// elasticsearch credentials
     public let credentials: ClientCredential?
-    /// configuration that is passed to http adaptor
-    public let adaptorConfig: HTTPAdaptorConfiguration
-    /// http client adaptor Type
-    public let clientAdaptor: HTTPClientAdaptor.Type
+    /// serializer to use for request/response serialization
     public let serializer: Serializer
+    /// httpSettings for underlying client
+    public let httpSettings: HTTPSettings
     
-    /// convenience initializer for localhost/development use
-    private convenience init(forHost host: String = "http://localhost:9200",  withCredentials credentials: ClientCredential? = nil, adaptor clientAdaptor: HTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self) {
-        self.init(forHost: Host(string: host)!, withCredentials: credentials)
-    }
-    
-    public init(forHost host: Host, withCredentials credentials: ClientCredential? = nil, adaptor clientAdaptor: HTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self, adaptorConfig: HTTPAdaptorConfiguration = .`default`, serializer: Serializer = DefaultSerializer()) {
-        hosts = [host]
-        self.credentials = credentials
-        self.adaptorConfig = adaptorConfig
-        self.clientAdaptor = clientAdaptor
-        self.serializer = serializer
-    }
-    
-    public init(forHost host: String, withCredentials credentials: ClientCredential? = nil, adaptor clientAdaptor: HTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self, adaptorConfig: HTTPAdaptorConfiguration = .`default`, serializer: Serializer = DefaultSerializer()) {
-        hosts = [URL(string: host)!]
-        self.credentials = credentials
-        self.adaptorConfig = adaptorConfig
-        self.clientAdaptor = clientAdaptor
-        self.serializer = serializer
-    }
-    
-    public init(forHosts hosts: [Host], withCredentials credentials: ClientCredential? = nil, adaptor clientAdaptor: HTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self, adaptorConfig: HTTPAdaptorConfiguration = .`default`, serializer: Serializer = DefaultSerializer()) {
+    public init(forHosts hosts: [Host], withCredentials credentials: ClientCredential? = nil, adaptorConfig: HTTPAdaptorConfiguration, serializer: Serializer = DefaultSerializer()) {
         self.hosts = hosts
         self.credentials = credentials
-        self.adaptorConfig = adaptorConfig
-        self.clientAdaptor = clientAdaptor
+        self.httpSettings = .managed(adaptorConfig: adaptorConfig)
         self.serializer = serializer
     }
-    
-    public init(forHosts hosts: [String], withCredentials credentials: ClientCredential? = nil, adaptor clientAdaptor: HTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self, adaptorConfig: HTTPAdaptorConfiguration = .`default`, serializer: Serializer = DefaultSerializer()) {
-        self.hosts = hosts.map({ return URL(string: $0)! })
+        
+    public init(forHosts hosts: [Host], withCredentials credentials: ClientCredential? = nil, adaptor clientAdaptor: HTTPClientAdaptor, serializer: Serializer = DefaultSerializer()) {
+        self.hosts = hosts
         self.credentials = credentials
-        self.adaptorConfig = adaptorConfig
-        self.clientAdaptor = clientAdaptor
+        self.httpSettings = .independent(adaptor: clientAdaptor)
         self.serializer = serializer
     }
     
-    /// default settings for ElasticClient
+    public convenience init(forHost host: Host, withCredentials credentials: ClientCredential? = nil, adaptorConfig: HTTPAdaptorConfiguration, serializer: Serializer = DefaultSerializer()) {
+        self.init(forHosts: [host], withCredentials: credentials, adaptorConfig: adaptorConfig, serializer: serializer)
+    }
+    
+    public convenience init(forHost host: Host, withCredentials credentials: ClientCredential? = nil, adaptor clientAdaptor: HTTPClientAdaptor, serializer: Serializer = DefaultSerializer()) {
+        self.init(forHosts: [host], withCredentials: credentials, adaptor: clientAdaptor, serializer: serializer)
+    }
+    
+    public convenience init(forHost host: String, withCredentials credentials: ClientCredential? = nil, adaptorConfig: HTTPAdaptorConfiguration, serializer: Serializer = DefaultSerializer()) {
+        self.init(forHosts: [URL(string: host)!], withCredentials: credentials, adaptorConfig: adaptorConfig, serializer: serializer)
+    }
+    
+    public convenience init(forHost host: String, withCredentials credentials: ClientCredential? = nil, adaptor clientAdaptor: HTTPClientAdaptor, serializer: Serializer = DefaultSerializer()) {
+        self.init(forHosts: [URL(string: host)!], withCredentials: credentials, adaptor: clientAdaptor, serializer: serializer)
+    }
+    
+    public convenience init(forHosts hosts: [String], withCredentials credentials: ClientCredential? = nil, adaptorConfig: HTTPAdaptorConfiguration, serializer: Serializer = DefaultSerializer()) {
+        self.init(forHosts: hosts.map({ return URL(string: $0)! }), withCredentials: credentials, adaptorConfig: adaptorConfig, serializer: serializer)
+    }
+    
+    public convenience init(forHosts hosts: [String], withCredentials credentials: ClientCredential? = nil, adaptor clientAdaptor: HTTPClientAdaptor, serializer: Serializer = DefaultSerializer()) {
+        self.init(forHosts: hosts.map({ return URL(string: $0)! }), withCredentials: credentials, adaptor: clientAdaptor, serializer: serializer)
+    }
+    
+    /// default settings for ElasticClient with host
+    public static func `default`(_ host: String) -> Settings {
+        #if os(iOS) || os(tvOS) || os(watchOS)
+          return urlSession(host)
+        #else
+          return swiftNIO(host)
+        #endif
+    }
+    
+    public static func swiftNIO(_ host: String) -> Settings {
+        return Settings(forHost: host, adaptorConfig: HTTPClientAdaptorConfiguration.default)
+    }
+    
+    public static func urlSession(_ host: String) -> Settings {
+        return Settings(forHost: host, adaptorConfig: URLSessionAdaptorConfiguration.default)
+    }
+    
+    /// default settings for ElasticClient for localhost/development use
     public static var `default`: Settings {
         get {
-            #if os(iOS) || os(tvOS) || os(watchOS)
-              return urlSession
-            #else
-              return swiftNIO
-            #endif
+            return swiftNIO("http://localhost:9200")
         }
-    }
-    
-    public static var swiftNIO: Settings {
-        get {
-            return Settings()
-        }
-    }
-    
-    public static var urlSession: Settings {
-        get {
-            return Settings(adaptor: URLSessionAdaptor.self)
-        }
-    }
-    
-}
-
-public class ClientCredential {
-    
-    let username: String
-    let password: String
-    
-    public init(username: String, password: String) {
-        self.username = username
-        self.password = password
     }
     
 }
@@ -272,11 +261,30 @@ public extension ElasticClient {
     private func authHeader() -> HTTPHeaders {
         var headers = HTTPHeaders()
         if let credentials = self.credentials {
-            let token = "\(credentials.username):\(credentials.password)".data(using: .utf8)?.base64EncodedString()
-            headers.add(name:"Authorization", value: "Basic \(token!)")
+            headers.add(name:"Authorization", value: credentials.token)
         }
         return headers
     }
 }
 
 
+//MARK:- BasicClientCredential
+
+public class BasicClientCredential: ClientCredential {
+    
+    let username: String
+    let password: String
+    
+    public init(username: String, password: String) {
+        self.username = username
+        self.password = password
+    }
+    
+    public var token: String {
+        get {
+            let token = "\(self.username):\(self.password)".data(using: .utf8)?.base64EncodedString()
+            return "Basic \(token!)"
+        }
+    }
+    
+}

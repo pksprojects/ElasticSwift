@@ -6,44 +6,89 @@ import NIOTLS
 #if canImport(NIOSSL)
 import NIOSSL
 #endif
+import ElasticSwiftCore
 
-public class HTTPAdaptorConfiguration {
+//MARK:- HTTPAdaptorConfiguration
+
+/// Class holding HTTPAdaptor Config
+public class HTTPClientAdaptorConfiguration: HTTPAdaptorConfiguration {
+    
+    public let adaptor: ManagedHTTPClientAdaptor.Type
     
     public let timeouts: Timeouts?
     
     public let eventLoopProvider: EventLoopProvider
     
-    // ssl config for URLSession based clients
-    public let sslConfig: SSLConfiguration?
-    
     #if canImport(NIOSSL)
     // ssl config for swift-nio-ssl based clients
     public let sslcontext: NIOSSLContext?
 
-    public init(eventLoopProvider: EventLoopProvider = .create(threads: 1), timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS, sslConfig: SSLConfiguration? = nil, sslContext: NIOSSLContext? = nil) {
+    public init(adaptor: ManagedHTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self, eventLoopProvider: EventLoopProvider = .create(threads: 1), timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS, sslContext: NIOSSLContext? = nil) {
         self.eventLoopProvider = eventLoopProvider
         self.timeouts = timeouts
-        self.sslConfig = sslConfig
         self.sslcontext = sslContext
+        self.adaptor = adaptor
     }
     
     #else
     
-    public init(eventLoopProvider: EventLoopProvider = .create(threads: 1), timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS, sslConfig: SSLConfiguration? = nil) {
+    public init(adaptor: ManagedHTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self, eventLoopProvider: EventLoopProvider = .create(threads: 1), timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS, sslConfig: SSLConfiguration? = nil) {
         self.eventLoopProvider = eventLoopProvider
         self.timeouts = timeouts
         self.sslConfig = sslConfig
+        self.adaptor = adaptor
     }
     
     #endif
     
     public static var `default`: HTTPAdaptorConfiguration {
         get {
-            return HTTPAdaptorConfiguration()
+            return HTTPClientAdaptorConfiguration()
         }
     }
     
 }
+
+public class URLSessionAdaptorConfiguration: HTTPAdaptorConfiguration {
+    
+    public let adaptor: ManagedHTTPClientAdaptor.Type
+    
+    public let timeouts: Timeouts?
+    
+    public let eventLoopProvider: EventLoopProvider
+    
+    #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
+    // URLSession basic SSL support for apple platform
+
+    // ssl config for URLSession based clients
+    public let sslConfig: SSLConfiguration?
+    
+    public init(adaptor: ManagedHTTPClientAdaptor.Type = URLSessionAdaptor.self, eventLoopProvider: EventLoopProvider = .create(threads: 1), timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS, sslConfig: SSLConfiguration? = nil) {
+        self.eventLoopProvider = eventLoopProvider
+        self.timeouts = timeouts
+        self.sslConfig = sslConfig
+        self.adaptor = adaptor
+    }
+    
+    #else
+    
+    public init(adaptor: ManagedHTTPClientAdaptor.Type = URLSessionAdaptor.self, timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS) {
+        self.eventLoopProvider = eventLoopProvider
+        self.timeouts = timeouts
+        self.adaptor = adaptor
+    }
+    
+    #endif
+    
+    public static var `default`: HTTPAdaptorConfiguration {
+        get {
+            return URLSessionAdaptorConfiguration()
+        }
+    }
+    
+}
+
+#if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
 
 public class SSLConfiguration {
     
@@ -55,3 +100,4 @@ public class SSLConfiguration {
         self.isSelfSigned = isSelfSigned
     }
 }
+#endif

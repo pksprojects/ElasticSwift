@@ -16,25 +16,15 @@ import NIOSSL
 #endif
 import ElasticSwiftCore
 
-// MARK: - HTTPClientAdaptor
-
-public protocol HTTPClientAdaptor {
-    
-    init(forHost host: URL, adaptorConfig: HTTPAdaptorConfiguration)
-    
-    func performRequest(_ request: HTTPRequest, callback: @escaping (_ result: Result<HTTPResponse, Error>) -> Void)
-}
-
-
 // MARK: - DefaultHTTPClientAdaptor
 
-public final class DefaultHTTPClientAdaptor: HTTPClientAdaptor {
+public final class DefaultHTTPClientAdaptor: ManagedHTTPClientAdaptor {
     
     private let logger = Logger(label: "org.pksprojects.ElasticSwfit.Networking.DefaultHTTPClientAdaptor")
     
     let client: HTTPClient
     
-    public required init(forHost host: URL, adaptorConfig: HTTPAdaptorConfiguration =  HTTPAdaptorConfiguration()) {
+    public required init(forHost host: URL, adaptorConfig: HTTPAdaptorConfiguration =  HTTPClientAdaptorConfiguration.default) {
         let httpClientConfig = DefaultHTTPClientAdaptor.createHttpClientConfig(from: adaptorConfig)
         self.client = HTTPClient(forHost: host, configuration: httpClientConfig)
     }
@@ -61,10 +51,12 @@ public final class DefaultHTTPClientAdaptor: HTTPClientAdaptor {
     }
     
     private static func createHttpClientConfig(from adaptorConfig: HTTPAdaptorConfiguration) -> HTTPClientConfiguration {
+        
+        let config = adaptorConfig as! HTTPClientAdaptorConfiguration
         #if canImport(NIOSSL)
-        return HTTPClientConfiguration(eventLoopProvider: adaptorConfig.eventLoopProvider, sslContext: adaptorConfig.sslcontext, timeouts: adaptorConfig.timeouts)
+        return HTTPClientConfiguration(eventLoopProvider: config.eventLoopProvider, sslContext: config.sslcontext, timeouts: config.timeouts)
         #else
-        return HTTPClientConfiguration(eventLoopProvider: adaptorConfig.eventLoopProvider, timeouts: adaptorConfig.timeouts)
+        return HTTPClientConfiguration(eventLoopProvider: config.eventLoopProvider, timeouts: config.timeouts)
         #endif
     }
     
@@ -72,7 +64,7 @@ public final class DefaultHTTPClientAdaptor: HTTPClientAdaptor {
 
 // MARK: - URLSessionAdaptor
 
-public final class URLSessionAdaptor: HTTPClientAdaptor {
+public final class URLSessionAdaptor: ManagedHTTPClientAdaptor {
     
     private let logger = Logger(label: "org.pksprojects.ElasticSwfit.Networking.URLSessionAdaptor")
     
@@ -80,8 +72,14 @@ public final class URLSessionAdaptor: HTTPClientAdaptor {
     
     let allocator: ByteBufferAllocator
     
-    public required init(forHost host: URL, adaptorConfig: HTTPAdaptorConfiguration =  HTTPAdaptorConfiguration()) {
-        self.sessionManager = SessionManager(forHost: host, sslConfig: adaptorConfig.sslConfig)
+    public required init(forHost host: URL, adaptorConfig: HTTPAdaptorConfiguration =  URLSessionAdaptorConfiguration.default) {
+        let config = adaptorConfig as! URLSessionAdaptorConfiguration
+        #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
+        // URLSession basic SSL support for apple platform
+        self.sessionManager = SessionManager(forHost: host, sslConfig: config.sslConfig)
+        #else
+        self.sessionManager = SessionManager(forHost: host)
+        #endif
         self.allocator = ByteBufferAllocator()
     }
     

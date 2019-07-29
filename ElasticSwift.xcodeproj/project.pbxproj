@@ -27,6 +27,7 @@
 		062E44A222EC97D9006335CE /* HTTPRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_66 /* HTTPRequest.swift */; };
 		062E44A322EC97DF006335CE /* HTTPResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_67 /* HTTPResponse.swift */; };
 		062E44A522EDE9AB006335CE /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 062E44A422EDE9AB006335CE /* Errors.swift */; };
+		062E44AB22EE0FCB006335CE /* HTTPAdaptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 062E44AA22EE0FCB006335CE /* HTTPAdaptor.swift */; };
 		OBJ_1000 /* ctx.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_267 /* ctx.c */; };
 		OBJ_1001 /* div.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_268 /* div.c */; };
 		OBJ_1002 /* div_extra.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_269 /* div_extra.c */; };
@@ -1799,6 +1800,7 @@
 
 /* Begin PBXFileReference section */
 		062E44A422EDE9AB006335CE /* Errors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
+		062E44AA22EE0FCB006335CE /* HTTPAdaptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPAdaptor.swift; sourceTree = "<group>"; };
 		"ElasticSwift::ElasticSwift::Product" /* ElasticSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ElasticSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"ElasticSwift::ElasticSwiftCodableUtils::Product" /* ElasticSwiftCodableUtils.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ElasticSwiftCodableUtils.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"ElasticSwift::ElasticSwiftCore::Product" /* ElasticSwiftCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ElasticSwiftCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2814,6 +2816,7 @@
 		062E44A722EDEA48006335CE /* Http */ = {
 			isa = PBXGroup;
 			children = (
+				062E44AA22EE0FCB006335CE /* HTTPAdaptor.swift */,
 				OBJ_67 /* HTTPResponse.swift */,
 				OBJ_66 /* HTTPRequest.swift */,
 			);
@@ -5399,6 +5402,7 @@
 				062E44A122EC94C1006335CE /* QueryDSL.swift in Sources */,
 				062E44A222EC97D9006335CE /* HTTPRequest.swift in Sources */,
 				OBJ_1455 /* ElasticSwiftCore.swift in Sources */,
+				062E44AB22EE0FCB006335CE /* HTTPAdaptor.swift in Sources */,
 				062E449C22EC92BF006335CE /* Request.swift in Sources */,
 				062E44A522EDE9AB006335CE /* Errors.swift in Sources */,
 			);
