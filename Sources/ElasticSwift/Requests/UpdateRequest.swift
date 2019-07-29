@@ -9,7 +9,7 @@
 import Foundation
 import NIOHTTP1
 import ElasticSwiftCore
-import ElasticSwiftDSL
+import ElasticSwiftQueryDSL
 import ElasticSwiftCodableUtils
 
 //MARK:- Update Request Builder

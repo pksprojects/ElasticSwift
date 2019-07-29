@@ -9,7 +9,7 @@
 import Foundation
 import NIOHTTP1
 import ElasticSwiftCore
-import ElasticSwiftDSL
+import ElasticSwiftQueryDSL
 
 //MARK:- Search Request Builder
 
