@@ -11,8 +11,8 @@ let package = Package(
             name: "ElasticSwift",
             targets: ["ElasticSwift"]),
         .library(
-            name: "ElasticSwiftDSL",
-            targets: ["ElasticSwiftDSL"]),
+            name: "ElasticSwiftQueryDSL",
+            targets: ["ElasticSwiftQueryDSL"]),
         .library(
             name: "ElasticSwiftNetworking",
             targets: ["ElasticSwiftNetworking"]),
@@ -36,9 +36,9 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "ElasticSwift",
-            dependencies: ["ElasticSwiftCore", "ElasticSwiftDSL", "ElasticSwiftNetworking", "ElasticSwiftCodableUtils", "Logging", "NIO", "NIOHTTP1", "NIOFoundationCompat", "NIOSSL", "NIOTransportServices"]),
+            dependencies: ["ElasticSwiftCore", "ElasticSwiftQueryDSL", "ElasticSwiftNetworking", "ElasticSwiftCodableUtils", "Logging", "NIO", "NIOHTTP1", "NIOFoundationCompat", "NIOSSL", "NIOTransportServices"]),
         .target(
-            name: "ElasticSwiftDSL",
+            name: "ElasticSwiftQueryDSL",
             dependencies: ["ElasticSwiftCore", "ElasticSwiftCodableUtils", "Logging"]),
         .target(
             name: "ElasticSwiftNetworking",
@@ -51,6 +51,6 @@ let package = Package(
             dependencies: []),
         .testTarget(
             name: "ElasticSwiftTests",
-            dependencies: ["ElasticSwift", "ElasticSwiftDSL", "ElasticSwiftNetworking", "ElasticSwiftCore", "ElasticSwiftCodableUtils"]),
+            dependencies: ["ElasticSwift", "ElasticSwiftQueryDSL", "ElasticSwiftNetworking", "ElasticSwiftCore", "ElasticSwiftCodableUtils"]),
     ]
 )

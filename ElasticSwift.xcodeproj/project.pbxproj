@@ -88,60 +88,30 @@
          path = "ElasticSwiftCore.framework";
          sourceTree = "BUILT_PRODUCTS_DIR";
       };
-      "ElasticSwift::ElasticSwiftDSL" = {
+      "ElasticSwift::ElasticSwiftNetworking" = {
          isa = "PBXNativeTarget";
          buildConfigurationList = "OBJ_1455";
          buildPhases = (
             "OBJ_1458",
-            "OBJ_1479"
+            "OBJ_1463"
          );
          dependencies = (
+            "OBJ_1480",
+            "OBJ_1481",
+            "OBJ_1482",
+            "OBJ_1483",
+            "OBJ_1484",
+            "OBJ_1485",
+            "OBJ_1486",
+            "OBJ_1487",
+            "OBJ_1488",
+            "OBJ_1489",
+            "OBJ_1490",
             "OBJ_1491",
             "OBJ_1492",
             "OBJ_1493",
             "OBJ_1494",
-            "OBJ_1495",
-            "OBJ_1496",
-            "OBJ_1497",
-            "OBJ_1498",
-            "OBJ_1499",
-            "OBJ_1500",
-            "OBJ_1501"
-         );
-         name = "ElasticSwiftDSL";
-         productName = "ElasticSwiftDSL";
-         productReference = "ElasticSwift::ElasticSwiftDSL::Product";
-         productType = "com.apple.product-type.framework";
-      };
-      "ElasticSwift::ElasticSwiftDSL::Product" = {
-         isa = "PBXFileReference";
-         path = "ElasticSwiftDSL.framework";
-         sourceTree = "BUILT_PRODUCTS_DIR";
-      };
-      "ElasticSwift::ElasticSwiftNetworking" = {
-         isa = "PBXNativeTarget";
-         buildConfigurationList = "OBJ_1502";
-         buildPhases = (
-            "OBJ_1505",
-            "OBJ_1510"
-         );
-         dependencies = (
-            "OBJ_1527",
-            "OBJ_1528",
-            "OBJ_1529",
-            "OBJ_1530",
-            "OBJ_1531",
-            "OBJ_1532",
-            "OBJ_1533",
-            "OBJ_1534",
-            "OBJ_1535",
-            "OBJ_1536",
-            "OBJ_1537",
-            "OBJ_1538",
-            "OBJ_1539",
-            "OBJ_1540",
-            "OBJ_1541",
-            "OBJ_1542"
+            "OBJ_1495"
          );
          name = "ElasticSwiftNetworking";
          productName = "ElasticSwiftNetworking";
@@ -155,14 +125,44 @@
       };
       "ElasticSwift::ElasticSwiftPackageTests::ProductTarget" = {
          isa = "PBXAggregateTarget";
-         buildConfigurationList = "OBJ_1550";
+         buildConfigurationList = "OBJ_1503";
          buildPhases = (
          );
          dependencies = (
-            "OBJ_1553"
+            "OBJ_1506"
          );
          name = "ElasticSwiftPackageTests";
          productName = "ElasticSwiftPackageTests";
+      };
+      "ElasticSwift::ElasticSwiftQueryDSL" = {
+         isa = "PBXNativeTarget";
+         buildConfigurationList = "OBJ_1508";
+         buildPhases = (
+            "OBJ_1511",
+            "OBJ_1532"
+         );
+         dependencies = (
+            "OBJ_1544",
+            "OBJ_1545",
+            "OBJ_1546",
+            "OBJ_1547",
+            "OBJ_1548",
+            "OBJ_1549",
+            "OBJ_1550",
+            "OBJ_1551",
+            "OBJ_1552",
+            "OBJ_1553",
+            "OBJ_1554"
+         );
+         name = "ElasticSwiftQueryDSL";
+         productName = "ElasticSwiftQueryDSL";
+         productReference = "ElasticSwift::ElasticSwiftQueryDSL::Product";
+         productType = "com.apple.product-type.framework";
+      };
+      "ElasticSwift::ElasticSwiftQueryDSL::Product" = {
+         isa = "PBXFileReference";
+         path = "ElasticSwiftQueryDSL.framework";
+         sourceTree = "BUILT_PRODUCTS_DIR";
       };
       "ElasticSwift::ElasticSwiftTests" = {
          isa = "PBXNativeTarget";
@@ -205,9 +205,9 @@
       };
       "ElasticSwift::SwiftPMPackageDescription" = {
          isa = "PBXNativeTarget";
-         buildConfigurationList = "OBJ_1544";
+         buildConfigurationList = "OBJ_1497";
          buildPhases = (
-            "OBJ_1547"
+            "OBJ_1500"
          );
          dependencies = (
          );
@@ -242,10 +242,10 @@
             "ElasticSwift::ElasticSwift",
             "ElasticSwift::ElasticSwiftCodableUtils",
             "ElasticSwift::ElasticSwiftCore",
-            "ElasticSwift::ElasticSwiftDSL",
             "ElasticSwift::ElasticSwiftNetworking",
             "ElasticSwift::SwiftPMPackageDescription",
             "ElasticSwift::ElasticSwiftPackageTests::ProductTarget",
+            "ElasticSwift::ElasticSwiftQueryDSL",
             "ElasticSwift::ElasticSwiftTests",
             "swift-log::Logging",
             "swift-nio::NIO",
@@ -2682,7 +2682,7 @@
       };
       "OBJ_1376" = {
          isa = "PBXBuildFile";
-         fileRef = "ElasticSwift::ElasticSwiftDSL::Product";
+         fileRef = "ElasticSwift::ElasticSwiftQueryDSL::Product";
       };
       "OBJ_1377" = {
          isa = "PBXBuildFile";
@@ -2782,7 +2782,7 @@
       };
       "OBJ_1400" = {
          isa = "PBXTargetDependency";
-         target = "ElasticSwift::ElasticSwiftDSL";
+         target = "ElasticSwift::ElasticSwiftQueryDSL";
       };
       "OBJ_1402" = {
          isa = "PBXTargetDependency";
@@ -3218,13 +3218,15 @@
             );
             HEADER_SEARCH_PATHS = (
                "$(inherited)",
+               "$(SRCROOT)/.build/checkouts/swift-nio-ssl/Sources/CNIOBoringSSLShims/include",
+               "$(SRCROOT)/.build/checkouts/swift-nio-ssl/Sources/CNIOBoringSSL/include",
                "$(SRCROOT)/.build/checkouts/swift-nio/Sources/CNIOHTTPParser/include",
                "$(SRCROOT)/.build/checkouts/swift-nio/Sources/CNIOSHA1/include",
                "$(SRCROOT)/.build/checkouts/swift-nio/Sources/CNIOAtomics/include",
                "$(SRCROOT)/.build/checkouts/swift-nio/Sources/CNIODarwin/include",
                "$(SRCROOT)/.build/checkouts/swift-nio/Sources/CNIOLinux/include"
             );
-            INFOPLIST_FILE = "ElasticSwift.xcodeproj/ElasticSwiftDSL_Info.plist";
+            INFOPLIST_FILE = "ElasticSwift.xcodeproj/ElasticSwiftNetworking_Info.plist";
             IPHONEOS_DEPLOYMENT_TARGET = "8.0";
             LD_RUNPATH_SEARCH_PATHS = (
                "$(inherited)",
@@ -3238,9 +3240,11 @@
                "$(inherited)"
             );
             OTHER_SWIFT_FLAGS = (
-               "$(inherited)"
+               "$(inherited)",
+               "-Xcc",
+               "-fmodule-map-file=$(SRCROOT)/.build/checkouts/swift-nio-ssl/Sources/CNIOBoringSSL/include/module.modulemap"
             );
-            PRODUCT_BUNDLE_IDENTIFIER = "ElasticSwiftDSL";
+            PRODUCT_BUNDLE_IDENTIFIER = "ElasticSwiftNetworking";
             PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
             PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
             SKIP_INSTALL = "YES";
@@ -3248,7 +3252,7 @@
                "$(inherited)"
             );
             SWIFT_VERSION = "5.0";
-            TARGET_NAME = "ElasticSwiftDSL";
+            TARGET_NAME = "ElasticSwiftNetworking";
             TVOS_DEPLOYMENT_TARGET = "9.0";
             WATCHOS_DEPLOYMENT_TARGET = "2.0";
          };
@@ -3264,13 +3268,15 @@
             );
             HEADER_SEARCH_PATHS = (
                "$(inherited)",
+               "$(SRCROOT)/.build/checkouts/swift-nio-ssl/Sources/CNIOBoringSSLShims/include",
+               "$(SRCROOT)/.build/checkouts/swift-nio-ssl/Sources/CNIOBoringSSL/include",
                "$(SRCROOT)/.build/checkouts/swift-nio/Sources/CNIOHTTPParser/include",
                "$(SRCROOT)/.build/checkouts/swift-nio/Sources/CNIOSHA1/include",
                "$(SRCROOT)/.build/checkouts/swift-nio/Sources/CNIOAtomics/include",
                "$(SRCROOT)/.build/checkouts/swift-nio/Sources/CNIODarwin/include",
                "$(SRCROOT)/.build/checkouts/swift-nio/Sources/CNIOLinux/include"
             );
-            INFOPLIST_FILE = "ElasticSwift.xcodeproj/ElasticSwiftDSL_Info.plist";
+            INFOPLIST_FILE = "ElasticSwift.xcodeproj/ElasticSwiftNetworking_Info.plist";
             IPHONEOS_DEPLOYMENT_TARGET = "8.0";
             LD_RUNPATH_SEARCH_PATHS = (
                "$(inherited)",
@@ -3284,9 +3290,11 @@
                "$(inherited)"
             );
             OTHER_SWIFT_FLAGS = (
-               "$(inherited)"
+               "$(inherited)",
+               "-Xcc",
+               "-fmodule-map-file=$(SRCROOT)/.build/checkouts/swift-nio-ssl/Sources/CNIOBoringSSL/include/module.modulemap"
             );
-            PRODUCT_BUNDLE_IDENTIFIER = "ElasticSwiftDSL";
+            PRODUCT_BUNDLE_IDENTIFIER = "ElasticSwiftNetworking";
             PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
             PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
             SKIP_INSTALL = "YES";
@@ -3294,7 +3302,7 @@
                "$(inherited)"
             );
             SWIFT_VERSION = "5.0";
-            TARGET_NAME = "ElasticSwiftDSL";
+            TARGET_NAME = "ElasticSwiftNetworking";
             TVOS_DEPLOYMENT_TARGET = "9.0";
             WATCHOS_DEPLOYMENT_TARGET = "2.0";
          };
@@ -3306,8 +3314,33 @@
             "OBJ_1459",
             "OBJ_1460",
             "OBJ_1461",
-            "OBJ_1462",
-            "OBJ_1463",
+            "OBJ_1462"
+         );
+      };
+      "OBJ_1459" = {
+         isa = "PBXBuildFile";
+         fileRef = "OBJ_47";
+      };
+      "OBJ_146" = {
+         isa = "PBXFileReference";
+         path = "file.c";
+         sourceTree = "<group>";
+      };
+      "OBJ_1460" = {
+         isa = "PBXBuildFile";
+         fileRef = "OBJ_48";
+      };
+      "OBJ_1461" = {
+         isa = "PBXBuildFile";
+         fileRef = "OBJ_49";
+      };
+      "OBJ_1462" = {
+         isa = "PBXBuildFile";
+         fileRef = "OBJ_50";
+      };
+      "OBJ_1463" = {
+         isa = "PBXFrameworksBuildPhase";
+         files = (
             "OBJ_1464",
             "OBJ_1465",
             "OBJ_1466",
@@ -3322,57 +3355,33 @@
             "OBJ_1475",
             "OBJ_1476",
             "OBJ_1477",
-            "OBJ_1478"
+            "OBJ_1478",
+            "OBJ_1479"
          );
-      };
-      "OBJ_1459" = {
-         isa = "PBXBuildFile";
-         fileRef = "OBJ_47";
-      };
-      "OBJ_146" = {
-         isa = "PBXFileReference";
-         path = "file.c";
-         sourceTree = "<group>";
-      };
-      "OBJ_1460" = {
-         isa = "PBXBuildFile";
-         fileRef = "OBJ_50";
-      };
-      "OBJ_1461" = {
-         isa = "PBXBuildFile";
-         fileRef = "OBJ_51";
-      };
-      "OBJ_1462" = {
-         isa = "PBXBuildFile";
-         fileRef = "OBJ_52";
-      };
-      "OBJ_1463" = {
-         isa = "PBXBuildFile";
-         fileRef = "OBJ_53";
       };
       "OBJ_1464" = {
          isa = "PBXBuildFile";
-         fileRef = "OBJ_54";
+         fileRef = "swift-nio-transport-services::NIOTransportServices::Product";
       };
       "OBJ_1465" = {
          isa = "PBXBuildFile";
-         fileRef = "OBJ_55";
+         fileRef = "swift-nio-ssl::NIOSSL::Product";
       };
       "OBJ_1466" = {
          isa = "PBXBuildFile";
-         fileRef = "OBJ_56";
+         fileRef = "swift-nio::NIOTLS::Product";
       };
       "OBJ_1467" = {
          isa = "PBXBuildFile";
-         fileRef = "OBJ_57";
+         fileRef = "swift-nio-ssl::CNIOBoringSSLShims::Product";
       };
       "OBJ_1468" = {
          isa = "PBXBuildFile";
-         fileRef = "OBJ_58";
+         fileRef = "swift-nio-ssl::CNIOBoringSSL::Product";
       };
       "OBJ_1469" = {
          isa = "PBXBuildFile";
-         fileRef = "OBJ_59";
+         fileRef = "swift-nio::NIOFoundationCompat::Product";
       };
       "OBJ_147" = {
          isa = "PBXFileReference";
@@ -3381,55 +3390,43 @@
       };
       "OBJ_1470" = {
          isa = "PBXBuildFile";
-         fileRef = "OBJ_60";
+         fileRef = "ElasticSwift::ElasticSwiftCore::Product";
       };
       "OBJ_1471" = {
          isa = "PBXBuildFile";
-         fileRef = "OBJ_61";
+         fileRef = "swift-nio::NIOHTTP1::Product";
       };
       "OBJ_1472" = {
          isa = "PBXBuildFile";
-         fileRef = "OBJ_62";
+         fileRef = "swift-nio::CNIOHTTPParser::Product";
       };
       "OBJ_1473" = {
          isa = "PBXBuildFile";
-         fileRef = "OBJ_63";
+         fileRef = "swift-nio::NIO::Product";
       };
       "OBJ_1474" = {
          isa = "PBXBuildFile";
-         fileRef = "OBJ_64";
+         fileRef = "swift-nio::CNIOSHA1::Product";
       };
       "OBJ_1475" = {
          isa = "PBXBuildFile";
-         fileRef = "OBJ_65";
+         fileRef = "swift-nio::NIOConcurrencyHelpers::Product";
       };
       "OBJ_1476" = {
          isa = "PBXBuildFile";
-         fileRef = "OBJ_66";
+         fileRef = "swift-nio::CNIOAtomics::Product";
       };
       "OBJ_1477" = {
          isa = "PBXBuildFile";
-         fileRef = "OBJ_67";
+         fileRef = "swift-nio::CNIODarwin::Product";
       };
       "OBJ_1478" = {
          isa = "PBXBuildFile";
-         fileRef = "OBJ_68";
+         fileRef = "swift-nio::CNIOLinux::Product";
       };
       "OBJ_1479" = {
-         isa = "PBXFrameworksBuildPhase";
-         files = (
-            "OBJ_1480",
-            "OBJ_1481",
-            "OBJ_1482",
-            "OBJ_1483",
-            "OBJ_1484",
-            "OBJ_1485",
-            "OBJ_1486",
-            "OBJ_1487",
-            "OBJ_1488",
-            "OBJ_1489",
-            "OBJ_1490"
-         );
+         isa = "PBXBuildFile";
+         fileRef = "swift-log::Logging::Product";
       };
       "OBJ_148" = {
          isa = "PBXFileReference";
@@ -3437,44 +3434,44 @@
          sourceTree = "<group>";
       };
       "OBJ_1480" = {
-         isa = "PBXBuildFile";
-         fileRef = "ElasticSwift::ElasticSwiftCodableUtils::Product";
+         isa = "PBXTargetDependency";
+         target = "swift-nio-transport-services::NIOTransportServices";
       };
       "OBJ_1481" = {
-         isa = "PBXBuildFile";
-         fileRef = "ElasticSwift::ElasticSwiftCore::Product";
+         isa = "PBXTargetDependency";
+         target = "swift-nio-ssl::NIOSSL";
       };
       "OBJ_1482" = {
-         isa = "PBXBuildFile";
-         fileRef = "swift-nio::NIOHTTP1::Product";
+         isa = "PBXTargetDependency";
+         target = "swift-nio::NIOTLS";
       };
       "OBJ_1483" = {
-         isa = "PBXBuildFile";
-         fileRef = "swift-nio::CNIOHTTPParser::Product";
+         isa = "PBXTargetDependency";
+         target = "swift-nio-ssl::CNIOBoringSSLShims";
       };
       "OBJ_1484" = {
-         isa = "PBXBuildFile";
-         fileRef = "swift-nio::NIO::Product";
+         isa = "PBXTargetDependency";
+         target = "swift-nio-ssl::CNIOBoringSSL";
       };
       "OBJ_1485" = {
-         isa = "PBXBuildFile";
-         fileRef = "swift-nio::CNIOSHA1::Product";
+         isa = "PBXTargetDependency";
+         target = "swift-nio::NIOFoundationCompat";
       };
       "OBJ_1486" = {
-         isa = "PBXBuildFile";
-         fileRef = "swift-nio::NIOConcurrencyHelpers::Product";
+         isa = "PBXTargetDependency";
+         target = "ElasticSwift::ElasticSwiftCore";
       };
       "OBJ_1487" = {
-         isa = "PBXBuildFile";
-         fileRef = "swift-nio::CNIOAtomics::Product";
+         isa = "PBXTargetDependency";
+         target = "swift-nio::NIOHTTP1";
       };
       "OBJ_1488" = {
-         isa = "PBXBuildFile";
-         fileRef = "swift-nio::CNIODarwin::Product";
+         isa = "PBXTargetDependency";
+         target = "swift-nio::CNIOHTTPParser";
       };
       "OBJ_1489" = {
-         isa = "PBXBuildFile";
-         fileRef = "swift-nio::CNIOLinux::Product";
+         isa = "PBXTargetDependency";
+         target = "swift-nio::NIO";
       };
       "OBJ_149" = {
          isa = "PBXFileReference";
@@ -3482,44 +3479,73 @@
          sourceTree = "<group>";
       };
       "OBJ_1490" = {
-         isa = "PBXBuildFile";
-         fileRef = "swift-log::Logging::Product";
-      };
-      "OBJ_1491" = {
-         isa = "PBXTargetDependency";
-         target = "ElasticSwift::ElasticSwiftCodableUtils";
-      };
-      "OBJ_1492" = {
-         isa = "PBXTargetDependency";
-         target = "ElasticSwift::ElasticSwiftCore";
-      };
-      "OBJ_1493" = {
-         isa = "PBXTargetDependency";
-         target = "swift-nio::NIOHTTP1";
-      };
-      "OBJ_1494" = {
-         isa = "PBXTargetDependency";
-         target = "swift-nio::CNIOHTTPParser";
-      };
-      "OBJ_1495" = {
-         isa = "PBXTargetDependency";
-         target = "swift-nio::NIO";
-      };
-      "OBJ_1496" = {
          isa = "PBXTargetDependency";
          target = "swift-nio::CNIOSHA1";
       };
-      "OBJ_1497" = {
+      "OBJ_1491" = {
          isa = "PBXTargetDependency";
          target = "swift-nio::NIOConcurrencyHelpers";
       };
-      "OBJ_1498" = {
+      "OBJ_1492" = {
          isa = "PBXTargetDependency";
          target = "swift-nio::CNIOAtomics";
       };
-      "OBJ_1499" = {
+      "OBJ_1493" = {
          isa = "PBXTargetDependency";
          target = "swift-nio::CNIODarwin";
+      };
+      "OBJ_1494" = {
+         isa = "PBXTargetDependency";
+         target = "swift-nio::CNIOLinux";
+      };
+      "OBJ_1495" = {
+         isa = "PBXTargetDependency";
+         target = "swift-log::Logging";
+      };
+      "OBJ_1497" = {
+         isa = "XCConfigurationList";
+         buildConfigurations = (
+            "OBJ_1498",
+            "OBJ_1499"
+         );
+         defaultConfigurationIsVisible = "0";
+         defaultConfigurationName = "Release";
+      };
+      "OBJ_1498" = {
+         isa = "XCBuildConfiguration";
+         buildSettings = {
+            LD = "/usr/bin/true";
+            OTHER_SWIFT_FLAGS = (
+               "-swift-version",
+               "5",
+               "-I",
+               "$(TOOLCHAIN_DIR)/usr/lib/swift/pm/4_2",
+               "-target",
+               "x86_64-apple-macosx10.10",
+               "-sdk",
+               "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk"
+            );
+            SWIFT_VERSION = "5.0";
+         };
+         name = "Debug";
+      };
+      "OBJ_1499" = {
+         isa = "XCBuildConfiguration";
+         buildSettings = {
+            LD = "/usr/bin/true";
+            OTHER_SWIFT_FLAGS = (
+               "-swift-version",
+               "5",
+               "-I",
+               "$(TOOLCHAIN_DIR)/usr/lib/swift/pm/4_2",
+               "-target",
+               "x86_64-apple-macosx10.10",
+               "-sdk",
+               "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk"
+            );
+            SWIFT_VERSION = "5.0";
+         };
+         name = "Release";
       };
       "OBJ_15" = {
          isa = "PBXGroup";
@@ -3536,23 +3562,50 @@
          sourceTree = "<group>";
       };
       "OBJ_1500" = {
-         isa = "PBXTargetDependency";
-         target = "swift-nio::CNIOLinux";
+         isa = "PBXSourcesBuildPhase";
+         files = (
+            "OBJ_1501"
+         );
       };
       "OBJ_1501" = {
-         isa = "PBXTargetDependency";
-         target = "swift-log::Logging";
+         isa = "PBXBuildFile";
+         fileRef = "OBJ_6";
       };
-      "OBJ_1502" = {
+      "OBJ_1503" = {
          isa = "XCConfigurationList";
          buildConfigurations = (
-            "OBJ_1503",
-            "OBJ_1504"
+            "OBJ_1504",
+            "OBJ_1505"
          );
          defaultConfigurationIsVisible = "0";
          defaultConfigurationName = "Release";
       };
-      "OBJ_1503" = {
+      "OBJ_1504" = {
+         isa = "XCBuildConfiguration";
+         buildSettings = {
+         };
+         name = "Debug";
+      };
+      "OBJ_1505" = {
+         isa = "XCBuildConfiguration";
+         buildSettings = {
+         };
+         name = "Release";
+      };
+      "OBJ_1506" = {
+         isa = "PBXTargetDependency";
+         target = "ElasticSwift::ElasticSwiftTests";
+      };
+      "OBJ_1508" = {
+         isa = "XCConfigurationList";
+         buildConfigurations = (
+            "OBJ_1509",
+            "OBJ_1510"
+         );
+         defaultConfigurationIsVisible = "0";
+         defaultConfigurationName = "Release";
+      };
+      "OBJ_1509" = {
          isa = "XCBuildConfiguration";
          buildSettings = {
             ENABLE_TESTABILITY = "YES";
@@ -3562,15 +3615,13 @@
             );
             HEADER_SEARCH_PATHS = (
                "$(inherited)",
-               "$(SRCROOT)/.build/checkouts/swift-nio-ssl/Sources/CNIOBoringSSLShims/include",
-               "$(SRCROOT)/.build/checkouts/swift-nio-ssl/Sources/CNIOBoringSSL/include",
                "$(SRCROOT)/.build/checkouts/swift-nio/Sources/CNIOHTTPParser/include",
                "$(SRCROOT)/.build/checkouts/swift-nio/Sources/CNIOSHA1/include",
                "$(SRCROOT)/.build/checkouts/swift-nio/Sources/CNIOAtomics/include",
                "$(SRCROOT)/.build/checkouts/swift-nio/Sources/CNIODarwin/include",
                "$(SRCROOT)/.build/checkouts/swift-nio/Sources/CNIOLinux/include"
             );
-            INFOPLIST_FILE = "ElasticSwift.xcodeproj/ElasticSwiftNetworking_Info.plist";
+            INFOPLIST_FILE = "ElasticSwift.xcodeproj/ElasticSwiftQueryDSL_Info.plist";
             IPHONEOS_DEPLOYMENT_TARGET = "8.0";
             LD_RUNPATH_SEARCH_PATHS = (
                "$(inherited)",
@@ -3584,11 +3635,9 @@
                "$(inherited)"
             );
             OTHER_SWIFT_FLAGS = (
-               "$(inherited)",
-               "-Xcc",
-               "-fmodule-map-file=$(SRCROOT)/.build/checkouts/swift-nio-ssl/Sources/CNIOBoringSSL/include/module.modulemap"
+               "$(inherited)"
             );
-            PRODUCT_BUNDLE_IDENTIFIER = "ElasticSwiftNetworking";
+            PRODUCT_BUNDLE_IDENTIFIER = "ElasticSwiftQueryDSL";
             PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
             PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
             SKIP_INSTALL = "YES";
@@ -3596,86 +3645,11 @@
                "$(inherited)"
             );
             SWIFT_VERSION = "5.0";
-            TARGET_NAME = "ElasticSwiftNetworking";
+            TARGET_NAME = "ElasticSwiftQueryDSL";
             TVOS_DEPLOYMENT_TARGET = "9.0";
             WATCHOS_DEPLOYMENT_TARGET = "2.0";
          };
          name = "Debug";
-      };
-      "OBJ_1504" = {
-         isa = "XCBuildConfiguration";
-         buildSettings = {
-            ENABLE_TESTABILITY = "YES";
-            FRAMEWORK_SEARCH_PATHS = (
-               "$(inherited)",
-               "$(PLATFORM_DIR)/Developer/Library/Frameworks"
-            );
-            HEADER_SEARCH_PATHS = (
-               "$(inherited)",
-               "$(SRCROOT)/.build/checkouts/swift-nio-ssl/Sources/CNIOBoringSSLShims/include",
-               "$(SRCROOT)/.build/checkouts/swift-nio-ssl/Sources/CNIOBoringSSL/include",
-               "$(SRCROOT)/.build/checkouts/swift-nio/Sources/CNIOHTTPParser/include",
-               "$(SRCROOT)/.build/checkouts/swift-nio/Sources/CNIOSHA1/include",
-               "$(SRCROOT)/.build/checkouts/swift-nio/Sources/CNIOAtomics/include",
-               "$(SRCROOT)/.build/checkouts/swift-nio/Sources/CNIODarwin/include",
-               "$(SRCROOT)/.build/checkouts/swift-nio/Sources/CNIOLinux/include"
-            );
-            INFOPLIST_FILE = "ElasticSwift.xcodeproj/ElasticSwiftNetworking_Info.plist";
-            IPHONEOS_DEPLOYMENT_TARGET = "8.0";
-            LD_RUNPATH_SEARCH_PATHS = (
-               "$(inherited)",
-               "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx"
-            );
-            MACOSX_DEPLOYMENT_TARGET = "10.10";
-            OTHER_CFLAGS = (
-               "$(inherited)"
-            );
-            OTHER_LDFLAGS = (
-               "$(inherited)"
-            );
-            OTHER_SWIFT_FLAGS = (
-               "$(inherited)",
-               "-Xcc",
-               "-fmodule-map-file=$(SRCROOT)/.build/checkouts/swift-nio-ssl/Sources/CNIOBoringSSL/include/module.modulemap"
-            );
-            PRODUCT_BUNDLE_IDENTIFIER = "ElasticSwiftNetworking";
-            PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
-            PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-            SKIP_INSTALL = "YES";
-            SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
-               "$(inherited)"
-            );
-            SWIFT_VERSION = "5.0";
-            TARGET_NAME = "ElasticSwiftNetworking";
-            TVOS_DEPLOYMENT_TARGET = "9.0";
-            WATCHOS_DEPLOYMENT_TARGET = "2.0";
-         };
-         name = "Release";
-      };
-      "OBJ_1505" = {
-         isa = "PBXSourcesBuildPhase";
-         files = (
-            "OBJ_1506",
-            "OBJ_1507",
-            "OBJ_1508",
-            "OBJ_1509"
-         );
-      };
-      "OBJ_1506" = {
-         isa = "PBXBuildFile";
-         fileRef = "OBJ_70";
-      };
-      "OBJ_1507" = {
-         isa = "PBXBuildFile";
-         fileRef = "OBJ_71";
-      };
-      "OBJ_1508" = {
-         isa = "PBXBuildFile";
-         fileRef = "OBJ_72";
-      };
-      "OBJ_1509" = {
-         isa = "PBXBuildFile";
-         fileRef = "OBJ_73";
       };
       "OBJ_151" = {
          isa = "PBXFileReference";
@@ -3683,9 +3657,54 @@
          sourceTree = "<group>";
       };
       "OBJ_1510" = {
-         isa = "PBXFrameworksBuildPhase";
+         isa = "XCBuildConfiguration";
+         buildSettings = {
+            ENABLE_TESTABILITY = "YES";
+            FRAMEWORK_SEARCH_PATHS = (
+               "$(inherited)",
+               "$(PLATFORM_DIR)/Developer/Library/Frameworks"
+            );
+            HEADER_SEARCH_PATHS = (
+               "$(inherited)",
+               "$(SRCROOT)/.build/checkouts/swift-nio/Sources/CNIOHTTPParser/include",
+               "$(SRCROOT)/.build/checkouts/swift-nio/Sources/CNIOSHA1/include",
+               "$(SRCROOT)/.build/checkouts/swift-nio/Sources/CNIOAtomics/include",
+               "$(SRCROOT)/.build/checkouts/swift-nio/Sources/CNIODarwin/include",
+               "$(SRCROOT)/.build/checkouts/swift-nio/Sources/CNIOLinux/include"
+            );
+            INFOPLIST_FILE = "ElasticSwift.xcodeproj/ElasticSwiftQueryDSL_Info.plist";
+            IPHONEOS_DEPLOYMENT_TARGET = "8.0";
+            LD_RUNPATH_SEARCH_PATHS = (
+               "$(inherited)",
+               "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx"
+            );
+            MACOSX_DEPLOYMENT_TARGET = "10.10";
+            OTHER_CFLAGS = (
+               "$(inherited)"
+            );
+            OTHER_LDFLAGS = (
+               "$(inherited)"
+            );
+            OTHER_SWIFT_FLAGS = (
+               "$(inherited)"
+            );
+            PRODUCT_BUNDLE_IDENTIFIER = "ElasticSwiftQueryDSL";
+            PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+            PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+            SKIP_INSTALL = "YES";
+            SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+               "$(inherited)"
+            );
+            SWIFT_VERSION = "5.0";
+            TARGET_NAME = "ElasticSwiftQueryDSL";
+            TVOS_DEPLOYMENT_TARGET = "9.0";
+            WATCHOS_DEPLOYMENT_TARGET = "2.0";
+         };
+         name = "Release";
+      };
+      "OBJ_1511" = {
+         isa = "PBXSourcesBuildPhase";
          files = (
-            "OBJ_1511",
             "OBJ_1512",
             "OBJ_1513",
             "OBJ_1514",
@@ -3700,44 +3719,45 @@
             "OBJ_1523",
             "OBJ_1524",
             "OBJ_1525",
-            "OBJ_1526"
+            "OBJ_1526",
+            "OBJ_1527",
+            "OBJ_1528",
+            "OBJ_1529",
+            "OBJ_1530",
+            "OBJ_1531"
          );
-      };
-      "OBJ_1511" = {
-         isa = "PBXBuildFile";
-         fileRef = "swift-nio-transport-services::NIOTransportServices::Product";
       };
       "OBJ_1512" = {
          isa = "PBXBuildFile";
-         fileRef = "swift-nio-ssl::NIOSSL::Product";
+         fileRef = "OBJ_52";
       };
       "OBJ_1513" = {
          isa = "PBXBuildFile";
-         fileRef = "swift-nio::NIOTLS::Product";
+         fileRef = "OBJ_55";
       };
       "OBJ_1514" = {
          isa = "PBXBuildFile";
-         fileRef = "swift-nio-ssl::CNIOBoringSSLShims::Product";
+         fileRef = "OBJ_56";
       };
       "OBJ_1515" = {
          isa = "PBXBuildFile";
-         fileRef = "swift-nio-ssl::CNIOBoringSSL::Product";
+         fileRef = "OBJ_57";
       };
       "OBJ_1516" = {
          isa = "PBXBuildFile";
-         fileRef = "swift-nio::NIOFoundationCompat::Product";
+         fileRef = "OBJ_58";
       };
       "OBJ_1517" = {
          isa = "PBXBuildFile";
-         fileRef = "ElasticSwift::ElasticSwiftCore::Product";
+         fileRef = "OBJ_59";
       };
       "OBJ_1518" = {
          isa = "PBXBuildFile";
-         fileRef = "swift-nio::NIOHTTP1::Product";
+         fileRef = "OBJ_60";
       };
       "OBJ_1519" = {
          isa = "PBXBuildFile";
-         fileRef = "swift-nio::CNIOHTTPParser::Product";
+         fileRef = "OBJ_61";
       };
       "OBJ_152" = {
          isa = "PBXGroup";
@@ -3751,43 +3771,43 @@
       };
       "OBJ_1520" = {
          isa = "PBXBuildFile";
-         fileRef = "swift-nio::NIO::Product";
+         fileRef = "OBJ_62";
       };
       "OBJ_1521" = {
          isa = "PBXBuildFile";
-         fileRef = "swift-nio::CNIOSHA1::Product";
+         fileRef = "OBJ_63";
       };
       "OBJ_1522" = {
          isa = "PBXBuildFile";
-         fileRef = "swift-nio::NIOConcurrencyHelpers::Product";
+         fileRef = "OBJ_64";
       };
       "OBJ_1523" = {
          isa = "PBXBuildFile";
-         fileRef = "swift-nio::CNIOAtomics::Product";
+         fileRef = "OBJ_65";
       };
       "OBJ_1524" = {
          isa = "PBXBuildFile";
-         fileRef = "swift-nio::CNIODarwin::Product";
+         fileRef = "OBJ_66";
       };
       "OBJ_1525" = {
          isa = "PBXBuildFile";
-         fileRef = "swift-nio::CNIOLinux::Product";
+         fileRef = "OBJ_67";
       };
       "OBJ_1526" = {
          isa = "PBXBuildFile";
-         fileRef = "swift-log::Logging::Product";
+         fileRef = "OBJ_68";
       };
       "OBJ_1527" = {
-         isa = "PBXTargetDependency";
-         target = "swift-nio-transport-services::NIOTransportServices";
+         isa = "PBXBuildFile";
+         fileRef = "OBJ_69";
       };
       "OBJ_1528" = {
-         isa = "PBXTargetDependency";
-         target = "swift-nio-ssl::NIOSSL";
+         isa = "PBXBuildFile";
+         fileRef = "OBJ_70";
       };
       "OBJ_1529" = {
-         isa = "PBXTargetDependency";
-         target = "swift-nio::NIOTLS";
+         isa = "PBXBuildFile";
+         fileRef = "OBJ_71";
       };
       "OBJ_153" = {
          isa = "PBXFileReference";
@@ -3795,44 +3815,56 @@
          sourceTree = "<group>";
       };
       "OBJ_1530" = {
-         isa = "PBXTargetDependency";
-         target = "swift-nio-ssl::CNIOBoringSSLShims";
+         isa = "PBXBuildFile";
+         fileRef = "OBJ_72";
       };
       "OBJ_1531" = {
-         isa = "PBXTargetDependency";
-         target = "swift-nio-ssl::CNIOBoringSSL";
+         isa = "PBXBuildFile";
+         fileRef = "OBJ_73";
       };
       "OBJ_1532" = {
-         isa = "PBXTargetDependency";
-         target = "swift-nio::NIOFoundationCompat";
+         isa = "PBXFrameworksBuildPhase";
+         files = (
+            "OBJ_1533",
+            "OBJ_1534",
+            "OBJ_1535",
+            "OBJ_1536",
+            "OBJ_1537",
+            "OBJ_1538",
+            "OBJ_1539",
+            "OBJ_1540",
+            "OBJ_1541",
+            "OBJ_1542",
+            "OBJ_1543"
+         );
       };
       "OBJ_1533" = {
-         isa = "PBXTargetDependency";
-         target = "ElasticSwift::ElasticSwiftCore";
+         isa = "PBXBuildFile";
+         fileRef = "ElasticSwift::ElasticSwiftCodableUtils::Product";
       };
       "OBJ_1534" = {
-         isa = "PBXTargetDependency";
-         target = "swift-nio::NIOHTTP1";
+         isa = "PBXBuildFile";
+         fileRef = "ElasticSwift::ElasticSwiftCore::Product";
       };
       "OBJ_1535" = {
-         isa = "PBXTargetDependency";
-         target = "swift-nio::CNIOHTTPParser";
+         isa = "PBXBuildFile";
+         fileRef = "swift-nio::NIOHTTP1::Product";
       };
       "OBJ_1536" = {
-         isa = "PBXTargetDependency";
-         target = "swift-nio::NIO";
+         isa = "PBXBuildFile";
+         fileRef = "swift-nio::CNIOHTTPParser::Product";
       };
       "OBJ_1537" = {
-         isa = "PBXTargetDependency";
-         target = "swift-nio::CNIOSHA1";
+         isa = "PBXBuildFile";
+         fileRef = "swift-nio::NIO::Product";
       };
       "OBJ_1538" = {
-         isa = "PBXTargetDependency";
-         target = "swift-nio::NIOConcurrencyHelpers";
+         isa = "PBXBuildFile";
+         fileRef = "swift-nio::CNIOSHA1::Product";
       };
       "OBJ_1539" = {
-         isa = "PBXTargetDependency";
-         target = "swift-nio::CNIOAtomics";
+         isa = "PBXBuildFile";
+         fileRef = "swift-nio::NIOConcurrencyHelpers::Product";
       };
       "OBJ_154" = {
          isa = "PBXFileReference";
@@ -3840,71 +3872,44 @@
          sourceTree = "<group>";
       };
       "OBJ_1540" = {
-         isa = "PBXTargetDependency";
-         target = "swift-nio::CNIODarwin";
+         isa = "PBXBuildFile";
+         fileRef = "swift-nio::CNIOAtomics::Product";
       };
       "OBJ_1541" = {
-         isa = "PBXTargetDependency";
-         target = "swift-nio::CNIOLinux";
+         isa = "PBXBuildFile";
+         fileRef = "swift-nio::CNIODarwin::Product";
       };
       "OBJ_1542" = {
-         isa = "PBXTargetDependency";
-         target = "swift-log::Logging";
+         isa = "PBXBuildFile";
+         fileRef = "swift-nio::CNIOLinux::Product";
+      };
+      "OBJ_1543" = {
+         isa = "PBXBuildFile";
+         fileRef = "swift-log::Logging::Product";
       };
       "OBJ_1544" = {
-         isa = "XCConfigurationList";
-         buildConfigurations = (
-            "OBJ_1545",
-            "OBJ_1546"
-         );
-         defaultConfigurationIsVisible = "0";
-         defaultConfigurationName = "Release";
+         isa = "PBXTargetDependency";
+         target = "ElasticSwift::ElasticSwiftCodableUtils";
       };
       "OBJ_1545" = {
-         isa = "XCBuildConfiguration";
-         buildSettings = {
-            LD = "/usr/bin/true";
-            OTHER_SWIFT_FLAGS = (
-               "-swift-version",
-               "5",
-               "-I",
-               "$(TOOLCHAIN_DIR)/usr/lib/swift/pm/4_2",
-               "-target",
-               "x86_64-apple-macosx10.10",
-               "-sdk",
-               "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk"
-            );
-            SWIFT_VERSION = "5.0";
-         };
-         name = "Debug";
+         isa = "PBXTargetDependency";
+         target = "ElasticSwift::ElasticSwiftCore";
       };
       "OBJ_1546" = {
-         isa = "XCBuildConfiguration";
-         buildSettings = {
-            LD = "/usr/bin/true";
-            OTHER_SWIFT_FLAGS = (
-               "-swift-version",
-               "5",
-               "-I",
-               "$(TOOLCHAIN_DIR)/usr/lib/swift/pm/4_2",
-               "-target",
-               "x86_64-apple-macosx10.10",
-               "-sdk",
-               "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk"
-            );
-            SWIFT_VERSION = "5.0";
-         };
-         name = "Release";
+         isa = "PBXTargetDependency";
+         target = "swift-nio::NIOHTTP1";
       };
       "OBJ_1547" = {
-         isa = "PBXSourcesBuildPhase";
-         files = (
-            "OBJ_1548"
-         );
+         isa = "PBXTargetDependency";
+         target = "swift-nio::CNIOHTTPParser";
       };
       "OBJ_1548" = {
-         isa = "PBXBuildFile";
-         fileRef = "OBJ_6";
+         isa = "PBXTargetDependency";
+         target = "swift-nio::NIO";
+      };
+      "OBJ_1549" = {
+         isa = "PBXTargetDependency";
+         target = "swift-nio::CNIOSHA1";
       };
       "OBJ_155" = {
          isa = "PBXGroup";
@@ -3916,29 +3921,24 @@
          sourceTree = "<group>";
       };
       "OBJ_1550" = {
-         isa = "XCConfigurationList";
-         buildConfigurations = (
-            "OBJ_1551",
-            "OBJ_1552"
-         );
-         defaultConfigurationIsVisible = "0";
-         defaultConfigurationName = "Release";
+         isa = "PBXTargetDependency";
+         target = "swift-nio::NIOConcurrencyHelpers";
       };
       "OBJ_1551" = {
-         isa = "XCBuildConfiguration";
-         buildSettings = {
-         };
-         name = "Debug";
+         isa = "PBXTargetDependency";
+         target = "swift-nio::CNIOAtomics";
       };
       "OBJ_1552" = {
-         isa = "XCBuildConfiguration";
-         buildSettings = {
-         };
-         name = "Release";
+         isa = "PBXTargetDependency";
+         target = "swift-nio::CNIODarwin";
       };
       "OBJ_1553" = {
          isa = "PBXTargetDependency";
-         target = "ElasticSwift::ElasticSwiftTests";
+         target = "swift-nio::CNIOLinux";
+      };
+      "OBJ_1554" = {
+         isa = "PBXTargetDependency";
+         target = "swift-log::Logging";
       };
       "OBJ_1555" = {
          isa = "XCConfigurationList";
@@ -4142,7 +4142,7 @@
       };
       "OBJ_1571" = {
          isa = "PBXBuildFile";
-         fileRef = "ElasticSwift::ElasticSwiftDSL::Product";
+         fileRef = "ElasticSwift::ElasticSwiftQueryDSL::Product";
       };
       "OBJ_1572" = {
          isa = "PBXBuildFile";
@@ -4232,7 +4232,7 @@
       };
       "OBJ_1591" = {
          isa = "PBXTargetDependency";
-         target = "ElasticSwift::ElasticSwiftDSL";
+         target = "ElasticSwift::ElasticSwiftQueryDSL";
       };
       "OBJ_1592" = {
          isa = "PBXTargetDependency";
@@ -8457,10 +8457,12 @@
          isa = "PBXGroup";
          children = (
             "OBJ_47",
-            "OBJ_48"
+            "OBJ_48",
+            "OBJ_49",
+            "OBJ_50"
          );
-         name = "ElasticSwiftDSL";
-         path = "Sources/ElasticSwiftDSL";
+         name = "ElasticSwiftNetworking";
+         path = "Sources/ElasticSwiftNetworking";
          sourceTree = "SOURCE_ROOT";
       };
       "OBJ_460" = {
@@ -8530,7 +8532,7 @@
       };
       "OBJ_47" = {
          isa = "PBXFileReference";
-         path = "ElasticSwiftDSL.swift";
+         path = "ElasticSwiftNetworking.swift";
          sourceTree = "<group>";
       };
       "OBJ_470" = {
@@ -8636,21 +8638,8 @@
          sourceTree = "<group>";
       };
       "OBJ_48" = {
-         isa = "PBXGroup";
-         children = (
-            "OBJ_49",
-            "OBJ_60",
-            "OBJ_61",
-            "OBJ_62",
-            "OBJ_63",
-            "OBJ_64",
-            "OBJ_65",
-            "OBJ_66",
-            "OBJ_67",
-            "OBJ_68"
-         );
-         name = "Queries";
-         path = "Queries";
+         isa = "PBXFileReference";
+         path = "HTTPClient.swift";
          sourceTree = "<group>";
       };
       "OBJ_480" = {
@@ -8704,21 +8693,8 @@
          sourceTree = "<group>";
       };
       "OBJ_49" = {
-         isa = "PBXGroup";
-         children = (
-            "OBJ_50",
-            "OBJ_51",
-            "OBJ_52",
-            "OBJ_53",
-            "OBJ_54",
-            "OBJ_55",
-            "OBJ_56",
-            "OBJ_57",
-            "OBJ_58",
-            "OBJ_59"
-         );
-         name = "Builders";
-         path = "Builders";
+         isa = "PBXFileReference";
+         path = "HTTPClientAdaptor.swift";
          sourceTree = "<group>";
       };
       "OBJ_490" = {
@@ -8789,7 +8765,7 @@
       };
       "OBJ_50" = {
          isa = "PBXFileReference";
-         path = "CompoundQueryBuilders.swift";
+         path = "SessionManager.swift";
          sourceTree = "<group>";
       };
       "OBJ_500" = {
@@ -8843,9 +8819,14 @@
          sourceTree = "<group>";
       };
       "OBJ_51" = {
-         isa = "PBXFileReference";
-         path = "FullTextBuilders.swift";
-         sourceTree = "<group>";
+         isa = "PBXGroup";
+         children = (
+            "OBJ_52",
+            "OBJ_53"
+         );
+         name = "ElasticSwiftQueryDSL";
+         path = "Sources/ElasticSwiftQueryDSL";
+         sourceTree = "SOURCE_ROOT";
       };
       "OBJ_510" = {
          isa = "PBXFileReference";
@@ -8899,7 +8880,7 @@
       };
       "OBJ_52" = {
          isa = "PBXFileReference";
-         path = "GeoQueryBuilders.swift";
+         path = "ElasticSwiftDSL.swift";
          sourceTree = "<group>";
       };
       "OBJ_520" = {
@@ -8989,8 +8970,21 @@
          sourceTree = "<group>";
       };
       "OBJ_53" = {
-         isa = "PBXFileReference";
-         path = "JoiningQueryBuilders.swift";
+         isa = "PBXGroup";
+         children = (
+            "OBJ_54",
+            "OBJ_65",
+            "OBJ_66",
+            "OBJ_67",
+            "OBJ_68",
+            "OBJ_69",
+            "OBJ_70",
+            "OBJ_71",
+            "OBJ_72",
+            "OBJ_73"
+         );
+         name = "Queries";
+         path = "Queries";
          sourceTree = "<group>";
       };
       "OBJ_530" = {
@@ -9044,8 +9038,21 @@
          sourceTree = "<group>";
       };
       "OBJ_54" = {
-         isa = "PBXFileReference";
-         path = "MatchAllBuilders.swift";
+         isa = "PBXGroup";
+         children = (
+            "OBJ_55",
+            "OBJ_56",
+            "OBJ_57",
+            "OBJ_58",
+            "OBJ_59",
+            "OBJ_60",
+            "OBJ_61",
+            "OBJ_62",
+            "OBJ_63",
+            "OBJ_64"
+         );
+         name = "Builders";
+         path = "Builders";
          sourceTree = "<group>";
       };
       "OBJ_540" = {
@@ -9100,7 +9107,7 @@
       };
       "OBJ_55" = {
          isa = "PBXFileReference";
-         path = "QueryBuilders.swift";
+         path = "CompoundQueryBuilders.swift";
          sourceTree = "<group>";
       };
       "OBJ_550" = {
@@ -9194,7 +9201,7 @@
       };
       "OBJ_56" = {
          isa = "PBXFileReference";
-         path = "ScoreFunctionBuilders.swift";
+         path = "FullTextBuilders.swift";
          sourceTree = "<group>";
       };
       "OBJ_560" = {
@@ -9249,7 +9256,7 @@
       };
       "OBJ_57" = {
          isa = "PBXFileReference";
-         path = "SpanQueryBuilders.swift";
+         path = "GeoQueryBuilders.swift";
          sourceTree = "<group>";
       };
       "OBJ_570" = {
@@ -9304,7 +9311,7 @@
       };
       "OBJ_58" = {
          isa = "PBXFileReference";
-         path = "SpecializedQueryBuilders.swift";
+         path = "JoiningQueryBuilders.swift";
          sourceTree = "<group>";
       };
       "OBJ_580" = {
@@ -9359,7 +9366,7 @@
       };
       "OBJ_59" = {
          isa = "PBXFileReference";
-         path = "TermLevelQueryBuilders.swift";
+         path = "MatchAllBuilders.swift";
          sourceTree = "<group>";
       };
       "OBJ_590" = {
@@ -9442,7 +9449,7 @@
       };
       "OBJ_60" = {
          isa = "PBXFileReference";
-         path = "CompoundQuries.swift";
+         path = "QueryBuilders.swift";
          sourceTree = "<group>";
       };
       "OBJ_600" = {
@@ -9582,7 +9589,7 @@
       };
       "OBJ_61" = {
          isa = "PBXFileReference";
-         path = "FullTextQueries.swift";
+         path = "ScoreFunctionBuilders.swift";
          sourceTree = "<group>";
       };
       "OBJ_610" = {
@@ -9637,7 +9644,7 @@
       };
       "OBJ_62" = {
          isa = "PBXFileReference";
-         path = "GeoQueries.swift";
+         path = "SpanQueryBuilders.swift";
          sourceTree = "<group>";
       };
       "OBJ_620" = {
@@ -9692,7 +9699,7 @@
       };
       "OBJ_63" = {
          isa = "PBXFileReference";
-         path = "JoiningQueries.swift";
+         path = "SpecializedQueryBuilders.swift";
          sourceTree = "<group>";
       };
       "OBJ_630" = {
@@ -9747,7 +9754,7 @@
       };
       "OBJ_64" = {
          isa = "PBXFileReference";
-         path = "MatchAllQuery.swift";
+         path = "TermLevelQueryBuilders.swift";
          sourceTree = "<group>";
       };
       "OBJ_640" = {
@@ -9802,7 +9809,7 @@
       };
       "OBJ_65" = {
          isa = "PBXFileReference";
-         path = "Sort.swift";
+         path = "CompoundQuries.swift";
          sourceTree = "<group>";
       };
       "OBJ_650" = {
@@ -9857,7 +9864,7 @@
       };
       "OBJ_66" = {
          isa = "PBXFileReference";
-         path = "SpanQueries.swift";
+         path = "FullTextQueries.swift";
          sourceTree = "<group>";
       };
       "OBJ_660" = {
@@ -9912,7 +9919,7 @@
       };
       "OBJ_67" = {
          isa = "PBXFileReference";
-         path = "SpecializedQuries.swift";
+         path = "GeoQueries.swift";
          sourceTree = "<group>";
       };
       "OBJ_670" = {
@@ -9967,7 +9974,7 @@
       };
       "OBJ_68" = {
          isa = "PBXFileReference";
-         path = "TermLevelQueries.swift";
+         path = "JoiningQueries.swift";
          sourceTree = "<group>";
       };
       "OBJ_680" = {
@@ -10052,16 +10059,9 @@
          sourceTree = "<group>";
       };
       "OBJ_69" = {
-         isa = "PBXGroup";
-         children = (
-            "OBJ_70",
-            "OBJ_71",
-            "OBJ_72",
-            "OBJ_73"
-         );
-         name = "ElasticSwiftNetworking";
-         path = "Sources/ElasticSwiftNetworking";
-         sourceTree = "SOURCE_ROOT";
+         isa = "PBXFileReference";
+         path = "MatchAllQuery.swift";
+         sourceTree = "<group>";
       };
       "OBJ_690" = {
          isa = "PBXFileReference";
@@ -10120,7 +10120,7 @@
             "OBJ_32",
             "OBJ_34",
             "OBJ_46",
-            "OBJ_69"
+            "OBJ_51"
          );
          name = "Sources";
          path = "";
@@ -10128,7 +10128,7 @@
       };
       "OBJ_70" = {
          isa = "PBXFileReference";
-         path = "ElasticSwiftNetworking.swift";
+         path = "Sort.swift";
          sourceTree = "<group>";
       };
       "OBJ_700" = {
@@ -10219,7 +10219,7 @@
       };
       "OBJ_71" = {
          isa = "PBXFileReference";
-         path = "HTTPClient.swift";
+         path = "SpanQueries.swift";
          sourceTree = "<group>";
       };
       "OBJ_710" = {
@@ -10297,7 +10297,7 @@
       };
       "OBJ_72" = {
          isa = "PBXFileReference";
-         path = "HTTPClientAdaptor.swift";
+         path = "SpecializedQuries.swift";
          sourceTree = "<group>";
       };
       "OBJ_720" = {
@@ -10373,7 +10373,7 @@
       };
       "OBJ_73" = {
          isa = "PBXFileReference";
-         path = "SessionManager.swift";
+         path = "TermLevelQueries.swift";
          sourceTree = "<group>";
       };
       "OBJ_730" = {
@@ -11083,27 +11083,27 @@
       "OBJ_825" = {
          isa = "PBXGroup";
          children = (
-            "swift-nio::NIOHTTP1::Product",
-            "ElasticSwift::ElasticSwiftCore::Product",
-            "swift-nio::CNIOSHA1::Product",
-            "swift-nio-transport-services::NIOTransportServices::Product",
-            "swift-nio::CNIOLinux::Product",
-            "swift-nio::CNIOAtomics::Product",
-            "ElasticSwift::ElasticSwiftTests::Product",
-            "swift-log::Logging::Product",
-            "swift-nio::NIOConcurrencyHelpers::Product",
-            "ElasticSwift::ElasticSwiftCodableUtils::Product",
-            "swift-nio::NIO::Product",
-            "swift-nio-ssl::NIOSSL::Product",
-            "swift-nio-ssl::CNIOBoringSSLShims::Product",
             "ElasticSwift::ElasticSwiftNetworking::Product",
+            "ElasticSwift::ElasticSwiftTests::Product",
+            "ElasticSwift::ElasticSwift::Product",
             "swift-nio::NIOTLS::Product",
             "swift-nio::NIOFoundationCompat::Product",
-            "swift-nio::CNIODarwin::Product",
-            "ElasticSwift::ElasticSwiftDSL::Product",
-            "ElasticSwift::ElasticSwift::Product",
+            "swift-nio-ssl::CNIOBoringSSLShims::Product",
             "swift-nio-ssl::CNIOBoringSSL::Product",
-            "swift-nio::CNIOHTTPParser::Product"
+            "ElasticSwift::ElasticSwiftCore::Product",
+            "swift-nio::CNIOHTTPParser::Product",
+            "swift-nio::NIOHTTP1::Product",
+            "swift-nio-transport-services::NIOTransportServices::Product",
+            "swift-log::Logging::Product",
+            "ElasticSwift::ElasticSwiftQueryDSL::Product",
+            "swift-nio::NIO::Product",
+            "swift-nio::CNIODarwin::Product",
+            "swift-nio-ssl::NIOSSL::Product",
+            "ElasticSwift::ElasticSwiftCodableUtils::Product",
+            "swift-nio::NIOConcurrencyHelpers::Product",
+            "swift-nio::CNIOSHA1::Product",
+            "swift-nio::CNIOAtomics::Product",
+            "swift-nio::CNIOLinux::Product"
          );
          name = "Products";
          path = "";
