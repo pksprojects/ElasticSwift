@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import Logging
 import NIOHTTP1
 import ElasticSwiftCore
 import ElasticSwiftDSL

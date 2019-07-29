@@ -132,20 +132,6 @@ public class HTTPClientConfiguration {
     
 }
 
-public class Timeouts {
-    
-    public static let DEFAULT_TIMEOUTS: Timeouts = Timeouts(read: TimeAmount.milliseconds(1000), connect: TimeAmount.milliseconds(3000))
-    
-    public let read: TimeAmount?
-    public let connect: TimeAmount?
-    
-    public init(read: TimeAmount? = nil, connect: TimeAmount? = nil) {
-        self.read = read
-        self.connect = connect
-    }
-    
-}
-
 public enum EventLoopProvider {
     case create(threads: Int)
     case share(EventLoopGroup)

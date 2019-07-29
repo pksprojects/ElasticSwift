@@ -1,11 +1,6 @@
 import Foundation
 import Logging
-import NIO
 import NIOHTTP1
-import NIOTLS
-#if canImport(NIOSSL)
-import NIOSSL
-#endif
 import ElasticSwiftCore
 import ElasticSwiftNetworking
 

@@ -39,16 +39,16 @@ let package = Package(
             dependencies: ["ElasticSwiftCore", "ElasticSwiftDSL", "ElasticSwiftNetworking", "ElasticSwiftCodableUtils", "Logging", "NIO", "NIOHTTP1", "NIOFoundationCompat", "NIOSSL", "NIOTransportServices"]),
         .target(
             name: "ElasticSwiftDSL",
-            dependencies: ["ElasticSwiftCore", "ElasticSwiftCodableUtils", "Logging", "NIO", "NIOHTTP1", "NIOFoundationCompat", "NIOSSL", "NIOTransportServices"]),
+            dependencies: ["ElasticSwiftCore", "ElasticSwiftCodableUtils", "Logging"]),
         .target(
             name: "ElasticSwiftNetworking",
             dependencies: ["ElasticSwiftCore", "Logging", "NIO", "NIOHTTP1", "NIOFoundationCompat", "NIOSSL", "NIOTransportServices"]),
         .target(
             name: "ElasticSwiftCore",
-            dependencies: ["Logging", "NIO", "NIOHTTP1", "NIOFoundationCompat", "NIOSSL", "NIOTransportServices"]),
+            dependencies: ["Logging", "NIO", "NIOHTTP1"]),
         .target(
             name: "ElasticSwiftCodableUtils",
-            dependencies: ["Logging", "NIO", "NIOHTTP1", "NIOFoundationCompat", "NIOSSL", "NIOTransportServices"]),
+            dependencies: []),
         .testTarget(
             name: "ElasticSwiftTests",
             dependencies: ["ElasticSwift", "ElasticSwiftDSL", "ElasticSwiftNetworking", "ElasticSwiftCore", "ElasticSwiftCodableUtils"]),

@@ -7,7 +7,6 @@
 
 import Foundation
 import ElasticSwiftCore
-import ElasticSwiftNetworking
 
 public typealias HTTPResponseHandler = (_ result: Result<HTTPResponse, Error>) -> Void
 public typealias ResultCallback<T: Codable> = (_ result: Result<T, Error>) -> Void

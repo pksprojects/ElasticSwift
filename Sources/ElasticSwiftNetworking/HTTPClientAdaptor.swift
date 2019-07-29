@@ -9,11 +9,7 @@
 import Foundation
 import Logging
 import NIOHTTP1
-import NIOConcurrencyHelpers
 import NIO
-#if canImport(NIOSSL)
-import NIOSSL
-#endif
 import ElasticSwiftCore
 
 // MARK: - DefaultHTTPClientAdaptor
