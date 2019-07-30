@@ -16,4 +16,4 @@ script:
   - swift test
 after_success:
   - xcodebuild -quiet -scheme ElasticSwift-Package build test
-  - bash <(curl -s https://codecov.io/bash) -J '^ElasticSwift$|^ElasticSwiftCore$|^ElasticSwiftCodableUtils$|^ElasticSwiftQueryDSL$|^ElasticSwiftNetworking$'
+  - bash <(curl -s https://codecov.io/bash) -J '^ElasticSwift$' -J '^ElasticSwiftCore$' -J '^ElasticSwiftCodableUtils$' -J '^ElasticSwiftNetworking$' -J '^ElasticSwiftQueryDSL$'
