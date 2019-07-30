@@ -183,7 +183,7 @@ class ElasticSwiftTests: XCTestCase {
             e.fulfill()
         }
         
-        let request = try GetRequestBuilder<Message>() { builder in
+        let request = try GetRequestBuilder() { builder in
             builder.set(id: "0")
                 .set(index: "test")
                 .set(type: "_doc")
@@ -289,7 +289,7 @@ class ElasticSwiftTests: XCTestCase {
         let sort =  SortBuilders.fieldSort("msg.keyword")
             .set(order: .asc)
             .build()
-        let request: SearchRequest<Message> = try SearchRequestBuilder() { builder in
+        let request = try SearchRequestBuilder() { builder in
             builder.set(indices: "test")
                 .set(types: "_doc")
                 .set(query: queryBuilder.query)
