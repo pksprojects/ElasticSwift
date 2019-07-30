@@ -13,20 +13,20 @@ Pod::Spec.new do |s|
   s.swift_version = '5.0'
   s.cocoapods_version = '>=1.6.0'
   s.ios.deployment_target = '10.0'
-  s.osx.deployment_target = '10.12'
-  s.tvos.deployment_target = '10.0'
+  # s.osx.deployment_target = '10.12'
+  # s.tvos.deployment_target = '10.0'
   
-  s.default_subspec = "ElasticSwift/ElasticSwift"
+  s.default_subspec = "ElasticSwift"
 
   s.subspec 'ElasticSwift' do |es|
     es.source_files = 'Sources/ElasticSwift/**/*.swift'
-    es.dependency 'SwiftNIO', '~> 2.2.0'
-    es.dependency 'SwiftNIOHTTP1', '~> 2.2.0'
-    es.dependency 'SwiftNIOTLS', '~> 2.2.0'
-    es.dependency 'SwiftNIOConcurrencyHelpers', '~> 2.2.0'
-    es.dependency 'SwiftNIOFoundationCompat', '~> 2.2.0'
-    es.dependency 'SwiftNIOTransportServices', '~> 1.0.3'
-    es.dependency 'Logging', '~> 1.1.0'
+    es.dependency 'SwiftNIO'
+    es.dependency 'SwiftNIOHTTP1'
+    es.dependency 'SwiftNIOTLS'
+    es.dependency 'SwiftNIOConcurrencyHelpers'
+    es.dependency 'SwiftNIOFoundationCompat'
+    es.dependency 'SwiftNIOTransportServices'
+    es.dependency 'Logging'
     es.dependency 'ElasticSwift/ElasticSwiftCore'
     es.dependency 'ElasticSwift/ElasticSwiftCodableUtils'
     es.dependency 'ElasticSwift/ElasticSwiftNetworking'
@@ -35,9 +35,9 @@ Pod::Spec.new do |s|
 
   s.subspec 'ElasticSwiftCore' do |core|
     core.source_files = 'Sources/ElasticSwiftCore/**/*.swift'
-    core.dependency 'SwiftNIO', '~> 2.2.0'
-    core.dependency 'SwiftNIOHTTP1', '~> 2.2.0'
-    core.dependency 'Logging', '~> 1.1.0'
+    core.dependency 'SwiftNIO'
+    core.dependency 'SwiftNIOHTTP1'
+    core.dependency 'Logging'
   end
 
   s.subspec 'ElasticSwiftCodableUtils' do |utils|
@@ -47,28 +47,28 @@ Pod::Spec.new do |s|
   s.subspec 'ElasticSwiftNetworking' do |net|
     net.source_files = 'Sources/ElasticSwiftNetworking/**/*.swift'
     net.dependency 'ElasticSwift/ElasticSwiftCore'
-    net.dependency 'SwiftNIO', '~> 2.2.0'
-    net.dependency 'SwiftNIOHTTP1', '~> 2.2.0'
-    net.dependency 'SwiftNIOTLS', '~> 2.2.0'
-    net.dependency 'SwiftNIOConcurrencyHelpers', '~> 2.2.0'
-    net.dependency 'SwiftNIOFoundationCompat', '~> 2.2.0'
-    net.dependency 'SwiftNIOTransportServices', '~> 1.0.3'
-    net.dependency 'Logging', '~> 1.1.0'
+    net.dependency 'SwiftNIO'
+    net.dependency 'SwiftNIOHTTP1'
+    net.dependency 'SwiftNIOTLS'
+    net.dependency 'SwiftNIOConcurrencyHelpers'
+    net.dependency 'SwiftNIOFoundationCompat'
+    net.dependency 'SwiftNIOTransportServices'
+    net.dependency 'Logging'
   end
 
   s.subspec 'ElasticSwiftQueryDSL' do |dsl|
     dsl.source_files = 'Sources/ElasticSwiftQueryDSL/**/*.swift'
-    dsl.dependency 'ElasticSwiftCodableUtils'
+    dsl.dependency 'ElasticSwift/ElasticSwiftCodableUtils'
     dsl.dependency 'ElasticSwift/ElasticSwiftCore'
-    dsl.dependency 'Logging', '~> 1.1.0'
+    dsl.dependency 'Logging'
   end
 
-  # s.dependency 'SwiftNIO', '~> 2.2.0'
-  # s.dependency 'SwiftNIOHTTP1', '~> 2.2.0'
-  # s.dependency 'SwiftNIOTLS', '~> 2.2.0'
-  # s.dependency 'SwiftNIOConcurrencyHelpers', '~> 2.2.0'
-  # s.dependency 'SwiftNIOFoundationCompat', '~> 2.2.0'
-  # s.dependency 'SwiftNIOTransportServices', '~> 1.0.3'
-  # s.dependency 'Logging', '~> 1.1.0'
+  s.dependency 'SwiftNIO', '~> 2.2.0'
+  s.dependency 'SwiftNIOHTTP1', '~> 2.2.0'
+  s.dependency 'SwiftNIOTLS', '~> 2.2.0'
+  s.dependency 'SwiftNIOConcurrencyHelpers', '~> 2.2.0'
+  s.dependency 'SwiftNIOFoundationCompat', '~> 2.2.0'
+  s.dependency 'SwiftNIOTransportServices', '~> 1.0.3'
+  s.dependency 'Logging', '~> 1.1.0'
 
 end
