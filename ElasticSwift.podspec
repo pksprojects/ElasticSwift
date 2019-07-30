@@ -13,8 +13,8 @@ Pod::Spec.new do |s|
   s.swift_version = '5.0'
   s.cocoapods_version = '>=1.6.0'
   s.ios.deployment_target = '10.0'
-  # s.osx.deployment_target = '10.12'
-  # s.tvos.deployment_target = '10.0'
+  s.osx.deployment_target = '10.12'
+  s.tvos.deployment_target = '10.0'
   
   s.default_subspec = "ElasticSwift"
 
