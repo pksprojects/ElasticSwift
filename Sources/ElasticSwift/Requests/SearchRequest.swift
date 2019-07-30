@@ -13,9 +13,9 @@ import ElasticSwiftQueryDSL
 
 //MARK:- Search Request Builder
 
-public class SearchRequestBuilder<T: Codable>: RequestBuilder {
+public class SearchRequestBuilder: RequestBuilder {
     
-    public typealias RequestType = SearchRequest<T>
+    public typealias RequestType = SearchRequest
     
     public typealias BuilderClosure = (SearchRequestBuilder) -> Void
     
@@ -81,19 +81,18 @@ public class SearchRequestBuilder<T: Codable>: RequestBuilder {
         return self
     }
     
-    public func build() throws -> SearchRequest<T> {
-        return try SearchRequest<T>(withBuilder: self)
+    public func build() throws -> SearchRequest {
+        return try SearchRequest(withBuilder: self)
     }
 }
 
 //MARK:- Search Request
 
-public class SearchRequest<T: Codable>: Request {
+public class SearchRequest: Request {
+    
     public var headers: HTTPHeaders = HTTPHeaders()
     
     public var queryParams: [URLQueryItem] = []
-    
-    public typealias ResponseType = SearchResponse<T>
     
     public let index: String
     public let type: String?
@@ -105,7 +104,7 @@ public class SearchRequest<T: Codable>: Request {
     public let explain: Bool?
     public let minScore: Decimal?
     
-    init(withBuilder builder: SearchRequestBuilder<T>) throws {
+    init(withBuilder builder: SearchRequestBuilder) throws {
         self.index = builder.index ?? "_all"
         self.type = builder.type
         self.query = builder.query

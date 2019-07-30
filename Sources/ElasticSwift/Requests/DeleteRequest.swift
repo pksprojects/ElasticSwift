@@ -88,8 +88,6 @@ public class DeleteRequest: Request {
     
     public var headers: HTTPHeaders = HTTPHeaders()
     
-    public typealias ResponseType = DeleteResponse
-    
     public let index: String
     public let type: String
     public let id: String

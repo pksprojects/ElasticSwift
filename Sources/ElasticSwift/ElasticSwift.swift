@@ -45,7 +45,7 @@ public class ElasticClient {
 
 extension ElasticClient {
     
-    public func get<T: Codable>(_ getRequest: GetRequest<T>, completionHandler: @escaping (_ result: Result<GetResponse<T>, Error>) -> Void) -> Void {
+    public func get<T: Codable>(_ getRequest: GetRequest, completionHandler: @escaping (_ result: Result<GetResponse<T>, Error>) -> Void) -> Void {
         return self.execute(request: getRequest, options: .default, completionHandler: completionHandler)
     }
     
@@ -61,14 +61,14 @@ extension ElasticClient {
         return self.execute(request: updateRequest, options: .default, completionHandler: completionHandler)
     }
     
-    public func search<T: Codable>(_ serachRequest: SearchRequest<T>, completionHandler: @escaping (_ result: Result<SearchResponse<T>, Error>) -> Void) -> Void {
+    public func search<T: Codable>(_ serachRequest: SearchRequest, completionHandler: @escaping (_ result: Result<SearchResponse<T>, Error>) -> Void) -> Void {
         return self.execute(request: serachRequest, options: .default, completionHandler: completionHandler)
     }
 }
 
 extension ElasticClient {
     
-    public func get<T: Codable>(_ getRequest: GetRequest<T>, with options: RequestOptions, completionHandler: @escaping (_ result: Result<GetResponse<T>, Error>) -> Void) -> Void {
+    public func get<T: Codable>(_ getRequest: GetRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<GetResponse<T>, Error>) -> Void) -> Void {
         return self.execute(request: getRequest, options: options, completionHandler: completionHandler)
     }
     
@@ -84,7 +84,7 @@ extension ElasticClient {
         return self.execute(request: updateRequest, options: options, completionHandler: completionHandler)
     }
     
-    public func search<T: Codable>(_ serachRequest: SearchRequest<T>, with options: RequestOptions, completionHandler: @escaping (_ result: Result<SearchResponse<T>, Error>) -> Void) -> Void {
+    public func search<T: Codable>(_ serachRequest: SearchRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<SearchResponse<T>, Error>) -> Void) -> Void {
         return self.execute(request: serachRequest, options: options, completionHandler: completionHandler)
     }
     

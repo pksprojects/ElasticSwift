@@ -113,8 +113,6 @@ public class IndexRequest<T: Codable>: Request {
     
     public var headers: HTTPHeaders = HTTPHeaders()
     
-    public typealias ResponseType = IndexResponse
-    
     public var method: HTTPMethod  {
         get {
             if self.id == nil {
