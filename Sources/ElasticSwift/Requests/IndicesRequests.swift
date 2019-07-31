@@ -118,8 +118,6 @@ public class IndexExistsRequest: Request {
     
     public var queryParams: [URLQueryItem] = []
     
-    public typealias ResponseType = IndexExistsResponse
-    
     public let name: String
     
     public init(name: String) {
@@ -148,8 +146,6 @@ public class IndexExistsRequest: Request {
 
 public class CreateIndexRequest: Request, Encodable {
     public var headers: HTTPHeaders = HTTPHeaders()
-    
-    public typealias ResponseType = CreateIndexResponse
     
     public let name: String
     public let aliases: [IndexAlias]?
@@ -228,8 +224,6 @@ public class GetIndexRequest: Request {
     
     public var queryParams: [URLQueryItem] = []
     
-    public typealias ResponseType = GetIndexResponse
-    
     public let name: String
     
     public init(name: String) {
@@ -265,8 +259,6 @@ public class DeleteIndexRequest: Request {
     
     public var queryParams: [URLQueryItem] = []
     
-    public typealias ResponseType = AcknowledgedResponse
-    
     public let name: String
     
     public init(name: String) {
@@ -297,8 +289,6 @@ public class DeleteIndexRequest: Request {
 //MARK:- Open Index Request
 
 public class OpenIndexRequest: Request {
-    
-    public typealias ResponseType = AcknowledgedResponse
     
     public var headers: HTTPHeaders = HTTPHeaders()
     
@@ -339,8 +329,6 @@ public class OpenIndexRequest: Request {
 //MARK:- Close Index Request
 
 public class CloseIndexRequest: Request {
-    
-    public typealias ResponseType = AcknowledgedResponse
     
     public var headers: HTTPHeaders = HTTPHeaders()
     

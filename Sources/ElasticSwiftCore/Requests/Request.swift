@@ -14,8 +14,6 @@ import NIOHTTP1
 /// Represents High Level Elasticsearch Reqeust
 public protocol Request {
     
-    associatedtype ResponseType: Codable
-    
     var headers: HTTPHeaders { get }
     
     var queryParams: [URLQueryItem] { get }

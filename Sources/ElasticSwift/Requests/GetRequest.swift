@@ -12,10 +12,10 @@ import ElasticSwiftCore
 
 //MARK:- Get Request Builder
 
-public class GetRequestBuilder<T: Codable>: RequestBuilder {
+public class GetRequestBuilder: RequestBuilder {
     
     public typealias BuilderClosure = (GetRequestBuilder) -> Void
-    public typealias RequestType = GetRequest<T>
+    public typealias RequestType = GetRequest
 
     var index: String?
     var type: String?
@@ -47,7 +47,7 @@ public class GetRequestBuilder<T: Codable>: RequestBuilder {
         return self
     }
     
-    public func build() throws -> GetRequest<T> {
+    public func build() throws -> GetRequest {
         
         guard self.index != nil else {
             throw RequestBuilderError.missingRequiredField("index")
@@ -57,7 +57,7 @@ public class GetRequestBuilder<T: Codable>: RequestBuilder {
             throw RequestBuilderError.missingRequiredField("id")
         }
         
-        return try GetRequest<T>(withBuilder: self)
+        return try GetRequest(withBuilder: self)
     }
     
     
@@ -65,14 +65,11 @@ public class GetRequestBuilder<T: Codable>: RequestBuilder {
 
 //MARK:- Get Request
 
-public class GetRequest<T: Codable>: Request {
+public class GetRequest: Request {
     
     public var headers: HTTPHeaders = HTTPHeaders()
     
     public var queryParams: [URLQueryItem] = []
-    
-    
-    public typealias ResponseType = GetResponse<T>
     
     public let index: String
     public let type: String
@@ -90,7 +87,7 @@ public class GetRequest<T: Codable>: Request {
         self.id = id
     }
     
-    init(withBuilder builder: GetRequestBuilder<T>) throws {
+    init(withBuilder builder: GetRequestBuilder) throws {
         self.index = builder.index!
         self.type = builder.type ?? "_doc"
         self.id =  builder.id!

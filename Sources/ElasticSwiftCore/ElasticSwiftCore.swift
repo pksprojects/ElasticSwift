@@ -62,6 +62,7 @@ public enum QueryParams: String {
     case refresh
     case parentTask = "parent_task"
     case waitForActiveShards = "wait_for_active_shards"
+    case waitForCompletion = "wait_for_completion"
     case opType = "op_type"
     case routing
     case timeout
@@ -76,6 +77,13 @@ public enum QueryParams: String {
     case source = "_source"
     case sourceIncludes = "_source_includes"
     case sourceExcludes = "_source_excludes"
+    case conflicts
+    case requestsPerSecond = "requests_per_second"
+    case slices
+    case requestCache = "request_cache"
+    case stats
+    case from
+    case scrollSize = "scroll_size"
 }
 
 enum EndPointCategory: String {
