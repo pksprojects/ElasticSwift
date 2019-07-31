@@ -7,7 +7,7 @@
 
 This project is actively in developement, more information will be made available as project progresses.
 
-If you'd like to contribute contact me via <support@pksprojects.org>
+If you'd like to contribute pull requests are welcome.
 
 * Platform support for macOS, iOS & linux.
 
@@ -39,7 +39,11 @@ platform :ios, '10.0'
 use_frameworks!
 
 target '<Your Target Name>' do
-    pod 'ElasticSwift', '~> 1.0.0-alpha.8'
+    pod 'ElasticSwift', '~> 1.0.0-alpha.9'
+    pod 'ElasticSwiftCore', '~> 1.0.0-alpha.9'
+    pod 'ElasticSwiftQueryDSL', '~> 1.0.0-alpha.9'
+    pod 'ElasticSwiftCodableUtils', '~> 1.0.0-alpha.9'
+    pod 'ElasticSwiftNetworking', '~> 1.0.0-alpha.9'
 end
 ```
 
@@ -57,7 +61,7 @@ Once you have your Swift package set up, adding ElasticSwift as a dependency is 
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/pksprojects/ElasticSwift.git", from: "1.0.0-alpha.8")
+    .package(url: "https://github.com/pksprojects/ElasticSwift.git", from: "1.0.0-alpha.9")
 ]
 ```
 
@@ -82,20 +86,21 @@ Creating `Settings` for specified host.
 ```swift
 
 // with host address as string
-var settings = Settings(forHost: "http://samplehost:port")
+var settings = Settings.default(forHost: "http://samplehost:port")
 
 // with host address
 var host = Host(string: "http://samplehost:port")
-var settings = Settings(forHost: host)
+var settings = Settings(forHost: host, adaptorConfig: HTTPClientAdaptorConfiguration.default)
 
 ```
 
 ```swift
 
-let cred = ClientCredential(username: "elastic", password: "elastic")
+let cred = BasicClientCredential(username: "elastic", password: "elastic")
 let certPath = "/path/to/certificate.der"
 let sslConfig = SSLConfiguration(certPath: certPath, isSelf: true)
-let settings = Settings(forHosts: ["https://samplehost:port"], withCredentials: cred, withSSL: true, sslConfig: sslConfig)
+let adaptorConfig = URLSessionAdaptorConfiguration(sslConfig: sslConfig)
+let settings = Settings(forHosts: ["https://samplehost:port"], withCredentials: cred, adaptorConfig: adaptorConfig)
 let client = RestClient(settings: settings)
 
 ```
