@@ -48,10 +48,9 @@ public class HTTPClientAdaptorConfiguration: HTTPAdaptorConfiguration {
     
     #else
     
-    public init(adaptor: ManagedHTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self, eventLoopProvider: EventLoopProvider = .create(threads: 1), timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS, sslConfig: SSLConfiguration? = nil) {
+    public init(adaptor: ManagedHTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self, eventLoopProvider: EventLoopProvider = .create(threads: 1), timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS) {
         self.eventLoopProvider = eventLoopProvider
         self.timeouts = timeouts
-        self.sslConfig = sslConfig
         self.adaptor = adaptor
     }
     
@@ -71,16 +70,13 @@ public class URLSessionAdaptorConfiguration: HTTPAdaptorConfiguration {
     
     public let timeouts: Timeouts?
     
-    public let eventLoopProvider: EventLoopProvider
-    
     #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
     // URLSession basic SSL support for apple platform
 
     // ssl config for URLSession based clients
     public let sslConfig: SSLConfiguration?
     
-    public init(adaptor: ManagedHTTPClientAdaptor.Type = URLSessionAdaptor.self, eventLoopProvider: EventLoopProvider = .create(threads: 1), timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS, sslConfig: SSLConfiguration? = nil) {
-        self.eventLoopProvider = eventLoopProvider
+    public init(adaptor: ManagedHTTPClientAdaptor.Type = URLSessionAdaptor.self, timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS, sslConfig: SSLConfiguration? = nil) {
         self.timeouts = timeouts
         self.sslConfig = sslConfig
         self.adaptor = adaptor
@@ -89,7 +85,6 @@ public class URLSessionAdaptorConfiguration: HTTPAdaptorConfiguration {
     #else
     
     public init(adaptor: ManagedHTTPClientAdaptor.Type = URLSessionAdaptor.self, timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS) {
-        self.eventLoopProvider = eventLoopProvider
         self.timeouts = timeouts
         self.adaptor = adaptor
     }
