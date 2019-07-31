@@ -23,6 +23,8 @@ class SessionManager: NSObject, URLSessionDelegate {
     
     private var session: URLSession?
     private let url: URL
+    
+    #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
     private var sslConfig: SSLConfiguration?
     
     init(forHost url: URL, sslConfig: SSLConfiguration? = nil) {
@@ -33,7 +35,15 @@ class SessionManager: NSObject, URLSessionDelegate {
         let queue = OperationQueue()
         self.session = URLSession(configuration: config, delegate: self, delegateQueue: queue)
     }
-    
+    #else
+    init(forHost url: URL) {
+        self.url = url
+        super.init()
+        let config = URLSessionConfiguration.ephemeral
+        let queue = OperationQueue()
+        self.session = URLSession(configuration: config, delegate: self, delegateQueue: queue)
+    }
+    #endif
     func createReqeust(_ httpRequest: HTTPRequest) -> URLRequest {
         var components =  URLComponents()
         components.queryItems = httpRequest.queryParams
