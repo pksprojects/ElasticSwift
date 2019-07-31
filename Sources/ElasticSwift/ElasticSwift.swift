@@ -65,8 +65,12 @@ extension ElasticClient {
         return self.execute(request: serachRequest, options: .default, completionHandler: completionHandler)
     }
     
-    public func deleteByQuery(_ deleteRequest: DeleteByQueryRequest, completionHandler: @escaping (_ result: Result<DeleteByQueryResponse, Error>) -> Void) -> Void {
-        return self.execute(request: deleteRequest, options: .default, completionHandler: completionHandler)
+    public func deleteByQuery(_ deleteByQueryRequest: DeleteByQueryRequest, completionHandler: @escaping (_ result: Result<DeleteByQueryResponse, Error>) -> Void) -> Void {
+        return self.execute(request: deleteByQueryRequest, options: .default, completionHandler: completionHandler)
+    }
+    
+    public func updateByQuery(_ updateByQueryRequest: UpdateByQueryRequest, completionHandler: @escaping (_ result: Result<UpdateByQueryResponse, Error>) -> Void) -> Void {
+        return self.execute(request: updateByQueryRequest, options: .default, completionHandler: completionHandler)
     }
 }
 
@@ -92,8 +96,12 @@ extension ElasticClient {
         return self.execute(request: serachRequest, options: options, completionHandler: completionHandler)
     }
     
-    public func deleteByQuery(_ deleteRequest: DeleteByQueryRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<DeleteByQueryResponse, Error>) -> Void) -> Void {
-        return self.execute(request: deleteRequest, options: options, completionHandler: completionHandler)
+    public func deleteByQuery(_ deleteByQueryRequest: DeleteByQueryRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<DeleteByQueryResponse, Error>) -> Void) -> Void {
+        return self.execute(request: deleteByQueryRequest, options: options, completionHandler: completionHandler)
+    }
+    
+    public func updateByQuery(_ updateByQueryRequest: UpdateByQueryRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<UpdateByQueryResponse, Error>) -> Void) -> Void {
+        return self.execute(request: updateByQueryRequest, options: options, completionHandler: completionHandler)
     }
     
 }

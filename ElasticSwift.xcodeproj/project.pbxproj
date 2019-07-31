@@ -22,6 +22,7 @@
 
 /* Begin PBXBuildFile section */
 		06D56A6322F0E5EB0085E831 /* DeleteByQueryRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06D56A6222F0E5EB0085E831 /* DeleteByQueryRequest.swift */; };
+		06DF073122F12E9900B8A799 /* UpdateByQueryRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06DF073022F12E9900B8A799 /* UpdateByQueryRequest.swift */; };
 		OBJ_1000 /* add.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_266 /* add.c */; };
 		OBJ_1001 /* x86_64-gcc.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_268 /* x86_64-gcc.c */; };
 		OBJ_1002 /* bn.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_269 /* bn.c */; };
@@ -1585,6 +1586,7 @@
 
 /* Begin PBXFileReference section */
 		06D56A6222F0E5EB0085E831 /* DeleteByQueryRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteByQueryRequest.swift; sourceTree = "<group>"; };
+		06DF073022F12E9900B8A799 /* UpdateByQueryRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateByQueryRequest.swift; sourceTree = "<group>"; };
 		"ElasticSwift::ElasticSwift::Product" /* ElasticSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ElasticSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"ElasticSwift::ElasticSwiftCodableUtils::Product" /* ElasticSwiftCodableUtils.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ElasticSwiftCodableUtils.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"ElasticSwift::ElasticSwiftCore::Product" /* ElasticSwiftCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ElasticSwiftCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2781,6 +2783,7 @@
 				OBJ_22 /* SearchRequest.swift */,
 				OBJ_23 /* UpdateRequest.swift */,
 				06D56A6222F0E5EB0085E831 /* DeleteByQueryRequest.swift */,
+				06DF073022F12E9900B8A799 /* UpdateByQueryRequest.swift */,
 			);
 			path = Requests;
 			sourceTree = "<group>";
@@ -5114,6 +5117,7 @@
 				OBJ_1362 /* UpdateRequest.swift in Sources */,
 				OBJ_1363 /* IndicesResponse.swift in Sources */,
 				OBJ_1364 /* Response.swift in Sources */,
+				06DF073122F12E9900B8A799 /* UpdateByQueryRequest.swift in Sources */,
 				OBJ_1365 /* ResponseConverters.swift in Sources */,
 				OBJ_1366 /* Serialization.swift in Sources */,
 				OBJ_1367 /* Utils.swift in Sources */,

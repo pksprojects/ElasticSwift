@@ -657,7 +657,118 @@ class ElasticSwiftTests: XCTestCase {
         waitForExpectations(timeout: 10)
     }
     
-    func test_18_DeleteIndex() throws {
+    func test_18_UpdateByQuery() throws {
+        
+        let e = expectation(description: "execution complete")
+        
+        func handler(_ result: Result<UpdateByQueryResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                print("Error: ", error)
+                XCTAssert(false, error.localizedDescription)
+            case .success(let response):
+                print("Respone", response)
+                XCTAssert(response.updated == 1, "Result: \(response.updated)")
+            }
+            e.fulfill()
+        }
+        
+        let query = QueryBuilders.matchQuery { builder in
+            builder.set(field: "msg")
+                .set(value: "UpdateByQuery")
+        } .query
+        
+        let request = try UpdateByQueryRequestBuilder() { builder in
+            builder.set(index: "test")
+                .set(query: query)
+        } .build()
+        
+        request.refresh = .true
+        
+        /// make sure doc exists
+        func handler1(_ result: Result<IndexResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                print("Error: ", error)
+            case .success(let response):
+                print("Result", response.result)
+            }
+            
+            self.client?.updateByQuery(request, completionHandler: handler)
+        }
+        let msg = Message()
+        msg.msg = "UpdateByQuery"
+        let request1 =  try IndexRequestBuilder<Message>() { builder in
+            _ = builder.set(index: "test")
+                .set(type: "_doc")
+                .set(source: msg)
+            
+        } .build()
+        request1.refresh = .true
+        self.client?.execute(request: request1, completionHandler: handler1)
+        
+        waitForExpectations(timeout: 10)
+    }
+    
+    func test_19_UpdateByQuery_script() throws {
+        
+        let e = expectation(description: "execution complete")
+        
+        func handler(_ result: Result<UpdateByQueryResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                print("Error: ", error)
+                XCTAssert(false, error.localizedDescription)
+            case .success(let response):
+                print("Respone", response)
+                XCTAssert(response.updated == 1, "Result: \(response.updated)")
+            }
+            e.fulfill()
+        }
+        
+        let query = QueryBuilders.matchQuery { builder in
+            builder.set(field: "msg")
+                .set(value: "UpdateByQuery2")
+        } .query
+        let script = Script("ctx._source.msg = 'hello'")
+        let request = try UpdateByQueryRequestBuilder() { builder in
+            builder.set(index: "test")
+                .set(query: query)
+                .set(script: script)
+        } .build()
+        
+        request.refresh = .true
+        
+        /// make sure doc exists
+        func handler1(_ result: Result<IndexResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                print("Error: ", error)
+            case .success(let response):
+                print("Result", response.result)
+            }
+            
+            self.client?.updateByQuery(request, completionHandler: handler)
+        }
+        let msg = Message()
+        msg.msg = "UpdateByQuery2"
+        let request1 =  try IndexRequestBuilder<Message>() { builder in
+            _ = builder.set(index: "test")
+                .set(type: "_doc")
+                .set(source: msg)
+            
+        } .build()
+        request1.refresh = .true
+        self.client?.execute(request: request1, completionHandler: handler1)
+        
+        waitForExpectations(timeout: 10)
+    }
+    
+    func test_20_DeleteIndex() throws {
         let e = expectation(description: "execution complete")
         func handler(_ result: Result<AcknowledgedResponse, Error>) -> Void {
             
