@@ -21,6 +21,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		06D56A6322F0E5EB0085E831 /* DeleteByQueryRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06D56A6222F0E5EB0085E831 /* DeleteByQueryRequest.swift */; };
 		OBJ_1000 /* add.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_266 /* add.c */; };
 		OBJ_1001 /* x86_64-gcc.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_268 /* x86_64-gcc.c */; };
 		OBJ_1002 /* bn.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_269 /* bn.c */; };
@@ -1583,6 +1584,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		06D56A6222F0E5EB0085E831 /* DeleteByQueryRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteByQueryRequest.swift; sourceTree = "<group>"; };
 		"ElasticSwift::ElasticSwift::Product" /* ElasticSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ElasticSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"ElasticSwift::ElasticSwiftCodableUtils::Product" /* ElasticSwiftCodableUtils.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ElasticSwiftCodableUtils.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"ElasticSwift::ElasticSwiftCore::Product" /* ElasticSwiftCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ElasticSwiftCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2778,6 +2780,7 @@
 				OBJ_21 /* IndicesRequests.swift */,
 				OBJ_22 /* SearchRequest.swift */,
 				OBJ_23 /* UpdateRequest.swift */,
+				06D56A6222F0E5EB0085E831 /* DeleteByQueryRequest.swift */,
 			);
 			path = Requests;
 			sourceTree = "<group>";
@@ -5100,6 +5103,7 @@
 				OBJ_1352 /* Clusters.swift in Sources */,
 				OBJ_1353 /* Indices.swift in Sources */,
 				OBJ_1354 /* ElasticSwift.swift in Sources */,
+				06D56A6322F0E5EB0085E831 /* DeleteByQueryRequest.swift in Sources */,
 				OBJ_1355 /* Errors.swift in Sources */,
 				OBJ_1356 /* Transport.swift in Sources */,
 				OBJ_1357 /* DeleteRequest.swift in Sources */,

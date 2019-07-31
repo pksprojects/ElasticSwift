@@ -64,6 +64,10 @@ extension ElasticClient {
     public func search<T: Codable>(_ serachRequest: SearchRequest, completionHandler: @escaping (_ result: Result<SearchResponse<T>, Error>) -> Void) -> Void {
         return self.execute(request: serachRequest, options: .default, completionHandler: completionHandler)
     }
+    
+    public func deleteByQuery(_ deleteRequest: DeleteByQueryRequest, completionHandler: @escaping (_ result: Result<DeleteByQueryResponse, Error>) -> Void) -> Void {
+        return self.execute(request: deleteRequest, options: .default, completionHandler: completionHandler)
+    }
 }
 
 extension ElasticClient {
@@ -86,6 +90,10 @@ extension ElasticClient {
     
     public func search<T: Codable>(_ serachRequest: SearchRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<SearchResponse<T>, Error>) -> Void) -> Void {
         return self.execute(request: serachRequest, options: options, completionHandler: completionHandler)
+    }
+    
+    public func deleteByQuery(_ deleteRequest: DeleteByQueryRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<DeleteByQueryResponse, Error>) -> Void) -> Void {
+        return self.execute(request: deleteRequest, options: options, completionHandler: completionHandler)
     }
     
 }

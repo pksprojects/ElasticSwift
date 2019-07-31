@@ -602,7 +602,62 @@ class ElasticSwiftTests: XCTestCase {
         waitForExpectations(timeout: 10)
     }
     
-    func test_17_DeleteIndex() throws {
+    func test_17_DeleteByQuery() throws {
+        
+        let e = expectation(description: "execution complete")
+        
+        func handler(_ result: Result<DeleteByQueryResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                print("Error: ", error)
+                XCTAssert(false, error.localizedDescription)
+            case .success(let response):
+                print("Respone", response)
+                XCTAssert(response.deleted == 1, "Result: \(response.deleted)")
+            }
+            e.fulfill()
+        }
+        
+        let query = QueryBuilders.matchQuery { builder in
+            builder.set(field: "msg")
+                .set(value: "DeleteByQuery")
+        } .query
+        
+        let request = try DeleteByQueryRequestBuilder() { builder in
+            builder.set(index: "test")
+                .set(query: query)
+        } .build()
+        
+        request.refresh = .true
+        
+        /// make sure doc exists
+        func handler1(_ result: Result<IndexResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                print("Error: ", error)
+            case .success(let response):
+                print("Result", response.result)
+            }
+            
+            self.client?.deleteByQuery(request, completionHandler: handler)
+        }
+        let msg = Message()
+        msg.msg = "DeleteByQuery"
+        let request1 =  try IndexRequestBuilder<Message>() { builder in
+            _ = builder.set(index: "test")
+                .set(type: "_doc")
+                .set(source: msg)
+            
+        } .build()
+        request1.refresh = .true
+        self.client?.execute(request: request1, completionHandler: handler1)
+        
+        waitForExpectations(timeout: 10)
+    }
+    
+    func test_18_DeleteIndex() throws {
         let e = expectation(description: "execution complete")
         func handler(_ result: Result<AcknowledgedResponse, Error>) -> Void {
             
