@@ -195,3 +195,39 @@ public struct Retires: Codable {
     public let bulk: Int
     public let search: Int
 }
+
+// MARK:- Update By Query Response
+
+public struct UpdateByQueryResponse: Codable {
+    
+    public let took: Int
+    public let timedOut: Bool
+    public let total: Int
+    public let updated: Int
+    public let deleted: Int
+    public let batches: Int
+    public let versionConflicts: Int
+    public let noops: Int
+    public let retries: Retires
+    public let throlledMillis: Int
+    public let requestsPerSecond: Int
+    public let throlledUntilMillis: Int
+    public let failures: [CodableValue]
+    
+    enum CodingKeys: String, CodingKey {
+        case took
+        case timedOut = "timed_out"
+        case total
+        case deleted
+        case updated
+        case batches
+        case versionConflicts = "version_conflicts"
+        case noops
+        case retries
+        case throlledMillis = "throttled_millis"
+        case requestsPerSecond = "requests_per_second"
+        case throlledUntilMillis = "throttled_until_millis"
+        case failures
+    }
+    
+}
