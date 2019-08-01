@@ -279,6 +279,7 @@ class ElasticSwiftTests: XCTestCase {
                 XCTAssert(false)
             case .success(let response):
                 XCTAssertNotNil(response.hits)
+                XCTAssertTrue(response.hits.hits.count > 0, "Count \(response.hits.hits.count)")
             }
             
             e.fulfill()
@@ -295,7 +296,27 @@ class ElasticSwiftTests: XCTestCase {
                 .set(query: queryBuilder.query)
                 .set(sort: sort)
         } .build()
-        self.client?.execute(request: request, completionHandler: handler)
+        
+        /// make sure doc exists
+        func handler1(_ result: Result<IndexResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                print("Error", error)
+            case .success(let response):
+                print("Found", response.result)
+            }
+            self.client?.search(request, completionHandler: handler)
+        }
+        let msg = Message()
+        msg.msg = "Message"
+        let request1 =  try IndexRequestBuilder<Message>() { builder in
+            builder.set(index: "test")
+                .set(source: msg)
+        } .build()
+        request1.refresh = .true
+        self.client?.execute(request: request1, completionHandler: handler1)
+        
         waitForExpectations(timeout: 10)
     }
     

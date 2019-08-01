@@ -103,7 +103,13 @@ public struct Hits<T: Codable>: Codable {
     
     public let total: Int
     public let maxScore: Decimal?
-    public let hits: [SearchHit<T>] = []
+    public let hits: [SearchHit<T>]
+    
+    public init(total: Int, maxScore: Decimal?, hits: [SearchHit<T>] = []) {
+        self.total = total
+        self.maxScore = maxScore
+        self.hits = hits
+    }
     
     enum CodingKeys: String, CodingKey {
         case total
@@ -119,8 +125,9 @@ public struct SearchHit<T: Codable>: Codable {
     public let index: String
     public let type: String
     public let id: String
-    public let score: Decimal
+    public let score: Decimal?
     public let source: T?
+    public let sort: [CodableValue]?
     
     enum CodingKeys: String, CodingKey {
         case index = "_index"
@@ -128,6 +135,7 @@ public struct SearchHit<T: Codable>: Codable {
         case id = "_id"
         case score = "_score"
         case source = "_source"
+        case sort
     }
 }
 
