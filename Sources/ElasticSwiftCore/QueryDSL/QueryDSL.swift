@@ -21,6 +21,8 @@ public protocol Query {
 /// Protocol that all Builder for `Query` conforms to
 public protocol QueryBuilder {
     
-    var query: Query { get }
+    associatedtype QueryType: Query
+    
+    func build() throws -> QueryType
 
 }

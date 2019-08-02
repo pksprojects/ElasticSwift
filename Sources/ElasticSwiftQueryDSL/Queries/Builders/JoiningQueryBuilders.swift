@@ -11,22 +11,19 @@ import ElasticSwiftCore
 // MARK:- Nested Query Builder
 
 public class NestedQueryBuilder: QueryBuilder {
-    public var query: Query {
-        get {
-            return NestedQuery(withBuilder: self)
-        }
-    }
     
+    public func build() throws -> NestedQuery {
+        return NestedQuery(withBuilder: self)
+    }
     
 }
 
 // MARK:- HasChild Query Builder
 
 public class HasChildQueryBuilder: QueryBuilder {
-    public var query: Query {
-        get {
-            return HasChildQuery(withBuilder: self)
-        }
+    
+    public func build() throws -> HasChildQuery {
+        return HasChildQuery(withBuilder: self)
     }
     
     
@@ -35,22 +32,19 @@ public class HasChildQueryBuilder: QueryBuilder {
 // MARK:- HasParent Query Builder
 
 public class HasParentQueryBuilder: QueryBuilder {
-    public var query: Query {
-        get {
-            return HasParentQuery(withBuilder: self)
-        }
-    }
     
+    public func build() throws -> HasParentQuery {
+        return HasParentQuery(withBuilder: self)
+    }
     
 }
 
 // MARK:- ParentId Query Builder
 
 public class ParentIdQueryBuilder: QueryBuilder {
-    public var query: Query {
-        get {
-            return ParentIdQuery(withBuilder: self)
-        }
+    
+    public func build() throws -> ParentIdQuery {
+        return ParentIdQuery(withBuilder: self)
     }
     
     

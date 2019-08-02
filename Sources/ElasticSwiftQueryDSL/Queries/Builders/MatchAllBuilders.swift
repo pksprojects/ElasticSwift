@@ -23,15 +23,14 @@ public class MatchAllQueryBuilder: QueryBuilder {
         builderClosure(self)
     }
     
-    public var query: Query {
-        get {
-            return MatchAllQuery(withBuilder: self)
-        }
-    }
-    
+    @discardableResult
     public func set(boost: Decimal) -> Self {
         self.boost = boost
         return self
+    }
+    
+    public func build() throws -> MatchAllQuery {
+        return MatchAllQuery(withBuilder: self)
     }
 }
 
@@ -39,9 +38,7 @@ public class MatchAllQueryBuilder: QueryBuilder {
 
 public class MatchNoneQueryBuilder: QueryBuilder {
     
-    public var query: Query {
-        get {
-            return MatchNoneQuery(withBuilder: self)
-        }
+    public func build() throws -> MatchNoneQuery {
+        return MatchNoneQuery(withBuilder: self)
     }
 }

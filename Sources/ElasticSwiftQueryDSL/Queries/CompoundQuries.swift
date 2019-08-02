@@ -17,16 +17,16 @@ public class ConstantScoreQuery: Query {
     
     public let name: String = "constant_score"
     
-    public let queryBuilder: QueryBuilder
+    public let query: Query
     public let boost: Decimal
     
     public init(withBuilder builder: ConstantScoreQueryBuilder) {
-        self.queryBuilder = builder.queryBuilder!
+        self.query = builder.query!
         self.boost = builder.boost!
     }
     
     public func toDic() -> [String : Any] {
-        return [self.name: [ConstantScoreQuery.FILTER: self.queryBuilder.query, ConstantScoreQuery.BOOST: self.boost]]
+        return [self.name: [ConstantScoreQuery.FILTER: self.query.toDic(), ConstantScoreQuery.BOOST: self.boost]]
     }
     
 }
@@ -52,10 +52,10 @@ public class BoolQuery: Query {
     public let boost: Decimal?
     
     public init(withBuilder builder: BoolQueryBuilder) {
-        self.mustClauses = builder.getMustClauses().map { $0.query }
-        self.mustNotClauses = builder.getMustNotClauses().map { $0.query }
-        self.shouldClauses = builder.getShouldClauses().map { $0.query }
-        self.filterClauses = builder.getFilterClauses().map { $0.query }
+        self.mustClauses = builder.getMustClauses()
+        self.mustNotClauses = builder.getMustNotClauses()
+        self.shouldClauses = builder.getShouldClauses()
+        self.filterClauses = builder.getFilterClauses()
         self.boost = builder.boost
         self.minimumShouldMatch = builder.getMinimumShouldMatch()
     }
@@ -103,7 +103,7 @@ public class DisMaxQuery: Query {
     public init(withBuilder builder: DisMaxQueryBuilder) {
         self.tieBreaker = builder.tieBreaker ?? DisMaxQuery.DEFAULT_TIE_BREAKER
         self.boost = builder.boost
-        self.queries = builder.queryBuilders.map { $0.query }
+        self.queries = builder.querys
     }
     
     public func toDic() -> [String : Any] {
@@ -133,7 +133,7 @@ public class FunctionScoreQuery: Query {
     
     public let name: String = "function_score"
     
-    public let queryBuilder: QueryBuilder?
+    public let query: Query?
     public let boost: Decimal?
     public let boostMode: BoostMode?
     public let maxBoost: Decimal?
@@ -142,7 +142,7 @@ public class FunctionScoreQuery: Query {
     public let functions: [ScoreFunction]
     
     public init(withBuilder builder: FunctionScoreQueryBuilder) {
-        self.queryBuilder = builder.queryBuilder
+        self.query = builder.query
         self.boost = builder.boost
         self.boostMode = builder.boostMode
         self.maxBoost = builder.maxBoost
@@ -153,8 +153,8 @@ public class FunctionScoreQuery: Query {
     
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [:]
-        if let query = self.queryBuilder?.query {
-            dic[FunctionScoreQuery.QUERY] = query
+        if let query = self.query {
+            dic[FunctionScoreQuery.QUERY] = query.toDic()
         }
         if let boost = self.boost {
             dic[FunctionScoreQuery.BOOST] = boost

@@ -285,7 +285,7 @@ class ElasticSwiftTests: XCTestCase {
             e.fulfill()
         }
         let queryBuilder = QueryBuilders.boolQuery()
-        let match = QueryBuilders.matchQuery().set(field: "msg").set(value: "Message")
+        let match = try! QueryBuilders.matchQuery().set(field: "msg").set(value: "Message").build()
         queryBuilder.must(query: match)
         let sort =  SortBuilders.fieldSort("msg.keyword")
             .set(order: .asc)
@@ -293,7 +293,7 @@ class ElasticSwiftTests: XCTestCase {
         let request = try SearchRequestBuilder() { builder in
             builder.set(indices: "test")
                 .set(types: "_doc")
-                .set(query: queryBuilder.query)
+                .set(query: try! queryBuilder.build())
                 .set(sort: sort)
         } .build()
         
@@ -640,10 +640,10 @@ class ElasticSwiftTests: XCTestCase {
             e.fulfill()
         }
         
-        let query = QueryBuilders.matchQuery { builder in
+        let query = try! QueryBuilders.matchQuery { builder in
             builder.set(field: "msg")
                 .set(value: "DeleteByQuery")
-        } .query
+        } .build()
         
         let request = try DeleteByQueryRequestBuilder() { builder in
             builder.set(index: "test")
@@ -695,10 +695,10 @@ class ElasticSwiftTests: XCTestCase {
             e.fulfill()
         }
         
-        let query = QueryBuilders.matchQuery { builder in
+        let query = try! QueryBuilders.matchQuery { builder in
             builder.set(field: "msg")
                 .set(value: "UpdateByQuery")
-        } .query
+        } .build()
         
         let request = try UpdateByQueryRequestBuilder() { builder in
             builder.set(index: "test")
@@ -750,10 +750,10 @@ class ElasticSwiftTests: XCTestCase {
             e.fulfill()
         }
         
-        let query = QueryBuilders.matchQuery { builder in
+        let query = try! QueryBuilders.matchQuery { builder in
             builder.set(field: "msg")
                 .set(value: "UpdateByQuery2")
-        } .query
+        } .build()
         let script = Script("ctx._source.msg = 'hello'")
         let request = try UpdateByQueryRequestBuilder() { builder in
             builder.set(index: "test")

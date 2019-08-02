@@ -24,12 +24,9 @@ public class TermQueryBuilder: QueryBuilder {
         builderClosure(self)
     }
     
-    public var query: Query {
-        get {
-            return TermQuery(withBuilder: self)
-        }
+    public func build() throws -> TermQuery {
+        return TermQuery(withBuilder: self)
     }
-    
 }
 
 // MARK:- Terms Query Builder
@@ -48,10 +45,8 @@ public class TermsQueryBuilder: QueryBuilder {
         builderClosure(self)
     }
     
-    public var query: Query {
-        get {
-            return TermsQuery(withBuilder: self)
-        }
+    public func build() throws -> TermsQuery {
+        return TermsQuery(withBuilder: self)
     }
 
 }
@@ -78,15 +73,10 @@ public class RangeQueryBuilder: QueryBuilder {
         self.init()
         builderClosure(self)
     }
-    
-    
-    public var query: Query {
-        get {
-            return RangeQuery(withBuilder: self)
-        }
-    }
 
-    
+    public func build() throws -> RangeQuery {
+        return RangeQuery(withBuilder: self)
+    }
 }
 
 // MARK:- Exists Query Builder
@@ -103,14 +93,10 @@ public class ExistsQueryBuilder: QueryBuilder {
         self.init()
         builderClosure(self)
     }
-    
-    public var query: Query {
-        get {
-            return ExistsQuery(withBuilder: self)
-        }
-    }
 
-    
+    public func build() throws -> ExistsQuery {
+        return ExistsQuery(withBuilder: self)
+    }
 }
 
 // MARK:- Prefix Query Builder
@@ -130,13 +116,9 @@ public class PrefixQueryBuilder: QueryBuilder {
         builderClosure(self)
     }
     
-    public var query: Query {
-        get {
-            return PrefixQuery(withBuilder: self)
-        }
+    public func build() throws -> PrefixQuery {
+        return PrefixQuery(withBuilder: self)
     }
-    
-    
 }
 
 // MARK:- Wildcard Query Builder
@@ -156,10 +138,8 @@ public class WildCardQueryBuilder: QueryBuilder {
         builderClosure(self)
     }
     
-    public var query: Query {
-        get {
-            return WildCardQuery(withBuilder: self)
-        }
+    public func build() throws -> WildCardQuery {
+        return WildCardQuery(withBuilder: self)
     }
 
 }
@@ -183,12 +163,9 @@ public class RegexpQueryBuilder: QueryBuilder {
         builderClosure(self)
     }
     
-    public var query: Query {
-        get {
-            return RegexpQuery(withBuilder: self)
-        }
+    public func build() throws -> RegexpQuery {
+        return RegexpQuery(withBuilder: self)
     }
-    
 }
 
 // MARK:- Fuzzy Query Builder
@@ -212,10 +189,8 @@ public class FuzzyQueryBuilder: QueryBuilder {
         builderClosure(self)
     }
     
-    public var query: Query {
-        get {
-            return FuzzyQuery(withBuilder: self)
-        }
+    public func build() throws -> FuzzyQuery {
+        return FuzzyQuery(withBuilder: self)
     }
 
 }
@@ -235,13 +210,9 @@ public class TypeQueryBuilder: QueryBuilder {
         builderClosure(self)
     }
     
-    public var query: Query {
-        get {
-            return TypeQuery(withBuilder: self)
-        }
+    public func build() throws -> TypeQuery {
+        return TypeQuery(withBuilder: self)
     }
-    
-    
 }
 
 // MARK:- Ids Query Builder
@@ -260,11 +231,7 @@ public class IdsQueryBuilder: QueryBuilder {
         builderClosure(self)
     }
     
-    public var query: Query {
-        get {
-            return IdsQuery(withBuilder: self)
-        }
+    public func build() throws -> IdsQuery {
+        return IdsQuery(withBuilder: self)
     }
-    
-    
 }

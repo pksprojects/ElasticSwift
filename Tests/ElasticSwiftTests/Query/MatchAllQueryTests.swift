@@ -20,10 +20,10 @@ class MatchAllQueryTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testMatchAllQuery() {
+    func testMatchAllQuery() throws {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
-        let query = QueryBuilders.matchAllQuery().query
+        let query = try! QueryBuilders.matchAllQuery().build()
         let expectedJson = "{\"match_all\":{}}"
         do {
             let data = try JSONSerialization.data(withJSONObject: query.toDic(), options: [])
@@ -40,7 +40,7 @@ class MatchAllQueryTests: XCTestCase {
 //        self.measure {
 //            // Put the code you want to measure the time of here.
 //        }
-        let query = QueryBuilders.matchAllQuery(){ builder in builder.boost = 1.1 }.query
+        let query = try! QueryBuilders.matchAllQuery(){ builder in builder.boost = 1.1 }.build()
         let expectedJson = "{\"match_all\":{\"boost\":1.1}}"
         do {
             let data = try JSONSerialization.data(withJSONObject: query.toDic(), options: [])
@@ -53,7 +53,7 @@ class MatchAllQueryTests: XCTestCase {
     }
     
     func testMatchNonQuery() {
-        let query = MatchNoneQueryBuilder().query
+        let query = try! MatchNoneQueryBuilder().build()
         let expectedJson = "{\"match_none\":{}}"
         do {
             let data = try JSONSerialization.data(withJSONObject: query.toDic(), options: [])
