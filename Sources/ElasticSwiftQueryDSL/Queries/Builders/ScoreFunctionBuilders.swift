@@ -72,7 +72,9 @@ public class ScoreFunctionBuilders {
 
 public protocol ScoreFunctionBuilder {
     
-    var scoreFunction: ScoreFunction { get }
+    associatedtype ScoreFunctionType: ScoreFunction
+    
+    func build() throws -> ScoreFunctionType
     
 }
 
@@ -97,7 +99,7 @@ public class WeightBuilder: ScoreFunctionBuilder {
         builderClosure(self)
     }
     
-    public var scoreFunction: ScoreFunction {
+    public func build() throws -> WeightScoreFunction {
         return WeightScoreFunction(withBuilder: self)
     }
     
@@ -117,10 +119,9 @@ public class RandomScoreFunctionBuilder: ScoreFunctionBuilder {
         builderClosure(self)
     }
     
-    public var scoreFunction: ScoreFunction {
+    public func build() throws -> RandomScoreFunction {
         return RandomScoreFunction(withBuilder: self)
     }
-    
 }
 
 public class ScriptScoreFunctionBuilder: ScoreFunctionBuilder {
@@ -136,10 +137,9 @@ public class ScriptScoreFunctionBuilder: ScoreFunctionBuilder {
         builderClosure(self)
     }
     
-    public var scoreFunction: ScoreFunction {
+    public func build() throws -> ScriptScoreFunction {
         return ScriptScoreFunction(withBuilder: self)
     }
-    
 }
 
 public class LinearDecayFunctionBuilder: ScoreFunctionBuilder {
@@ -161,10 +161,9 @@ public class LinearDecayFunctionBuilder: ScoreFunctionBuilder {
         builderClosure(self)
     }
     
-    public var scoreFunction: ScoreFunction {
+    public func build() throws -> LinearDecayScoreFunction {
         return LinearDecayScoreFunction(withBuilder: self)
     }
-    
 }
 
 public class GaussDecayFunctionBuilder: ScoreFunctionBuilder {
@@ -186,10 +185,9 @@ public class GaussDecayFunctionBuilder: ScoreFunctionBuilder {
         builderClosure(self)
     }
     
-    public var scoreFunction: ScoreFunction {
+    public func build() throws -> GaussScoreFunction {
         return GaussScoreFunction(withBuilder: self)
     }
-    
 }
 
 public class ExponentialDecayFunctionBuilder: ScoreFunctionBuilder {
@@ -211,7 +209,7 @@ public class ExponentialDecayFunctionBuilder: ScoreFunctionBuilder {
         builderClosure(self)
     }
     
-    public var scoreFunction: ScoreFunction {
+    public func build() throws -> ExponentialDecayScoreFunction {
         return ExponentialDecayScoreFunction(withBuilder: self)
     }
     
@@ -233,7 +231,7 @@ public class FieldValueFactorFunctionBuilder: ScoreFunctionBuilder {
         builderClosure(self)
     }
     
-    public var scoreFunction: ScoreFunction {
+    public func build() throws -> FieldValueScoreFunction {
         return FieldValueScoreFunction(withBuilder: self)
     }
     
