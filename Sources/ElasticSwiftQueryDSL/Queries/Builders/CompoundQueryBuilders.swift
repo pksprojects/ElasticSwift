@@ -251,7 +251,7 @@ public class FunctionScoreQueryBuilder: QueryBuilder {
     }
     
     public var query: Query? {
-        self._query
+        return self._query
     }
     
     public var boost: Decimal? {
@@ -320,15 +320,15 @@ public class BoostingQueryBuilder: QueryBuilder {
     }
     
     public var negative: Query? {
-        self._negative
+        return self._negative
     }
     
     public var positive: Query? {
-        self._positive
+        return self._positive
     }
     
     public var negativeBoost: Decimal? {
-        self._negativeBoost
+        return self._negativeBoost
     }
     
     public func build() throws -> BoostingQuery {
