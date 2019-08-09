@@ -103,3 +103,14 @@ public class HTTPResponseBuilderError: Error {
     }
     
 }
+
+
+// MARK:- QueryBuilder Error
+
+/// Error(s) thrown by QueryBuilder
+public enum QueryBuilderError: Error {
+    case missingRequiredField(String)
+    case missingRequiredFields([String])
+    case atleastOneFieldRequired([String])
+    case atlestOneElementRequired(String)
+}

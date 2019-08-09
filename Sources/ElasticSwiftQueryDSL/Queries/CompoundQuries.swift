@@ -20,9 +20,18 @@ public class ConstantScoreQuery: Query {
     public let query: Query
     public let boost: Decimal
     
-    public init(withBuilder builder: ConstantScoreQueryBuilder) {
-        self.query = builder.query!
-        self.boost = builder.boost!
+    public init(_ query: Query, boost: Decimal = 1.0) {
+        self.query = query
+        self.boost = boost
+    }
+    
+    internal convenience init(withBuilder builder: ConstantScoreQueryBuilder) throws {
+        
+        guard builder.query != nil else {
+            throw QueryBuilderError.missingRequiredField("query")
+        }
+        
+        self.init(builder.query!, boost: builder.boost!)
     }
     
     public func toDic() -> [String : Any] {
@@ -51,13 +60,27 @@ public class BoolQuery: Query {
     public let minimumShouldMatch: Int?
     public let boost: Decimal?
     
-    public init(withBuilder builder: BoolQueryBuilder) {
-        self.mustClauses = builder.getMustClauses()
-        self.mustNotClauses = builder.getMustNotClauses()
-        self.shouldClauses = builder.getShouldClauses()
-        self.filterClauses = builder.getFilterClauses()
+    public init(must: [Query], mustNot: [Query], should: [Query], filter: [Query], minimumShouldMatch: Int? = nil,  boost: Decimal? = nil) {
+        self.mustNotClauses = mustNot
+        self.mustClauses = must
+        self.shouldClauses = should
+        self.filterClauses = filter
+        self.minimumShouldMatch = minimumShouldMatch
+        self.boost = boost
+    }
+    
+    internal init(withBuilder builder: BoolQueryBuilder) throws {
+        
+        guard !builder.filterClauses.isEmpty || !builder.mustClauses.isEmpty || !builder.mustNotClauses.isEmpty || !builder.shouldClauses.isEmpty else {
+            throw QueryBuilderError.atleastOneFieldRequired(["filterClauses", "mustClauses", "mustNotClauses", "shouldClauses"])
+        }
+        
+        self.mustClauses = builder.mustClauses
+        self.mustNotClauses = builder.mustNotClauses
+        self.shouldClauses = builder.shouldClauses
+        self.filterClauses = builder.filterClauses
         self.boost = builder.boost
-        self.minimumShouldMatch = builder.getMinimumShouldMatch()
+        self.minimumShouldMatch = builder.minimumShouldMatch
     }
     
     public func toDic() -> [String : Any] {
@@ -94,16 +117,27 @@ public class DisMaxQuery: Query {
     
     public let name: String = "dis_max"
     
-    private static let DEFAULT_TIE_BREAKER: Decimal = 0.0
+    public static let DEFAULT_TIE_BREAKER: Decimal = 0.0
     
     public let tieBreaker: Decimal
     public let boost: Decimal?
     public let queries: [Query]
     
-    public init(withBuilder builder: DisMaxQueryBuilder) {
+    public init(_ queries: [Query], tieBreaker: Decimal = DisMaxQuery.DEFAULT_TIE_BREAKER, boost: Decimal? = nil) {
+        self.tieBreaker = tieBreaker
+        self.boost = boost
+        self.queries = queries
+    }
+    
+    internal init(withBuilder builder: DisMaxQueryBuilder) throws {
+        
+        guard !builder.queries.isEmpty else {
+            throw QueryBuilderError.missingRequiredField("query")
+        }
+        
         self.tieBreaker = builder.tieBreaker ?? DisMaxQuery.DEFAULT_TIE_BREAKER
         self.boost = builder.boost
-        self.queries = builder.querys
+        self.queries = builder.queries
     }
     
     public func toDic() -> [String : Any] {
@@ -133,7 +167,7 @@ public class FunctionScoreQuery: Query {
     
     public let name: String = "function_score"
     
-    public let query: Query?
+    public let query: Query
     public let boost: Decimal?
     public let boostMode: BoostMode?
     public let maxBoost: Decimal?
@@ -141,8 +175,27 @@ public class FunctionScoreQuery: Query {
     public let minScore: Decimal?
     public let functions: [ScoreFunction]
     
-    public init(withBuilder builder: FunctionScoreQueryBuilder) {
-        self.query = builder.query
+    public init(query: Query, boost: Decimal? = nil, boostMode: BoostMode? = nil, maxBoost: Decimal? = nil, scoreMode: ScoreMode? = nil, minScore: Decimal? = nil, functions: ScoreFunction...) {
+        self.query = query
+        self.boost = boost
+        self.boostMode = boostMode
+        self.maxBoost = maxBoost
+        self.scoreMode = scoreMode
+        self.minScore = minScore
+        self.functions = functions
+    }
+    
+    internal init(withBuilder builder: FunctionScoreQueryBuilder) throws {
+        
+        guard builder.query != nil else {
+            throw QueryBuilderError.missingRequiredField("query")
+        }
+        
+        guard builder.functions.isEmpty else {
+            throw QueryBuilderError.atlestOneElementRequired("functions")
+        }
+        
+        self.query = builder.query!
         self.boost = builder.boost
         self.boostMode = builder.boostMode
         self.maxBoost = builder.maxBoost
@@ -153,9 +206,8 @@ public class FunctionScoreQuery: Query {
     
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [:]
-        if let query = self.query {
-            dic[FunctionScoreQuery.QUERY] = query.toDic()
-        }
+        
+        dic[FunctionScoreQuery.QUERY] = query.toDic()
         if let boost = self.boost {
             dic[FunctionScoreQuery.BOOST] = boost
         }
@@ -195,24 +247,35 @@ public class BoostingQuery: Query {
     
     public let name: String = "boosting"
     
-    public let negativeQuery: Query?
-    public let positiveQuery: Query?
+    public let negative: Query
+    public let positive: Query
     public let negativeBoost: Decimal?
     
-    public init(withBuilder builder: BoostingQueryBuilder) {
-        self.negativeQuery = builder.negativeQuery
-        self.positiveQuery = builder.positiveQuery
-        self.negativeBoost = builder.negativeBoost
+    public init(positive: Query, negative: Query, negativeBoost: Decimal? = nil) {
+        self.positive = positive
+        self.negative = negative
+        self.negativeBoost = negativeBoost
+    }
+    
+    internal convenience init(withBuilder builder: BoostingQueryBuilder) throws {
+        
+        guard builder.positive != nil else {
+            throw QueryBuilderError.missingRequiredField("positive")
+        }
+        
+        guard builder.negative != nil else {
+            throw QueryBuilderError.missingRequiredField("negative")
+        }
+        
+        self.init(positive: builder.positive!, negative: builder.negative!, negativeBoost: builder.negativeBoost)
     }
     
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [:]
-        if let positive = self.positiveQuery {
-            dic[BoostingQuery.POSITIVE] = positive
-        }
-        if let negative = self.negativeQuery {
-            dic[BoostingQuery.NEGATIVE] = negative
-        }
+       
+        dic[BoostingQuery.POSITIVE] = positive
+        dic[BoostingQuery.NEGATIVE] = negative
+        
         if let negativeBoost = self.negativeBoost {
             dic[BoostingQuery.NEGATIVE_BOOST] = negativeBoost
         }
