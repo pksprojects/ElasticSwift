@@ -40,7 +40,7 @@ class MatchAllQueryTests: XCTestCase {
 //        self.measure {
 //            // Put the code you want to measure the time of here.
 //        }
-        let query = try! QueryBuilders.matchAllQuery(){ builder in builder.boost = 1.1 }.build()
+        let query = try! QueryBuilders.matchAllQuery().set(boost: 1.1).build()
         let expectedJson = "{\"match_all\":{\"boost\":1.1}}"
         do {
             let data = try JSONSerialization.data(withJSONObject: query.toDic(), options: [])

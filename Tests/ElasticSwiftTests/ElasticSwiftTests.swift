@@ -640,10 +640,10 @@ class ElasticSwiftTests: XCTestCase {
             e.fulfill()
         }
         
-        let query = try! QueryBuilders.matchQuery { builder in
-            builder.set(field: "msg")
-                .set(value: "DeleteByQuery")
-        } .build()
+        let query = try! QueryBuilders.matchQuery()
+            .set(field: "msg")
+            .set(value: "DeleteByQuery")
+            .build()
         
         let request = try DeleteByQueryRequestBuilder() { builder in
             builder.set(index: "test")
@@ -695,10 +695,10 @@ class ElasticSwiftTests: XCTestCase {
             e.fulfill()
         }
         
-        let query = try! QueryBuilders.matchQuery { builder in
-            builder.set(field: "msg")
-                .set(value: "UpdateByQuery")
-        } .build()
+        let query = try! QueryBuilders.matchQuery()
+            .set(field: "msg")
+            .set(value: "UpdateByQuery")
+            .build()
         
         let request = try UpdateByQueryRequestBuilder() { builder in
             builder.set(index: "test")
@@ -750,10 +750,10 @@ class ElasticSwiftTests: XCTestCase {
             e.fulfill()
         }
         
-        let query = try! QueryBuilders.matchQuery { builder in
-            builder.set(field: "msg")
-                .set(value: "UpdateByQuery2")
-        } .build()
+        let query = try! QueryBuilders.matchQuery()
+            .set(field: "msg")
+            .set(value: "UpdateByQuery2")
+            .build()
         let script = Script("ctx._source.msg = 'hello'")
         let request = try UpdateByQueryRequestBuilder() { builder in
             builder.set(index: "test")

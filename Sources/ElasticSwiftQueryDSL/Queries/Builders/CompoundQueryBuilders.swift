@@ -15,14 +15,7 @@ public class ConstantScoreQueryBuilder: QueryBuilder {
     private var _query: Query?
     private var _boost: Decimal?
     
-    typealias BuilderClosure = (ConstantScoreQueryBuilder) -> Void
-    
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
-    }
+    public init() {}
     
     @discardableResult
     public func set(query: Query) -> ConstantScoreQueryBuilder {
@@ -61,14 +54,7 @@ public class BoolQueryBuilder: QueryBuilder {
     private var _minimumShouldMatch: Int?
     private var _boost: Decimal?
     
-    typealias BuilderClosure = (BoolQueryBuilder) -> Void
-    
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
-    }
+    public init() {}
     
     @discardableResult
     public func must<T: Query>(query: T) -> BoolQueryBuilder {
@@ -143,14 +129,7 @@ public class DisMaxQueryBuilder: QueryBuilder {
     private var _boost: Decimal?
     private var _queries: [Query] = []
     
-    typealias BuilderClosure = (DisMaxQueryBuilder) -> Void
-    
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
-    }
+    public init() {}
     
     @discardableResult
     public func add(query: Query) -> DisMaxQueryBuilder {
@@ -199,14 +178,7 @@ public class FunctionScoreQueryBuilder: QueryBuilder {
     private var _minScore: Decimal?
     private var _functions: [ScoreFunction] = [ScoreFunction]()
     
-    typealias BuilderClosure = (FunctionScoreQueryBuilder) -> Void
-    
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
-    }
+    public init() {}
     
     @discardableResult
     public func set(query: Query) -> FunctionScoreQueryBuilder {
@@ -292,14 +264,7 @@ public class BoostingQueryBuilder: QueryBuilder {
     private var _positive: Query?
     private var _negativeBoost: Decimal?
     
-    typealias BuilderClosure = (BoostingQueryBuilder) -> Void
-    
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
-    }
+    public init() {}
     
     @discardableResult
     public func set(negative: Query) -> BoostingQueryBuilder {

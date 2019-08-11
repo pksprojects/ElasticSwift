@@ -22,14 +22,7 @@ public class MatchQueryBuilder: QueryBuilder {
     private var _fuzziness: String?
     private var _autoGenSynonymnsPhraseQuery: Bool?
     
-    typealias BuilderClosure = (MatchQueryBuilder) -> Void
-    
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
-    }
+    public init() {}
     
     @discardableResult
     public func set(field: String) -> MatchQueryBuilder {
@@ -126,14 +119,7 @@ public class MatchPhraseQueryBuilder: QueryBuilder {
     private var _value: String?
     private var _analyzer: String?
     
-    typealias BuilderClosure = (MatchPhraseQueryBuilder) -> Void
-    
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
-    }
+    public init() {}
     
     @discardableResult
     public func set(field: String) -> MatchPhraseQueryBuilder {
@@ -178,14 +164,7 @@ public class MatchPhrasePrefixQueryBuilder: QueryBuilder {
     private var _value: String?
     private var _maxExpansions: Int?
     
-    typealias BuilderClosure = (MatchPhrasePrefixQueryBuilder) -> Void
-    
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
-    }
+    public init() {}
     
     @discardableResult
     public func set(field: String) -> Self {
@@ -230,14 +209,7 @@ public class MultiMatchQueryBuilder: QueryBuilder {
     private var _type: MultiMatchQueryType?
     private var _tieBreaker: Decimal?
     
-    typealias BuilderClosure = (MultiMatchQueryBuilder) -> Void
-    
     init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
-    }
     
     @discardableResult
     public func set(query: String) -> MultiMatchQueryBuilder {
@@ -301,14 +273,7 @@ public class CommonTermsQueryBuilder: QueryBuilder {
     private var _minimumShouldMatchLowFreq: Int?
     private var _minimumShouldMatchHighFreq: Int?
     
-    typealias BuilderClosure = (CommonTermsQueryBuilder) -> Void
-    
     init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
-    }
     
     @discardableResult
     public func set(query: String) -> CommonTermsQueryBuilder {
@@ -406,14 +371,7 @@ public class QueryStringQueryBuilder: QueryBuilder {
     private var _quoteFieldSuffix: String?
     private var _autoGenerateSynonymsPhraseQuery: Bool?
     
-    typealias BuilderClosure = (QueryStringQueryBuilder) -> Void
-    
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
-    }
+    public init() {}
     
     @discardableResult
     public func set(allowLeadingWildcard: Bool) -> Self {
@@ -628,14 +586,7 @@ public class SimpleQueryStringQueryBuilder: QueryBuilder {
     private var _quoteFieldSuffix: String?
     private var _autoGenerateSynonymsPhraseQuery: Bool?
     
-    typealias BuilderClosure = (SimpleQueryStringQueryBuilder) -> Void
-    
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
-    }
+    public init() {}
     
     @discardableResult
     public func set(query: String) -> Self {

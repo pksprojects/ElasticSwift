@@ -290,18 +290,3 @@ Below Table lists all the available search queries with their corresponding Quer
 | TypeQuery | TypeQueryBuilder | QueryBuilders.typeQuery() |
 | IdsQuery | IdsQueryBuilder | QueryBuilders.idsQuery() |
 
-#### Note 
-
-An overload for all the helper methods are available which that a closure to set builder properties.
-
-```swift
-
-public static func matchAllQuery() -> MatchAllQueryBuilder
-
-public static func matchAllQuery(_ closure: (MatchAllQueryBuilder) -> Void) -> MatchAllQueryBuilder
-
-let matchAll = QueryBuilders.matchAllQuery { builder in
-    builder.boost = 1.2
-}
-
-```

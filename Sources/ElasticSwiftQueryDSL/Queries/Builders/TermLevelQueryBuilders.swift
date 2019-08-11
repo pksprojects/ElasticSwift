@@ -16,14 +16,7 @@ public class TermQueryBuilder: QueryBuilder {
     private var _value: String?
     private var _boost: Decimal?
     
-    typealias BuilderClosure = (TermQueryBuilder) -> Void
-    
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
-    }
+    public init() {}
     
     public func set(field: String) -> TermQueryBuilder {
         self._field = field
@@ -62,14 +55,7 @@ public class TermsQueryBuilder: QueryBuilder {
     public var _field: String?
     public var _values: [String] = []
     
-    typealias BuilderClosure = (TermsQueryBuilder) -> Void
-    
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
-    }
+    public init() {}
     
     public func set(field: String) -> TermsQueryBuilder {
         self._field = field
@@ -113,14 +99,7 @@ public class RangeQueryBuilder: QueryBuilder {
     private var _boost: Decimal?
     private var _relation: ShapeRelation?
     
-    typealias BuilderClosure = (RangeQueryBuilder) -> Void
-    
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
-    }
+    public init() {}
     
     public func set(field: String) -> RangeQueryBuilder {
         self._field = field
@@ -207,14 +186,7 @@ public class ExistsQueryBuilder: QueryBuilder {
     
     private var _field: String?
     
-    typealias BuilderClosure = (ExistsQueryBuilder) -> Void
-    
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
-    }
+    public init() {}
     
     public func set(field: String) -> ExistsQueryBuilder {
         self._field = field
@@ -238,14 +210,7 @@ public class PrefixQueryBuilder: QueryBuilder {
     private var _value: String?
     private var _boost: Decimal?
     
-    typealias BuilderClosure = (PrefixQueryBuilder) -> Void
-    
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
-    }
+    public init() {}
     
     public func set(field: String) -> PrefixQueryBuilder {
         self._field = field
@@ -286,14 +251,7 @@ public class WildCardQueryBuilder: QueryBuilder {
     private var _value: String?
     private var _boost: Decimal?
     
-    typealias BuilderClosure = (WildCardQueryBuilder) -> Void
-    
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
-    }
+    public init() {}
     
     public func set(field: String) -> WildCardQueryBuilder {
         self._field = field
@@ -337,14 +295,7 @@ public class RegexpQueryBuilder: QueryBuilder {
     private var _regexFlags: [RegexFlag] = []
     private var _maxDeterminizedStates: Int?
     
-    typealias BuilderClosure = (RegexpQueryBuilder) -> Void
-    
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
-    }
+    public init() {}
     
     public func set(field: String) -> RegexpQueryBuilder {
         self._field = field
@@ -409,14 +360,7 @@ public class FuzzyQueryBuilder: QueryBuilder {
     private var _maxExpansions: Int?
     private var _transpositions: Bool?
     
-    typealias BuilderClosure = (FuzzyQueryBuilder) -> Void
-    
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
-    }
+    public init() {}
     
     public func set(field: String) -> FuzzyQueryBuilder {
         self._field = field
@@ -487,14 +431,7 @@ public class TypeQueryBuilder: QueryBuilder {
     
     private var _type: String?
     
-    typealias BuilderClosure = (TypeQueryBuilder) -> Void
-    
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
-    }
+    public init() {}
     
     public func set(type: String) -> TypeQueryBuilder {
         self._type = type
@@ -517,14 +454,7 @@ public class IdsQueryBuilder: QueryBuilder {
     private var _type: String?
     private var _ids: [String] = []
     
-    typealias BuilderClosure = (IdsQueryBuilder) -> Void
-    
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
-    }
+    public init() {}
     
     public func set(ids: String...) -> IdsQueryBuilder {
         self._ids = ids
