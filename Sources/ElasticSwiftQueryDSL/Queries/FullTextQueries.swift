@@ -29,14 +29,28 @@ public class MatchQuery: Query {
     public let fuzziness: String?
     public let autoGenSynonymnsPhraseQuery: Bool?
     
-    init(withBuilder builder: MatchQueryBuilder) {
-        self.field = builder.field!
-        self.value = builder.value!
-        self.`operator` = builder.`operator`
-        self.zeroTermQuery = builder.zeroTermQuery
-        self.fuzziness = builder.fuzziness
-        self.cutoffFrequency = builder.cutoffFrequency
-        self.autoGenSynonymnsPhraseQuery = builder.autoGenSynonymnsPhraseQuery
+    public init(field: String, value: String, `operator`: MatchQueryOperator? = nil, zeroTermQuery: ZeroTermQuery? = nil, cutoffFrequency: Decimal? = nil, fuzziness: String? = nil, autoGenSynonymnsPhraseQuery: Bool? = nil) {
+        self.field = field
+        self.value = value
+        self.`operator` = `operator`
+        self.zeroTermQuery = zeroTermQuery
+        self.cutoffFrequency = cutoffFrequency
+        self.fuzziness = fuzziness
+        self.autoGenSynonymnsPhraseQuery = autoGenSynonymnsPhraseQuery
+    }
+    
+    internal convenience init(withBuilder builder: MatchQueryBuilder) throws {
+        
+        guard builder.field != nil else {
+            throw QueryBuilderError.missingRequiredField("field")
+        }
+        
+        guard builder.value != nil else {
+            throw QueryBuilderError.missingRequiredField("value")
+        }
+        
+        self.init(field: builder.field!, value: builder.value!, operator: builder.`operator`, zeroTermQuery: builder.zeroTermQuery, cutoffFrequency: builder.cutoffFrequency, fuzziness: builder.fuzziness, autoGenSynonymnsPhraseQuery: builder.autoGenSynonymnsPhraseQuery)
+
     }
     
     public func toDic() -> [String : Any] {
@@ -75,10 +89,24 @@ public class MatchPhraseQuery: Query {
     public let value: String
     public let analyzer: String?
     
-    public init(withBuilder builder: MatchPhraseQueryBuilder) {
-        self.field = builder.field!
-        self.value = builder.value!
-        self.analyzer = builder.analyzer
+    public init(field: String, value: String, analyzer: String? = nil) {
+        self.field = field
+        self.value = value
+        self.analyzer = analyzer
+    }
+    
+    internal convenience init(withBuilder builder: MatchPhraseQueryBuilder) throws {
+        
+        guard builder.field != nil else {
+            throw QueryBuilderError.missingRequiredField("field")
+        }
+        
+        guard builder.value != nil else {
+            throw QueryBuilderError.missingRequiredField("value")
+        }
+        
+        self.init(field: builder.field!, value: builder.value!, analyzer: builder.analyzer)
+        
     }
     
     public func toDic() -> [String : Any] {
@@ -108,10 +136,22 @@ public class MatchPhrasePrefixQuery: Query {
     public let value: String
     public let maxExpansions: Int?
     
-    public init(withBuilder builder: MatchPhrasePrefixQueryBuilder) {
-        self.field = builder.field!
-        self.value = builder.value!
-        self.maxExpansions = builder.maxExpansions
+    public init(field: String, value: String, maxExpansions: Int? = nil) {
+        self.field = field
+        self.value = value
+        self.maxExpansions = maxExpansions
+    }
+    
+    internal convenience init(withBuilder builder: MatchPhrasePrefixQueryBuilder) throws {
+        guard builder.field != nil else {
+            throw QueryBuilderError.missingRequiredField("field")
+        }
+        
+        guard builder.value != nil else {
+            throw QueryBuilderError.missingRequiredField("value")
+        }
+        
+        self.init(field: builder.field!, value: builder.value!, maxExpansions: builder.maxExpansions)
     }
     
     public func toDic() -> [String : Any] {
@@ -144,9 +184,25 @@ public class MultiMatchQuery: Query {
     public let query: String
     public let fields: [String]
     
-    public init(withBuilder builder: MultiMatchQueryBuilder) {
-        self.query = builder.value!
-        self.fields = builder.fields!
+    internal init(tieBreaker: Decimal?, type: MultiMatchQueryType?, query: String, fields: [String]) {
+        self.tieBreaker = tieBreaker
+        self.type = type
+        self.query = query
+        self.fields = fields
+    }
+    
+    public init(withBuilder builder: MultiMatchQueryBuilder) throws {
+        
+        guard !builder.fields.isEmpty else {
+            throw QueryBuilderError.atlestOneElementRequired("fields")
+        }
+        
+        guard builder.query != nil else {
+            throw QueryBuilderError.missingRequiredField("query")
+        }
+        
+        self.query = builder.query!
+        self.fields = builder.fields
         self.tieBreaker = builder.tieBreaker
         self.type = builder.type
     }
@@ -181,7 +237,7 @@ public class CommonTermsQuery: Query {
     
     public let name: String = "common"
     
-    public let value: String
+    public let query: String
     public let cutoffFrequency: Decimal
     public let lowFrequencyOperator: String?
     public let highFrequencyOperator: String?
@@ -189,19 +245,32 @@ public class CommonTermsQuery: Query {
     public let minimumShouldMatchLowFreq: Int?
     public let minimumShouldMatchHighFreq: Int?
     
-    public init(withBuilder builder: CommonTermsQueryBuilder) {
-        self.value = builder.value!
-        self.cutoffFrequency = builder.cutoffFrequency!
-        self.lowFrequencyOperator = builder.lowFrequencyOperator
-        self.highFrequencyOperator = builder.highFrequencyOperator
-        self.minimumShouldMatch = builder.minimumShouldMatch
-        self.minimumShouldMatchHighFreq = builder.minimumShouldMatchHighFreq
-        self.minimumShouldMatchLowFreq = builder.minimumShouldMatchLowFreq
+    public init(query: String, cutoffFrequency: Decimal, lowFrequencyOperator: String? = nil, highFrequencyOperator: String? = nil, minimumShouldMatch: Int? = nil, minimumShouldMatchLowFreq: Int? = nil, minimumShouldMatchHighFreq: Int? = nil) {
+        self.query = query
+        self.cutoffFrequency = cutoffFrequency
+        self.lowFrequencyOperator = lowFrequencyOperator
+        self.highFrequencyOperator = highFrequencyOperator
+        self.minimumShouldMatch = minimumShouldMatch
+        self.minimumShouldMatchLowFreq = minimumShouldMatchLowFreq
+        self.minimumShouldMatchHighFreq = minimumShouldMatchHighFreq
+    }
+    
+    internal convenience init(withBuilder builder: CommonTermsQueryBuilder) throws {
+        
+        guard builder.cutoffFrequency != nil else {
+            throw QueryBuilderError.atlestOneElementRequired("cutoffFrequency")
+        }
+        
+        guard builder.query != nil else {
+            throw QueryBuilderError.missingRequiredField("query")
+        }
+        
+        self.init(query: builder.query!, cutoffFrequency: builder.cutoffFrequency!, lowFrequencyOperator: builder.lowFrequencyOperator, highFrequencyOperator: builder.highFrequencyOperator, minimumShouldMatch: builder.minimumShouldMatch, minimumShouldMatchLowFreq: builder.minimumShouldMatchLowFreq, minimumShouldMatchHighFreq: builder.minimumShouldMatchHighFreq)
     }
     
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [:]
-        dic[CommonTermsQuery.QUERY] = value
+        dic[CommonTermsQuery.QUERY] = query
         dic[CommonTermsQuery.CUTOFF_FREQUENCY] = cutoffFrequency
         if let lowFrequencyOperator = self.lowFrequencyOperator {
             dic[CommonTermsQuery.LOW_FREQ_OPERATOR] = lowFrequencyOperator
@@ -272,7 +341,7 @@ public class QueryStringQuery: Query {
     public let quoteFieldSuffix: String?
     public let autoGenerateSynonymsPhraseQuery: Bool?
     
-    public init(withBuilder builder: QueryStringQueryBuilder) {
+    internal init(withBuilder builder: QueryStringQueryBuilder) throws {
         self.defaultField = builder.defaultField
         self.value = builder.value!
         self.defaultOperator = builder.defaultOperator
@@ -383,7 +452,7 @@ public class SimpleQueryStringQuery: Query {
     
     public let name: String = "simple_query_string"
     
-    public let value: String
+    public let query: String
     public let fields: [String]?
     public let defaultOperator: String?
     public let analyzer: String?
@@ -396,24 +465,33 @@ public class SimpleQueryStringQuery: Query {
     public let quoteFieldSuffix: String?
     public let autoGenerateSynonymsPhraseQuery: Bool?
     
-    public init(withBuilder builder: SimpleQueryStringQueryBuilder) {
-        self.value = builder.value!
-        self.fields = builder.fields
-        self.defaultOperator = builder.defaultOperator
-        self.analyzer = builder.analyzer
-        self.flags = builder.flags
-        self.fuzzyMaxExpansions = builder.fuzzyMaxExpansions
-        self.fuzzyPrefixLength = builder.fuzzyPrefixLength
-        self.fuzzyTranspositions = builder.fuzzyTranspositions
-        self.lenient = builder.lenient
-        self.quoteFieldSuffix = builder.quoteFieldSuffix
-        self.minimumShouldMatch = builder.minimumShouldMatch
-        self.autoGenerateSynonymsPhraseQuery = builder.autoGenerateSynonymsPhraseQuery
+    internal init(query: String, fields: [String]? = nil, defaultOperator: String? = nil, analyzer: String? = nil, flags: String? = nil, lenient: Bool? = nil, minimumShouldMatch: Int? = nil, fuzzyMaxExpansions: Int? = nil, fuzzyPrefixLength: Int? = nil, fuzzyTranspositions: Bool? = nil, quoteFieldSuffix: String? = nil, autoGenerateSynonymsPhraseQuery: Bool? = nil) {
+        self.query = query
+        self.fields = fields
+        self.defaultOperator = defaultOperator
+        self.analyzer = analyzer
+        self.flags = flags
+        self.lenient = lenient
+        self.minimumShouldMatch = minimumShouldMatch
+        self.fuzzyMaxExpansions = fuzzyMaxExpansions
+        self.fuzzyPrefixLength = fuzzyPrefixLength
+        self.fuzzyTranspositions = fuzzyTranspositions
+        self.quoteFieldSuffix = quoteFieldSuffix
+        self.autoGenerateSynonymsPhraseQuery = autoGenerateSynonymsPhraseQuery
+    }
+    
+    public convenience init(withBuilder builder: SimpleQueryStringQueryBuilder) throws {
+        
+        guard builder.query != nil else {
+            throw QueryBuilderError.missingRequiredField("query")
+        }
+        
+        self.init(query: builder.query!, fields: builder.fields, defaultOperator: builder.defaultOperator, analyzer: builder.analyzer, flags: builder.flags, lenient: builder.lenient, minimumShouldMatch: builder.minimumShouldMatch, fuzzyMaxExpansions: builder.fuzzyMaxExpansions, fuzzyPrefixLength: builder.fuzzyPrefixLength, fuzzyTranspositions: builder.fuzzyTranspositions, quoteFieldSuffix: builder.quoteFieldSuffix, autoGenerateSynonymsPhraseQuery: builder.autoGenerateSynonymsPhraseQuery)
     }
     
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [:]
-        dic[SimpleQueryStringQuery.QUERY] = value
+        dic[SimpleQueryStringQuery.QUERY] = query
         if let fields = self.fields {
             dic[SimpleQueryStringQuery.FIELDS] = fields
         }
