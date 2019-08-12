@@ -10,7 +10,7 @@ import ElasticSwiftCore
 
 // MARK:- MoreLikeThis Query Builder
 
-public class MoreLikeThisQueryBuilder: QueryBuilder {
+internal class MoreLikeThisQueryBuilder: QueryBuilder {
     
     public func build() throws -> MoreLikeThisQuery {
         return MoreLikeThisQuery(withBuilder: self)
@@ -19,7 +19,7 @@ public class MoreLikeThisQueryBuilder: QueryBuilder {
 
 // MARK:- Script Query Builder
 
-public class ScriptQueryBuilder: QueryBuilder {
+internal class ScriptQueryBuilder: QueryBuilder {
     
     public func build() throws -> ScriptQuery {
         return ScriptQuery(withBuilder: self)
@@ -28,7 +28,7 @@ public class ScriptQueryBuilder: QueryBuilder {
 
 // MARK:- Percolate Query Builder
 
-public class PercoloteQueryBuilder: QueryBuilder {
+internal class PercoloteQueryBuilder: QueryBuilder {
     
     public func build() throws -> PercoloteQuery {
         return PercoloteQuery(withBuilder: self)
@@ -37,7 +37,7 @@ public class PercoloteQueryBuilder: QueryBuilder {
 
 // MARK:- Wrapper Query Builder
 
-public class WrapperQueryBuilder: QueryBuilder {
+internal class WrapperQueryBuilder: QueryBuilder {
     
     public func build() throws -> WrapperQuery {
         return WrapperQuery(withBuilder: self)

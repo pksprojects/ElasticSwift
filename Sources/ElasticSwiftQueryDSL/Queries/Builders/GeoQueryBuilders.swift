@@ -11,7 +11,7 @@ import ElasticSwiftCore
 
 // MARK:- GeoShape Query Builder
 
-public class GeoShapeQueryBuilder: QueryBuilder {
+internal class GeoShapeQueryBuilder: QueryBuilder {
     
     public func build() throws -> GeoShapeQuery {
         return GeoShapeQuery(withBuilder: self)
@@ -20,7 +20,7 @@ public class GeoShapeQueryBuilder: QueryBuilder {
 
 // MARK:- Geo Bounding Box Query Builder
 
-public class GeoBoundingBoxQueryBuilder: QueryBuilder {
+internal class GeoBoundingBoxQueryBuilder: QueryBuilder {
     
     public func build() throws -> GeoBoundingBoxQuery {
         return GeoBoundingBoxQuery(withBuilder: self)
@@ -29,7 +29,7 @@ public class GeoBoundingBoxQueryBuilder: QueryBuilder {
 
 // MARK:- Geo Distance Query Builder
 
-public class GeoDistanceQueryBuilder: QueryBuilder {
+internal class GeoDistanceQueryBuilder: QueryBuilder {
     
     public func build() throws -> GeoDistanceQuery {
         return GeoDistanceQuery(withBuilder: self)
@@ -39,7 +39,7 @@ public class GeoDistanceQueryBuilder: QueryBuilder {
 
 // MARK:- Geo Polygon Query Builder
 
-public class GeoPolygonQueryBuilder: QueryBuilder {
+internal class GeoPolygonQueryBuilder: QueryBuilder {
     
     public func build() throws -> GeoPolygonQuery {
         return GeoPolygonQuery(withBuilder: self)

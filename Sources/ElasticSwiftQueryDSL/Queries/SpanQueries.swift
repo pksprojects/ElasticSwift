@@ -10,7 +10,7 @@ import ElasticSwiftCore
 
 // MARK:- Span Term Query
 
-public class SpanTermQuery: Query {
+internal class SpanTermQuery: Query {
     public let name: String = ""
     
     public init(withBuilder builder: SpanTermQueryBuilder) {
@@ -27,7 +27,7 @@ public class SpanTermQuery: Query {
 
 // MARK:- Span Multi Term Query
 
-public class SpanMultiTermQuery: Query {
+internal class SpanMultiTermQuery: Query {
     public let name: String = ""
     
     public init(withBuilder builder: SpanMultiTermQueryBuilder) {
@@ -44,7 +44,7 @@ public class SpanMultiTermQuery: Query {
 
 // MARK:- Span First Query
 
-public class SpanFirstQuery: Query {
+internal class SpanFirstQuery: Query {
     public let name: String = ""
     
     public init(withBuilder builder: SpanFirstQueryBuilder) {
@@ -61,7 +61,7 @@ public class SpanFirstQuery: Query {
 
 // MARK:- Span Near Query
 
-public class SpanNearQuery: Query {
+internal class SpanNearQuery: Query {
     public let name: String = ""
     
     public init(withBuilder builder: SpanNearQueryBuilder) {
@@ -78,7 +78,7 @@ public class SpanNearQuery: Query {
 
 // MARK:- Span Or Query
 
-public class SpanOrQuery: Query {
+internal class SpanOrQuery: Query {
     public let name: String = ""
     
     public init(withBuilder builder: SpanOrQueryBuilder) {
@@ -95,7 +95,7 @@ public class SpanOrQuery: Query {
 
 // MARK:- Span Not Query
 
-public class SpanNotQuery: Query {
+internal class SpanNotQuery: Query {
     public let name: String = ""
     
     public init(withBuilder builder: SpanNotQueryBuilder) {
@@ -112,7 +112,7 @@ public class SpanNotQuery: Query {
 
 // MARK:- Span Containing Query
 
-public class SpanContainingQuery: Query {
+internal class SpanContainingQuery: Query {
     public let name: String = ""
     
     public init(withBuilder builder: SpanContainingQueryBuilder) {
@@ -129,7 +129,7 @@ public class SpanContainingQuery: Query {
 
 // MARK:- Span Within Query
 
-public class SpanWithinQuery: Query {
+internal class SpanWithinQuery: Query {
     public let name: String = ""
     
     public init(withBuilder builder: SpanWithinQueryBuilder) {
@@ -146,7 +146,7 @@ public class SpanWithinQuery: Query {
 
 // MARK:- Span Field Masking Query
 
-public class SpanFieldMaskingQuery: Query {
+internal class SpanFieldMaskingQuery: Query {
     public let name: String = ""
     
     public init(withBuilder builder: SpanFieldMaskingQueryBuilder) {

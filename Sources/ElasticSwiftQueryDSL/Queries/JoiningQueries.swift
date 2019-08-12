@@ -11,7 +11,7 @@ import ElasticSwiftCore
 
 // MARK:- Nested Query
 
-public class NestedQuery: Query {
+internal class NestedQuery: Query {
     public let name: String = ""
     
     public init(withBuilder builder: NestedQueryBuilder) {
@@ -28,7 +28,7 @@ public class NestedQuery: Query {
 
 // MARK:- HasChild Query
 
-public class HasChildQuery: Query {
+internal class HasChildQuery: Query {
     public let name: String = ""
     
     public init(withBuilder builder: HasChildQueryBuilder) {
@@ -45,7 +45,7 @@ public class HasChildQuery: Query {
 
 // MARK:- HasParent Query
 
-public class HasParentQuery: Query {
+internal class HasParentQuery: Query {
     public let name: String = ""
     
     public init(withBuilder builder: HasParentQueryBuilder) {
@@ -62,7 +62,7 @@ public class HasParentQuery: Query {
 
 // MARK:- ParentId Query
 
-public class ParentIdQuery: Query {
+internal class ParentIdQuery: Query {
     public let name: String = ""
     
     public init(withBuilder builder: ParentIdQueryBuilder) {

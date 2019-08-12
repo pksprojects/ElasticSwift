@@ -10,7 +10,7 @@ import ElasticSwiftCore
 
 // MARK:- Span Term Query Builder
 
-public class SpanTermQueryBuilder: QueryBuilder {
+internal class SpanTermQueryBuilder: QueryBuilder {
     
     public func build() throws -> SpanTermQuery {
         return SpanTermQuery(withBuilder: self)
@@ -20,7 +20,7 @@ public class SpanTermQueryBuilder: QueryBuilder {
 
 // MARK:- Span Multi Term Query Builder
 
-public class SpanMultiTermQueryBuilder: QueryBuilder {
+internal class SpanMultiTermQueryBuilder: QueryBuilder {
     
     public func build() throws -> SpanMultiTermQuery {
         return SpanMultiTermQuery(withBuilder: self)
@@ -30,7 +30,7 @@ public class SpanMultiTermQueryBuilder: QueryBuilder {
 
 // MARK:- Span First Query Builder
 
-public class SpanFirstQueryBuilder: QueryBuilder {
+internal class SpanFirstQueryBuilder: QueryBuilder {
     
     public func build() throws -> SpanFirstQuery {
         return SpanFirstQuery(withBuilder: self)
@@ -39,7 +39,7 @@ public class SpanFirstQueryBuilder: QueryBuilder {
 
 // MARK:- Span Near Query Builder
 
-public class SpanNearQueryBuilder: QueryBuilder {
+internal class SpanNearQueryBuilder: QueryBuilder {
     
     public func build() throws -> SpanNearQuery {
         return SpanNearQuery(withBuilder: self)
@@ -49,7 +49,7 @@ public class SpanNearQueryBuilder: QueryBuilder {
 
 // MARK:- Span Or Query Builder
 
-public class SpanOrQueryBuilder: QueryBuilder {
+internal class SpanOrQueryBuilder: QueryBuilder {
     
     public func build() throws -> SpanOrQuery {
         return SpanOrQuery(withBuilder: self)
@@ -58,7 +58,7 @@ public class SpanOrQueryBuilder: QueryBuilder {
 
 // MARK:- Span Not Query Builder
 
-public class SpanNotQueryBuilder: QueryBuilder {
+internal class SpanNotQueryBuilder: QueryBuilder {
     
     public func build() throws -> SpanNotQuery {
         return SpanNotQuery(withBuilder: self)
@@ -68,7 +68,7 @@ public class SpanNotQueryBuilder: QueryBuilder {
 
 // MARK:- Span Containing Query Builder
 
-public class SpanContainingQueryBuilder: QueryBuilder {
+internal class SpanContainingQueryBuilder: QueryBuilder {
     
     public func build() throws -> SpanContainingQuery {
         return SpanContainingQuery(withBuilder: self)
@@ -78,7 +78,7 @@ public class SpanContainingQueryBuilder: QueryBuilder {
 
 // MARK:- Span Within Query Builder
 
-public class SpanWithinQueryBuilder: QueryBuilder {
+internal class SpanWithinQueryBuilder: QueryBuilder {
     
     public func build() throws -> SpanWithinQuery {
         return SpanWithinQuery(withBuilder: self)
@@ -87,7 +87,7 @@ public class SpanWithinQueryBuilder: QueryBuilder {
 
 // MARK:- Span Field Masking Query Builder
 
-public class SpanFieldMaskingQueryBuilder: QueryBuilder {
+internal class SpanFieldMaskingQueryBuilder: QueryBuilder {
     
     public func build() throws -> SpanFieldMaskingQuery {
         return SpanFieldMaskingQuery(withBuilder: self)
