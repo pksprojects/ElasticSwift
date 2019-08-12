@@ -72,6 +72,7 @@ public class WeightBuilder: ScoreFunctionBuilder {
     
     public init() {}
     
+    @discardableResult
     public func set(weight: Decimal) -> WeightBuilder {
         self._weight = weight
         return self
@@ -96,11 +97,13 @@ public class RandomScoreFunctionBuilder: ScoreFunctionBuilder {
     
     public init() {}
     
+    @discardableResult
     public func set(seed: Int) -> RandomScoreFunctionBuilder {
         self._seed = seed
         return self
     }
     
+    @discardableResult
     public func set(field: String) -> RandomScoreFunctionBuilder {
         self._field = field
         return self
@@ -126,6 +129,7 @@ public class ScriptScoreFunctionBuilder: ScoreFunctionBuilder {
     
     public init() {}
     
+    @discardableResult
     public func set(script: Script) -> ScriptScoreFunctionBuilder {
         self._script = script
         return self
@@ -153,26 +157,32 @@ public class LinearDecayFunctionBuilder: ScoreFunctionBuilder {
     
     public init() {}
     
+    @discardableResult
     public func set(field: String) -> LinearDecayFunctionBuilder {
         self._field = field
         return self
     }
+    @discardableResult
     public func set(origin: String) -> LinearDecayFunctionBuilder {
         self._origin = origin
         return self
     }
+    @discardableResult
     public func set(scale: String) -> LinearDecayFunctionBuilder {
         self._scale = scale
         return self
     }
+    @discardableResult
     public func set(offset: String) -> LinearDecayFunctionBuilder {
         self._offset = offset
         return self
     }
+    @discardableResult
     public func set(decay: Decimal) -> LinearDecayFunctionBuilder {
         self._decay = decay
         return self
     }
+    @discardableResult
     public func set(multiValudMode: MultiValueMode) -> LinearDecayFunctionBuilder {
         self._multiValueMode = multiValudMode
         return self
@@ -215,26 +225,32 @@ public class GaussDecayFunctionBuilder: ScoreFunctionBuilder {
     
     public init() {}
     
+    @discardableResult
     public func set(field: String) -> GaussDecayFunctionBuilder {
         self._field = field
         return self
     }
+    @discardableResult
     public func set(origin: String) -> GaussDecayFunctionBuilder {
         self._origin = origin
         return self
     }
+    @discardableResult
     public func set(scale: String) -> GaussDecayFunctionBuilder {
         self._scale = scale
         return self
     }
+    @discardableResult
     public func set(offset: String) -> GaussDecayFunctionBuilder {
         self._offset = offset
         return self
     }
+    @discardableResult
     public func set(decay: Decimal) -> GaussDecayFunctionBuilder {
         self._decay = decay
         return self
     }
+    @discardableResult
     public func set(multiValudMode: MultiValueMode) -> GaussDecayFunctionBuilder {
         self._multiValueMode = multiValudMode
         return self
@@ -277,26 +293,32 @@ public class ExponentialDecayFunctionBuilder: ScoreFunctionBuilder {
     
     public init() {}
     
+    @discardableResult
     public func set(field: String) -> ExponentialDecayFunctionBuilder {
         self._field = field
         return self
     }
+    @discardableResult
     public func set(origin: String) -> ExponentialDecayFunctionBuilder {
         self._origin = origin
         return self
     }
+    @discardableResult
     public func set(scale: String) -> ExponentialDecayFunctionBuilder {
         self._scale = scale
         return self
     }
+    @discardableResult
     public func set(offset: String) -> ExponentialDecayFunctionBuilder {
         self._offset = offset
         return self
     }
+    @discardableResult
     public func set(decay: Decimal) -> ExponentialDecayFunctionBuilder {
         self._decay = decay
         return self
     }
+    @discardableResult
     public func set(multiValudMode: MultiValueMode) -> ExponentialDecayFunctionBuilder {
         self._multiValueMode = multiValudMode
         return self
@@ -338,21 +360,22 @@ public class FieldValueFactorFunctionBuilder: ScoreFunctionBuilder {
     
     public init() {}
     
+    @discardableResult
     public func set(field: String) -> FieldValueFactorFunctionBuilder {
         self._field = field
         return self
     }
-    
+    @discardableResult
     public func set(factor: Decimal) -> FieldValueFactorFunctionBuilder {
         self._factor = factor
         return self
     }
-    
+    @discardableResult
     public func set(modifier: FieldValueScoreFunction.Modifier) -> FieldValueFactorFunctionBuilder {
         self._modifier = modifier
         return self
     }
-    
+    @discardableResult
     public func set(missing: Decimal) -> FieldValueFactorFunctionBuilder {
         self._missing = missing
         return self
