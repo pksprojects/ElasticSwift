@@ -10,7 +10,7 @@ import ElasticSwiftCore
 
 // MARK:- MoreLikeThis Query
 
-public class MoreLikeThisQuery: Query {
+internal class MoreLikeThisQuery: Query {
     public let name: String = ""
     
     public init(withBuilder builder: MoreLikeThisQueryBuilder) {
@@ -27,7 +27,7 @@ public class MoreLikeThisQuery: Query {
 
 // MARK:- Script Query
 
-public class ScriptQuery: Query {
+internal class ScriptQuery: Query {
     public let name: String = ""
     
     public init(withBuilder builder: ScriptQueryBuilder) {
@@ -44,7 +44,7 @@ public class ScriptQuery: Query {
 
 // MARK:- Percolate Query
 
-public class PercoloteQuery: Query {
+internal class PercoloteQuery: Query {
     public let name: String = ""
     
     public init(withBuilder builder: PercoloteQueryBuilder) {
@@ -61,7 +61,7 @@ public class PercoloteQuery: Query {
 
 // MARK:- Wrapper Query
 
-public class WrapperQuery: Query {
+internal class WrapperQuery: Query {
     public let name: String = ""
     
     public init(withBuilder builder: WrapperQueryBuilder) {

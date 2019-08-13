@@ -7,6 +7,9 @@
 
 import Foundation
 import ElasticSwiftCore
+import ElasticSwiftCodableUtils
+
+// MARK:- ScoreFunctionBuilders
 
 public class ScoreFunctionBuilders {
     
@@ -40,41 +43,19 @@ public class ScoreFunctionBuilders {
         return FieldValueFactorFunctionBuilder()
     }
     
-    public static func linearDecayFunction(_ builderClosure: (LinearDecayFunctionBuilder) -> Void) -> LinearDecayFunctionBuilder {
-        return LinearDecayFunctionBuilder(builderClosure: builderClosure)
-    }
-    
-    public static func gaussDecayFunction(_ builderClosure: (GaussDecayFunctionBuilder) -> Void) -> GaussDecayFunctionBuilder {
-        return GaussDecayFunctionBuilder(builderClosure: builderClosure)
-    }
-    
-    public static func exponentialDecayFunction(_ builderClosure: (ExponentialDecayFunctionBuilder) -> Void) -> ExponentialDecayFunctionBuilder {
-        return ExponentialDecayFunctionBuilder(builderClosure: builderClosure)
-    }
-    
-    public static func scriptFunction(_ builderClosure: (ScriptScoreFunctionBuilder) -> Void) -> ScriptScoreFunctionBuilder {
-        return ScriptScoreFunctionBuilder(builderClosure: builderClosure)
-    }
-    
-    public static func randomFunction(_ builderClosure: (RandomScoreFunctionBuilder) -> Void) -> RandomScoreFunctionBuilder {
-        return RandomScoreFunctionBuilder(builderClosure: builderClosure)
-    }
-    
-    public static func weightFactorFunction(_ builderClosure: (WeightBuilder) -> Void) -> WeightBuilder {
-        return WeightBuilder(builderClosure: builderClosure)
-    }
-    
-    public static func fieldValueFactorFunction(_ builderClosure: (FieldValueFactorFunctionBuilder) -> Void) -> FieldValueFactorFunctionBuilder {
-        return FieldValueFactorFunctionBuilder(builderClosure: builderClosure)
-    }
 }
 
+// MARK:- ScoreFunctionBuilder Protocol
 
 public protocol ScoreFunctionBuilder {
     
-    var scoreFunction: ScoreFunction { get }
+    associatedtype ScoreFunctionType: ScoreFunction
+    
+    func build() throws -> ScoreFunctionType
     
 }
+
+// MARK:- ScoreFunction Protocol
 
 public protocol ScoreFunction {
     
@@ -83,169 +64,359 @@ public protocol ScoreFunction {
     func toDic() -> [String: Any]
 }
 
+// MARK:- Weight Builder
 
 public class WeightBuilder: ScoreFunctionBuilder {
     
-    var weight: Decimal?
+    private var _weight: Decimal?
     
-    typealias BuilderClosure = (WeightBuilder) -> Void
+    public init() {}
     
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
+    @discardableResult
+    public func set(weight: Decimal) -> WeightBuilder {
+        self._weight = weight
+        return self
     }
     
-    public var scoreFunction: ScoreFunction {
-        return WeightScoreFunction(withBuilder: self)
+    public var weight: Decimal? {
+        return self._weight
+    }
+    
+    public func build() throws -> WeightScoreFunction {
+        return try WeightScoreFunction(withBuilder: self)
     }
     
 }
+
+// MARK:- Randon Score Function Builder
 
 public class RandomScoreFunctionBuilder: ScoreFunctionBuilder {
     
-    var seed: Int?
-    var field: String?
+    public var _seed: Int?
+    public var _field: String?
     
-    typealias BuilderClosure = (RandomScoreFunctionBuilder) -> Void
+    public init() {}
     
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
+    @discardableResult
+    public func set(seed: Int) -> RandomScoreFunctionBuilder {
+        self._seed = seed
+        return self
     }
     
-    public var scoreFunction: ScoreFunction {
-        return RandomScoreFunction(withBuilder: self)
+    @discardableResult
+    public func set(field: String) -> RandomScoreFunctionBuilder {
+        self._field = field
+        return self
     }
     
+    public var seed: Int? {
+        return self._seed
+    }
+    public var field: String? {
+        return self._field
+    }
+    
+    public func build() throws -> RandomScoreFunction {
+        return try RandomScoreFunction(withBuilder: self)
+    }
 }
+
+// MARK:- ScriptScoreFunction Builder
 
 public class ScriptScoreFunctionBuilder: ScoreFunctionBuilder {
     
-    var script: Script?
+    private var _script: Script?
     
-    typealias BuilderClosure = (ScriptScoreFunctionBuilder) -> Void
+    public init() {}
     
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
+    @discardableResult
+    public func set(script: Script) -> ScriptScoreFunctionBuilder {
+        self._script = script
+        return self
     }
     
-    public var scoreFunction: ScoreFunction {
-        return ScriptScoreFunction(withBuilder: self)
+    public var script: Script? {
+        return self._script
     }
     
+    public func build() throws -> ScriptScoreFunction {
+        return try ScriptScoreFunction(withBuilder: self)
+    }
 }
+
+// MARK:- Linear Decay Function Builder
 
 public class LinearDecayFunctionBuilder: ScoreFunctionBuilder {
     
-    public var field: String?
-    public var origin: String?
-    public var scale: String?
-    public var offset: String?
-    public var decay: Decimal?
-    public var isMultiValue: Bool = false
-    public var multiValueMode: DecayScoreFunction.MultiValueMode = .MIN
+    private var _field: String?
+    private var _origin: String?
+    private var _scale: String?
+    private var _offset: String?
+    private var _decay: Decimal?
+    private var _multiValueMode: MultiValueMode?
     
-    typealias BuilderClosure = (LinearDecayFunctionBuilder) -> Void
+    public init() {}
     
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
+    @discardableResult
+    public func set(field: String) -> LinearDecayFunctionBuilder {
+        self._field = field
+        return self
+    }
+    @discardableResult
+    public func set(origin: String) -> LinearDecayFunctionBuilder {
+        self._origin = origin
+        return self
+    }
+    @discardableResult
+    public func set(scale: String) -> LinearDecayFunctionBuilder {
+        self._scale = scale
+        return self
+    }
+    @discardableResult
+    public func set(offset: String) -> LinearDecayFunctionBuilder {
+        self._offset = offset
+        return self
+    }
+    @discardableResult
+    public func set(decay: Decimal) -> LinearDecayFunctionBuilder {
+        self._decay = decay
+        return self
+    }
+    @discardableResult
+    public func set(multiValudMode: MultiValueMode) -> LinearDecayFunctionBuilder {
+        self._multiValueMode = multiValudMode
+        return self
     }
     
-    public var scoreFunction: ScoreFunction {
-        return LinearDecayScoreFunction(withBuilder: self)
+    public var field: String? {
+        return self._field
+    }
+    public var origin: String? {
+        return self._origin
+    }
+    public var scale: String? {
+        return self._scale
+    }
+    public var offset: String? {
+        return self._offset
+    }
+    public var decay: Decimal? {
+        return self._decay
+    }
+    public var multiValueMode: MultiValueMode? {
+        return self._multiValueMode
     }
     
+    public func build() throws -> LinearDecayScoreFunction {
+        return try LinearDecayScoreFunction(withBuilder: self)
+    }
 }
+
+// MARK:- Gauss Decay Function Builder
 
 public class GaussDecayFunctionBuilder: ScoreFunctionBuilder {
     
-    public var field: String?
-    public var origin: String?
-    public var scale: String?
-    public var offset: String?
-    public var decay: Decimal?
-    public var isMultiValue: Bool = false
-    public var multiValueMode: DecayScoreFunction.MultiValueMode = .MIN
+    private var _field: String?
+    private var _origin: String?
+    private var _scale: String?
+    private var _offset: String?
+    private var _decay: Decimal?
+    private var _multiValueMode: MultiValueMode?
     
-    typealias BuilderClosure = (GaussDecayFunctionBuilder) -> Void
+    public init() {}
     
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
+    @discardableResult
+    public func set(field: String) -> GaussDecayFunctionBuilder {
+        self._field = field
+        return self
+    }
+    @discardableResult
+    public func set(origin: String) -> GaussDecayFunctionBuilder {
+        self._origin = origin
+        return self
+    }
+    @discardableResult
+    public func set(scale: String) -> GaussDecayFunctionBuilder {
+        self._scale = scale
+        return self
+    }
+    @discardableResult
+    public func set(offset: String) -> GaussDecayFunctionBuilder {
+        self._offset = offset
+        return self
+    }
+    @discardableResult
+    public func set(decay: Decimal) -> GaussDecayFunctionBuilder {
+        self._decay = decay
+        return self
+    }
+    @discardableResult
+    public func set(multiValudMode: MultiValueMode) -> GaussDecayFunctionBuilder {
+        self._multiValueMode = multiValudMode
+        return self
     }
     
-    public var scoreFunction: ScoreFunction {
-        return GaussScoreFunction(withBuilder: self)
+    public var field: String? {
+        return self._field
+    }
+    public var origin: String? {
+        return self._origin
+    }
+    public var scale: String? {
+        return self._scale
+    }
+    public var offset: String? {
+        return self._offset
+    }
+    public var decay: Decimal? {
+        return self._decay
+    }
+    public var multiValueMode: MultiValueMode? {
+        return self._multiValueMode
     }
     
+    public func build() throws -> GaussScoreFunction {
+        return try GaussScoreFunction(withBuilder: self)
+    }
 }
+
+// MARK:- Exponential Decay Function Builder
 
 public class ExponentialDecayFunctionBuilder: ScoreFunctionBuilder {
     
-    public var field: String?
-    public var origin: String?
-    public var scale: String?
-    public var offset: String?
-    public var decay: Decimal?
-    public var isMultiValue: Bool = false
-    public var multiValueMode: DecayScoreFunction.MultiValueMode = .MIN
+    private var _field: String?
+    private var _origin: String?
+    private var _scale: String?
+    private var _offset: String?
+    private var _decay: Decimal?
+    private var _multiValueMode: MultiValueMode?
     
-    typealias BuilderClosure = (ExponentialDecayFunctionBuilder) -> Void
+    public init() {}
     
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
+    @discardableResult
+    public func set(field: String) -> ExponentialDecayFunctionBuilder {
+        self._field = field
+        return self
+    }
+    @discardableResult
+    public func set(origin: String) -> ExponentialDecayFunctionBuilder {
+        self._origin = origin
+        return self
+    }
+    @discardableResult
+    public func set(scale: String) -> ExponentialDecayFunctionBuilder {
+        self._scale = scale
+        return self
+    }
+    @discardableResult
+    public func set(offset: String) -> ExponentialDecayFunctionBuilder {
+        self._offset = offset
+        return self
+    }
+    @discardableResult
+    public func set(decay: Decimal) -> ExponentialDecayFunctionBuilder {
+        self._decay = decay
+        return self
+    }
+    @discardableResult
+    public func set(multiValudMode: MultiValueMode) -> ExponentialDecayFunctionBuilder {
+        self._multiValueMode = multiValudMode
+        return self
     }
     
-    public var scoreFunction: ScoreFunction {
-        return ExponentialDecayScoreFunction(withBuilder: self)
+    public var field: String? {
+        return self._field
+    }
+    public var origin: String? {
+        return self._origin
+    }
+    public var scale: String? {
+        return self._scale
+    }
+    public var offset: String? {
+        return self._offset
+    }
+    public var decay: Decimal? {
+        return self._decay
+    }
+    public var multiValueMode: MultiValueMode? {
+        return self._multiValueMode
+    }
+    
+    public func build() throws -> ExponentialDecayScoreFunction {
+        return try ExponentialDecayScoreFunction(withBuilder: self)
     }
     
 }
+
+// MARK:- Field Value Factor Function Builder
 
 public class FieldValueFactorFunctionBuilder: ScoreFunctionBuilder {
     
-    var field: String?
-    var factor: Decimal?
-    var modifier: FieldValueScoreFunction.Modifier?
-    var missing: Decimal?
+    private var _field: String?
+    private var _factor: Decimal?
+    private var _modifier: FieldValueScoreFunction.Modifier?
+    private var _missing: Decimal?
     
-    typealias BuilderClosure = (FieldValueFactorFunctionBuilder) -> Void
+    public init() {}
     
-    init() {}
-    
-    convenience init(builderClosure: BuilderClosure) {
-        self.init()
-        builderClosure(self)
+    @discardableResult
+    public func set(field: String) -> FieldValueFactorFunctionBuilder {
+        self._field = field
+        return self
+    }
+    @discardableResult
+    public func set(factor: Decimal) -> FieldValueFactorFunctionBuilder {
+        self._factor = factor
+        return self
+    }
+    @discardableResult
+    public func set(modifier: FieldValueScoreFunction.Modifier) -> FieldValueFactorFunctionBuilder {
+        self._modifier = modifier
+        return self
+    }
+    @discardableResult
+    public func set(missing: Decimal) -> FieldValueFactorFunctionBuilder {
+        self._missing = missing
+        return self
     }
     
-    public var scoreFunction: ScoreFunction {
-        return FieldValueScoreFunction(withBuilder: self)
+    public var field: String? {
+        return self._field
+    }
+    public var factor: Decimal? {
+        return self._factor
+    }
+    public var modifier: FieldValueScoreFunction.Modifier? {
+        return self._modifier
+    }
+    public var missing: Decimal? {
+        return self._missing
+    }
+    
+    public func build() throws -> FieldValueScoreFunction {
+        return try FieldValueScoreFunction(withBuilder: self)
     }
     
 }
 
+// MARK:- Weight Score Function
 
 public class WeightScoreFunction: ScoreFunction {
     public var name: String = "weight"
     
     var weight: Decimal
     
-    public init(withBuilder builder: WeightBuilder) {
+    public init(_ weight: Decimal) {
+        self.weight = weight
+    }
+    
+    internal init(withBuilder builder: WeightBuilder) throws {
+        
+        guard builder.weight != nil else {
+            throw ScoreFunctionBuilderError.missingRequiredField("weight")
+        }
+        
         self.weight = builder.weight!
     }
     
@@ -253,6 +424,8 @@ public class WeightScoreFunction: ScoreFunction {
         return [self.name: self.weight]
     }
 }
+
+// MARK:- Randon Score Function
 
 public class RandomScoreFunction: ScoreFunction {
     
@@ -264,65 +437,140 @@ public class RandomScoreFunction: ScoreFunction {
     var seed: Int
     var field: String
     
-    public init(withBuilder builder: RandomScoreFunctionBuilder) {
+    public init(field: String, seed: Int) {
+        self.seed = seed
+        self.field = field
+    }
+    
+    internal init(withBuilder builder: RandomScoreFunctionBuilder) throws {
+        
+        guard builder.seed != nil else {
+            throw ScoreFunctionBuilderError.missingRequiredField("seed")
+        }
+        
+        guard builder.field != nil else {
+            throw ScoreFunctionBuilderError.missingRequiredField("field")
+        }
+        
         self.seed = builder.seed!
         self.field = builder.field!
     }
     
     public func toDic() -> [String : Any] {
-        return [self.name: [RandomScoreFunction.SEED: self.seed, RandomScoreFunction.FIELD: self.field]]
+        return [self.name: [RandomScoreFunction.SEED: self.seed,
+                            RandomScoreFunction.FIELD: self.field]]
     }
 }
+
+// MARK: Script Score Function
 
 public class ScriptScoreFunction: ScoreFunction {
     
     private static let SOURCE = "source"
+    private static let LANG = "lang"
     private static let PARAMS = "params"
+    private static let SCRIPT = "script"
     
     public var name: String = "script_score"
     
-    var source: String?
-    var params: [String: Any] = [String: Any]()
+    public let script: Script
     
-    public init(withBuilder builder: ScriptScoreFunctionBuilder) {
-        self.source = builder.script?.source
-        if let params = builder.script?.params {
-            self.params = params
+    public init(source: String, lang: String? = nil, params: [String: CodableValue]? = nil) {
+        self.script = Script(source, lang: lang, params: params)
+    }
+    
+    internal init(withBuilder builder: ScriptScoreFunctionBuilder) throws {
+        
+        guard builder.script != nil else {
+            throw ScoreFunctionBuilderError.missingRequiredField("script")
         }
+        
+        self.script = builder.script!
     }
     
     public func toDic() -> [String : Any] {
-        var dic: [String: Any] = [String: Any]()
-        if let source = self.source {
-            dic[ScriptScoreFunction.SOURCE] = source
+        var dic: [String: Any] = [:]
+        
+        dic[ScriptScoreFunction.SOURCE] = self.script.source
+        
+        if let lang = self.script.lang, !lang.isEmpty {
+            dic[ScriptScoreFunction.PARAMS] = lang
         }
-        if params.isEmpty {
+        
+        if let params = self.script.params, !params.isEmpty {
             dic[ScriptScoreFunction.PARAMS] = params
         }
-        return [self.name: dic]
+        return [self.name: [ScriptScoreFunction.SCRIPT: dic]]
     }
 }
+
+// MARK:- Linear Decay Score Function
 
 public class LinearDecayScoreFunction: DecayScoreFunction {
     
-    public init(withBuilder builder: LinearDecayFunctionBuilder) {
-        super.init(type: .Linear, field: builder.field!, origin: builder.origin!, scale: builder.scale!, offset: builder.offset!, decay: builder.decay!, isMultiValue: builder.isMultiValue, multiValueMode: builder.multiValueMode)
+    internal init(withBuilder builder: LinearDecayFunctionBuilder) throws {
+        
+        guard builder.field != nil else {
+            throw ScoreFunctionBuilderError.missingRequiredField("field")
+        }
+        
+        guard builder.origin != nil else {
+            throw ScoreFunctionBuilderError.missingRequiredField("origin")
+        }
+        
+        guard builder.scale != nil else {
+            throw ScoreFunctionBuilderError.missingRequiredField("scale")
+        }
+        
+        super.init(type: .linear, field: builder.field!, origin: builder.origin!, scale: builder.scale!, offset: builder.offset!, decay: builder.decay!, multiValueMode: builder.multiValueMode)
     }
 }
+
+// MARK:- Gauss Score Function
 
 public class GaussScoreFunction: DecayScoreFunction {
     
-    public init(withBuilder builder: GaussDecayFunctionBuilder) {
-        super.init(type: .Linear, field: builder.field!, origin: builder.origin!, scale: builder.scale!, offset: builder.offset!, decay: builder.decay!, isMultiValue: builder.isMultiValue, multiValueMode: builder.multiValueMode)
+    internal init(withBuilder builder: GaussDecayFunctionBuilder) throws {
+        
+        guard builder.field != nil else {
+            throw ScoreFunctionBuilderError.missingRequiredField("field")
+        }
+        
+        guard builder.origin != nil else {
+            throw ScoreFunctionBuilderError.missingRequiredField("origin")
+        }
+        
+        guard builder.scale != nil else {
+            throw ScoreFunctionBuilderError.missingRequiredField("scale")
+        }
+        
+        super.init(type: .gauss, field: builder.field!, origin: builder.origin!, scale: builder.scale!, offset: builder.offset!, decay: builder.decay!, multiValueMode: builder.multiValueMode)
     }
 }
 
+// MARK:- Exponential Decay Score Function
+
 public class ExponentialDecayScoreFunction: DecayScoreFunction {
     
-    public init(withBuilder builder: ExponentialDecayFunctionBuilder) {
-        super.init(type: .Linear, field: builder.field!, origin: builder.origin!, scale: builder.scale!, offset: builder.offset!, decay: builder.decay!, isMultiValue: builder.isMultiValue, multiValueMode: builder.multiValueMode)
+    internal init(withBuilder builder: ExponentialDecayFunctionBuilder) throws {
+        
+        guard builder.field != nil else {
+            throw ScoreFunctionBuilderError.missingRequiredField("field")
+        }
+        
+        guard builder.origin != nil else {
+            throw ScoreFunctionBuilderError.missingRequiredField("origin")
+        }
+        
+        guard builder.scale != nil else {
+            throw ScoreFunctionBuilderError.missingRequiredField("scale")
+        }
+        
+        super.init(type: .exp, field: builder.field!, origin: builder.origin!, scale: builder.scale!, offset: builder.offset!, decay: builder.decay!, multiValueMode: builder.multiValueMode)
     }
 }
+
+// MARK:- Decay Score Function
 
 public class DecayScoreFunction: ScoreFunction {
     
@@ -332,23 +580,24 @@ public class DecayScoreFunction: ScoreFunction {
     private static let DECAY = "decay"
     private static let MULTI_VALUE_MODE = "multi_value_mode"
     
-    public var name: String
-    public var field: String
+    public let name: String
+    public let field: String
     
-    public var multiValueMode:  MultiValueMode = .MIN
+    public let multiValueMode:  MultiValueMode?
     
-    public var origin: String
-    public var scale: String
-    public var offset: String
-    public var decay: Decimal
+    public let origin: String
+    public let scale: String
+    public let offset: String?
+    public let decay: Decimal?
     
-    public init(type: DecayScoreFunctionType, field: String, origin: String, scale: String, offset: String, decay: Decimal, isMultiValue: Bool, multiValueMode: MultiValueMode) {
+    public init(type: DecayScoreFunctionType, field: String, origin: String, scale: String, offset: String? = nil, decay: Decimal? = nil, multiValueMode: MultiValueMode?) {
         self.name = type.rawValue
         self.field = field
         self.origin = origin
         self.scale = scale
         self.offset = offset
         self.decay = decay
+        self.multiValueMode = multiValueMode
     }
     
     public func toDic() -> [String : Any] {
@@ -356,28 +605,38 @@ public class DecayScoreFunction: ScoreFunction {
             self.field: [
                 DecayScoreFunction.ORIGIN: self.origin,
                 DecayScoreFunction.SCALE: self.scale,
-                DecayScoreFunction.OFFSET: self.offset,
-                DecayScoreFunction.DECAY: self.decay,
             ]
         ]
-        dic[DecayScoreFunction.MULTI_VALUE_MODE] = self.multiValueMode
+        if var subDic = dic[self.field] as? [String: Any] {
+            subDic[DecayScoreFunction.OFFSET] = self.offset
+        }
+        if var subDic = dic[self.field] as? [String: Any] {
+            subDic[DecayScoreFunction.DECAY] = self.decay
+        }
+        
+        if let multiValueMode =  self.multiValueMode {
+            dic[DecayScoreFunction.MULTI_VALUE_MODE] = multiValueMode
+        }
+        
         return [self.name: dic]
     }
     
-    public enum DecayScoreFunctionType: String {
-        case Linear = "linear"
-        case Gauss = "gauss"
-        case Exponential = "exp"
-    }
-    
-    public enum MultiValueMode: String {
-        case MIN = "min"
-        case MAX = "max"
-        case AVG = "avg"
-        case SUM = "sum"
-    }
-    
 }
+
+public enum DecayScoreFunctionType: String {
+    case linear
+    case gauss
+    case exp
+}
+
+public enum MultiValueMode: String {
+    case min
+    case max
+    case avg
+    case sum
+}
+
+// MARK:- Field Value Score Function
 
 public class FieldValueScoreFunction: ScoreFunction {
     
@@ -386,18 +645,31 @@ public class FieldValueScoreFunction: ScoreFunction {
     private static let MODIFIER = "modifier"
     private static let MISSING = "missing"
     
-    public var name: String = "field_value_factor"
+    public let name: String = "field_value_factor"
     
-    var field: String
-    var factor: Decimal
-    var modifier: Modifier?
-    var missing: Decimal?
+    public let field: String
+    public let factor: Decimal
+    public let modifier: Modifier?
+    public let missing: Decimal?
     
-    public init(withBuilder builder: FieldValueFactorFunctionBuilder) {
-        self.field = builder.field!
-        self.factor = builder.factor!
-        self.modifier = builder.modifier
-        self.missing = builder.missing
+    public init(field: String, factor: Decimal, modifier: FieldValueScoreFunction.Modifier? = nil, missing: Decimal? = nil) {
+        self.field = field
+        self.factor = factor
+        self.modifier = modifier
+        self.missing = missing
+    }
+    
+    internal convenience init(withBuilder builder: FieldValueFactorFunctionBuilder) throws {
+        
+        guard builder.field != nil else {
+            throw ScoreFunctionBuilderError.missingRequiredField("field")
+        }
+        
+        guard builder.factor != nil else {
+            throw ScoreFunctionBuilderError.missingRequiredField("factor")
+        }
+        
+        self.init(field: builder.field!, factor: builder.factor!, modifier: builder.modifier, missing: builder.missing)
     }
     
     public func toDic() -> [String : Any] {
@@ -415,17 +687,24 @@ public class FieldValueScoreFunction: ScoreFunction {
     }
     
     public enum Modifier: String {
-        case NONE = "none"
-        case LOG = "log"
-        case LOG1P = "log1p"
-        case LOG2P = "log2p"
-        case LN = "ln"
-        case LN1P = "ln1p"
-        case LN2P = "ln2p"
-        case SQUARE = "square"
-        case SQRT = "sqrt"
-        case RECIPROCAL = "reciprocal"
+        case none
+        case log
+        case log1p
+        case log2p
+        case ln
+        case ln1p
+        case ln2p
+        case square
+        case sqrt
+        case reciprocal
     }
+}
+
+// MARK:- ScoreFunctionBuilder Error
+
+/// Error(s) thrown by ScoreFunctionBuilder
+public enum ScoreFunctionBuilderError: Error {
+    case missingRequiredField(String)
 }
 
 //public class Script {

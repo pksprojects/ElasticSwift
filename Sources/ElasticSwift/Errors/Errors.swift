@@ -120,5 +120,7 @@ public class RequestCreationError: ESClientError {
 
 public enum RequestBuilderError: Error {
     case missingRequiredField(String)
+    case atlestOneElementRequired(String)
+    case missingRequiredFields([String])
     case atleastOneFieldRequired([String])
 }

@@ -15,46 +15,43 @@ import NIOHTTP1
 public class DeleteByQueryRequestBuilder: RequestBuilder {
     
     public typealias RequestType = DeleteByQueryRequest
-    public typealias BuilderClosure = (DeleteByQueryRequestBuilder) -> Void
     
-    fileprivate var index: String?
-    fileprivate var type: String?
-    fileprivate var query: Query?
+    private var _index: String?
+    private var _type: String?
+    private var _query: Query?
     
-    init() {}
-    
-    public init(builderClosure: BuilderClosure) {
-        builderClosure(self)
-    }
+    public init() {}
     
     @discardableResult
     public func set(index: String) -> Self {
-        self.index = index
+        self._index = index
         return self
     }
     
     @discardableResult
     @available(*, deprecated, message: "Elasticsearch has deprecated use of custom types and will be remove in 7.0")
     public func set(type: String) -> Self {
-        self.type = type
+        self._type = type
         return self
     }
     
     @discardableResult
     public func set(query: Query) -> Self {
-        self.query = query
+        self._query = query
         return self
     }
     
+    public var index: String? {
+        return self._index
+    }
+    public var type: String? {
+        return self._type
+    }
+    public var query: Query? {
+        return self._query
+    }
+    
     public func build() throws -> DeleteByQueryRequest {
-        
-        guard self.index != nil else {
-            throw RequestBuilderError.missingRequiredField("index")
-        }
-        guard self.query != nil else {
-            throw RequestBuilderError.missingRequiredField("query")
-        }
-        
         return try DeleteByQueryRequest(withBuilder: self)
     }
 }
@@ -89,7 +86,15 @@ public class DeleteByQueryRequest: Request {
         self.query = query
     }
     
-    init(withBuilder builder: DeleteByQueryRequestBuilder) throws {
+    internal init(withBuilder builder: DeleteByQueryRequestBuilder) throws {
+        
+        guard builder.index != nil else {
+            throw RequestBuilderError.missingRequiredField("index")
+        }
+        guard builder.query != nil else {
+            throw RequestBuilderError.missingRequiredField("query")
+        }
+        
         self.index = builder.index!
         self.type = builder.type
         self.query = builder.query!

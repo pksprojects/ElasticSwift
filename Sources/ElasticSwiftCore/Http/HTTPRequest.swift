@@ -31,7 +31,16 @@ public class HTTPRequest {
         self.queryParams = queryParams
     }
     
-    init(withBuilder builder: HTTPRequestBuilder) {
+    internal init(withBuilder builder: HTTPRequestBuilder) throws {
+        
+        guard builder.method != nil else {
+            throw HTTPRequestBuilderError("method can't be nil")
+        }
+        
+        guard builder.path != nil else {
+            throw HTTPRequestBuilderError("url can't be nil")
+        }
+        
         if let version = builder.version {
             self.version = version
         } else {
@@ -75,32 +84,81 @@ public class HTTPRequest {
 /// Builder for `HTTPRequest`
 public class HTTPRequestBuilder {
     
-    public typealias BuilderClosure = (HTTPRequestBuilder) -> Void
+    private var _version: HTTPVersion?
+    private var _method: HTTPMethod?
+    private var _headers: HTTPHeaders?
+    private var _body: Data?
+    private var _path: String?
+    private var _queryParams: [URLQueryItem]?
+    private var _completionHandler: ((_ response: HTTPResponse)  -> Void)?
     
-    public var version: HTTPVersion?
-    public var method: HTTPMethod?
-    public var headers: HTTPHeaders?
-    public var body: Data?
-    public var path: String?
-    public var queryParams: [URLQueryItem]?
-    public var completionHandler: ((_ response: HTTPResponse)  -> Void)?
+    public init() {}
     
-    init() {}
+    @discardableResult
+    public func set(version: HTTPVersion) -> HTTPRequestBuilder {
+        self._version = version
+        return self
+    }
     
-    public init(builderClosure: BuilderClosure) {
-        builderClosure(self)
+    @discardableResult
+    public func set(method: HTTPMethod) -> HTTPRequestBuilder {
+        self._method = method
+        return self
+    }
+    
+    @discardableResult
+    public func set(headers: HTTPHeaders) -> HTTPRequestBuilder {
+        self._headers = headers
+        return self
+    }
+    
+    @discardableResult
+    public func set(body: Data) -> HTTPRequestBuilder {
+        self._body = body
+        return self
+    }
+    
+    @discardableResult
+    public func set(path: String) -> HTTPRequestBuilder {
+        self._path = path
+        return self
+    }
+    
+    @discardableResult
+    public func set(queryParams: [URLQueryItem]) -> HTTPRequestBuilder {
+        self._queryParams = queryParams
+        return self
+    }
+    
+    @discardableResult
+    public func set(completionHandler: @escaping ((_ response: HTTPResponse)  -> Void)) -> HTTPRequestBuilder {
+        self._completionHandler = completionHandler
+        return self
+    }
+    
+    public var version: HTTPVersion? {
+        return self._version
+    }
+    public var method: HTTPMethod? {
+        return self._method
+    }
+    public var headers: HTTPHeaders? {
+        return self._headers
+    }
+    public var body: Data? {
+        return self._body
+    }
+    public var path: String? {
+        return self._path
+    }
+    public var queryParams: [URLQueryItem]? {
+        return self._queryParams
+    }
+    public var completionHandler: ((_ response: HTTPResponse)  -> Void)? {
+        return self._completionHandler
     }
     
     public func build() throws -> HTTPRequest {
-        
-        guard self.method != nil else {
-            throw HTTPRequestBuilderError("method can't be nil")
-        }
-        
-        guard self.path != nil else {
-            throw HTTPRequestBuilderError("url can't be nil")
-        }
-        
-        return HTTPRequest(withBuilder: self)
+        return try HTTPRequest(withBuilder: self)
     }
 }

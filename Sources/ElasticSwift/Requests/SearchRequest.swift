@@ -17,68 +17,99 @@ public class SearchRequestBuilder: RequestBuilder {
     
     public typealias RequestType = SearchRequest
     
-    public typealias BuilderClosure = (SearchRequestBuilder) -> Void
+    private var _index: String?
+    private var _type: String?
+    private var _from: Int16?
+    private var _size: Int16?
+    private var _query: Query?
+    private var _sort: Sort?
+    private var _fetchSource: Bool?
+    private var _explain: Bool?
+    private var _minScore: Decimal?
     
-    var index: String?
-    var type: String?
-    var from: Int16?
-    var size: Int16?
-    var query: Query?
-    var sort: Sort?
-    var fetchSource: Bool?
-    var explain: Bool?
-    var minScore: Decimal?
+    public init() {}
     
-    init() {}
-    
-    public init(builderClosure: BuilderClosure) {
-        builderClosure(self)
-    }
-    
+    @discardableResult
     public func set(indices: String...) -> Self {
-        self.index = indices.compactMap({$0}).joined(separator: ",")
+        self._index = indices.compactMap({$0}).joined(separator: ",")
         return self
     }
     
     @available(*, deprecated, message: "Elasticsearch has deprecated use of custom types and will be remove in 7.0")
+    @discardableResult
     public func set(types: String...) -> Self {
-        self.type = types.compactMap({$0}).joined(separator: ",")
+        self._type = types.compactMap({$0}).joined(separator: ",")
         return self
     }
     
+    @discardableResult
     public func set(from: Int16) -> Self {
-        self.from = from
+        self._from = from
         return self
     }
     
+    @discardableResult
     public func set(size: Int16) -> Self {
-        self.size = size
+        self._size = size
         return self
     }
     
+    @discardableResult
     public func set(query: Query) -> Self {
-        self.query = query
+        self._query = query
         return self
     }
     
+    @discardableResult
     public func set(sort: Sort) -> Self {
-        self.sort = sort
+        self._sort = sort
         return self
     }
     
+    @discardableResult
     public func fetchSource(_ fetchSource: Bool) -> Self {
-        self.fetchSource = fetchSource
+        self._fetchSource = fetchSource
         return self
     }
     
+    @discardableResult
     public func explain(_ explain: Bool) -> Self {
-        self.explain = explain
+        self._explain = explain
         return self
     }
     
+    @discardableResult
     public func set(minScore: Decimal) -> Self {
-        self.minScore = minScore
+        self._minScore = minScore
         return self
+    }
+    
+    public var index: String? {
+        return self._index
+    }
+    public var type: String? {
+        return self._type
+    }
+    public var from: Int16? {
+        return self._from
+    }
+    public var size: Int16? {
+        return self._size
+    }
+    public var query: Query? {
+        return self._query
+    }
+    public var sort: Sort? {
+        return self._sort
+    }
+    public var fetchSource: Bool? {
+        return self._fetchSource
+    }
+    public var explain: Bool? {
+        return self._explain
+    }
+    public var minScore: Decimal? {
+        return self._minScore
     }
     
     public func build() throws -> SearchRequest {

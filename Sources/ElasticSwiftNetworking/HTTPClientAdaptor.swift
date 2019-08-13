@@ -85,27 +85,26 @@ public final class URLSessionAdaptor: ManagedHTTPClientAdaptor {
             guard error == nil else {
                 return callback(.failure(error!))
             }
-            let responseBuilder =  HTTPResponseBuilder { builder in
-                builder.request = request
-                if let response = response as? HTTPURLResponse {
-                    
-                    builder.status = HTTPResponseStatus.init(statusCode: response.statusCode)
-                    
-                    let headerDic =  response.allHeaderFields as! [String: String]
-                    
-                    var headers = HTTPHeaders()
-                    
-                    for header in headerDic {
-                        headers.add(name: header.key, value: header.value)
-                    }
-                    builder.headers = headers
-                    
+            let responseBuilder =  HTTPResponseBuilder()
+                .set(request: request)
+            if let response = response as? HTTPURLResponse {
+                
+                responseBuilder.set(status: HTTPResponseStatus(statusCode: response.statusCode))
+                
+                let headerDic =  response.allHeaderFields as! [String: String]
+                
+                var headers = HTTPHeaders()
+                
+                for header in headerDic {
+                    headers.add(name: header.key, value: header.value)
                 }
-                if let resData = data {
-                    var buff = self.allocator.buffer(capacity: resData.count)
-                    buff.writeBytes(resData)
-                    builder.body = buff
-                }
+                responseBuilder.set(headers: headers)
+                
+            }
+            if let resData = data {
+                var buff = self.allocator.buffer(capacity: resData.count)
+                buff.writeBytes(resData)
+                responseBuilder.set(body: buff)
             }
             
             do {

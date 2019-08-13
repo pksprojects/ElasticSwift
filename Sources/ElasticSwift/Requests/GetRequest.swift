@@ -14,49 +14,44 @@ import ElasticSwiftCore
 
 public class GetRequestBuilder: RequestBuilder {
     
-    public typealias BuilderClosure = (GetRequestBuilder) -> Void
     public typealias RequestType = GetRequest
 
-    var index: String?
-    var type: String?
-    var id: String?
-    var method: HTTPMethod = .GET
+    private var _index: String?
+    private var _type: String?
+    private var _id: String?
     
-    init() {}
-    
-    public init(builderClosure: BuilderClosure) {
-        builderClosure(self)
-    }
+    public init() {}
     
     @discardableResult
-    public func set(index: String) -> Self {
-        self.index = index
+    public func set(index: String) -> GetRequestBuilder {
+        self._index = index
         return self
     }
     
     @discardableResult
     @available(*, deprecated, message: "Elasticsearch has deprecated use of custom types and will be remove in 7.0")
-    public func set(type: String) -> Self {
-        self.type = type
+    public func set(type: String) -> GetRequestBuilder {
+        self._type = type
         return self
     }
     
     @discardableResult
-    public func set(id: String) -> Self {
-        self.id = id
+    public func set(id: String) -> GetRequestBuilder {
+        self._id = id
         return self
     }
     
+    public var index: String? {
+        return self._index
+    }
+    public var type: String? {
+        return self._type
+    }
+    public var id: String? {
+        return self._id
+    }
+    
     public func build() throws -> GetRequest {
-        
-        guard self.index != nil else {
-            throw RequestBuilderError.missingRequiredField("index")
-        }
-        
-        guard self.id != nil else {
-            throw RequestBuilderError.missingRequiredField("id")
-        }
-        
         return try GetRequest(withBuilder: self)
     }
     
@@ -87,7 +82,16 @@ public class GetRequest: Request {
         self.id = id
     }
     
-    init(withBuilder builder: GetRequestBuilder) throws {
+    internal init(withBuilder builder: GetRequestBuilder) throws {
+        
+        guard builder.index != nil else {
+            throw RequestBuilderError.missingRequiredField("index")
+        }
+        
+        guard builder.id != nil else {
+            throw RequestBuilderError.missingRequiredField("id")
+        }
+        
         self.index = builder.index!
         self.type = builder.type ?? "_doc"
         self.id =  builder.id!

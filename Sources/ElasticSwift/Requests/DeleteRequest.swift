@@ -14,69 +14,74 @@ import ElasticSwiftCore
 
 public class DeleteRequestBuilder: RequestBuilder {
     
-    public typealias BuilderClosure = (DeleteRequestBuilder) -> Void
     public typealias RequestType = DeleteRequest
     
-    var index: String?
-    var type: String?
-    var id: String?
-    var version: String?
-    var versionType: VersionType?
-    var refresh: IndexRefresh?
+    private var _index: String?
+    private var _type: String?
+    private var _id: String?
+    private var _version: String?
+    private var _versionType: VersionType?
+    private var _refresh: IndexRefresh?
     
-    init() {}
-    
-    public init(builderClosure: BuilderClosure) {
-        builderClosure(self)
-    }
+    public init() {}
     
     @discardableResult
     public func set(index: String) -> Self {
-        self.index = index
+        self._index = index
         return self
     }
     
     @discardableResult
     @available(*, deprecated, message: "Elasticsearch has deprecated use of custom types and will be remove in 7.0")
     public func set(type: String) -> Self {
-        self.type = type
+        self._type = type
         return self
     }
     
     @discardableResult
     public func set(id: String) -> Self {
-        self.id = id
+        self._id = id
         return self
     }
     
     @discardableResult
     public func set(version: String) -> Self {
-        self.version = version
+        self._version = version
         return self
     }
     
     @discardableResult
     public func set(versionType: VersionType) -> Self {
-        self.versionType = versionType
+        self._versionType = versionType
         return self
     }
     
     @discardableResult
     public func set(refresh: IndexRefresh) -> Self {
-        self.refresh = refresh
+        self._refresh = refresh
         return self
     }
     
+    public var index: String? {
+        return self._index
+    }
+    public var type: String? {
+        return self._type
+    }
+    public var id: String? {
+        return self._id
+    }
+    public var version: String? {
+        return self._version
+    }
+    public var versionType: VersionType? {
+        return self._versionType
+    }
+    public var refresh: IndexRefresh? {
+        return self._refresh
+    }
+    
     public func build() throws -> RequestType {
-        
-        guard self.index != nil else {
-            throw RequestBuilderError.missingRequiredField("index")
-        }
-        
-        guard self.id != nil else {
-            throw RequestBuilderError.missingRequiredField("id")
-        }
-        
         return try DeleteRequest(withBuilder: self)
     }
     
@@ -101,7 +106,16 @@ public class DeleteRequest: Request {
         self.id = id
     }
     
-    init(withBuilder builder: DeleteRequestBuilder) throws {
+    internal init(withBuilder builder: DeleteRequestBuilder) throws {
+        
+        guard builder.index != nil else {
+            throw RequestBuilderError.missingRequiredField("index")
+        }
+        
+        guard builder.id != nil else {
+            throw RequestBuilderError.missingRequiredField("id")
+        }
+        
         self.index = builder.index!
         self.type = builder.type ?? "_doc"
         self.id = builder.id!

@@ -15,42 +15,50 @@ import ElasticSwiftQueryDSL
 public class UpdateByQueryRequestBuilder: RequestBuilder {
     
     public typealias RequestType = UpdateByQueryRequest
-    public typealias BuilderClosure = (UpdateByQueryRequestBuilder) -> Void
     
-    var index: String?
-    var type: String?
-    var script: Script?
-    var query: Query?
+    private var _index: String?
+    private var _type: String?
+    private var _script: Script?
+    private var _query: Query?
     
-    init() {}
-    
-    public init(builderClosure: BuilderClosure) {
-        builderClosure(self)
-    }
+    public init() {}
     
     @discardableResult
     public func set(index: String) -> Self {
-        self.index = index
+        self._index = index
         return self
     }
     
     @discardableResult
     @available(*, deprecated, message: "Elasticsearch has deprecated use of custom types and will be remove in 7.0")
     public func set(type: String) -> Self {
-        self.type = type
+        self._type = type
         return self
     }
     
     @discardableResult
     public func set(query: Query) -> Self {
-        self.query = query
+        self._query = query
         return self
     }
     
     @discardableResult
     public func set(script: Script) -> Self {
-        self.script = script
+        self._script = script
         return self
+    }
+    
+    public var index: String? {
+        return self._index
+    }
+    public var type: String? {
+        return self._type
+    }
+    public var script: Script? {
+        return self._script
+    }
+    public var query: Query? {
+        return self._query
     }
     
     public func build() throws -> UpdateByQueryRequest {
@@ -81,7 +89,12 @@ public class UpdateByQueryRequest: Request {
         self.query = query
     }
     
-    init(withBuilder builder: UpdateByQueryRequestBuilder) throws {
+    internal init(withBuilder builder: UpdateByQueryRequestBuilder) throws {
+        
+        guard builder.index != nil else {
+            throw RequestBuilderError.missingRequiredField("index")
+        }
+        
         self.index = builder.index!
         self.type = builder.type
         self.query = builder.query

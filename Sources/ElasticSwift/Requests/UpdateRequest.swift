@@ -18,93 +18,103 @@ public class UpdateRequestBuilder: RequestBuilder {
     
     public typealias RequestType = UpdateRequest
     
-    public typealias BuilderClosure = (UpdateRequestBuilder) -> Void
+    private var _index: String?
+    private var _type: String?
+    private var _id: String?
+    private var _script: Script?
+    private var _upsert: EncodableValue?
+    private var _detectNoop: Bool?
+    private var _docAsUpsert: Bool?
+    private var _doc: EncodableValue?
+    private var _scriptedUpsert: Bool?
     
-    var index: String?
-    var type: String?
-    var id: String?
-    var script: Script?
-    var upsert: EncodableValue?
-    var detectNoop: Bool?
-    var docAsUpsert: Bool?
-    var doc: EncodableValue?
-    var scriptedUpsert: Bool?
-    
-    init() {}
-    
-    public init(builderClosure: BuilderClosure) {
-        builderClosure(self)
-    }
+    public init() {}
     
     @discardableResult
     public func set(index: String) -> Self {
-        self.index = index
+        self._index = index
         return self
     }
     
     @discardableResult
     @available(*, deprecated, message: "Elasticsearch has deprecated use of custom types and will be remove in 7.0")
     public func set(type: String) -> Self {
-        self.type = type
+        self._type = type
         return self
     }
     
     @discardableResult
     public func set(id: String) -> Self {
-        self.id = id
+        self._id = id
         return self
     }
     
     @discardableResult
     public func set(doc: EncodableValue) -> Self {
-        self.doc = doc
+        self._doc = doc
         return self
     }
     
     @discardableResult
     public func set(upsert: EncodableValue) -> Self {
-        self.upsert = upsert
+        self._upsert = upsert
         return self
     }
     
     @discardableResult
     public func set(scriptedUpsert: Bool) -> Self {
-        self.scriptedUpsert = scriptedUpsert
+        self._scriptedUpsert = scriptedUpsert
         return self
     }
     
     @discardableResult
     public func set(docAsUpsert: Bool) -> Self {
-        self.docAsUpsert = docAsUpsert
+        self._docAsUpsert = docAsUpsert
         return self
     }
     
     @discardableResult
     public func set(detectNoop: Bool) -> Self {
-        self.detectNoop = detectNoop
+        self._detectNoop = detectNoop
         return self
     }
     
     @discardableResult
     public func set(script: Script) -> Self {
-        self.script = script
+        self._script = script
         return self
     }
     
+    public var index: String? {
+        return self._index
+    }
+    public var type: String? {
+        return self._type
+    }
+    public var id: String? {
+        return self._id
+    }
+    public var script: Script? {
+        return self._script
+    }
+    public var upsert: EncodableValue? {
+        return self._upsert
+    }
+    public var detectNoop: Bool? {
+        return self._detectNoop
+    }
+    public var docAsUpsert: Bool? {
+        return self._docAsUpsert
+    }
+    public var doc: EncodableValue? {
+        return self._doc
+    }
+    public var scriptedUpsert: Bool? {
+        return self._scriptedUpsert
+    }
+    
     public func build() throws -> UpdateRequest {
-        guard self.index != nil else {
-            throw RequestBuilderError.missingRequiredField("index")
-        }
-        
-        guard self.id != nil else {
-            throw RequestBuilderError.missingRequiredField("id")
-        }
-        
-        guard self.doc != nil || self.script != nil else {
-            throw RequestBuilderError.atleastOneFieldRequired(["doc", "script"])
-        }
-        
-        return UpdateRequest(withBuilder: self)
+        return try UpdateRequest(withBuilder: self)
     }
 }
 
@@ -140,7 +150,32 @@ public class UpdateRequest: Request, Encodable {
     public var fields: String?
     public var source: Bool?
     
-    init(withBuilder builder: UpdateRequestBuilder) {
+    public init(index: String, type: String = "_doc", id: String, script: Script? = nil, upsert: EncodableValue? = nil, detectNoop: Bool? = nil, docAsUpsert: Bool? = nil, doc: EncodableValue? = nil, scriptedUpsert: Bool? = nil) {
+        self.index = index
+        self.type = type
+        self.id = id
+        self.script = script
+        self.upsert = upsert
+        self.detectNoop = detectNoop
+        self.docAsUpsert = docAsUpsert
+        self.doc = doc
+        self.scriptedUpsert = scriptedUpsert
+    }
+    
+    internal init(withBuilder builder: UpdateRequestBuilder) throws {
+        
+        guard builder.index != nil else {
+            throw RequestBuilderError.missingRequiredField("index")
+        }
+        
+        guard builder.id != nil else {
+            throw RequestBuilderError.missingRequiredField("id")
+        }
+        
+        guard builder.doc != nil || builder.script != nil else {
+            throw RequestBuilderError.atleastOneFieldRequired(["doc", "script"])
+        }
+        
         self.index = builder.index!
         self.type = builder.type ?? "_doc"
         self.id = builder.id!
