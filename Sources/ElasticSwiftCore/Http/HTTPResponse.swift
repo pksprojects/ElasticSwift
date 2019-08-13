@@ -28,7 +28,20 @@ public class HTTPResponse {
         self.request = request
     }
     
-    init(withBuilder builder: HTTPResponseBuilder) {
+    internal init(withBuilder builder: HTTPResponseBuilder) throws {
+        
+        guard builder.request != nil else {
+            throw HTTPResponseBuilderError("request can't be nil")
+        }
+        
+        guard builder.headers != nil else {
+            throw HTTPResponseBuilderError("headers can't be nil")
+        }
+        
+        guard builder.status != nil else {
+            throw HTTPResponseBuilderError("status can't be nil")
+        }
+        
         self.request = builder.request!
         self.status =  builder.status!
         self.headers = builder.headers!
@@ -41,34 +54,52 @@ public class HTTPResponse {
 /// Builder for `HTTPResponse`
 public class HTTPResponseBuilder {
     
-    public typealias BuilderClosure = (HTTPResponseBuilder) -> Void
+    private var _request: HTTPRequest?
+    private var _status: HTTPResponseStatus?
+    private var _headers: HTTPHeaders?
+    private var _body: ByteBuffer?
     
-    public var request: HTTPRequest?
-    public var status: HTTPResponseStatus?
-    public var headers: HTTPHeaders?
-    public var body: ByteBuffer?
+    public init() {}
     
-    init() {}
+    @discardableResult
+    public func set(headers: HTTPHeaders) -> HTTPResponseBuilder {
+        self._headers = headers
+        return self
+    }
     
-    public init(builderClosure: BuilderClosure) {
-        builderClosure(self)
+    @discardableResult
+    public func set(request: HTTPRequest) -> HTTPResponseBuilder {
+        self._request = request
+        return self
+    }
+    
+    @discardableResult
+    public func set(status: HTTPResponseStatus) -> HTTPResponseBuilder {
+        self._status = status
+        return self
+    }
+    
+    @discardableResult
+    public func set(body: ByteBuffer) -> HTTPResponseBuilder {
+        self._body = body
+        return self
+    }
+    
+    public var request: HTTPRequest? {
+        return self._request
+    }
+    public var status: HTTPResponseStatus? {
+        return self._status
+    }
+    public var headers: HTTPHeaders? {
+        return self._headers
+    }
+    public var body: ByteBuffer? {
+        return self._body
     }
     
     public func build() throws -> HTTPResponse {
-        
-        guard self.request != nil else {
-            throw HTTPResponseBuilderError("request can't be nil")
-        }
-        
-        guard self.headers != nil else {
-            throw HTTPResponseBuilderError("headers can't be nil")
-        }
-        
-        guard self.status != nil else {
-            throw HTTPResponseBuilderError("status can't be nil")
-        }
-        
-        return HTTPResponse(withBuilder: self)
+        return try HTTPResponse(withBuilder: self)
     }
 }
 
