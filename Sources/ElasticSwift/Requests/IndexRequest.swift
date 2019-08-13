@@ -15,93 +15,103 @@ import ElasticSwiftCore
 public class IndexRequestBuilder<T: Codable>: RequestBuilder {
     
     public typealias RequestType = IndexRequest<T>
-    public typealias BuilderClosure = (IndexRequestBuilder) -> Void
     
-    var index: String?
-    var type: String?
-    var id: String?
-    var source: T?
-    var routing: String?
-    var parent: String?
-    var version: String?
-    var versionType: VersionType?
-    var refresh: IndexRefresh?
+    private var _index: String?
+    private var _type: String?
+    private var _id: String?
+    private var _source: T?
+    private var _routing: String?
+    private var _parent: String?
+    private var _version: String?
+    private var _versionType: VersionType?
+    private var _refresh: IndexRefresh?
     
-    init() {}
-    
-    public init(builderClosure: BuilderClosure) {
-        builderClosure(self)
-    }
+    public init() {}
     
     @discardableResult
     public func set(index: String) -> Self {
-        self.index = index
+        self._index = index
         return self
     }
     
     @discardableResult
     @available(*, deprecated, message: "Elasticsearch has deprecated use of custom types and will be remove in 7.0")
     public func set(type: String) -> Self {
-        self.type = type
+        self._type = type
         return self
     }
     
     @discardableResult
     public func set(id: String) -> Self {
-        self.id = id
+        self._id = id
         return self
     }
     
     @discardableResult
     public func set(routing: String) -> Self {
-        self.routing = routing
+        self._routing = routing
         return self
     }
     
     @discardableResult
     public func set(parent: String) -> Self {
-        self.parent = parent
+        self._parent = parent
         return self
     }
     
     @discardableResult
     public func set(source: T) -> Self {
-        self.source = source
+        self._source = source
         return self
     }
     
     @discardableResult
     public func set(version: String) -> Self {
-        self.version = version
+        self._version = version
         return self
     }
     
     @discardableResult
     public func set(versionType: VersionType) -> Self {
-        self.versionType = versionType
+        self._versionType = versionType
         return self
     }
     
     @discardableResult
     public func set(refresh: IndexRefresh) -> Self {
-        self.refresh = refresh
+        self._refresh = refresh
         return self
     }
     
+    public var index: String? {
+        return self._index
+    }
+    public var type: String? {
+        return self._type
+    }
+    public var id: String? {
+        return self._id
+    }
+    public var source: T? {
+        return self._source
+    }
+    public var routing: String? {
+        return self._routing
+    }
+    public var parent: String? {
+        return self._parent
+    }
+    public var version: String? {
+        return self._version
+    }
+    public var versionType: VersionType? {
+        return self._versionType
+    }
+    public var refresh: IndexRefresh? {
+        return self._refresh
+    }
+    
     public func build() throws -> IndexRequest<T> {
-        
-        guard self.index != nil else {
-            throw RequestBuilderError.missingRequiredField("index")
-        }
-        
-        guard self.source != nil else {
-            throw RequestBuilderError.missingRequiredField("source")
-        }
-        
-        guard (self.version != nil && self.versionType != nil) || (self.version == nil && self.versionType == nil) else {
-            throw RequestBuilderError.missingRequiredField("source")
-        }
-        
         return try IndexRequest<T>(withBuilder: self)
     }
     
@@ -151,7 +161,20 @@ public class IndexRequest<T: Codable>: Request {
         self.versionType = versionType
     }
     
-    init(withBuilder builder: IndexRequestBuilder<T>) throws {
+    internal init(withBuilder builder: IndexRequestBuilder<T>) throws {
+        
+        guard builder.index != nil else {
+            throw RequestBuilderError.missingRequiredField("index")
+        }
+        
+        guard builder.source != nil else {
+            throw RequestBuilderError.missingRequiredField("source")
+        }
+        
+        guard (builder.version != nil && builder.versionType != nil) || (builder.version == nil && builder.versionType == nil) else {
+            throw RequestBuilderError.missingRequiredField("source")
+        }
+        
         self.index = builder.index!
         self.id = builder.id
         self.type = builder.type ?? "_doc"

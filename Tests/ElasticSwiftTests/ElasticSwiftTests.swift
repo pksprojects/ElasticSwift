@@ -60,7 +60,7 @@ class ElasticSwiftTests: XCTestCase {
             }
             e.fulfill()
         }
-        let createIndexRequest = CreateIndexRequest(name: "test")
+        let createIndexRequest = CreateIndexRequest("test")
         
         func handler1(_ result: Result<AcknowledgedResponse, Error>) -> Void {
             
@@ -73,7 +73,7 @@ class ElasticSwiftTests: XCTestCase {
             
             self.client?.indices.create(createIndexRequest, completionHandler: handler)
         }
-        let deleteIndexRequest = DeleteIndexRequest(name: "test")
+        let deleteIndexRequest = DeleteIndexRequest("test")
         
         self.client?.indices.delete(deleteIndexRequest, completionHandler: handler1)
         
@@ -94,7 +94,7 @@ class ElasticSwiftTests: XCTestCase {
             }
             e.fulfill()
         }
-        let request = GetIndexRequest(name: "test")
+        let request = GetIndexRequest("test")
         
         self.client?.indices.get(request, completionHandler: handler)
         
@@ -121,13 +121,12 @@ class ElasticSwiftTests: XCTestCase {
         }
         let msg = Message()
         msg.msg = "Test Message"
-        let request = try IndexRequestBuilder<Message>() { builder in
-            _ = builder.set(index: "test")
-                .set(type: "_doc")
-                .set(id: "0")
-                .set(source: msg)
-        }
-        .build()
+        let request = try IndexRequestBuilder<Message>()
+            .set(index: "test")
+            .set(type: "_doc")
+            .set(id: "0")
+            .set(source: msg)
+            .build()
         
         self.client?.execute(request: request, completionHandler: handler)
         waitForExpectations(timeout: 10)
@@ -152,12 +151,11 @@ class ElasticSwiftTests: XCTestCase {
         }
         let msg = Message()
         msg.msg = "Test Message No Id"
-        let request = try IndexRequestBuilder<Message>() { builder in
-            _ = builder.set(index: "test")
-                .set(type: "_doc")
-                .set(source: msg)
-        }
-        .build()
+        let request = try IndexRequestBuilder<Message>()
+            .set(index: "test")
+            .set(type: "_doc")
+            .set(source: msg)
+            .build()
         
         self.client?.execute(request: request, completionHandler: handler)
         waitForExpectations(timeout: 10)
@@ -183,13 +181,11 @@ class ElasticSwiftTests: XCTestCase {
             e.fulfill()
         }
         
-        let request = try GetRequestBuilder() { builder in
-            builder.set(id: "0")
-                .set(index: "test")
-                .set(type: "_doc")
-            
-        }
-        .build()
+        let request = try GetRequestBuilder()
+            .set(id: "0")
+            .set(index: "test")
+            .set(type: "_doc")
+            .build()
         
         
         /// make sure doc exists
@@ -205,13 +201,12 @@ class ElasticSwiftTests: XCTestCase {
         }
         let msg = Message()
         msg.msg = "Test Message"
-        let request1 = try IndexRequestBuilder<Message>() { builder in
-            _ = builder.set(index: "test")
-                .set(type: "_doc")
-                .set(id: "0")
-                .set(source: msg)
-            
-        } .build()
+        let request1 = try IndexRequestBuilder<Message>()
+            .set(index: "test")
+            .set(type: "_doc")
+            .set(id: "0")
+            .set(source: msg)
+            .build()
         
         self.client?.execute(request: request1, completionHandler: handler1)
         waitForExpectations(timeout: 10)
@@ -236,11 +231,11 @@ class ElasticSwiftTests: XCTestCase {
             }
             e.fulfill()
         }
-        let request = try DeleteRequestBuilder() { builder in
-            builder.set(index: "test")
-                .set(type: "_doc")
-                .set(id: "0")
-        } .build()
+        let request = try DeleteRequestBuilder()
+            .set(index: "test")
+            .set(type: "_doc")
+            .set(id: "0")
+            .build()
         
         /// make sure doc exists
         func handler1(_ result: Result<IndexResponse, Error>) -> Void {
@@ -256,13 +251,12 @@ class ElasticSwiftTests: XCTestCase {
         }
         let msg = Message()
         msg.msg = "Test Message"
-        let request1 =  try IndexRequestBuilder<Message>() { builder in
-            _ = builder.set(index: "test")
-                .set(type: "_doc")
-                .set(id: "0")
-                .set(source: msg)
-            
-        } .build()
+        let request1 =  try IndexRequestBuilder<Message>()
+            .set(index: "test")
+            .set(type: "_doc")
+            .set(id: "0")
+            .set(source: msg)
+            .build()
         self.client?.execute(request: request1, completionHandler: handler1)
         
         waitForExpectations(timeout: 10)
@@ -290,12 +284,12 @@ class ElasticSwiftTests: XCTestCase {
         let sort =  SortBuilders.fieldSort("msg.keyword")
             .set(order: .asc)
             .build()
-        let request = try SearchRequestBuilder() { builder in
-            builder.set(indices: "test")
-                .set(types: "_doc")
-                .set(query: try! queryBuilder.build())
-                .set(sort: sort)
-        } .build()
+        let request = try SearchRequestBuilder()
+            .set(indices: "test")
+            .set(types: "_doc")
+            .set(query: try! queryBuilder.build())
+            .set(sort: sort)
+            .build()
         
         /// make sure doc exists
         func handler1(_ result: Result<IndexResponse, Error>) -> Void {
@@ -310,10 +304,10 @@ class ElasticSwiftTests: XCTestCase {
         }
         let msg = Message()
         msg.msg = "Message"
-        let request1 =  try IndexRequestBuilder<Message>() { builder in
-            builder.set(index: "test")
-                .set(source: msg)
-        } .build()
+        let request1 =  try IndexRequestBuilder<Message>()
+            .set(index: "test")
+            .set(source: msg)
+            .build()
         request1.refresh = .true
         self.client?.execute(request: request1, completionHandler: handler1)
         
@@ -323,9 +317,9 @@ class ElasticSwiftTests: XCTestCase {
     func test_09_IndexExists() throws {
         let e = expectation(description: "execution complete")
         
-        let existsRequest = IndexExistsRequest(name: "test")
+        let existsRequest = IndexExistsRequest("test")
         
-        let getIndexRequest = GetIndexRequest(name: "test")
+        let getIndexRequest = GetIndexRequest("test")
         
         func existsFalseHander(_ result: Result<IndexExistsResponse, Error>) -> Void {
             switch result {
@@ -352,7 +346,7 @@ class ElasticSwiftTests: XCTestCase {
             }
             self.client?.indices.exists(getIndexRequest, completionHandler: existsFalseHander)
         }
-        let deleteRequest = DeleteIndexRequest(name: "test")
+        let deleteRequest = DeleteIndexRequest("test")
         
         func existsTrueHander(_ result: Result<IndexExistsResponse, Error>) -> Void {
             switch result {
@@ -379,7 +373,7 @@ class ElasticSwiftTests: XCTestCase {
             self.client?.indices.exists(existsRequest, completionHandler: existsTrueHander)
         }
         
-        let createIndexRequest = CreateIndexRequest(name: "test")
+        let createIndexRequest = CreateIndexRequest("test")
         self.client?.indices.create(createIndexRequest, completionHandler: createIndexRequestHandler)
         waitForExpectations(timeout: 10)
     }
@@ -390,11 +384,11 @@ class ElasticSwiftTests: XCTestCase {
         
         let params: [String: CodableValue] = ["msg": "Updated Message"]
         let script = Script("ctx._source.msg = params.msg", lang: "painless", params: params)
-        let updateRequest = try UpdateRequestBuilder { builder in
-            builder.set(id: "0")
-                .set(index: "test")
-                .set(script: script)
-        }.build()
+        let updateRequest = try UpdateRequestBuilder()
+            .set(id: "0")
+            .set(index: "test")
+            .set(script: script)
+            .build()
         
         let msg = Message("Test Message")
         let indexRequest = IndexRequest(index: "test", id: "0", source: msg)
@@ -428,11 +422,11 @@ class ElasticSwiftTests: XCTestCase {
         let e = expectation(description: "execution complete")
         
         let script = Script("ctx._source.msg = 'hello'")
-        let updateRequest = try UpdateRequestBuilder { builder in
-            builder.set(id: "1")
-                .set(index: "test")
-                .set(script: script)
-        }.build()
+        let updateRequest = try UpdateRequestBuilder()
+            .set(id: "1")
+            .set(index: "test")
+            .set(script: script)
+            .build()
         
         let msg = Message("Test Message")
         let indexRequest = IndexRequest(index: "test", id: "1", source: msg)
@@ -465,11 +459,11 @@ class ElasticSwiftTests: XCTestCase {
                 
         let e = expectation(description: "execution complete")
         
-        let updateRequest = try UpdateRequestBuilder { builder in
-            builder.set(id: "2")
-                .set(index: "test")
-                .set(doc: ["msg": "Test Message"])
-        }.build()
+        let updateRequest = try UpdateRequestBuilder()
+            .set(id: "2")
+            .set(index: "test")
+            .set(doc: ["msg": "Test Message"])
+            .build()
         
         let msg = Message("Test Message")
         let indexRequest = IndexRequest(index: "test", id: "2", source: msg)
@@ -502,12 +496,12 @@ class ElasticSwiftTests: XCTestCase {
                     
         let e = expectation(description: "execution complete")
         
-        let updateRequest = try UpdateRequestBuilder { builder in
-            builder.set(id: "3")
-                .set(index: "test")
-                .set(doc: ["msg": "Test Message"])
-                .set(detectNoop: false)
-        }.build()
+        let updateRequest = try UpdateRequestBuilder()
+            .set(id: "3")
+            .set(index: "test")
+            .set(doc: ["msg": "Test Message"])
+            .set(detectNoop: false)
+            .build()
         
         let msg = Message("Test Message")
         let indexRequest = IndexRequest(index: "test", id: "3", source: msg)
@@ -541,12 +535,12 @@ class ElasticSwiftTests: XCTestCase {
         let e = expectation(description: "execution complete")
         
         let script = Script("ctx._source.msg = params.msg", lang: "painless", params: ["msg": "upsert script"])
-        let updateRequest = try UpdateRequestBuilder { builder in
-            builder.set(id: "abcdef")
-                .set(index: "test")
-                .set(script: script)
-                .set(upsert: ["msg": "Test Message"])
-        }.build()
+        let updateRequest = try UpdateRequestBuilder()
+            .set(id: "abcdef")
+            .set(index: "test")
+            .set(script: script)
+            .set(upsert: ["msg": "Test Message"])
+            .build()
         
         self.client?.update(updateRequest) { result in
             switch result {
@@ -570,13 +564,13 @@ class ElasticSwiftTests: XCTestCase {
         
         let script = Script("ctx._source.msg = params.msg", lang: "painless", params: ["msg": "scripted upsert"])
         
-        let updateRequest = try UpdateRequestBuilder { builder in
-            builder.set(id: "abcdefg")
-                .set(index: "test")
-                .set(script: script)
-                .set(scriptedUpsert: true)
-                .set(upsert: [:])
-        }.build()
+        let updateRequest = try UpdateRequestBuilder()
+            .set(id: "abcdefg")
+            .set(index: "test")
+            .set(script: script)
+            .set(scriptedUpsert: true)
+            .set(upsert: [:])
+            .build()
         
         self.client?.update(updateRequest) { result in
             switch result {
@@ -599,12 +593,12 @@ class ElasticSwiftTests: XCTestCase {
                         
         let e = expectation(description: "execution complete")
         
-        let updateRequest = try UpdateRequestBuilder { builder in
-            builder.set(id: "3docAsUpsert")
-                .set(index: "test")
-                .set(doc: ["msg": "Test Message"])
-                .set(docAsUpsert: true)
-        }.build()
+        let updateRequest = try UpdateRequestBuilder()
+            .set(id: "3docAsUpsert")
+            .set(index: "test")
+            .set(doc: ["msg": "Test Message"])
+            .set(docAsUpsert: true)
+            .build()
         
         self.client?.update(updateRequest) { result in
             switch result {
@@ -645,10 +639,10 @@ class ElasticSwiftTests: XCTestCase {
             .set(value: "DeleteByQuery")
             .build()
         
-        let request = try DeleteByQueryRequestBuilder() { builder in
-            builder.set(index: "test")
-                .set(query: query)
-        } .build()
+        let request = try DeleteByQueryRequestBuilder()
+            .set(index: "test")
+            .set(query: query)
+            .build()
         
         request.refresh = .true
         
@@ -666,12 +660,11 @@ class ElasticSwiftTests: XCTestCase {
         }
         let msg = Message()
         msg.msg = "DeleteByQuery"
-        let request1 =  try IndexRequestBuilder<Message>() { builder in
-            _ = builder.set(index: "test")
-                .set(type: "_doc")
-                .set(source: msg)
-            
-        } .build()
+        let request1 =  try IndexRequestBuilder<Message>()
+            .set(index: "test")
+            .set(type: "_doc")
+            .set(source: msg)
+            .build()
         request1.refresh = .true
         self.client?.execute(request: request1, completionHandler: handler1)
         
@@ -700,10 +693,10 @@ class ElasticSwiftTests: XCTestCase {
             .set(value: "UpdateByQuery")
             .build()
         
-        let request = try UpdateByQueryRequestBuilder() { builder in
-            builder.set(index: "test")
-                .set(query: query)
-        } .build()
+        let request = try UpdateByQueryRequestBuilder()
+            .set(index: "test")
+            .set(query: query)
+            .build()
         
         request.refresh = .true
         
@@ -721,12 +714,11 @@ class ElasticSwiftTests: XCTestCase {
         }
         let msg = Message()
         msg.msg = "UpdateByQuery"
-        let request1 =  try IndexRequestBuilder<Message>() { builder in
-            _ = builder.set(index: "test")
-                .set(type: "_doc")
-                .set(source: msg)
-            
-        } .build()
+        let request1 =  try IndexRequestBuilder<Message>()
+            .set(index: "test")
+            .set(type: "_doc")
+            .set(source: msg)
+            .build()
         request1.refresh = .true
         self.client?.execute(request: request1, completionHandler: handler1)
         
@@ -755,11 +747,11 @@ class ElasticSwiftTests: XCTestCase {
             .set(value: "UpdateByQuery2")
             .build()
         let script = Script("ctx._source.msg = 'hello'")
-        let request = try UpdateByQueryRequestBuilder() { builder in
-            builder.set(index: "test")
-                .set(query: query)
-                .set(script: script)
-        } .build()
+        let request = try UpdateByQueryRequestBuilder()
+            .set(index: "test")
+            .set(query: query)
+            .set(script: script)
+            .build()
         
         request.refresh = .true
         
@@ -777,12 +769,11 @@ class ElasticSwiftTests: XCTestCase {
         }
         let msg = Message()
         msg.msg = "UpdateByQuery2"
-        let request1 =  try IndexRequestBuilder<Message>() { builder in
-            _ = builder.set(index: "test")
-                .set(type: "_doc")
-                .set(source: msg)
-            
-        } .build()
+        let request1 =  try IndexRequestBuilder<Message>()
+            .set(index: "test")
+            .set(type: "_doc")
+            .set(source: msg)
+            .build()
         request1.refresh = .true
         self.client?.execute(request: request1, completionHandler: handler1)
         
@@ -803,7 +794,7 @@ class ElasticSwiftTests: XCTestCase {
             }
             e.fulfill()
         }
-        let request = DeleteIndexRequest(name: "test")
+        let request = DeleteIndexRequest("test")
         
         /// make sure index exists
         func handler1(_ result: Result<CreateIndexResponse, Error>) -> Void {
@@ -817,7 +808,7 @@ class ElasticSwiftTests: XCTestCase {
             self.client?.execute(request: request, completionHandler: handler)
         }
         
-        let request1 = CreateIndexRequest(name: "test")
+        let request1 = CreateIndexRequest("test")
         self.client?.execute(request: request1, completionHandler: handler1)
         waitForExpectations(timeout: 10)
     }
