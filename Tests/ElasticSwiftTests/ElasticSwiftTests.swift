@@ -780,7 +780,53 @@ class ElasticSwiftTests: XCTestCase {
         waitForExpectations(timeout: 10)
     }
     
-    func test_20_DeleteIndex() throws {
+    func test_20_mget() throws {
+        let e = expectation(description: "execution complete")
+        func handler(_ result: Result<MultiGetResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                print("Error", error)
+                XCTAssert(false, error.localizedDescription)
+            case .success(let response):
+                print("Response: ", response)
+                XCTAssertNotNil(response.responses, "Responses: \(response.responses)")
+            }
+            e.fulfill()
+        }
+        let request = try MultiGetRequestBuilder()
+            .set(index: "test")
+            .add(item: .init(index: "test", id: "0"))
+            .add(item: .init(index: "test", id: "1000"))
+            .add(item: .init(index: "doesntExists", id: "0"))
+            .build()
+        
+        /// make sure doc exists
+        func handler1(_ result: Result<IndexResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                print("Error", error)
+            case .success(let response):
+                print("Response: ", response)
+            }
+            self.client?.mget(request, completionHandler: handler)
+        }
+        
+        let msg = Message()
+        msg.msg = "UpdateByQuery2"
+        let request1 =  try IndexRequestBuilder<Message>()
+            .set(index: "test")
+            .set(type: "_doc")
+            .set(id: "0")
+            .set(source: msg)
+            .build()
+        request1.refresh = .true
+        self.client?.index(request1, completionHandler: handler1)
+        waitForExpectations(timeout: 10)
+    }
+    
+    func test_21_DeleteIndex() throws {
         let e = expectation(description: "execution complete")
         func handler(_ result: Result<AcknowledgedResponse, Error>) -> Void {
             

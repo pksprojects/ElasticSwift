@@ -72,6 +72,10 @@ extension ElasticClient {
     public func updateByQuery(_ updateByQueryRequest: UpdateByQueryRequest, completionHandler: @escaping (_ result: Result<UpdateByQueryResponse, Error>) -> Void) -> Void {
         return self.execute(request: updateByQueryRequest, options: .default, completionHandler: completionHandler)
     }
+    
+    public func mget(_ multiGetRequest: MultiGetRequest, completionHandler: @escaping (_ result: Result<MultiGetResponse, Error>) -> Void) -> Void {
+        return self.execute(request: multiGetRequest, options: .default, completionHandler: completionHandler)
+    }
 }
 
 extension ElasticClient {
@@ -104,6 +108,9 @@ extension ElasticClient {
         return self.execute(request: updateByQueryRequest, options: options, completionHandler: completionHandler)
     }
     
+    public func mget(_ multiGetRequest: MultiGetRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<MultiGetResponse, Error>) -> Void) -> Void {
+        return self.execute(request: multiGetRequest, options: options, completionHandler: completionHandler)
+    }
 }
 
 extension ElasticClient {
