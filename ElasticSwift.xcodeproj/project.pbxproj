@@ -21,6 +21,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		060558CB2310DA5E00F18D3B /* MultiGetRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 060558CA2310DA5E00F18D3B /* MultiGetRequest.swift */; };
 		06D56A6322F0E5EB0085E831 /* DeleteByQueryRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06D56A6222F0E5EB0085E831 /* DeleteByQueryRequest.swift */; };
 		06DF073122F12E9900B8A799 /* UpdateByQueryRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06DF073022F12E9900B8A799 /* UpdateByQueryRequest.swift */; };
 		OBJ_1000 /* add.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_266 /* add.c */; };
@@ -1585,6 +1586,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		060558CA2310DA5E00F18D3B /* MultiGetRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiGetRequest.swift; sourceTree = "<group>"; };
 		06D56A6222F0E5EB0085E831 /* DeleteByQueryRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteByQueryRequest.swift; sourceTree = "<group>"; };
 		06DF073022F12E9900B8A799 /* UpdateByQueryRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateByQueryRequest.swift; sourceTree = "<group>"; };
 		"ElasticSwift::ElasticSwift::Product" /* ElasticSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ElasticSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2784,6 +2786,7 @@
 				OBJ_23 /* UpdateRequest.swift */,
 				06D56A6222F0E5EB0085E831 /* DeleteByQueryRequest.swift */,
 				06DF073022F12E9900B8A799 /* UpdateByQueryRequest.swift */,
+				060558CA2310DA5E00F18D3B /* MultiGetRequest.swift */,
 			);
 			path = Requests;
 			sourceTree = "<group>";
@@ -5113,6 +5116,7 @@
 				OBJ_1358 /* GetRequest.swift in Sources */,
 				OBJ_1359 /* IndexRequest.swift in Sources */,
 				OBJ_1360 /* IndicesRequests.swift in Sources */,
+				060558CB2310DA5E00F18D3B /* MultiGetRequest.swift in Sources */,
 				OBJ_1361 /* SearchRequest.swift in Sources */,
 				OBJ_1362 /* UpdateRequest.swift in Sources */,
 				OBJ_1363 /* IndicesResponse.swift in Sources */,
