@@ -162,12 +162,11 @@ func indexHandler(_ result: Result<IndexResponse, Error>) -> Void {
 let mySource = MyClass()
 mySource.myField = "My value"
 
-let indexRequest = try IndexRequestBuilder<MyClass>() { builder in
-            _ = builder.set(index: "indexName")
-                .set(type: "type")
-                .set(id: "id")
-                .set(source: mySource)
-        }
+let indexRequest = try IndexRequestBuilder<MyClass>()
+        .set(index: "indexName")
+        .set(type: "type")
+        .set(id: "id")
+        .set(source: mySource)
         .build()
 
 client.index(indexRequest, completionHandler: indexHandler)
@@ -182,12 +181,11 @@ func getHandler(_ result: Result<GetResponse<MyClass>, Error>) -> Void {
     }
 }
 
-let getRequest = GetRequestBuilder<MyClass>() { builder in
-            builder.set(id: "id")
-                .set(index: "indexName")
-                .set(type: "type")
-        }
-        .build()
+let getRequest = GetRequestBuilder<MyClass>()
+    .set(id: "id")
+    .set(index: "indexName")
+    .set(type: "type")
+    .build()
 
 client.get(getRequest, completionHandler: getHandler)
 
@@ -201,11 +199,11 @@ func deleteHandler(_ result: Result<DeleteResponse, Error>) -> Void {
     }
 }
 
-let deleteRequest = try DeleteRequestBuilder() { builder in
-        builder.set(index: "indexName")
-                .set(type: "type")
-                .set(id: "id")
-    } .build()
+let deleteRequest = try DeleteRequestBuilder()
+    .set(index: "indexName")
+    .set(type: "type")
+    .set(id: "id")
+    .build()
 
 client.delete(deleteRequest, completionHandler: deleteHandler)
 
@@ -218,11 +216,11 @@ Currently not all QueryBuilders are available. Future releases will add support 
 ```swift
 
 let builder = QueryBuilders.boolQuery()
-let mustMatch = QueryBuilders.matchQuery().match(field: "fieldName", value: "value")
-let mustNotMatch = QueryBuilders.matchQuery().match(field: "fieldName", value: "value")
+let mustMatch = try QueryBuilders.matchQuery().match(field: "fieldName", value: "value").build()
+let mustNotMatch = try QueryBuilders.matchQuery().match(field: "fieldName", value: "value").build()
 builder.must(query: mustMatch)
 builder.mustNot(query: mustNotMatch)
-
+let boolQuery = try builder.build()
 ```
 
 ### Search
@@ -241,19 +239,21 @@ func handler(_ result: Result<SearchResponse<Message>, Error>) -> Void {
 }
 
 let queryBuilder = QueryBuilders.boolQuery()
-let match = QueryBuilders.matchQuery().match(field: "myField", value: "MySearchValue")
+let match = try QueryBuilders.matchQuery().match(field: "myField", value: "MySearchValue").build()
 queryBuilder.must(query: match)
+
+let query =  try queryBuilder.build()
 
 let sort =  SortBuilders.fieldSort("msg") // use "msg.keyword" as field name in case of text field
     .set(order: .asc)
     .build()
 
-let request = try SearchRequestBuilder() { builder in
-            builder.set(indices: "indexName")
-                .set(types: "type")
-                .set(query: queryBuilder.query)
-                .set(sort: sort)
-        } .build()
+let request = try SearchRequestBuilder()
+        .set(indices: "indexName")
+        .set(types: "type")
+        .set(query: query)
+        .set(sort: sort)
+        .build()
 
 client.search(request, completionHandler: handler)
 

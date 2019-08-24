@@ -279,7 +279,7 @@ class ElasticSwiftTests: XCTestCase {
             e.fulfill()
         }
         let queryBuilder = QueryBuilders.boolQuery()
-        let match = try! QueryBuilders.matchQuery().set(field: "msg").set(value: "Message").build()
+        let match = try QueryBuilders.matchQuery().set(field: "msg").set(value: "Message").build()
         queryBuilder.must(query: match)
         let sort =  SortBuilders.fieldSort("msg.keyword")
             .set(order: .asc)
