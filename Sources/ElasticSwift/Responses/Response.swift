@@ -27,7 +27,7 @@ public class ESResponse {
 public struct GetResponse<T: Codable>: Codable {
     
     public let index: String
-    public let type: String
+    public let type: String?
     public let id: String
     public let version: Int?
     public let found: Bool
@@ -238,4 +238,55 @@ public struct UpdateByQueryResponse: Codable {
         case failures
     }
     
+}
+
+// MARK:- Multi Get Response
+
+public struct MultiGetResponse: Codable {
+    
+    public let responses: [MultiGetItemResponse]
+    
+    public struct Failure: Codable {
+        public let index: String
+        public let id: String
+        public let type: String?
+        public let error: ElasticError
+        
+        enum CodingKeys: String, CodingKey {
+            case index = "_index"
+            case id = "_id"
+            case type = "_type"
+            case error
+        }
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case responses = "docs"
+    }
+    
+}
+
+public struct MultiGetItemResponse: Codable {
+    
+    public let response: GetResponse<CodableValue>?
+    public let failure: MultiGetResponse.Failure?
+    
+    public func encode(to encoder: Encoder) throws {
+        if let response = self.response {
+            try response.encode(to: encoder)
+        } else {
+            try failure.encode(to: encoder)
+        }
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        do {
+            self.response = try container.decode(GetResponse<CodableValue>.self)
+            self.failure = nil
+        } catch {
+            self.failure = try container.decode(MultiGetResponse.Failure.self)
+            self.response = nil
+        }
+    }
 }

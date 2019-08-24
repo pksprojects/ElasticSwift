@@ -84,6 +84,9 @@ public enum QueryParams: String {
     case stats
     case from
     case scrollSize = "scroll_size"
+    case realTime = "realtime"
+    case preference
+    case storedFields = "stored_fields"
 }
 
 enum EndPointCategory: String {
