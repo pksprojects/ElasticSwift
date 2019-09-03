@@ -144,19 +144,9 @@ public class UpdateByQueryRequest: Request {
     
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
         var dic = [String: Any]()
-        /// TODO: Need to look for alternate for encoding, decoding and again encoding for script
+        
         if let script = self.script {
-            let result = serializer.encode(script)
-            switch result {
-            case .success(let data):
-                do {
-                dic["script"] = try JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
-                } catch {
-                    return .failure(.wrapped(error))
-                }
-            case .failure(let error):
-                return .failure(.wrapped(error))
-            }
+            dic["script"] = script.toDic()
         }
         
         if let query = self.query {

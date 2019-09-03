@@ -27,7 +27,7 @@ class ScriptTests: XCTestCase {
         
         logger.debug("Script Encode test: \(encodedStr)")
         
-        XCTAssertEqual("ctx._source.likes++", encodedStr)
+        XCTAssertEqual("{\"script\":\"ctx._source.likes++\"}", encodedStr)
     }
     
     func testScript_decode_short() throws {

@@ -90,7 +90,7 @@ class ScoreFunctionTests: XCTestCase {
         
         logger.debug("ScriptScoreFunction Encode test: \(dataStr)")
         
-        XCTAssertEqual("{\"script_score\":{\"script\":{\"source\":\"Math.log(2 + doc['likes'].value)\"}}}", dataStr)
+        XCTAssertEqual("{\"script_score\":{\"script\":\"Math.log(2 + doc['likes'].value)\"}}", dataStr)
         
     }
     
