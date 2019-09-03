@@ -133,13 +133,13 @@ extension KeyedEncodingContainer {
         }
     }
     
-    public mutating func encodeIfPresent(_ value: Query?, forKey key: Self.Key) throws {
+    public mutating func encodeIfPresent(_ value: Query?, forKey key: KeyedEncodingContainer<K>.Key) throws {
         if let value = value {
             try value.encode(to: self.superEncoder(forKey: key))
         }
     }
 
-    public mutating func encode(_ value: [Query]?, forKey key: Self.Key) throws {
+    public mutating func encode(_ value: [Query]?, forKey key: KeyedEncodingContainer<K>.Key) throws {
         if let value = value {
             let queriesEncoder = self.superEncoder(forKey: key)
             var queriesContainer = queriesEncoder.unkeyedContainer()
