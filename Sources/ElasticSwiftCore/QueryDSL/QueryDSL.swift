@@ -11,7 +11,7 @@ import Foundation
 //MARK:- Query Protocol
 
 /// Protocol that all `Query` conforms to
-public protocol Query {
+public protocol Query: Encodable {
     
     var name: String { get }
     

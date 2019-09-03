@@ -12,10 +12,8 @@ import ElasticSwiftCore
 
 public class TermQuery: Query {
     
-    private static let BOOST = "boost"
-    private static let VALUE = "value"
-    
     public let name: String = "term"
+    
     public let field: String
     public let value: String
     public let boost: Decimal?
@@ -43,13 +41,33 @@ public class TermQuery: Query {
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [:]
         if let boost = boost {
-            dic = [self.field: [TermQuery.VALUE: self.value,
-                                TermQuery.BOOST: boost]]
+            dic = [self.field: [CodingKeys.value.rawValue: self.value,
+                                CodingKeys.boost.rawValue: boost]]
         } else {
             dic = [self.field: self.value]
         }
         return [self.name: dic]
     }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: DynamicCodingKeys.self)
+        var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: self.name))
+        
+        guard self.boost != nil else {
+            try nested.encode(self.value, forKey: .key(named: self.field))
+            return
+        }
+        
+        var fieldContainer = nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.field))
+        try fieldContainer.encode(self.value, forKey: .value)
+        try fieldContainer.encodeIfPresent(self.boost, forKey: .boost)
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case boost
+        case value
+    }
+    
     
 }
 
@@ -85,21 +103,16 @@ public class TermsQuery: Query {
         return [self.name: dic]
     }
     
-    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: DynamicCodingKeys.self)
+        var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: self.name))
+        try nested.encode(self.values, forKey: .key(named: self.field))
+    }
 }
 
 // MARK:- Range Query
 
 public class RangeQuery: Query {
-    
-    private static let GT = "gt"
-    private static let GTE = "gte"
-    private static let LT = "lt"
-    private static let LTE = "lte"
-    private static let BOOST = "boost"
-    private static let FORMAT = "format"
-    private static let TIME_ZONE = "time_zone"
-    private static let RELATION = "relation"
     
     public let name: String = "range"
     
@@ -149,40 +162,63 @@ public class RangeQuery: Query {
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [:]
         if let gt = self.gt {
-            dic[RangeQuery.GT] = gt
+            dic[CodingKeys.gt.rawValue] = gt
         }
         if let gte = self.gte {
-            dic[RangeQuery.GTE] = gte
+            dic[CodingKeys.gte.rawValue] = gte
         }
         if let lt = self.lt {
-            dic[RangeQuery.LT] = lt
+            dic[CodingKeys.lt.rawValue] = lt
         }
         if let lte = self.lte {
-            dic[RangeQuery.LTE] = lte
+            dic[CodingKeys.lte.rawValue] = lte
         }
         if let boost = self.boost {
-            dic[RangeQuery.BOOST] = boost
+            dic[CodingKeys.boost.rawValue] = boost
         }
         if let format = self.format {
-            dic[RangeQuery.FORMAT] = format
+            dic[CodingKeys.format.rawValue] = format
         }
         if let timeZone = self.timeZone {
-            dic[RangeQuery.TIME_ZONE] = timeZone
+            dic[CodingKeys.timeZone.rawValue] = timeZone
         }
         if let relation = self.relation {
-            dic[RangeQuery.RELATION] = relation
+            dic[CodingKeys.relation.rawValue] = relation
         }
         return [self.name: [self.field: dic]]
     }
     
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: DynamicCodingKeys.self)
+        var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: self.name))
+        var fieldContainer =  nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.field))
+        
+        try fieldContainer.encodeIfPresent(self.gt, forKey: .gt)
+        try fieldContainer.encodeIfPresent(self.gte, forKey: .gte)
+        try fieldContainer.encodeIfPresent(self.lt, forKey: .lt)
+        try fieldContainer.encodeIfPresent(self.lte, forKey: .lte)
+        try fieldContainer.encodeIfPresent(self.boost, forKey: .boost)
+        try fieldContainer.encodeIfPresent(self.format, forKey: .format)
+        try fieldContainer.encodeIfPresent(self.timeZone, forKey: .timeZone)
+        try fieldContainer.encodeIfPresent(self.relation, forKey: .relation)
+        
+    }
     
+    enum CodingKeys: String, CodingKey {
+        case gt
+        case gte
+        case lt
+        case lte
+        case boost
+        case format
+        case timeZone = "time_zone"
+        case relation
+    }
 }
 
 // MARK:- Exists Query
 
 public class ExistsQuery: Query {
-    
-    private static let FIELD = "field"
     
     public let name: String = "exists"
     
@@ -202,19 +238,24 @@ public class ExistsQuery: Query {
     }
     
     public func toDic() -> [String : Any] {
-        let dic: [String: Any] = [ExistsQuery.FIELD: self.field]
+        let dic: [String: Any] = [CodingKeys.field.rawValue: self.field]
         return [self.name: dic]
     }
     
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: DynamicCodingKeys.self)
+        var nested =  container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.name))
+        try nested.encode(self.field, forKey: .field)
+    }
     
+    enum CodingKeys: String, CodingKey {
+        case field
+    }
 }
 
 // MARK:- Prefix Query
 
 public class PrefixQuery: Query {
-    
-    private static let BOOST = "boost"
-    private static let VALUE = "value"
     
     public let name: String = "prefix"
     
@@ -243,22 +284,36 @@ public class PrefixQuery: Query {
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [:]
         if let boost = self.boost {
-            dic = [self.field: [PrefixQuery.VALUE: self.value, PrefixQuery.BOOST: boost]]
+            dic = [self.field: [CodingKeys.value.rawValue: self.value, CodingKeys.boost.rawValue: boost]]
         } else {
             dic = [self.field: self.value]
         }
         return [self.name: dic]
     }
     
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: DynamicCodingKeys.self)
+        var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: self.name))
+        
+        guard self.boost != nil else {
+            try nested.encode(self.value, forKey: .key(named: self.field))
+            return
+        }
+        
+        var fieldContainer = nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.field))
+        try fieldContainer.encode(self.value, forKey: .value)
+        try fieldContainer.encodeIfPresent(self.boost, forKey: .boost)
+    }
     
+    enum CodingKeys: String, CodingKey {
+        case boost
+        case value
+    }
 }
 
 // MARK:- WildCard Query
 
 public class WildCardQuery: Query {
-    
-    private static let BOOST = "boost"
-    private static let VALUE = "value"
     
     public let name: String = "wildcard"
     
@@ -287,24 +342,37 @@ public class WildCardQuery: Query {
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [:]
         if let boost = self.boost {
-            dic = [self.field: [WildCardQuery.VALUE: self.value, WildCardQuery.BOOST: boost]]
+            dic = [self.field: [CodingKeys.value.rawValue: self.value,
+                                CodingKeys.boost.rawValue: boost]]
         } else {
             dic = [self.field: self.value]
         }
         return [self.name: dic]
     }
     
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: DynamicCodingKeys.self)
+        var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: self.name))
+        
+        guard self.boost != nil else {
+            try nested.encode(self.value, forKey: .key(named: self.field))
+            return
+        }
+        
+        var fieldContainer = nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.field))
+        try fieldContainer.encode(self.value, forKey: .value)
+        try fieldContainer.encodeIfPresent(self.boost, forKey: .boost)
+    }
     
+    enum CodingKeys: String, CodingKey {
+        case boost
+        case value
+    }
 }
 
 // MARK:- Regexp Query
 
 public class RegexpQuery: Query {
-    
-    private static let BOOST = "boost"
-    private static let FLAGS = "flags"
-    private static let MAX_DETERMINIZED_STATUS = "max_determinized_states"
-    private static let VALUE = "value"
     
     public let name: String = "regexp"
     
@@ -338,31 +406,40 @@ public class RegexpQuery: Query {
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [:]
         if let boost = self.boost {
-            dic[RegexpQuery.BOOST] = boost
+            dic[CodingKeys.boost.rawValue] = boost
         }
         if !self.regexFlags.isEmpty {
-            dic[RegexpQuery.FLAGS] = regexFlags
+            dic[CodingKeys.flags.rawValue] = regexFlags
         }
         if let maxDeterminizedStates = self.maxDeterminizedStates {
-            dic[RegexpQuery.MAX_DETERMINIZED_STATUS] = maxDeterminizedStates
+            dic[CodingKeys.maxDeterminizedStates.rawValue] = maxDeterminizedStates
         }
-        dic[RegexpQuery.VALUE] = self.value
+        dic[CodingKeys.value.rawValue] = self.value
         return [self.name: [self.field: dic]]
     }
     
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: DynamicCodingKeys.self)
+        var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: self.name))
+        var fieldContainer = nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.field))
+        
+        try fieldContainer.encode(self.value, forKey: .value)
+        try fieldContainer.encodeIfPresent(self.boost, forKey: .boost)
+        try fieldContainer.encodeIfPresent(self.regexFlags, forKey: .flags)
+        try fieldContainer.encodeIfPresent(self.maxDeterminizedStates, forKey: .maxDeterminizedStates)
+    }
     
+    enum CodingKeys: String, CodingKey {
+        case boost
+        case flags
+        case value
+        case maxDeterminizedStates = "max_determinized_states"
+    }
 }
 
 // MARK:- Fuzzy Query
 
 public class FuzzyQuery: Query {
-    
-    private static let BOOST = "boost"
-    private static let FUZZINESS = "fuzziness"
-    private static let PREFIX_LENGTH = "prefix_length"
-    private static let MAX_EXPANSIONS = "max_expansions"
-    private static let TRANSPOSITIONS = "transpositions"
-    private static let VALUE = "value"
     
     public let name: String = "fuzzy"
     
@@ -400,33 +477,51 @@ public class FuzzyQuery: Query {
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [:]
         if let boost = self.boost {
-            dic[FuzzyQuery.BOOST] = boost
+            dic[CodingKeys.boost.rawValue] = boost
         }
         if let fuzziness = self.fuzziness {
-            dic[FuzzyQuery.FUZZINESS] = fuzziness
+            dic[CodingKeys.fuzziness.rawValue] = fuzziness
         }
         if let prefixLenght = self.prefixLenght {
-            dic[FuzzyQuery.PREFIX_LENGTH] = prefixLenght
+            dic[CodingKeys.prefixLength.rawValue] = prefixLenght
         }
         if let maxExpansions = self.maxExpansions {
-            dic[FuzzyQuery.MAX_EXPANSIONS] = maxExpansions
+            dic[CodingKeys.maxExpansions.rawValue] = maxExpansions
         }
         if let transpositions = self.transpositions {
-            dic[FuzzyQuery.TRANSPOSITIONS] = transpositions
+            dic[CodingKeys.tranpositions.rawValue] = transpositions
         }
         
-        dic[FuzzyQuery.VALUE] = self.value
+        dic[CodingKeys.value.rawValue] = self.value
         return [self.name: [self.field: dic]]
     }
     
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: DynamicCodingKeys.self)
+        var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: self.name))
+        var fieldContainer = nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.field))
+        
+        try fieldContainer.encode(self.value, forKey: .value)
+        try fieldContainer.encodeIfPresent(self.boost, forKey: .boost)
+        try fieldContainer.encodeIfPresent(self.fuzziness, forKey: .fuzziness)
+        try fieldContainer.encodeIfPresent(self.maxExpansions, forKey: .maxExpansions)
+        try fieldContainer.encodeIfPresent(self.prefixLenght, forKey: .prefixLength)
+        try fieldContainer.encodeIfPresent(self.transpositions, forKey: .tranpositions)
+    }
     
+    enum CodingKeys: String, CodingKey {
+        case boost
+        case value
+        case fuzziness
+        case prefixLength = "prefix_length"
+        case maxExpansions = "max_expansions"
+        case tranpositions
+    }
 }
 
 // MARK:- Type Query
 
 public class TypeQuery: Query {
-    
-    private static let VALUE = "value"
     
     public let name: String = "type"
     
@@ -446,18 +541,23 @@ public class TypeQuery: Query {
     }
     
     public func toDic() -> [String : Any] {
-        return [self.name: [TypeQuery.VALUE: self.type]]
+        return [self.name: [CodingKeys.value.rawValue: self.type]]
     }
     
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: DynamicCodingKeys.self)
+        var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.name))
+        try nested.encode(self.type, forKey: .value)
+    }
     
+    enum CodingKeys: String, CodingKey {
+        case value
+    }
 }
 
 // MARK:- Ids Query
 
 public class IdsQuery: Query {
-    
-    private static let VALUES = "values"
-    private static let TYPE = "type"
     
     public let name: String = "ids"
     
@@ -480,13 +580,24 @@ public class IdsQuery: Query {
     }
     
     public func toDic() -> [String : Any] {
-        var dic: [String: Any] = [IdsQuery.VALUES: self.ids]
+        var dic: [String: Any] = [CodingKeys.values.rawValue: self.ids]
         if let type = self.type {
-            dic[IdsQuery.TYPE] = type
+            dic[CodingKeys.type.rawValue] = type
         }
         return [self.name: dic]
     }
     
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: DynamicCodingKeys.self)
+        var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.name))
+        try nested.encode(self.ids, forKey: .values)
+        try nested.encodeIfPresent(self.type, forKey: .type)
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case values
+        case type
+    }
     
 }
 

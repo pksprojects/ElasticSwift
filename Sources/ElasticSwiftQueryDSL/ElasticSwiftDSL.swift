@@ -107,22 +107,22 @@ public enum BoostMode: String, Codable {
 
 extension KeyedEncodingContainer {
     
-//    public mutating func encode(_ value: Query, forKey key: KeyedEncodingContainer<K>.Key) throws {
-//        try value.encode(to: self.superEncoder(forKey: key))
-//    }
+    public mutating func encode(_ value: Query, forKey key: KeyedEncodingContainer<K>.Key) throws {
+        try value.encode(to: self.superEncoder(forKey: key))
+    }
     
     public mutating func encode(_ value: ScoreFunction, forKey key: KeyedEncodingContainer<K>.Key) throws {
         try value.encode(to: self.superEncoder(forKey: key))
     }
     
-//    public mutating func encode(_ value: [Query], forKey key: KeyedEncodingContainer<K>.Key) throws {
-//        let queriesEncoder = self.superEncoder(forKey: key)
-//        var queriesContainer = queriesEncoder.unkeyedContainer()
-//        for query in value {
-//            let queryEncoder =  queriesContainer.superEncoder()
-//            try query.encode(to: queryEncoder)
-//        }
-//    }
+    public mutating func encode(_ value: [Query], forKey key: KeyedEncodingContainer<K>.Key) throws {
+        let queriesEncoder = self.superEncoder(forKey: key)
+        var queriesContainer = queriesEncoder.unkeyedContainer()
+        for query in value {
+            let queryEncoder =  queriesContainer.superEncoder()
+            try query.encode(to: queryEncoder)
+        }
+    }
     
     public mutating func encode(_ value: [ScoreFunction], forKey key: KeyedEncodingContainer<K>.Key) throws {
         let scoreFunctionEncoder = self.superEncoder(forKey: key)
@@ -133,21 +133,21 @@ extension KeyedEncodingContainer {
         }
     }
     
-//    public mutating func encodeIfPresent(_ value: Query?, forKey key: Self.Key) throws {
-//        if let value = value {
-//            try value.encode(to: self.superEncoder(forKey: key))
-//        }
-//    }
-//
-//    public mutating func encode(_ value: [Query]?, forKey key: Self.Key) throws {
-//        if let value = value {
-//            let queriesEncoder = self.superEncoder(forKey: key)
-//            var queriesContainer = queriesEncoder.unkeyedContainer()
-//            for query in value {
-//                let queryEncoder =  queriesContainer.superEncoder()
-//                try query.encode(to: queryEncoder)
-//            }
-//        }
-//    }
+    public mutating func encodeIfPresent(_ value: Query?, forKey key: Self.Key) throws {
+        if let value = value {
+            try value.encode(to: self.superEncoder(forKey: key))
+        }
+    }
+
+    public mutating func encode(_ value: [Query]?, forKey key: Self.Key) throws {
+        if let value = value {
+            let queriesEncoder = self.superEncoder(forKey: key)
+            var queriesContainer = queriesEncoder.unkeyedContainer()
+            for query in value {
+                let queryEncoder =  queriesContainer.superEncoder()
+                try query.encode(to: queryEncoder)
+            }
+        }
+    }
     
 }

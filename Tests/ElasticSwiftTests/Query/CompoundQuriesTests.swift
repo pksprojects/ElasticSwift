@@ -1,0 +1,59 @@
+//
+//  CompoundQuriesTests.swift
+//  ElasticSwiftTests
+//
+//  Created by Prafull Kumar Soni on 9/2/19.
+//
+
+import XCTest
+
+@testable import ElasticSwift
+@testable import ElasticSwiftQueryDSL
+
+
+class CompoundQuriesTest: XCTestCase {
+    
+    
+    func testConstantScoreQuery_encode() throws {
+        
+        let query = ConstantScoreQuery(MatchAllQuery(), boost: 1.1)
+        
+        let data = try! JSONEncoder().encode(query)
+        
+        XCTAssertEqual("{\"constant_score\":{\"filter\":{\"match_all\":{}},\"boost\":1.1}}", String(data: data, encoding: .utf8)!)
+        
+    }
+    
+    func testBoolQuery_encode() throws {
+        let query = try BoolQueryBuilder()
+            .filter(query: MatchAllQuery())
+            .filter(query: MatchNoneQuery())
+            .must(query: MatchAllQuery())
+            .mustNot(query: MatchNoneQuery())
+            .build()
+        
+        let data = try! JSONEncoder().encode(query)
+        
+    XCTAssertEqual("{\"bool\":{\"filter\":[{\"match_all\":{}},{\"match_none\":{}}],\"must\":[{\"match_all\":{}}],\"must_not\":[{\"match_none\":{}}]}}", String(data: data, encoding: .utf8)!)
+    }
+    
+    func testFunctionScoreQuery_encode() throws {
+        
+        let scoreFunction =  try LinearDecayFunctionBuilder()
+            .set(field: "date")
+            .set(origin: "2013-09-17")
+            .set(scale: "10d")
+            .set(offset: "5d")
+            .set(decay: 0.5)
+            .build()
+        
+        let query = try FunctionScoreQueryBuilder()
+            .set(query: MatchAllQuery())
+            .add(function: scoreFunction)
+            .build()
+    
+        let data = try! JSONEncoder().encode(query)
+        XCTAssertEqual("{\"function_score\":{\"query\":{\"match_all\":{}},\"functions\":[{\"linear\":{\"date\":{\"decay\":0.5,\"offset\":\"5d\",\"origin\":\"2013-09-17\",\"scale\":\"10d\"}}}]}}", String(data: data, encoding: .utf8)!)
+        
+    }
+}
