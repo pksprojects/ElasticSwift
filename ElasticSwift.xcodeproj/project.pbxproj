@@ -24,6 +24,7 @@
 		060558CB2310DA5E00F18D3B /* MultiGetRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 060558CA2310DA5E00F18D3B /* MultiGetRequest.swift */; };
 		06D56A6322F0E5EB0085E831 /* DeleteByQueryRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06D56A6222F0E5EB0085E831 /* DeleteByQueryRequest.swift */; };
         06F5E02B231DF30C009568DB /* ScriptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06F5E02A231DF30C009568DB /* ScriptTests.swift */; };
+        06F5E029231DCF5A009568DB /* ScoreFunctionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06F5E028231DCF5A009568DB /* ScoreFunctionTests.swift */; };
 		06DF073122F12E9900B8A799 /* UpdateByQueryRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06DF073022F12E9900B8A799 /* UpdateByQueryRequest.swift */; };
 		OBJ_1000 /* add.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_266 /* add.c */; };
 		OBJ_1001 /* x86_64-gcc.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_268 /* x86_64-gcc.c */; };
