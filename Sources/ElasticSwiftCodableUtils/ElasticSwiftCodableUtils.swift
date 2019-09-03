@@ -767,7 +767,7 @@ extension SingleValueDecodingContainer {
     /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
     ///   is null.
     public func decodeBool() throws -> Bool {
-        try decode(Bool.self)
+        return try decode(Bool.self)
     }
 
     /// Decodes a single value of the given type.
@@ -779,7 +779,7 @@ extension SingleValueDecodingContainer {
     /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
     ///   is null.
     public func decodeString() throws -> String {
-        try decode(String.self)
+        return try decode(String.self)
     }
 
     /// Decodes a single value of the given type.
@@ -791,7 +791,7 @@ extension SingleValueDecodingContainer {
     /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
     ///   is null.
     public func decodeDouble() throws -> Double {
-        try decode(Double.self)
+        return try decode(Double.self)
     }
 
     /// Decodes a single value of the given type.
@@ -803,7 +803,7 @@ extension SingleValueDecodingContainer {
     /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
     ///   is null.
     public func decodeFloat() throws -> Float {
-        try decode(Float.self)
+        return try decode(Float.self)
     }
 
     /// Decodes a single value of the given type.
@@ -815,7 +815,7 @@ extension SingleValueDecodingContainer {
     /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
     ///   is null.
     public func decodeInt() throws -> Int {
-        try decode(Int.self)
+        return try decode(Int.self)
     }
 
     /// Decodes a single value of the given type.
@@ -827,7 +827,7 @@ extension SingleValueDecodingContainer {
     /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
     ///   is null.
     public func decodeInt8() throws -> Int8 {
-        try decode(Int8.self)
+        return try decode(Int8.self)
     }
 
     /// Decodes a single value of the given type.
@@ -839,7 +839,7 @@ extension SingleValueDecodingContainer {
     /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
     ///   is null.
     public func decodeInt16() throws -> Int16 {
-        try decode(Int16.self)
+        return try decode(Int16.self)
     }
 
     /// Decodes a single value of the given type.
@@ -851,7 +851,7 @@ extension SingleValueDecodingContainer {
     /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
     ///   is null.
     public func decodeInt32() throws -> Int32 {
-        try decode(Int32.self)
+        return try decode(Int32.self)
     }
 
     /// Decodes a single value of the given type.
@@ -863,7 +863,7 @@ extension SingleValueDecodingContainer {
     /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
     ///   is null.
     public func decodeInt64() throws -> Int64 {
-        try decode(Int64.self)
+        return try decode(Int64.self)
     }
 
     /// Decodes a single value of the given type.
@@ -875,7 +875,7 @@ extension SingleValueDecodingContainer {
     /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
     ///   is null.
     public func decodeUInt() throws -> UInt {
-        try decode(UInt.self)
+        return try decode(UInt.self)
     }
 
     /// Decodes a single value of the given type.
@@ -887,7 +887,7 @@ extension SingleValueDecodingContainer {
     /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
     ///   is null.
     public func decodeUInt8() throws -> UInt8 {
-        try decode(UInt8.self)
+        return try decode(UInt8.self)
     }
 
     /// Decodes a single value of the given type.
@@ -899,7 +899,7 @@ extension SingleValueDecodingContainer {
     /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
     ///   is null.
     public func decodeUInt16() throws -> UInt16 {
-        try decode(UInt16.self)
+        return try decode(UInt16.self)
     }
 
     /// Decodes a single value of the given type.
@@ -911,7 +911,7 @@ extension SingleValueDecodingContainer {
     /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
     ///   is null.
     public func decodeUInt32() throws -> UInt32 {
-        try decode(UInt32.self)
+        return try decode(UInt32.self)
     }
 
     /// Decodes a single value of the given type.
@@ -923,7 +923,7 @@ extension SingleValueDecodingContainer {
     /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
     ///   is null.
     public func decodeUInt64() throws -> UInt64 {
-        try decode(UInt64.self)
+        return try decode(UInt64.self)
     }
     
 }
