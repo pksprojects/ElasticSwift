@@ -23,6 +23,7 @@
 /* Begin PBXBuildFile section */
 		060558CB2310DA5E00F18D3B /* MultiGetRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 060558CA2310DA5E00F18D3B /* MultiGetRequest.swift */; };
 		06D56A6322F0E5EB0085E831 /* DeleteByQueryRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06D56A6222F0E5EB0085E831 /* DeleteByQueryRequest.swift */; };
+        06F5E02B231DF30C009568DB /* ScriptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06F5E02A231DF30C009568DB /* ScriptTests.swift */; };
 		06DF073122F12E9900B8A799 /* UpdateByQueryRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06DF073022F12E9900B8A799 /* UpdateByQueryRequest.swift */; };
 		OBJ_1000 /* add.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_266 /* add.c */; };
 		OBJ_1001 /* x86_64-gcc.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_268 /* x86_64-gcc.c */; };
@@ -1587,8 +1588,12 @@
 
 /* Begin PBXFileReference section */
 		060558CA2310DA5E00F18D3B /* MultiGetRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiGetRequest.swift; sourceTree = "<group>"; };
+		060A7EBD23126B94007AEF1C /* ReIndexRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReIndexRequest.swift; sourceTree = "<group>"; };
 		06D56A6222F0E5EB0085E831 /* DeleteByQueryRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteByQueryRequest.swift; sourceTree = "<group>"; };
 		06DF073022F12E9900B8A799 /* UpdateByQueryRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateByQueryRequest.swift; sourceTree = "<group>"; };
+		06F5E026231D7C87009568DB /* CompoundQuriesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompoundQuriesTests.swift; sourceTree = "<group>"; };
+		06F5E028231DCF5A009568DB /* ScoreFunctionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreFunctionTests.swift; sourceTree = "<group>"; };
+		06F5E02A231DF30C009568DB /* ScriptTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptTests.swift; sourceTree = "<group>"; };
 		"ElasticSwift::ElasticSwift::Product" /* ElasticSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ElasticSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"ElasticSwift::ElasticSwiftCodableUtils::Product" /* ElasticSwiftCodableUtils.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ElasticSwiftCodableUtils.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"ElasticSwift::ElasticSwiftCore::Product" /* ElasticSwiftCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ElasticSwiftCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2787,6 +2792,7 @@
 				06D56A6222F0E5EB0085E831 /* DeleteByQueryRequest.swift */,
 				06DF073022F12E9900B8A799 /* UpdateByQueryRequest.swift */,
 				060558CA2310DA5E00F18D3B /* MultiGetRequest.swift */,
+				060A7EBD23126B94007AEF1C /* ReIndexRequest.swift */,
 			);
 			path = Requests;
 			sourceTree = "<group>";
@@ -4118,6 +4124,9 @@
 			isa = PBXGroup;
 			children = (
 				OBJ_78 /* MatchAllQueryTests.swift */,
+				06F5E026231D7C87009568DB /* CompoundQuriesTests.swift */,
+				06F5E028231DCF5A009568DB /* ScoreFunctionTests.swift */,
+				06F5E02A231DF30C009568DB /* ScriptTests.swift */,
 			);
 			path = Query;
 			sourceTree = "<group>";
@@ -5121,6 +5130,7 @@
 				OBJ_1362 /* UpdateRequest.swift in Sources */,
 				OBJ_1363 /* IndicesResponse.swift in Sources */,
 				OBJ_1364 /* Response.swift in Sources */,
+				060A7EBE23126B94007AEF1C /* ReIndexRequest.swift in Sources */,
 				06DF073122F12E9900B8A799 /* UpdateByQueryRequest.swift in Sources */,
 				OBJ_1365 /* ResponseConverters.swift in Sources */,
 				OBJ_1366 /* Serialization.swift in Sources */,
@@ -5200,7 +5210,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
+				06F5E029231DCF5A009568DB /* ScoreFunctionTests.swift in Sources */,
 				OBJ_1559 /* ElasticSwiftTests.swift in Sources */,
+				06F5E02B231DF30C009568DB /* ScriptTests.swift in Sources */,
+				06F5E027231D7C87009568DB /* CompoundQuriesTests.swift in Sources */,
 				OBJ_1560 /* MatchAllQueryTests.swift in Sources */,
 				OBJ_1561 /* SerializationTests.swift in Sources */,
 			);

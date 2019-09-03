@@ -5,7 +5,7 @@ import ElasticSwiftCodableUtils
 
 // MARK:- SCRIPT
 
-public struct Script: Codable {
+public struct Script: Codable, Equatable {
     
     public let source: String
     public let lang: String?
@@ -17,15 +17,54 @@ public struct Script: Codable {
         self.params = params
     }
     
-    public func encode(_ encoder: Encoder) throws {
+    public func toDic() -> [String : Any] {
+        var dic: [String: Any] = [:]
+        
+        dic[CodingKeys.source.stringValue] = self.source
+        
+        if let lang = self.lang, !lang.isEmpty {
+            dic[CodingKeys.lang.stringValue] = lang
+        }
+        
+        if let params = self.params, !params.isEmpty {
+            dic[CodingKeys.params.stringValue] = params
+        }
+        return dic
+    }
+    
+    public init(from decoder: Decoder) throws {
+        if let container = try? decoder.container(keyedBy: CodingKeys.self) {
+            self.source = try container.decodeString(forKey: .source)
+            self.lang = try container.decodeStringIfPresent(forKey: .lang)
+            self.params = try container.decodeIfPresent(Dictionary<String, CodableValue>.self, forKey: .params)
+            return
+        } else if let container = try? decoder.singleValueContainer() {
+            self.source = try container.decodeString()
+            self.params = nil
+            self.lang = nil
+            return
+        } else {
+            throw Swift.DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unable to decode Script as String/Dic"))
+        }
+        
+    }
+    
+    public func encode(to encoder: Encoder) throws {
         if self.lang == nil && self.params == nil {
             var container = encoder.singleValueContainer()
             try container.encode(self.source)
+            return
         }
-        var container = encoder.container(keyedBy: Script.CodingKeys.self)
+        var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(self.source, forKey: .source)
         try container.encodeIfPresent(self.lang, forKey: .lang)
         try container.encodeIfPresent(self.params, forKey: .params)
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case source
+        case lang
+        case params
     }
 }
 
