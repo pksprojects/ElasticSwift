@@ -61,15 +61,18 @@ public protocol ScoreFunction: Codable {
     
     var name: String { get }
     
-    func isEquals(_ other: ScoreFunction) -> Bool
+    func isEqualTo(_ other: ScoreFunction) -> Bool
     
     func toDic() -> [String: Any]
 }
 
 extension ScoreFunction where Self: Equatable {
     
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs == rhs && lhs.isEquals(rhs)
+    public func isEqualTo(_ other: ScoreFunction) -> Bool {
+        if let o = other as? Self {
+            return self == o
+        }
+        return false
     }
     
 }
@@ -412,7 +415,7 @@ public class FieldValueFactorFunctionBuilder: ScoreFunctionBuilder {
 
 // MARK:- Weight Score Function
 
-public class WeightScoreFunction: ScoreFunction, Equatable {
+public class WeightScoreFunction: ScoreFunction {
     public let name: String = "weight"
     
     public let weight: Decimal
@@ -430,14 +433,6 @@ public class WeightScoreFunction: ScoreFunction, Equatable {
         self.weight = builder.weight!
     }
     
-    public func isEquals(_ other: ScoreFunction) -> Bool {
-        if let other = other as? WeightScoreFunction {
-            return self.weight == other.weight
-        } else {
-            return false
-        }
-    }
-    
     public func toDic() -> [String : Any] {
         return [self.name: self.weight]
     }
@@ -453,9 +448,17 @@ public class WeightScoreFunction: ScoreFunction, Equatable {
     }
 }
 
+extension WeightScoreFunction: Equatable {
+    
+    public static func == (lhs: WeightScoreFunction, rhs: WeightScoreFunction) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.weight == rhs.weight
+    }
+}
+
 // MARK:- Randon Score Function
 
-public class RandomScoreFunction: ScoreFunction, Equatable {
+public class RandomScoreFunction: ScoreFunction {
     
     public let name: String = "random_score"
     
@@ -479,15 +482,6 @@ public class RandomScoreFunction: ScoreFunction, Equatable {
         
         self.seed = builder.seed!
         self.field = builder.field!
-    }
-    
-    public func isEquals(_ other: ScoreFunction) -> Bool {
-        if let other = other as? RandomScoreFunction {
-            return self.seed == other.seed
-                && self.field == other.field
-        } else {
-            return false
-        }
     }
     
     public func toDic() -> [String : Any] {
@@ -515,9 +509,17 @@ public class RandomScoreFunction: ScoreFunction, Equatable {
     }
 }
 
+extension RandomScoreFunction: Equatable {
+    public static func == (lhs: RandomScoreFunction, rhs: RandomScoreFunction) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.seed == rhs.seed
+            && lhs.field == rhs.field
+    }
+}
+
 // MARK: Script Score Function
 
-public class ScriptScoreFunction: ScoreFunction, Equatable {
+public class ScriptScoreFunction: ScoreFunction {
     
     public let name: String = "script_score"
     
@@ -534,14 +536,6 @@ public class ScriptScoreFunction: ScoreFunction, Equatable {
         }
         
         self.script = builder.script!
-    }
-    
-    public func isEquals(_ other: ScoreFunction) -> Bool {
-        if let other = other as? ScriptScoreFunction {
-            return self.script == other.script
-        } else {
-            return false
-        }
     }
     
     public func toDic() -> [String : Any] {
@@ -562,6 +556,13 @@ public class ScriptScoreFunction: ScoreFunction, Equatable {
     
     enum CodingKeys: String, CodingKey {
         case script
+    }
+}
+
+extension ScriptScoreFunction: Equatable {
+    public static func == (lhs: ScriptScoreFunction, rhs: ScriptScoreFunction) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.script == rhs.script
     }
 }
 
@@ -645,7 +646,7 @@ public class ExponentialDecayScoreFunction: DecayScoreFunction {
 
 // MARK:- Decay Score Function
 
-public class DecayScoreFunction: ScoreFunction, Equatable {
+public class DecayScoreFunction: ScoreFunction {
     
     public let name: String
     public let field: String
@@ -665,20 +666,6 @@ public class DecayScoreFunction: ScoreFunction, Equatable {
         self.offset = offset
         self.decay = decay
         self.multiValueMode = multiValueMode
-    }
-    
-    public func isEquals(_ other: ScoreFunction) -> Bool {
-        if let other = other as? DecayScoreFunction {
-            return self.name == other.name
-                && self.field == other.field
-                && self.origin == other.origin
-                && self.scale == other.origin
-                && self.offset == other.offset
-                && self.decay == other.decay
-                && self.multiValueMode == other.multiValueMode
-        } else {
-            return false
-        }
     }
     
     public func toDic() -> [String : Any] {
@@ -764,6 +751,18 @@ public class DecayScoreFunction: ScoreFunction, Equatable {
     
 }
 
+extension DecayScoreFunction: Equatable {
+    public static func == (lhs: DecayScoreFunction, rhs: DecayScoreFunction) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.field == rhs.field
+            && lhs.origin == rhs.origin
+            && lhs.scale == rhs.origin
+            && lhs.offset == rhs.offset
+            && lhs.decay == rhs.decay
+            && lhs.multiValueMode == rhs.multiValueMode
+    }
+}
+
 public enum DecayScoreFunctionType: String, Codable, CaseIterable {
     case linear
     case gauss
@@ -779,7 +778,7 @@ public enum MultiValueMode: String, Codable {
 
 // MARK:- Field Value Score Function
 
-public class FieldValueFactorScoreFunction: ScoreFunction, Equatable {
+public class FieldValueFactorScoreFunction: ScoreFunction {
     
     public let name: String = "field_value_factor"
     
@@ -806,17 +805,6 @@ public class FieldValueFactorScoreFunction: ScoreFunction, Equatable {
         }
         
         self.init(field: builder.field!, factor: builder.factor!, modifier: builder.modifier, missing: builder.missing)
-    }
-    
-    public func isEquals(_ other: ScoreFunction) -> Bool {
-        if let other = other as? FieldValueFactorScoreFunction {
-            return self.field == other.field
-                && self.factor == other.factor
-                && self.modifier == other.modifier
-                && self.missing == other.missing
-        } else {
-            return false
-        }
     }
     
     public func toDic() -> [String : Any] {
@@ -872,25 +860,18 @@ public class FieldValueFactorScoreFunction: ScoreFunction, Equatable {
     }
 }
 
+extension FieldValueFactorScoreFunction: Equatable {
+    public static func == (lhs: FieldValueFactorScoreFunction, rhs: FieldValueFactorScoreFunction) -> Bool {
+        return lhs.field == rhs.field
+            && lhs.factor == rhs.factor
+            && lhs.modifier == rhs.modifier
+            && lhs.missing == rhs.missing
+    }
+}
+
 // MARK:- ScoreFunctionBuilder Error
 
 /// Error(s) thrown by ScoreFunctionBuilder
 public enum ScoreFunctionBuilderError: Error {
     case missingRequiredField(String)
 }
-
-//public class Script {
-//    
-//    public let source: String
-//    public let params: [String: Any]
-//
-//    convenience public init(source: String) {
-//        self.init(source: source, params: [String: Any]())
-//    }
-//
-//    public init(source: String, params: [String: Any]) {
-//        self.source = source
-//        self.params = params
-//    }
-//
-//}
