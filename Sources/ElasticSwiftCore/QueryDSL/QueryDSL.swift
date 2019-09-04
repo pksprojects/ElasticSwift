@@ -15,7 +15,20 @@ public protocol Query: Encodable {
     
     var name: String { get }
     
+    func isEqualTo(_ other: Query) -> Bool
+    
     func toDic() -> [String: Any]
+}
+
+extension Query where Self: Equatable {
+    
+    public func isEqualTo(_ other: Query) -> Bool {
+        if let o = other as? Self {
+            return self == o
+        }
+        return false
+    }
+    
 }
 
 /// Protocol that all Builder for `Query` conforms to

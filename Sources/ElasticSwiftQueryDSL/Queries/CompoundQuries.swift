@@ -13,9 +13,6 @@ import ElasticSwiftCodableUtils
 
 public class ConstantScoreQuery: Query {
     
-    private static let BOOST = "boost"
-    private static let FILTER = "filter"
-    
     public let name: String = "constant_score"
     
     public let query: Query
@@ -36,7 +33,7 @@ public class ConstantScoreQuery: Query {
     }
     
     public func toDic() -> [String : Any] {
-        return [self.name: [ConstantScoreQuery.FILTER: self.query.toDic(), ConstantScoreQuery.BOOST: self.boost]]
+        return [self.name: [CodingKeys.filter.rawValue: self.query.toDic(), CodingKeys.boost.rawValue: self.boost]]
     }
     
 //    public required init(from decoder: Decoder) throws {
@@ -60,16 +57,17 @@ public class ConstantScoreQuery: Query {
     
 }
 
+extension ConstantScoreQuery: Equatable {
+    public static func == (lhs: ConstantScoreQuery, rhs: ConstantScoreQuery) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.query.isEqualTo(rhs.query)
+            && lhs.boost == rhs.boost
+    }
+}
+
 // MARK:- Bool Query
 
 public class BoolQuery: Query {
-    
-    private static let BOOST = "boost"
-    private static let MUST: String = "must"
-    private static let MUST_NOT: String = "must_not"
-    private static let SHOULD: String = "should"
-    private static let FILTER: String = "filter"
-    private static let MIN_SHOULD_MATCH = "minimum_should_match"
     
     public let name: String = "bool"
     
@@ -106,22 +104,22 @@ public class BoolQuery: Query {
     public func toDic() -> [String : Any] {
         var dic: [String : Any] = [:]
         if !self.mustClauses.isEmpty {
-            dic[BoolQuery.MUST] = self.mustClauses.map { $0.toDic() }
+            dic[CodingKeys.must.rawValue] = self.mustClauses.map { $0.toDic() }
         }
         if !self.mustNotClauses.isEmpty {
-            dic[BoolQuery.MUST_NOT] = self.mustNotClauses.map { $0.toDic() }
+            dic[CodingKeys.mustNot.rawValue] = self.mustNotClauses.map { $0.toDic() }
         }
         if !self.shouldClauses.isEmpty {
-            dic[BoolQuery.SHOULD] = self.shouldClauses.map { $0.toDic() }
+            dic[CodingKeys.should.rawValue] = self.shouldClauses.map { $0.toDic() }
         }
         if !self.filterClauses.isEmpty {
-            dic[BoolQuery.FILTER] = self.filterClauses.map { $0.toDic() }
+            dic[CodingKeys.filter.rawValue] = self.filterClauses.map { $0.toDic() }
         }
         if let boost = self.boost {
-            dic[BoolQuery.BOOST] = boost
+            dic[CodingKeys.boost.rawValue] = boost
         }
         if let minimumShouldMatch = self.minimumShouldMatch {
-            dic[BoolQuery.MIN_SHOULD_MATCH] = minimumShouldMatch
+            dic[CodingKeys.minShouldMatch.rawValue] = minimumShouldMatch
         }
         return [self.name: dic]
     }
@@ -159,6 +157,22 @@ public class BoolQuery: Query {
         case filter
         case minShouldMatch = "minimum_should_match"
         case boost
+    }
+}
+
+extension BoolQuery: Equatable {
+    public static func == (lhs: BoolQuery, rhs: BoolQuery) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.minimumShouldMatch == rhs.minimumShouldMatch
+            && lhs.boost == rhs.boost
+            && lhs.filterClauses.count == rhs.filterClauses.count
+            && !zip(lhs.filterClauses, rhs.filterClauses).contains { !$0.isEqualTo($1) }
+            && lhs.mustClauses.count == rhs.mustClauses.count
+            && !zip(lhs.mustClauses, rhs.mustClauses).contains { !$0.isEqualTo($1) }
+            && lhs.mustNotClauses.count == rhs.mustNotClauses.count
+            && !zip(lhs.mustNotClauses, rhs.mustNotClauses).contains { !$0.isEqualTo($1) }
+            && lhs.shouldClauses.count == rhs.shouldClauses.count
+            && !zip(lhs.shouldClauses, rhs.shouldClauses).contains { !$0.isEqualTo($1) }
     }
 }
 
@@ -214,6 +228,16 @@ public class DisMaxQuery: Query {
         case queries
         case boost
         case tieBreaker = "tie_breaker"
+    }
+}
+
+extension DisMaxQuery: Equatable {
+    public static func == (lhs: DisMaxQuery, rhs: DisMaxQuery) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.tieBreaker == rhs.tieBreaker
+            && lhs.boost == rhs.boost
+            && lhs.queries.count == rhs.queries.count
+            && !zip(lhs.queries, rhs.queries).contains { !$0.isEqualTo($1) }
     }
 }
 
@@ -315,6 +339,21 @@ public class FunctionScoreQuery: Query {
     }
 }
 
+extension FunctionScoreQuery: Equatable {
+    
+    public static func == (lhs: FunctionScoreQuery, rhs: FunctionScoreQuery) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.boost == rhs.boost
+            && lhs.boostMode == rhs.boostMode
+            && lhs.maxBoost == rhs.maxBoost
+            && lhs.minScore == rhs.minScore
+            && lhs.query.isEqualTo(rhs.query)
+            && lhs.scoreMode == rhs.scoreMode
+            && lhs.functions.count == rhs.functions.count
+            && !zip(lhs.functions, rhs.functions).contains { !$0.isEqualTo($1) }
+    }
+}
+
 // MARK:- Boosting Query
 
 public class BoostingQuery: Query {
@@ -373,4 +412,13 @@ public class BoostingQuery: Query {
     
 }
 
+extension BoostingQuery: Equatable {
+    
+    public static func == (lhs: BoostingQuery, rhs: BoostingQuery) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.negative.isEqualTo(rhs.negative)
+            && lhs.positive.isEqualTo(rhs.positive)
+            && lhs.negativeBoost == rhs.negativeBoost
+    }
+}
 

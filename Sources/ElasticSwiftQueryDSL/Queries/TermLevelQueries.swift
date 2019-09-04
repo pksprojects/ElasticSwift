@@ -71,6 +71,15 @@ public class TermQuery: Query {
     
 }
 
+extension TermQuery: Equatable {
+    public static func == (lhs: TermQuery, rhs: TermQuery) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.field == rhs.field
+            && lhs.value == rhs.value
+            && lhs.boost == rhs.boost
+    }
+}
+
 // MARK:- Terms Query
 
 public class TermsQuery: Query {
@@ -107,6 +116,14 @@ public class TermsQuery: Query {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: self.name))
         try nested.encode(self.values, forKey: .key(named: self.field))
+    }
+}
+
+extension TermsQuery: Equatable {
+    public static func == (lhs: TermsQuery, rhs: TermsQuery) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.field == rhs.field
+            && lhs.values == rhs.values
     }
 }
 
@@ -216,6 +233,21 @@ public class RangeQuery: Query {
     }
 }
 
+extension RangeQuery: Equatable {
+    public static func == (lhs: RangeQuery, rhs: RangeQuery) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.field == rhs.field
+            && lhs.gt == rhs.gt
+            && lhs.gte == rhs.gte
+            && lhs.lt == rhs.lt
+            && lhs.lte == rhs.lte
+            && lhs.boost == rhs.boost
+            && lhs.relation == rhs.relation
+            && lhs.format == rhs.format
+            && lhs.timeZone == rhs.timeZone
+    }
+}
+
 // MARK:- Exists Query
 
 public class ExistsQuery: Query {
@@ -250,6 +282,13 @@ public class ExistsQuery: Query {
     
     enum CodingKeys: String, CodingKey {
         case field
+    }
+}
+
+extension ExistsQuery: Equatable {
+    public static func == (lhs: ExistsQuery, rhs: ExistsQuery) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.field == rhs.field
     }
 }
 
@@ -311,6 +350,15 @@ public class PrefixQuery: Query {
     }
 }
 
+extension PrefixQuery: Equatable {
+    public static func == (lhs: PrefixQuery, rhs: PrefixQuery) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.field == rhs.field
+            && lhs.value == rhs.value
+            && lhs.boost == rhs.boost
+    }
+}
+
 // MARK:- WildCard Query
 
 public class WildCardQuery: Query {
@@ -367,6 +415,15 @@ public class WildCardQuery: Query {
     enum CodingKeys: String, CodingKey {
         case boost
         case value
+    }
+}
+
+extension WildCardQuery: Equatable {
+    public static func == (lhs: WildCardQuery, rhs: WildCardQuery) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.field == rhs.field
+            && lhs.value == rhs.value
+            && lhs.boost == rhs.boost
     }
 }
 
@@ -434,6 +491,17 @@ public class RegexpQuery: Query {
         case flags
         case value
         case maxDeterminizedStates = "max_determinized_states"
+    }
+}
+
+extension RegexpQuery: Equatable {
+    public static func == (lhs: RegexpQuery, rhs: RegexpQuery) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.field == rhs.field
+            && lhs.value == rhs.value
+            && lhs.regexFlags == rhs.regexFlags
+            && lhs.boost == rhs.boost
+            && lhs.maxDeterminizedStates == rhs.maxDeterminizedStates
     }
 }
 
@@ -519,6 +587,19 @@ public class FuzzyQuery: Query {
     }
 }
 
+extension FuzzyQuery: Equatable {
+    public static func == (lhs: FuzzyQuery, rhs: FuzzyQuery) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.field == rhs.field
+            && lhs.value == rhs.value
+            && lhs.boost == rhs.boost
+            && lhs.fuzziness == rhs.fuzziness
+            && lhs.maxExpansions == rhs.maxExpansions
+            && lhs.prefixLenght == rhs.prefixLenght
+            && lhs.transpositions == rhs.transpositions
+    }
+}
+
 // MARK:- Type Query
 
 public class TypeQuery: Query {
@@ -552,6 +633,13 @@ public class TypeQuery: Query {
     
     enum CodingKeys: String, CodingKey {
         case value
+    }
+}
+
+extension TypeQuery: Equatable {
+    public static func == (lhs: TypeQuery, rhs: TypeQuery) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.type == rhs.type
     }
 }
 
@@ -599,6 +687,14 @@ public class IdsQuery: Query {
         case type
     }
     
+}
+
+extension IdsQuery: Equatable {
+    public static func == (lhs: IdsQuery, rhs: IdsQuery) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.ids == rhs.ids
+            && lhs.type == rhs.type
+    }
 }
 
 

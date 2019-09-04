@@ -90,6 +90,19 @@ public class MatchQuery: Query {
     
 }
 
+extension MatchQuery: Equatable {
+    public static func == (lhs: MatchQuery, rhs: MatchQuery) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.field == rhs.field
+            && lhs.value == rhs.value
+            && lhs.cutoffFrequency == rhs.cutoffFrequency
+            && lhs.autoGenSynonymnsPhraseQuery == rhs.autoGenSynonymnsPhraseQuery
+            && lhs.fuzziness == rhs.fuzziness
+            && lhs.operator == rhs.operator
+            && lhs.zeroTermQuery == rhs.zeroTermQuery
+    }
+}
+
 // MARK:- MatchPhraseQuery
 
 public class MatchPhraseQuery: Query {
@@ -151,6 +164,15 @@ public class MatchPhraseQuery: Query {
     }
 }
 
+extension MatchPhraseQuery: Equatable {
+    public static func == (lhs: MatchPhraseQuery, rhs: MatchPhraseQuery) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.field == rhs.field
+            && lhs.value == rhs.value
+            && lhs.analyzer == rhs.analyzer
+    }
+}
+
 // MARK:- MatchPhrasePrefixQuery
 
 public class MatchPhrasePrefixQuery: Query {
@@ -207,6 +229,15 @@ public class MatchPhrasePrefixQuery: Query {
     enum CodingKeys: String, CodingKey {
         case query
         case maxExpansions = "max_expansions"
+    }
+}
+
+extension MatchPhrasePrefixQuery: Equatable {
+    public static func == (lhs: MatchPhrasePrefixQuery, rhs: MatchPhrasePrefixQuery) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.field == rhs.field
+            && lhs.value == rhs.value
+            && lhs.maxExpansions == rhs.maxExpansions
     }
 }
 
@@ -272,6 +303,16 @@ public class MultiMatchQuery: Query {
         case fields
         case tieBreaker = "tie_breaker"
         case type
+    }
+}
+
+extension MultiMatchQuery: Equatable {
+    public static func == (lhs: MultiMatchQuery, rhs: MultiMatchQuery) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.query == rhs.query
+            && lhs.fields == rhs.fields
+            && lhs.tieBreaker == rhs.tieBreaker
+            && lhs.type == rhs.type
     }
 }
 
@@ -363,6 +404,19 @@ public class CommonTermsQuery: Query {
         case highFreq = "high_freq"
     }
     
+}
+
+extension CommonTermsQuery: Equatable {
+    public static func == (lhs: CommonTermsQuery, rhs: CommonTermsQuery) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.query == rhs.query
+            && lhs.cutoffFrequency == rhs.cutoffFrequency
+            && lhs.highFrequencyOperator == rhs.highFrequencyOperator
+            && lhs.lowFrequencyOperator == rhs.lowFrequencyOperator
+            && lhs.minimumShouldMatch == rhs.minimumShouldMatch
+            && lhs.minimumShouldMatchLowFreq == rhs.minimumShouldMatchLowFreq
+            && lhs.minimumShouldMatchHighFreq == rhs.minimumShouldMatchHighFreq
+    }
 }
 
 // MARK:- QueryStringQuery
@@ -559,6 +613,32 @@ public class QueryStringQuery: Query {
     
 }
 
+extension QueryStringQuery: Equatable {
+    public static func == (lhs: QueryStringQuery, rhs: QueryStringQuery) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.value == rhs.value
+            && lhs.analyzer == rhs.analyzer
+            && lhs.allowLeadingWildcard == rhs.allowLeadingWildcard
+            && lhs.analyzeWildcard == rhs.analyzeWildcard
+            && lhs.autoGeneratePhraseQueries == rhs.autoGeneratePhraseQueries
+            && lhs.autoGenerateSynonymsPhraseQuery == rhs.autoGenerateSynonymsPhraseQuery
+            && lhs.boost == rhs.boost
+            && lhs.defaultField == rhs.defaultField
+            && lhs.defaultOperator == rhs.defaultOperator
+            && lhs.enablePositionIncrements == rhs.enablePositionIncrements
+            && lhs.fuzziness == rhs.fuzziness
+            && lhs.fuzzyMaxExpansions == rhs.fuzzyMaxExpansions
+            && lhs.fuzzyPrefixLength == rhs.fuzzyPrefixLength
+            && lhs.fuzzyTranspositions == rhs.fuzzyTranspositions
+            && lhs.lenient == rhs.lenient
+            && lhs.maxDeterminizedStates == rhs.maxDeterminizedStates
+            && lhs.minimumShouldMatch == rhs.minimumShouldMatch
+            && lhs.phraseSlop == rhs.phraseSlop
+            && lhs.quoteAnalyzer == rhs.quoteAnalyzer
+            && lhs.timeZone == rhs.timeZone
+    }
+}
+
 // MARK:- SimpleQueryStringQuery
 
 public class SimpleQueryStringQuery: Query {
@@ -675,6 +755,23 @@ public class SimpleQueryStringQuery: Query {
     }
 }
 
+extension SimpleQueryStringQuery: Equatable {
+    public static func == (lhs: SimpleQueryStringQuery, rhs: SimpleQueryStringQuery) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.query == rhs.query
+            && lhs.analyzer == rhs.analyzer
+            && lhs.autoGenerateSynonymsPhraseQuery == rhs.autoGenerateSynonymsPhraseQuery
+            && lhs.defaultOperator == rhs.defaultOperator
+            && lhs.fields == rhs.fields
+            && lhs.flags == rhs.flags
+            && lhs.fuzzyMaxExpansions == rhs.fuzzyMaxExpansions
+            && lhs.fuzzyPrefixLength == rhs.fuzzyPrefixLength
+            && lhs.fuzzyTranspositions == rhs.fuzzyTranspositions
+            && lhs.lenient == rhs.lenient
+            && lhs.minimumShouldMatch == rhs.minimumShouldMatch
+            && lhs.quoteFieldSuffix == rhs.quoteFieldSuffix
+    }
+}
 
 public enum MultiMatchQueryType: String, Codable {
     case bestFields = "best_fields"

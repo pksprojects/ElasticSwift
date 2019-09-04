@@ -11,6 +11,10 @@ import ElasticSwiftCore
 // MARK:- Span Term Query
 
 internal class SpanTermQuery: Query {
+    //TODO remove at time of implementation and conform to Equatable
+    func isEqualTo(_ other: Query) -> Bool {
+        return self.name == other.name
+    }
     public let name: String = ""
     
     public init(withBuilder builder: SpanTermQueryBuilder) {
@@ -28,6 +32,10 @@ internal class SpanTermQuery: Query {
 // MARK:- Span Multi Term Query
 
 internal class SpanMultiTermQuery: Query {
+    //TODO remove at time of implementation and conform to Equatable
+    func isEqualTo(_ other: Query) -> Bool {
+        return self.name == other.name
+    }
     public let name: String = ""
     
     public init(withBuilder builder: SpanMultiTermQueryBuilder) {
@@ -45,6 +53,10 @@ internal class SpanMultiTermQuery: Query {
 // MARK:- Span First Query
 
 internal class SpanFirstQuery: Query {
+    //TODO remove at time of implementation and conform to Equatable
+    func isEqualTo(_ other: Query) -> Bool {
+        return self.name == other.name
+    }
     public let name: String = ""
     
     public init(withBuilder builder: SpanFirstQueryBuilder) {
@@ -62,6 +74,10 @@ internal class SpanFirstQuery: Query {
 // MARK:- Span Near Query
 
 internal class SpanNearQuery: Query {
+    //TODO remove at time of implementation and conform to Equatable
+    func isEqualTo(_ other: Query) -> Bool {
+        return self.name == other.name
+    }
     public let name: String = ""
     
     public init(withBuilder builder: SpanNearQueryBuilder) {
@@ -79,6 +95,10 @@ internal class SpanNearQuery: Query {
 // MARK:- Span Or Query
 
 internal class SpanOrQuery: Query {
+    //TODO remove at time of implementation and conform to Equatable
+    func isEqualTo(_ other: Query) -> Bool {
+        return self.name == other.name
+    }
     public let name: String = ""
     
     public init(withBuilder builder: SpanOrQueryBuilder) {
@@ -96,6 +116,10 @@ internal class SpanOrQuery: Query {
 // MARK:- Span Not Query
 
 internal class SpanNotQuery: Query {
+    //TODO remove at time of implementation and conform to Equatable
+    func isEqualTo(_ other: Query) -> Bool {
+        return self.name == other.name
+    }
     public let name: String = ""
     
     public init(withBuilder builder: SpanNotQueryBuilder) {
@@ -113,6 +137,10 @@ internal class SpanNotQuery: Query {
 // MARK:- Span Containing Query
 
 internal class SpanContainingQuery: Query {
+    //TODO remove at time of implementation and conform to Equatable
+    func isEqualTo(_ other: Query) -> Bool {
+        return self.name == other.name
+    }
     public let name: String = ""
     
     public init(withBuilder builder: SpanContainingQueryBuilder) {
@@ -130,6 +158,10 @@ internal class SpanContainingQuery: Query {
 // MARK:- Span Within Query
 
 internal class SpanWithinQuery: Query {
+    //TODO remove at time of implementation and conform to Equatable
+    func isEqualTo(_ other: Query) -> Bool {
+        return self.name == other.name
+    }
     public let name: String = ""
     
     public init(withBuilder builder: SpanWithinQueryBuilder) {
@@ -147,6 +179,10 @@ internal class SpanWithinQuery: Query {
 // MARK:- Span Field Masking Query
 
 internal class SpanFieldMaskingQuery: Query {
+    //TODO remove at time of implementation and conform to Equatable
+    func isEqualTo(_ other: Query) -> Bool {
+        return self.name == other.name
+    }
     public let name: String = ""
     
     public init(withBuilder builder: SpanFieldMaskingQueryBuilder) {
