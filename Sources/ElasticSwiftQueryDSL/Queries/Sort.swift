@@ -171,6 +171,15 @@ public class Sort: Codable {
     }
 }
 
+extension Sort: Equatable {
+    public static func == (lhs: Sort, rhs: Sort) -> Bool {
+        return lhs.field == rhs.field
+            && lhs.sortOrder == rhs.sortOrder
+            && lhs.mode == rhs.mode
+            && lhs.fieldTypeisArray == rhs.fieldTypeisArray
+    }
+}
+
 public enum SortOrder: String, Codable {
     case asc = "asc"
     case desc = "desc"
