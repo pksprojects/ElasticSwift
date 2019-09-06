@@ -72,7 +72,7 @@ protocol SortBuilder {
     func build() -> Sort
 }
 
-public class Sort: Codable {
+public struct Sort {
     
     private static let ORDER = "order"
     private static let MODE = "mode"
@@ -104,18 +104,11 @@ public class Sort: Codable {
                 ]]
     }
     
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if self.fieldTypeisArray {
-            var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.field))
-            try nested.encode(self.sortOrder, forKey: .key(named: Sort.ORDER))
-            try nested.encode(self.mode, forKey: .key(named: Sort.MODE))
-        } else {
-            try container.encode(self.sortOrder, forKey: .key(named: self.field))
-        }
-    }
     
-    required public init(from decoder: Decoder) throws {
+}
+
+extension Sort: Codable {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         let dic = try container.decode([String: CodableValue].self)
         let item = dic.first!
@@ -149,6 +142,16 @@ public class Sort: Codable {
         self.fieldTypeisArray = self.mode != nil
     }
     
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if self.fieldTypeisArray {
+            var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.field))
+            try nested.encode(self.sortOrder, forKey: .key(named: Sort.ORDER))
+            try nested.encode(self.mode, forKey: .key(named: Sort.MODE))
+        } else {
+            try container.encode(self.sortOrder, forKey: .key(named: self.field))
+        }
+    }
     
     private struct CodingKeys: CodingKey {
         var stringValue: String
