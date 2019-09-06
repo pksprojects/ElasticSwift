@@ -415,7 +415,7 @@ public class FieldValueFactorFunctionBuilder: ScoreFunctionBuilder {
 
 // MARK:- Weight Score Function
 
-public class WeightScoreFunction: ScoreFunction {
+public struct WeightScoreFunction: ScoreFunction {
     public let name: String = "weight"
     
     public let weight: Decimal
@@ -436,8 +436,10 @@ public class WeightScoreFunction: ScoreFunction {
     public func toDic() -> [String : Any] {
         return [self.name: self.weight]
     }
-    
-    public required init(from decoder: Decoder) throws {
+}
+
+extension WeightScoreFunction {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         self.weight = try container.decodeDecimal(forKey: .key(named: self.name))
     }
@@ -458,7 +460,7 @@ extension WeightScoreFunction: Equatable {
 
 // MARK:- Randon Score Function
 
-public class RandomScoreFunction: ScoreFunction {
+public struct RandomScoreFunction: ScoreFunction {
     
     public let name: String = "random_score"
     
@@ -488,8 +490,10 @@ public class RandomScoreFunction: ScoreFunction {
         return [self.name: [CodingKeys.seed.rawValue: self.seed,
                             CodingKeys.field.rawValue: self.field]]
     }
-    
-    public required init(from decoder: Decoder) throws {
+}
+
+extension RandomScoreFunction {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.name))
         self.seed = try nested.decodeInt(forKey: .seed)
@@ -519,7 +523,7 @@ extension RandomScoreFunction: Equatable {
 
 // MARK: Script Score Function
 
-public class ScriptScoreFunction: ScoreFunction {
+public struct ScriptScoreFunction: ScoreFunction {
     
     public let name: String = "script_score"
     
@@ -541,8 +545,10 @@ public class ScriptScoreFunction: ScoreFunction {
     public func toDic() -> [String : Any] {
         return [self.name: [CodingKeys.script.rawValue: self.script.toDic()]]
     }
-    
-    public required init(from decoder: Decoder) throws {
+}
+
+extension ScriptScoreFunction {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.name))
         self.script = try nested.decode(Script.self, forKey: .script)
@@ -748,7 +754,6 @@ public class DecayScoreFunction: ScoreFunction {
         case decay
         case multiValueMode = "multi_value_mode"
     }
-    
 }
 
 extension DecayScoreFunction: Equatable {
@@ -778,7 +783,7 @@ public enum MultiValueMode: String, Codable {
 
 // MARK:- Field Value Score Function
 
-public class FieldValueFactorScoreFunction: ScoreFunction {
+public struct FieldValueFactorScoreFunction: ScoreFunction {
     
     public let name: String = "field_value_factor"
     
@@ -794,7 +799,7 @@ public class FieldValueFactorScoreFunction: ScoreFunction {
         self.missing = missing
     }
     
-    internal convenience init(withBuilder builder: FieldValueFactorFunctionBuilder) throws {
+    internal init(withBuilder builder: FieldValueFactorFunctionBuilder) throws {
         
         guard builder.field != nil else {
             throw ScoreFunctionBuilderError.missingRequiredField("field")
@@ -833,8 +838,10 @@ public class FieldValueFactorScoreFunction: ScoreFunction {
         case sqrt
         case reciprocal
     }
-    
-    public required init(from decoder: Decoder) throws {
+}
+
+extension FieldValueFactorScoreFunction {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.name))
         self.field = try nested.decodeString(forKey: .field)
