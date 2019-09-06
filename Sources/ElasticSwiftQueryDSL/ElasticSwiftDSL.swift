@@ -4,6 +4,119 @@ import Foundation
 import ElasticSwiftCore
 import ElasticSwiftCodableUtils
 
+// MARK:- Query Types
+
+enum QueryType: String, Codable {
+    case matchAll = "match_all"
+    case matchNone = "match_none"
+    case constantScore = "constant_score"
+    case bool
+    case disMax = "dis_max"
+    case functionScore = "function_score"
+    case boosting
+    case match
+    case matchPhrase = "match_phrase"
+    case matchPhrasePrefix = "match_phrase_prefix"
+    case multiMatch = "multi_match"
+    case common
+    case queryString = "query_string"
+    case simpleQueryString = "simple_query_string"
+    case term
+    case terms
+    case range
+    case exists
+    case prefix
+    case wildcard
+    case regexp
+    case fuzzy
+    case type
+    case ids
+    
+    var metaType: Query.Type {
+        switch self {
+        case .matchAll:
+            return MatchAllQuery.self
+        case .matchNone:
+            return MatchNoneQuery.self
+        case .constantScore:
+            return ConstantScoreQuery.self
+        case .bool:
+            return BoolQuery.self
+        case .disMax:
+            return DisMaxQuery.self
+        case .functionScore:
+            return FunctionScoreQuery.self
+        case .boosting:
+            return BoostingQuery.self
+        case .match:
+            return MatchQuery.self
+        case .matchPhrase:
+            return MatchPhraseQuery.self
+        case .matchPhrasePrefix:
+            return MatchPhrasePrefixQuery.self
+        case .multiMatch:
+            return MultiMatchQuery.self
+        case .common:
+            return CommonTermsQuery.self
+        case .queryString:
+            return QueryStringQuery.self
+        case .simpleQueryString:
+            return SimpleQueryStringQuery.self
+        case .term:
+            return TermQuery.self
+        case .terms:
+            return TermsQuery.self
+        case .range:
+            return RangeQuery.self
+        case .exists:
+            return ExistsQuery.self
+        case .prefix:
+            return PrefixQuery.self
+        case .wildcard:
+            return WildCardQuery.self
+        case .regexp:
+            return RegexpQuery.self
+        case .fuzzy:
+            return FuzzyQuery.self
+        case .type:
+            return TypeQuery.self
+        case .ids:
+            return IdsQuery.self
+        }
+    }
+}
+
+// MARK:- Score Function Types
+
+enum ScoreFunctionType: String, Codable {
+    case weight
+    case randomScore = "random_score"
+    case scriptScore = "script_score"
+    case linear
+    case gauss
+    case exp
+    case fieldValueFactor = "field_value_factor"
+    
+    var metaType: ScoreFunction.Type {
+        switch self {
+        case .weight:
+            return WeightScoreFunction.self
+        case .randomScore:
+            return RandomScoreFunction.self
+        case .scriptScore:
+            return ScriptScoreFunction.self
+        case .linear:
+            return LinearDecayScoreFunction.self
+        case .gauss:
+            return GaussScoreFunction.self
+        case .exp:
+            return ExponentialDecayScoreFunction.self
+        case .fieldValueFactor:
+            return FieldValueFactorScoreFunction.self
+        }
+    }
+}
+
 // MARK:- SCRIPT
 
 public struct Script: Codable, Equatable {
@@ -105,6 +218,8 @@ public enum BoostMode: String, Codable {
 }
 
 
+// MARK:- Codable Extenstions
+
 extension KeyedEncodingContainer {
     
     public mutating func encode(_ value: Query, forKey key: KeyedEncodingContainer<K>.Key) throws {
@@ -148,6 +263,115 @@ extension KeyedEncodingContainer {
                 try query.encode(to: queryEncoder)
             }
         }
+    }
+    
+}
+
+extension KeyedDecodingContainer {
+    
+    public func decodeQuery(forKey key: KeyedDecodingContainer<K>.Key) throws -> Query {
+        let qContainer = try self.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: key)
+        for qKey in qContainer.allKeys {
+            if let qType = QueryType(rawValue: qKey.stringValue) {
+                return try qType.metaType.init(from: self.superDecoder(forKey: key))
+            }
+        }
+        throw Swift.DecodingError.typeMismatch(QueryType.self, .init(codingPath: self.codingPath, debugDescription: "Unable to identify query type from key(s) \(qContainer.allKeys)"))
+    }
+    
+    public func decodeQueryIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Query? {
+        guard self.contains(key) else {
+            return nil
+        }
+        return try self.decodeQuery(forKey: key)
+    }
+    
+    public func decodeQueries(forKey key: KeyedDecodingContainer<K>.Key) throws -> [Query] {
+        var arrayContainer = try self.nestedUnkeyedContainer(forKey: key)
+        var result = [Query]()
+        if let count = arrayContainer.count {
+            var iterations = 0
+            while !arrayContainer.isAtEnd {
+                var copy = arrayContainer
+                let elementContainer = try copy.nestedContainer(keyedBy: DynamicCodingKeys.self)
+                for qKey in elementContainer.allKeys {
+                    if let qType = QueryType(rawValue: qKey.stringValue) {
+                        let q = try qType.metaType.init(from: arrayContainer.superDecoder())
+                        result.append(q)
+                    }
+                }
+                iterations += 1
+                if iterations > count {
+                    break
+                }
+            }
+            if result.count != count {
+                throw Swift.DecodingError.dataCorrupted(.init(codingPath: arrayContainer.codingPath, debugDescription: "Unable to decode all Queries expected: \(count) actual: \(result.count). Probable cause: Unable to determine QueryType form key(s)"))
+            }
+        }
+        return result
+    }
+    
+    public func decodeQueriesIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> [Query]? {
+        
+        guard self.contains(key) else {
+            return nil
+        }
+        
+        return try self.decodeQueries(forKey: key)
+    }
+    
+    public func decodeScoreFunction(forKey key: KeyedDecodingContainer<K>.Key) throws -> ScoreFunction {
+        let fContainer = try self.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: key)
+        
+        for fKey in fContainer.allKeys {
+            if let fType = ScoreFunctionType(rawValue: fKey.stringValue) {
+                return try fType.metaType.init(from: self.superDecoder(forKey: key))
+            }
+        }
+        throw Swift.DecodingError.typeMismatch(QueryType.self, .init(codingPath: self.codingPath, debugDescription: "Unable to identify score function type from key(s) \(fContainer.allKeys)"))
+    }
+    
+    public func decodeScoreFunctionIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> ScoreFunction? {
+        guard self.contains(key) else {
+            return nil
+        }
+        return try self.decodeScoreFunction(forKey: key)
+    }
+    
+    public func decodeScoreFunctions(forKey key: KeyedDecodingContainer<K>.Key) throws -> [ScoreFunction] {
+        var arrayContainer = try self.nestedUnkeyedContainer(forKey: key)
+        var result = [ScoreFunction]()
+        if let count = arrayContainer.count {
+            var iterations = 0
+            while !arrayContainer.isAtEnd {
+                var copy = arrayContainer
+                let elementContainer = try copy.nestedContainer(keyedBy: DynamicCodingKeys.self)
+                for fKey in elementContainer.allKeys {
+                    if let fType = ScoreFunctionType(rawValue: fKey.stringValue) {
+                        let f = try fType.metaType.init(from: arrayContainer.superDecoder())
+                        result.append(f)
+                    }
+                }
+                iterations += 1
+                if iterations > count {
+                    break
+                }
+            }
+            if result.count != count {
+                throw Swift.DecodingError.dataCorrupted(.init(codingPath: arrayContainer.codingPath, debugDescription: "Unable to decode all ScoreFunctions expected: \(count) actual: \(result.count). Probable cause: Unable to determine ScoreFunctionType form key(s)"))
+            }
+        }
+        return result
+    }
+    
+    public func decodeScoreFunctionsIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> [ScoreFunction]? {
+        
+        guard self.contains(key) else {
+            return nil
+        }
+        
+        return try self.decodeScoreFunctions(forKey: key)
     }
     
 }

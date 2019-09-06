@@ -10,7 +10,7 @@ import ElasticSwiftCore
 
 // MARK:- Span Term Query
 
-internal class SpanTermQuery: Query {
+internal struct SpanTermQuery: Query {
     //TODO remove at time of implementation and conform to Equatable
     func isEqualTo(_ other: Query) -> Bool {
         return self.name == other.name
@@ -31,7 +31,7 @@ internal class SpanTermQuery: Query {
 
 // MARK:- Span Multi Term Query
 
-internal class SpanMultiTermQuery: Query {
+internal struct SpanMultiTermQuery: Query {
     //TODO remove at time of implementation and conform to Equatable
     func isEqualTo(_ other: Query) -> Bool {
         return self.name == other.name
@@ -52,7 +52,7 @@ internal class SpanMultiTermQuery: Query {
 
 // MARK:- Span First Query
 
-internal class SpanFirstQuery: Query {
+internal struct SpanFirstQuery: Query {
     //TODO remove at time of implementation and conform to Equatable
     func isEqualTo(_ other: Query) -> Bool {
         return self.name == other.name
@@ -73,7 +73,7 @@ internal class SpanFirstQuery: Query {
 
 // MARK:- Span Near Query
 
-internal class SpanNearQuery: Query {
+internal struct SpanNearQuery: Query {
     //TODO remove at time of implementation and conform to Equatable
     func isEqualTo(_ other: Query) -> Bool {
         return self.name == other.name
@@ -94,7 +94,7 @@ internal class SpanNearQuery: Query {
 
 // MARK:- Span Or Query
 
-internal class SpanOrQuery: Query {
+internal struct SpanOrQuery: Query {
     //TODO remove at time of implementation and conform to Equatable
     func isEqualTo(_ other: Query) -> Bool {
         return self.name == other.name
@@ -115,7 +115,7 @@ internal class SpanOrQuery: Query {
 
 // MARK:- Span Not Query
 
-internal class SpanNotQuery: Query {
+internal struct SpanNotQuery: Query {
     //TODO remove at time of implementation and conform to Equatable
     func isEqualTo(_ other: Query) -> Bool {
         return self.name == other.name
@@ -136,7 +136,7 @@ internal class SpanNotQuery: Query {
 
 // MARK:- Span Containing Query
 
-internal class SpanContainingQuery: Query {
+internal struct SpanContainingQuery: Query {
     //TODO remove at time of implementation and conform to Equatable
     func isEqualTo(_ other: Query) -> Bool {
         return self.name == other.name
@@ -157,7 +157,7 @@ internal class SpanContainingQuery: Query {
 
 // MARK:- Span Within Query
 
-internal class SpanWithinQuery: Query {
+internal struct SpanWithinQuery: Query {
     //TODO remove at time of implementation and conform to Equatable
     func isEqualTo(_ other: Query) -> Bool {
         return self.name == other.name
@@ -178,7 +178,7 @@ internal class SpanWithinQuery: Query {
 
 // MARK:- Span Field Masking Query
 
-internal class SpanFieldMaskingQuery: Query {
+internal struct SpanFieldMaskingQuery: Query {
     //TODO remove at time of implementation and conform to Equatable
     func isEqualTo(_ other: Query) -> Bool {
         return self.name == other.name

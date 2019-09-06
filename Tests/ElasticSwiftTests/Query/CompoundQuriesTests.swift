@@ -24,6 +24,19 @@ class CompoundQuriesTest: XCTestCase {
         
     }
     
+    func testConstantScoreQuery_decode() throws {
+        
+        let query = ConstantScoreQuery(MatchAllQuery(1.1), boost: 1.1)
+        
+        let jsonStr =  "{\"constant_score\":{\"filter\":{\"match_all\":{\"boost\":1.1}},\"boost\":1.1}}"
+        
+        let decoded = try! JSONDecoder().decode(ConstantScoreQuery.self, from: jsonStr.data(using: .utf8)!)
+        
+        XCTAssertEqual(query, decoded)
+        
+    }
+    
+    
     func testBoolQuery_encode() throws {
         let query = try BoolQueryBuilder()
             .filter(query: MatchAllQuery())
@@ -35,6 +48,23 @@ class CompoundQuriesTest: XCTestCase {
         let data = try! JSONEncoder().encode(query)
         
     XCTAssertEqual("{\"bool\":{\"filter\":[{\"match_all\":{}},{\"match_none\":{}}],\"must\":[{\"match_all\":{}}],\"must_not\":[{\"match_none\":{}}]}}", String(data: data, encoding: .utf8)!)
+    }
+    
+    func testBoolQuery_decode() throws {
+        
+        let query = try BoolQueryBuilder()
+            .filter(query: MatchAllQuery())
+            .filter(query: MatchNoneQuery())
+            .must(query: MatchAllQuery())
+            .mustNot(query: MatchNoneQuery())
+            .build()
+        
+        let jsonStr =  "{\"bool\":{\"filter\":[{\"match_all\":{}},{\"match_none\":{}}],\"must\":[{\"match_all\":{}}],\"must_not\":[{\"match_none\":{}}]}}"
+        
+        let decoded = try! JSONDecoder().decode(BoolQuery.self, from: jsonStr.data(using: .utf8)!)
+        
+        XCTAssertEqual(query, decoded)
+        
     }
     
     func testFunctionScoreQuery_encode() throws {

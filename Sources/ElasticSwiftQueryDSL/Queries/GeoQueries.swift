@@ -11,7 +11,7 @@ import ElasticSwiftCore
 
 // MARK:- GeoShape Query
 
-internal class GeoShapeQuery: Query {
+internal struct GeoShapeQuery: Query {
     //TODO remove at time of implementation and conform to Equatable
     func isEqualTo(_ other: Query) -> Bool {
         return self.name == other.name
@@ -33,7 +33,7 @@ internal class GeoShapeQuery: Query {
 
 // MARK:- Geo Bounding Box Query
 
-internal class GeoBoundingBoxQuery: Query {
+internal struct GeoBoundingBoxQuery: Query {
     //TODO remove at time of implementation and conform to Equatable
     func isEqualTo(_ other: Query) -> Bool {
         return self.name == other.name
@@ -55,7 +55,7 @@ internal class GeoBoundingBoxQuery: Query {
 
 // MARK:- Geo Distance Query
 
-internal class GeoDistanceQuery: Query {
+internal struct GeoDistanceQuery: Query {
     //TODO remove at time of implementation and conform to Equatable
     func isEqualTo(_ other: Query) -> Bool {
         return self.name == other.name
@@ -77,7 +77,7 @@ internal class GeoDistanceQuery: Query {
 
 // MARK:- Geo Polygon Query
 
-internal class GeoPolygonQuery: Query {
+internal struct GeoPolygonQuery: Query {
     //TODO remove at time of implementation and conform to Equatable
     func isEqualTo(_ other: Query) -> Bool {
         return self.name == other.name

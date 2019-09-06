@@ -11,7 +11,7 @@ import ElasticSwiftCodableUtils
 
 // MARK:- Constant Score Query
 
-public class ConstantScoreQuery: Query {
+public struct ConstantScoreQuery: Query {
     
     public let name: String = "constant_score"
     
@@ -23,7 +23,7 @@ public class ConstantScoreQuery: Query {
         self.boost = boost
     }
     
-    internal convenience init(withBuilder builder: ConstantScoreQueryBuilder) throws {
+    internal init(withBuilder builder: ConstantScoreQueryBuilder) throws {
         
         guard builder.query != nil else {
             throw QueryBuilderError.missingRequiredField("query")
@@ -35,13 +35,15 @@ public class ConstantScoreQuery: Query {
     public func toDic() -> [String : Any] {
         return [self.name: [CodingKeys.filter.rawValue: self.query.toDic(), CodingKeys.boost.rawValue: self.boost]]
     }
-    
-//    public required init(from decoder: Decoder) throws {
-//        let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
-//        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: name))
-//        self.boost = try nested.decode(Decimal.self, forKey: .boost)
-//        self.query = try nested.decode(MatchAllQuery.self, forKey: .filter)
-//    }
+}
+
+extension ConstantScoreQuery {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
+        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: name))
+        self.boost = try nested.decode(Decimal.self, forKey: .boost)
+        self.query = try nested.decodeQuery(forKey: .filter)
+    }
     
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
@@ -54,7 +56,6 @@ public class ConstantScoreQuery: Query {
         case boost
         case filter
     }
-    
 }
 
 extension ConstantScoreQuery: Equatable {
@@ -67,7 +68,7 @@ extension ConstantScoreQuery: Equatable {
 
 // MARK:- Bool Query
 
-public class BoolQuery: Query {
+public struct BoolQuery: Query {
     
     public let name: String = "bool"
     
@@ -123,13 +124,19 @@ public class BoolQuery: Query {
         }
         return [self.name: dic]
     }
-    
-//    public required init(from decoder: Decoder) throws {
-//        let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
-//        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: name))
-//        self.boost = try nested.decodeIfPresent(Decimal.self, forKey: .boost)
-//        //self.filterClauses = nested.decodeIfPresent([Query].self, forKey: .filter) ?? []
-//    }
+}
+
+extension BoolQuery {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
+        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: name))
+        self.filterClauses = try nested.decodeQueriesIfPresent(forKey: .filter) ?? []
+        self.mustClauses = try nested.decodeQueriesIfPresent(forKey: .must) ?? []
+        self.mustNotClauses = try nested.decodeQueriesIfPresent(forKey: .mustNot) ?? []
+        self.shouldClauses = try nested.decodeQueriesIfPresent(forKey: .should) ?? []
+        self.boost = try nested.decodeIfPresent(Decimal.self, forKey: .boost)
+        self.minimumShouldMatch = try nested.decodeIntIfPresent(forKey: .minShouldMatch)
+    }
     
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
@@ -178,7 +185,7 @@ extension BoolQuery: Equatable {
 
 // MARK:- Dis Max Query
 
-public class DisMaxQuery: Query {
+public struct DisMaxQuery: Query {
     
     public let name: String = "dis_max"
     
@@ -214,6 +221,16 @@ public class DisMaxQuery: Query {
         dic[CodingKeys.queries.rawValue] = self.queries.map { $0.toDic() }
         return [self.name: dic]
     }
+}
+
+extension DisMaxQuery {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
+        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: name))
+        self.tieBreaker = try nested.decodeDecimal(forKey: .tieBreaker)
+        self.queries = try nested.decodeQueries(forKey: .queries)
+        self.boost =  try nested.decodeDecimalIfPresent(forKey: .boost)
+    }
     
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
@@ -243,7 +260,7 @@ extension DisMaxQuery: Equatable {
 
 // MARK:- Function Score Query
 
-public class FunctionScoreQuery: Query {
+public struct FunctionScoreQuery: Query {
     
     public let name: String = "function_score"
     
@@ -313,6 +330,20 @@ public class FunctionScoreQuery: Query {
         }
         return [self.name: dic]
     }
+}
+
+extension FunctionScoreQuery {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
+        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: name))
+        self.query = try nested.decodeQuery(forKey: .query)
+        self.functions = try nested.decodeScoreFunctionsIfPresent(forKey: .functions) ?? []
+        self.boost =  try nested.decodeDecimalIfPresent(forKey: .boost)
+        self.scoreMode = try nested.decodeIfPresent(ScoreMode.self, forKey: .scoreMode)
+        self.boostMode = try nested.decodeIfPresent(BoostMode.self, forKey: .boostMode)
+        self.maxBoost = try nested.decodeDecimalIfPresent(forKey: .maxBoost)
+        self.minScore = try nested.decodeDecimalIfPresent(forKey: .minScore)
+    }
     
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
@@ -356,7 +387,7 @@ extension FunctionScoreQuery: Equatable {
 
 // MARK:- Boosting Query
 
-public class BoostingQuery: Query {
+public struct BoostingQuery: Query {
     
     public let name: String = "boosting"
     
@@ -370,7 +401,7 @@ public class BoostingQuery: Query {
         self.negativeBoost = negativeBoost
     }
     
-    internal convenience init(withBuilder builder: BoostingQueryBuilder) throws {
+    internal init(withBuilder builder: BoostingQueryBuilder) throws {
         
         guard builder.positive != nil else {
             throw QueryBuilderError.missingRequiredField("positive")
@@ -394,7 +425,16 @@ public class BoostingQuery: Query {
         }
         return [self.name: dic]
     }
-    
+}
+
+extension BoostingQuery {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
+        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: name))
+        self.negative = try nested.decodeQuery(forKey: .negative)
+        self.positive = try nested.decodeQuery(forKey: .positive)
+        self.negativeBoost = try nested.decodeDecimalIfPresent(forKey: .negativeBoost)
+    }
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.name))
@@ -409,7 +449,6 @@ public class BoostingQuery: Query {
         case negative
         case negativeBoost = "negative_boost"
     }
-    
 }
 
 extension BoostingQuery: Equatable {
