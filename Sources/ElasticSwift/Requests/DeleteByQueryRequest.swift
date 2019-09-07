@@ -60,7 +60,7 @@ public class DeleteByQueryRequestBuilder: RequestBuilder {
 // MARK:- Delete By Query Request
 
 /// Class representing `_delete_by_query` request
-public class DeleteByQueryRequest: Request {
+public struct DeleteByQueryRequest: Request {
     
     public typealias ResponseType = DeleteByQueryResponse
     
@@ -153,6 +153,20 @@ public class DeleteByQueryRequest: Request {
         }
     }
     
+}
+
+extension DeleteByQueryRequest: Equatable {
+    public static func == (lhs: DeleteByQueryRequest, rhs: DeleteByQueryRequest) -> Bool {
+        return lhs.index == rhs.index
+            && lhs.type == rhs.type
+            && lhs.query.isEqualTo(rhs.query)
+            && lhs.refresh == rhs.refresh
+            && lhs.conflicts == rhs.conflicts
+            && lhs.routing == rhs.routing
+            && lhs.scrollSize == rhs.scrollSize
+            && lhs.from == rhs.from
+            && lhs.size == rhs.size
+    }
 }
 
 public enum ConflictStrategy: String {

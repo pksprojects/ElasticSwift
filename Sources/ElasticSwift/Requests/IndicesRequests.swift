@@ -206,7 +206,7 @@ public class CloseIndexRequestBuilder: RequestBuilder {
 
 //MARK:- Index Exists Request
 
-public class IndexExistsRequest: Request {
+public struct IndexExistsRequest: Request {
     public var headers: HTTPHeaders = HTTPHeaders()
     
     public let name: String
@@ -245,10 +245,19 @@ public class IndexExistsRequest: Request {
     }
 }
 
+extension IndexExistsRequest: Equatable {
+    public static func == (lhs: IndexExistsRequest, rhs: IndexExistsRequest) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.method == rhs.method
+            && lhs.queryParams == rhs.queryParams
+            && lhs.headers == rhs.headers
+    }
+}
+
 
 //MARK:- Create Index Reqeust
 
-public class CreateIndexRequest: Request, Encodable {
+public struct CreateIndexRequest: Request, Encodable {
     public var headers: HTTPHeaders = HTTPHeaders()
     
     public let name: String
@@ -326,9 +335,20 @@ public class CreateIndexRequest: Request, Encodable {
     }
 }
 
+extension CreateIndexRequest: Equatable {
+    public static func == (lhs: CreateIndexRequest, rhs: CreateIndexRequest) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.aliases == rhs.aliases
+            && lhs.method == rhs.method
+            && lhs.mappings == rhs.mappings
+            && lhs.settings == rhs.settings
+            && lhs.includeTypeName == rhs.includeTypeName
+    }
+}
+
 //MARK:- Get Index Request
 
-public class GetIndexRequest: Request {
+public struct GetIndexRequest: Request {
     public var headers: HTTPHeaders = HTTPHeaders()
     
     public let name: String
@@ -368,9 +388,18 @@ public class GetIndexRequest: Request {
     
 }
 
+extension GetIndexRequest: Equatable {
+    public static func == (lhs: GetIndexRequest, rhs: GetIndexRequest) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.headers == rhs.headers
+            && lhs.method == rhs.method
+            && lhs.queryParams == rhs.queryParams
+    }
+}
+
 //MARK:- Delete Index Request
 
-public class DeleteIndexRequest: Request {
+public struct DeleteIndexRequest: Request {
     public var headers: HTTPHeaders = HTTPHeaders()
     
     public let name: String
@@ -409,9 +438,18 @@ public class DeleteIndexRequest: Request {
     }
 }
 
+extension DeleteIndexRequest: Equatable {
+    public static func == (lhs: DeleteIndexRequest, rhs: DeleteIndexRequest) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.headers == rhs.headers
+            && lhs.method == rhs.method
+            && lhs.queryParams == rhs.queryParams
+    }
+}
+
 //MARK:- Open Index Request
 
-public class OpenIndexRequest: Request {
+public struct OpenIndexRequest: Request {
     
     public var headers: HTTPHeaders = HTTPHeaders()
     
@@ -425,7 +463,7 @@ public class OpenIndexRequest: Request {
         self.indices = indices
     }
     
-    internal convenience init(withBuilder builder: OpenIndexRequestBuilder) throws {
+    internal init(withBuilder builder: OpenIndexRequestBuilder) throws {
         
         guard !builder.indices.isEmpty else {
             throw RequestBuilderError.atlestOneElementRequired("indices")
@@ -459,9 +497,18 @@ public class OpenIndexRequest: Request {
     }
 }
 
+extension OpenIndexRequest: Equatable {
+    public static func == (lhs: OpenIndexRequest, rhs: OpenIndexRequest) -> Bool {
+        return lhs.indices == rhs.indices
+            && lhs.method == rhs.method
+            && lhs.queryParams == rhs.queryParams
+            && lhs.endPoint == rhs.endPoint
+    }
+}
+
 //MARK:- Close Index Request
 
-public class CloseIndexRequest: Request {
+public struct CloseIndexRequest: Request {
     
     public var headers: HTTPHeaders = HTTPHeaders()
     
@@ -475,7 +522,7 @@ public class CloseIndexRequest: Request {
         self.indices = indices
     }
     
-    internal convenience init(withBuilder builder: CloseIndexRequestBuilder) throws {
+    internal init(withBuilder builder: CloseIndexRequestBuilder) throws {
         
         guard !builder.indices.isEmpty else {
             throw RequestBuilderError.atlestOneElementRequired("indices")
@@ -510,5 +557,14 @@ public class CloseIndexRequest: Request {
     
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
         return .failure(.noBodyForRequest)
+    }
+}
+
+extension CloseIndexRequest: Equatable {
+    public static func == (lhs: CloseIndexRequest, rhs: CloseIndexRequest) -> Bool {
+        return lhs.indices == rhs.indices
+            && lhs.method == rhs.method
+            && lhs.queryParams == rhs.queryParams
+            && lhs.endPoint == rhs.endPoint
     }
 }

@@ -117,10 +117,10 @@ public struct MappingMetaData: Codable {
     public let fields: Fields?
     public var properties: [String: MappingMetaData]?
     
-    public struct Fields: Codable {
+    public struct Fields: Codable, Equatable {
         public let keyword: Keyword
         
-        public struct Keyword: Codable {
+        public struct Keyword: Codable, Equatable {
             public let type: String
             public let ignoreAbove: Int?
             
@@ -132,6 +132,8 @@ public struct MappingMetaData: Codable {
     }
     
 }
+
+extension MappingMetaData: Equatable {}
 
 public struct AliasMetaData: Codable {
     
@@ -147,6 +149,8 @@ public struct AliasMetaData: Codable {
         case filter
     }
 }
+
+extension AliasMetaData: Equatable {}
 
 public struct IndexSettings: Codable {
     
@@ -261,7 +265,9 @@ public struct IndexAlias: Codable {
     }
 }
 
-
+extension IndexAlias: Equatable {
+    
+}
 
 //MARK:- INDEX Exists Response
 

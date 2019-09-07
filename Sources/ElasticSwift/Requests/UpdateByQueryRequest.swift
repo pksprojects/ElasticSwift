@@ -68,7 +68,7 @@ public class UpdateByQueryRequestBuilder: RequestBuilder {
 
 // MARK:- Update By Query Request
 
-public class UpdateByQueryRequest: Request {
+public struct UpdateByQueryRequest: Request {
     public var headers: HTTPHeaders = HTTPHeaders()
     
     public let index: String
@@ -166,4 +166,29 @@ public class UpdateByQueryRequest: Request {
     }
     
     
+}
+
+extension UpdateByQueryRequest: Equatable {
+    public static func == (lhs: UpdateByQueryRequest, rhs: UpdateByQueryRequest) -> Bool {
+        return lhs.index == rhs.index
+            && lhs.type == rhs.type
+            && lhs.script == rhs.script
+            && lhs.refresh == rhs.refresh
+            && lhs.conflicts == rhs.conflicts
+            && lhs.routing == rhs.routing
+            && lhs.scrollSize == rhs.scrollSize
+            && lhs.from == rhs.from
+            && lhs.size == rhs.size
+            && matchQueries(lhs.query, rhs.query)
+    }
+    
+    private static func matchQueries(_ lhs: Query? , _ rhs: Query?) -> Bool {
+        if lhs == nil && rhs == nil {
+            return true
+        }
+        if let lhs = lhs, let rhs = rhs {
+            return lhs.isEqualTo(rhs)
+        }
+        return false
+    }
 }

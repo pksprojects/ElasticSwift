@@ -119,7 +119,7 @@ class ElasticSwiftTests: XCTestCase {
             }
             e.fulfill()
         }
-        let msg = Message()
+        var msg = Message()
         msg.msg = "Test Message"
         let request = try IndexRequestBuilder<Message>()
             .set(index: "test")
@@ -149,7 +149,7 @@ class ElasticSwiftTests: XCTestCase {
             }
             e.fulfill()
         }
-        let msg = Message()
+        var msg = Message()
         msg.msg = "Test Message No Id"
         let request = try IndexRequestBuilder<Message>()
             .set(index: "test")
@@ -199,7 +199,7 @@ class ElasticSwiftTests: XCTestCase {
             }
             client?.execute(request: request, completionHandler: handler)
         }
-        let msg = Message()
+        var msg = Message()
         msg.msg = "Test Message"
         let request1 = try IndexRequestBuilder<Message>()
             .set(index: "test")
@@ -249,7 +249,7 @@ class ElasticSwiftTests: XCTestCase {
             
             self.client?.execute(request: request, completionHandler: handler)
         }
-        let msg = Message()
+        var msg = Message()
         msg.msg = "Test Message"
         let request1 =  try IndexRequestBuilder<Message>()
             .set(index: "test")
@@ -302,9 +302,9 @@ class ElasticSwiftTests: XCTestCase {
             }
             self.client?.search(request, completionHandler: handler)
         }
-        let msg = Message()
+        var msg = Message()
         msg.msg = "Message"
-        let request1 =  try IndexRequestBuilder<Message>()
+        var request1 =  try IndexRequestBuilder<Message>()
             .set(index: "test")
             .set(source: msg)
             .build()
@@ -639,7 +639,7 @@ class ElasticSwiftTests: XCTestCase {
             .set(value: "DeleteByQuery")
             .build()
         
-        let request = try DeleteByQueryRequestBuilder()
+        var request = try DeleteByQueryRequestBuilder()
             .set(index: "test")
             .set(query: query)
             .build()
@@ -658,9 +658,9 @@ class ElasticSwiftTests: XCTestCase {
             
             self.client?.deleteByQuery(request, completionHandler: handler)
         }
-        let msg = Message()
+        var msg = Message()
         msg.msg = "DeleteByQuery"
-        let request1 =  try IndexRequestBuilder<Message>()
+        var request1 =  try IndexRequestBuilder<Message>()
             .set(index: "test")
             .set(type: "_doc")
             .set(source: msg)
@@ -693,7 +693,7 @@ class ElasticSwiftTests: XCTestCase {
             .set(value: "UpdateByQuery")
             .build()
         
-        let request = try UpdateByQueryRequestBuilder()
+        var request = try UpdateByQueryRequestBuilder()
             .set(index: "test")
             .set(query: query)
             .build()
@@ -712,9 +712,9 @@ class ElasticSwiftTests: XCTestCase {
             
             self.client?.updateByQuery(request, completionHandler: handler)
         }
-        let msg = Message()
+        var msg = Message()
         msg.msg = "UpdateByQuery"
-        let request1 =  try IndexRequestBuilder<Message>()
+        var request1 =  try IndexRequestBuilder<Message>()
             .set(index: "test")
             .set(type: "_doc")
             .set(source: msg)
@@ -747,7 +747,7 @@ class ElasticSwiftTests: XCTestCase {
             .set(value: "UpdateByQuery2")
             .build()
         let script = Script("ctx._source.msg = 'hello'")
-        let request = try UpdateByQueryRequestBuilder()
+        var request = try UpdateByQueryRequestBuilder()
             .set(index: "test")
             .set(query: query)
             .set(script: script)
@@ -767,9 +767,9 @@ class ElasticSwiftTests: XCTestCase {
             
             self.client?.updateByQuery(request, completionHandler: handler)
         }
-        let msg = Message()
+        var msg = Message()
         msg.msg = "UpdateByQuery2"
-        let request1 =  try IndexRequestBuilder<Message>()
+        var request1 =  try IndexRequestBuilder<Message>()
             .set(index: "test")
             .set(type: "_doc")
             .set(source: msg)
@@ -813,9 +813,9 @@ class ElasticSwiftTests: XCTestCase {
             self.client?.mget(request, completionHandler: handler)
         }
         
-        let msg = Message()
+        var msg = Message()
         msg.msg = "UpdateByQuery2"
-        let request1 =  try IndexRequestBuilder<Message>()
+        var request1 =  try IndexRequestBuilder<Message>()
             .set(index: "test")
             .set(type: "_doc")
             .set(id: "0")
@@ -872,7 +872,7 @@ class ElasticSwiftTests: XCTestCase {
 //    ]
 }
 
-class Message: Codable {
+struct Message: Codable, Equatable {
     var msg: String?
     
     init() {}

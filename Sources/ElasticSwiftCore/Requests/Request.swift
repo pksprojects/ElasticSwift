@@ -24,6 +24,19 @@ public protocol Request {
     
     func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError>
     
+    func isEqualTo(_ other: Request) -> Bool
+    
+}
+
+extension Request where Self: Equatable {
+    
+    public func isEqualTo(_ other: Request) -> Bool {
+        if let o = other as? Self {
+            return self == o
+        }
+        return false
+    }
+    
 }
 
 //MARK:- Request options

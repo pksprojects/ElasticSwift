@@ -148,7 +148,7 @@ public class MultiGetRequestBuilder: RequestBuilder {
 
 // MARK:- Multi-Get Request
 
-public class MultiGetRequest: Request, Encodable {
+public struct MultiGetRequest: Request, Encodable {
     
     public var headers: HTTPHeaders = HTTPHeaders()
     
@@ -269,7 +269,7 @@ public class MultiGetRequest: Request, Encodable {
         }
     }
     
-    public struct Item: Codable {
+    public struct Item: Codable, Equatable {
         
         public let index: String
         public let type: String?
@@ -353,5 +353,16 @@ public class MultiGetRequest: Request, Encodable {
     }
     
     
+}
+
+extension MultiGetRequest: Equatable {
+    public static func == (lhs: MultiGetRequest, rhs: MultiGetRequest) -> Bool {
+        return lhs.index == rhs.index
+            && lhs.items == rhs.items
+            && lhs.type == rhs.type
+            && lhs.headers == rhs.headers
+            && lhs.method == rhs.method
+            && lhs.queryParams == rhs.queryParams
+    }
 }
 

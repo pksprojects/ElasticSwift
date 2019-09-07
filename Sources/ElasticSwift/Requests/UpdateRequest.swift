@@ -120,7 +120,7 @@ public class UpdateRequestBuilder: RequestBuilder {
 
 //MARK:- Update Request
 
-public class UpdateRequest: Request, Encodable {
+public struct UpdateRequest: Request, Encodable {
     
     public var headers: HTTPHeaders = HTTPHeaders()
     
@@ -268,6 +268,35 @@ public class UpdateRequest: Request, Encodable {
     }
 }
 
+extension UpdateRequest: Equatable {
+    public static func == (lhs: UpdateRequest, rhs: UpdateRequest) -> Bool {
+        return lhs.index == rhs.index
+            && lhs.id == rhs.id
+            && lhs.type == rhs.type
+            && lhs.doc == rhs.doc
+            && lhs.detectNoop == rhs.detectNoop
+            && lhs.docAsUpsert ==  rhs.docAsUpsert
+            && lhs.fields == rhs.fields
+            && lhs.headers == rhs.headers
+            && lhs.ifPrimaryTerm == rhs.ifPrimaryTerm
+            && lhs.ifSeqNo == rhs.ifSeqNo
+            && lhs.lang == rhs.lang
+            && lhs.method == rhs.method
+            && lhs.parent == rhs.parent
+            && lhs.queryParams == rhs.queryParams
+            && lhs.refresh == rhs.refresh
+            && lhs.retryOnConflict == rhs.retryOnConflict
+            && lhs.routing == rhs.routing
+            && lhs.script == rhs.script
+            && lhs.scriptedUpsert == rhs.scriptedUpsert
+            && lhs.source == rhs.source
+            && lhs.timeout == rhs.timeout
+            && lhs.upsert == rhs.upsert
+            && lhs.version == rhs.version
+            && lhs.versionType == rhs.versionType
+            && lhs.waitForActiveShards == rhs.waitForActiveShards
+    }
+}
 
 // MARK:- UPDATE RESPONSE
 

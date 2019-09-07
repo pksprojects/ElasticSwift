@@ -119,7 +119,7 @@ public class SearchRequestBuilder: RequestBuilder {
 
 //MARK:- Search Request
 
-public class SearchRequest: Request {
+public struct SearchRequest: Request {
     
     public var headers: HTTPHeaders = HTTPHeaders()
     
@@ -135,7 +135,19 @@ public class SearchRequest: Request {
     public let explain: Bool?
     public let minScore: Decimal?
     
-    init(withBuilder builder: SearchRequestBuilder) throws {
+    public init(index: String, type: String?, from: Int16?, size: Int16?, query: Query?, sort: Sort?, fetchSource: Bool?, explain: Bool?, minScore: Decimal?) {
+        self.index = index
+        self.type = type
+        self.from = from
+        self.size = size
+        self.query = query
+        self.sort = sort
+        self.fetchSource = fetchSource
+        self.explain = explain
+        self.minScore = minScore
+    }
+    
+    internal init(withBuilder builder: SearchRequestBuilder) throws {
         self.index = builder.index ?? "_all"
         self.type = builder.type
         self.query = builder.query
@@ -193,5 +205,33 @@ public class SearchRequest: Request {
         } catch {
             return .failure(.wrapped(error))
         }
+    }
+}
+
+extension SearchRequest: Equatable {
+    public static func == (lhs: SearchRequest, rhs: SearchRequest) -> Bool {
+        return lhs.index == rhs.index
+            && lhs.explain == rhs.explain
+            && lhs.fetchSource == rhs.fetchSource
+            && lhs.from == rhs.from
+            && lhs.endPoint == rhs.endPoint
+            && lhs.headers == rhs.headers
+            && lhs.method == rhs.method
+            && lhs.minScore == rhs.minScore
+            && lhs.queryParams == rhs.queryParams
+            && lhs.size == rhs.size
+            && lhs.sort == rhs.sort
+            && lhs.type == rhs.type
+            && SearchRequest.matchQueries(lhs.query, rhs.query)
+    }
+    
+    private static func matchQueries(_ lhs: Query? , _ rhs: Query?) -> Bool {
+        if lhs == nil && rhs == nil {
+            return true
+        }
+        if let lhs = lhs, let rhs = rhs {
+            return lhs.isEqualTo(rhs)
+        }
+        return false
     }
 }
