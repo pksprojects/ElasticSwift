@@ -24,7 +24,7 @@ public class ESResponse {
 
 //MARK:- Get Response
 
-public struct GetResponse<T: Codable>: Codable {
+public struct GetResponse<T: Codable>: Codable, Equatable where T: Equatable {
     
     public let index: String
     public let type: String?
@@ -49,7 +49,7 @@ public struct GetResponse<T: Codable>: Codable {
 
 //MARK:- Index Response
 
-public struct IndexResponse: Codable {
+public struct IndexResponse: Codable, Equatable {
     
     public let shards: Shards
     public let index: String
@@ -74,7 +74,7 @@ public struct IndexResponse: Codable {
 
 //MARK:- Search Response
 
-public struct SearchResponse<T: Codable>: Codable {
+public struct SearchResponse<T: Codable>: Codable, Equatable where T: Equatable {
     
     public let took: Int
     public let timedOut: Bool
@@ -89,7 +89,7 @@ public struct SearchResponse<T: Codable>: Codable {
     }
 }
 
-public struct Shards: Codable {
+public struct Shards: Codable, Equatable {
     
     public let total: Int
     public let successful: Int
@@ -99,7 +99,7 @@ public struct Shards: Codable {
 }
 
 
-public struct Hits<T: Codable>: Codable {
+public struct Hits<T: Codable>: Codable, Equatable where T: Equatable {
     
     public let total: Int
     public let maxScore: Decimal?
@@ -120,7 +120,7 @@ public struct Hits<T: Codable>: Codable {
 }
 
 
-public struct SearchHit<T: Codable>: Codable {
+public struct SearchHit<T: Codable>: Codable, Equatable where T: Equatable {
     
     public let index: String
     public let type: String
@@ -141,7 +141,7 @@ public struct SearchHit<T: Codable>: Codable {
 
 //MARK:- Delete Response
 
-public struct DeleteResponse: Codable {
+public struct DeleteResponse: Codable, Equatable {
     
     public let shards: Shards
     public let index: String
@@ -166,7 +166,7 @@ public struct DeleteResponse: Codable {
 
 // MARK:- Delete By Query Response
 
-public struct DeleteByQueryResponse: Codable {
+public struct DeleteByQueryResponse: Codable, Equatable {
     
     public let took: Int
     public let timedOut: Bool
@@ -198,7 +198,7 @@ public struct DeleteByQueryResponse: Codable {
     
 }
 
-public struct Retires: Codable {
+public struct Retires: Codable, Equatable {
     
     public let bulk: Int
     public let search: Int
@@ -206,7 +206,7 @@ public struct Retires: Codable {
 
 // MARK:- Update By Query Response
 
-public struct UpdateByQueryResponse: Codable {
+public struct UpdateByQueryResponse: Codable, Equatable {
     
     public let took: Int
     public let timedOut: Bool
@@ -242,11 +242,11 @@ public struct UpdateByQueryResponse: Codable {
 
 // MARK:- Multi Get Response
 
-public struct MultiGetResponse: Codable {
+public struct MultiGetResponse: Codable, Equatable {
     
     public let responses: [MultiGetItemResponse]
     
-    public struct Failure: Codable {
+    public struct Failure: Codable, Equatable {
         public let index: String
         public let id: String
         public let type: String?
@@ -266,7 +266,7 @@ public struct MultiGetResponse: Codable {
     
 }
 
-public struct MultiGetItemResponse: Codable {
+public struct MultiGetItemResponse: Codable, Equatable {
     
     public let response: GetResponse<CodableValue>?
     public let failure: MultiGetResponse.Failure?
@@ -288,5 +288,27 @@ public struct MultiGetItemResponse: Codable {
             self.failure = try container.decode(MultiGetResponse.Failure.self)
             self.response = nil
         }
+    }
+}
+
+// MARK:- UPDATE RESPONSE
+
+public struct UpdateResponse: Codable, Equatable {
+    
+    public let shards: Shards
+    public let index: String
+    public let type: String
+    public let id: String
+    public let version: Int
+    public let result: String
+    
+    
+    private enum CodingKeys: String, CodingKey {
+        case shards = "_shards"
+        case index = "_index"
+        case type = "_type"
+        case id = "_id"
+        case version = "_version"
+        case result
     }
 }

@@ -12,7 +12,7 @@ import ElasticSwiftCodableUtils
 
 //MARK:- Create Index Response
 
-public struct CreateIndexResponse: Codable {
+public struct CreateIndexResponse: Codable, Equatable {
     
     public let acknowledged: Bool
     public let shardsAcknowledged: Bool
@@ -34,7 +34,7 @@ public struct CreateIndexResponse: Codable {
 
 //MARK:- Get Index Response
 
-public struct GetIndexResponse: Codable {
+public struct GetIndexResponse: Codable, Equatable {
     
     public let aliases: [IndexAlias]
     public let mappings: [String: MappingMetaData]
@@ -102,7 +102,7 @@ public struct GetIndexResponse: Codable {
     }
 }
 
-public struct AcknowledgedResponse: Codable {
+public struct AcknowledgedResponse: Codable, Equatable {
     
     public let acknowledged: Bool
     
@@ -152,7 +152,7 @@ public struct AliasMetaData: Codable {
 
 extension AliasMetaData: Equatable {}
 
-public struct IndexSettings: Codable {
+public struct IndexSettings: Codable, Equatable {
     
     public let creationDate: String
     public let numberOfShards: String
@@ -196,7 +196,7 @@ public struct IndexSettings: Codable {
     
 }
 
-public struct IndexVersion: Codable {
+public struct IndexVersion: Codable, Equatable {
     public let created: String
     public let updated: String?
     
@@ -265,13 +265,11 @@ public struct IndexAlias: Codable {
     }
 }
 
-extension IndexAlias: Equatable {
-    
-}
+extension IndexAlias: Equatable {}
 
 //MARK:- INDEX Exists Response
 
-public class IndexExistsResponse: Codable {
+public struct IndexExistsResponse: Codable, Equatable {
     
     public let exists: Bool
     

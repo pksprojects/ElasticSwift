@@ -298,24 +298,3 @@ extension UpdateRequest: Equatable {
     }
 }
 
-// MARK:- UPDATE RESPONSE
-
-public struct UpdateResponse: Codable {
-    
-    public let shards: Shards
-    public let index: String
-    public let type: String
-    public let id: String
-    public let version: Int
-    public let result: String
-    
-    
-    private enum CodingKeys: String, CodingKey {
-        case shards = "_shards"
-        case index = "_index"
-        case type = "_type"
-        case id = "_id"
-        case version = "_version"
-        case result
-    }
-}

@@ -19,7 +19,7 @@ public struct ElasticsearchError: Error, Codable {
     var status: Int
 }
 
-public struct ElasticError: Codable {
+public struct ElasticError: Codable, Equatable {
     
     var type: String?
     var index: String?
