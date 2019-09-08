@@ -45,7 +45,7 @@ let package = Package(
             dependencies: ["ElasticSwiftCore", "Logging", "NIO", "NIOHTTP1", "NIOFoundationCompat", "NIOSSL", "NIOTransportServices"]),
         .target(
             name: "ElasticSwiftCore",
-            dependencies: ["Logging", "NIO", "NIOHTTP1"]),
+            dependencies: ["Logging", "NIOHTTP1"]),
         .target(
             name: "ElasticSwiftCodableUtils",
             dependencies: []),

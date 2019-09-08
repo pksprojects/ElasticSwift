@@ -6,22 +6,21 @@
 //
 
 import Foundation
-import NIO
 import NIOHTTP1
 import Logging
 
 //MARK:- HTTPResponse
 
 /// Represents a HTTPResponse returned from Elasticsearch
-public class HTTPResponse {
+public struct HTTPResponse {
     
     public let request: HTTPRequest
     
     public let status: HTTPResponseStatus
     public let headers: HTTPHeaders
-    public var body: ByteBuffer?
+    public var body: Data?
     
-    public init(request: HTTPRequest, status: HTTPResponseStatus, headers: HTTPHeaders, body: ByteBuffer?) {
+    public init(request: HTTPRequest, status: HTTPResponseStatus, headers: HTTPHeaders, body: Data?) {
         self.status = status
         self.headers = headers
         self.body = body
@@ -49,6 +48,8 @@ public class HTTPResponse {
     }
 }
 
+extension HTTPResponse: Equatable {}
+
 //MARK:- HTTPResponseBuilder
 
 /// Builder for `HTTPResponse`
@@ -57,7 +58,7 @@ public class HTTPResponseBuilder {
     private var _request: HTTPRequest?
     private var _status: HTTPResponseStatus?
     private var _headers: HTTPHeaders?
-    private var _body: ByteBuffer?
+    private var _body: Data?
     
     public init() {}
     
@@ -80,7 +81,7 @@ public class HTTPResponseBuilder {
     }
     
     @discardableResult
-    public func set(body: ByteBuffer) -> HTTPResponseBuilder {
+    public func set(body: Data) -> HTTPResponseBuilder {
         self._body = body
         return self
     }
@@ -94,7 +95,7 @@ public class HTTPResponseBuilder {
     public var headers: HTTPHeaders? {
         return self._headers
     }
-    public var body: ByteBuffer? {
+    public var body: Data? {
         return self._body
     }
     
