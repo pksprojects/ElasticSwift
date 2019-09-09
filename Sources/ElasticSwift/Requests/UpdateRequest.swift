@@ -120,7 +120,7 @@ public class UpdateRequestBuilder: RequestBuilder {
 
 //MARK:- Update Request
 
-public struct UpdateRequest: Request, Encodable {
+public struct UpdateRequest: Request {
     
     public var headers: HTTPHeaders = HTTPHeaders()
     
@@ -243,28 +243,38 @@ public struct UpdateRequest: Request, Encodable {
     }
     
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-        return serializer.encode(self).mapError { error -> MakeBodyError in
+        let body = Body(script: self.script, upsert: self.upsert, detectNoop: self.detectNoop, docAsUpsert: self.docAsUpsert, doc: self.doc, scriptedUpsert: self.scriptedUpsert)
+        return serializer.encode(body).mapError { error -> MakeBodyError in
             return MakeBodyError.wrapped(error)
         }
     }
     
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(self.script, forKey: .script)
-        try container.encodeIfPresent(self.upsert, forKey: .upsert)
-        try container.encodeIfPresent(self.detectNoop, forKey: .detectNoop)
-        try container.encodeIfPresent(self.docAsUpsert, forKey: .docAsUpsert)
-        try container.encodeIfPresent(self.doc, forKey: .doc)
-        try container.encodeIfPresent(self.scriptedUpsert, forKey: .scriptedUpsert)
-    }
-    
-    private enum CodingKeys: String, CodingKey {
-        case script
-        case upsert
-        case doc
-        case detectNoop = "detect_noop"
-        case docAsUpsert = "doc_as_upsert"
-        case scriptedUpsert = "scripted_upsert"
+    struct Body: Encodable {
+        public let script: Script?
+        public let upsert: EncodableValue?
+        public let detectNoop: Bool?
+        public let docAsUpsert: Bool?
+        public let doc: EncodableValue?
+        public let scriptedUpsert: Bool?
+        
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encodeIfPresent(self.script, forKey: .script)
+            try container.encodeIfPresent(self.upsert, forKey: .upsert)
+            try container.encodeIfPresent(self.detectNoop, forKey: .detectNoop)
+            try container.encodeIfPresent(self.docAsUpsert, forKey: .docAsUpsert)
+            try container.encodeIfPresent(self.doc, forKey: .doc)
+            try container.encodeIfPresent(self.scriptedUpsert, forKey: .scriptedUpsert)
+        }
+        
+        private enum CodingKeys: String, CodingKey {
+            case script
+            case upsert
+            case doc
+            case detectNoop = "detect_noop"
+            case docAsUpsert = "doc_as_upsert"
+            case scriptedUpsert = "scripted_upsert"
+        }
     }
 }
 

@@ -176,34 +176,40 @@ public struct SearchRequest: Request {
     }
     
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        let body = Body(query: self.query, sort: self.sort, size: self.size, from: self.from, source: self.fetchSource, explain: self.explain, minScore: self.minScore)
+        return serializer.encode(body).mapError { error -> MakeBodyError in
+            return MakeBodyError.wrapped(error)
+        }
+    }
+    
+    struct Body: Encodable {
+        public let query: Query?
+        public let sort: Sort?
+        public let size: Int16?
+        public let from: Int16?
+        public let source: Bool?
+        public let explain: Bool?
+        public let minScore: Decimal?
         
-        var dic = [String: Any]()
-        if let query = self.query {
-            dic["query"] = query.toDic()
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encodeIfPresent(self.query, forKey: .query)
+            try container.encodeIfPresent(self.sort, forKey: .sort)
+            try container.encodeIfPresent(self.size, forKey: .size)
+            try container.encodeIfPresent(self.from, forKey: .from)
+            try container.encodeIfPresent(self.source, forKey: .source)
+            try container.encodeIfPresent(self.explain, forKey: .explain)
+            try container.encodeIfPresent(self.minScore, forKey: .minScore)
         }
-        if let sort = self.sort {
-            dic["sort"] = sort.toDic()
-        }
-        if let size = self.size {
-            dic["size"] = size
-        }
-        if let from = self.from {
-            dic["from"] = from
-        }
-        if let fetchSource = self.fetchSource {
-            dic["_source"] = fetchSource
-        }
-        if let explain = self.explain {
-            dic["explain"] = explain
-        }
-        if let minSore = self.minScore {
-            dic["min_score"] = minSore
-        }
-        do {
-            let data = try JSONSerialization.data(withJSONObject: dic, options: [])
-            return .success(data)
-        } catch {
-            return .failure(.wrapped(error))
+        
+        enum CodingKeys: String, CodingKey {
+            case query
+            case sort
+            case size
+            case from
+            case source = "_source"
+            case explain
+            case minScore = "min_score"
         }
     }
 }

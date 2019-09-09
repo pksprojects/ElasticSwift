@@ -143,29 +143,41 @@ public struct UpdateByQueryRequest: Request {
     }
     
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-        var dic = [String: Any]()
-        
-        if let script = self.script {
-            dic["script"] = script.toDic()
-        }
-        
-        if let query = self.query {
-            dic["query"] = query.toDic()
-        }
-        
-        if dic.isEmpty {
+        if self.query == nil && self.script == nil {
             return .failure(.noBodyForRequest)
         }
-        
-        do {
-            let data = try JSONSerialization.data(withJSONObject: dic, options: [])
-            return .success(data)
-        } catch {
-            return .failure(.wrapped(error))
+        let body = Body(query: self.query, script: self.script)
+        return serializer.encode(body).mapError { error -> MakeBodyError in
+            return MakeBodyError.wrapped(error)
         }
     }
     
-    
+    struct Body: Codable {
+        public let query: Query?
+        public let script: Script?
+        
+        init(query: Query?, script: Script?) {
+            self.query = query
+            self.script = script
+        }
+        
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self.query = try container.decodeQueryIfPresent(forKey: .query)
+            self.script = try container.decode(Script.self, forKey: .script)
+        }
+        
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encodeIfPresent(self.query, forKey: .query)
+            try container.encodeIfPresent(self.script, forKey: .script)
+        }
+        
+        enum CodingKeys: String, CodingKey {
+            case query
+            case script
+        }
+    }
 }
 
 extension UpdateByQueryRequest: Equatable {

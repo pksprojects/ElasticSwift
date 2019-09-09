@@ -257,7 +257,7 @@ extension IndexExistsRequest: Equatable {
 
 //MARK:- Create Index Reqeust
 
-public struct CreateIndexRequest: Request, Encodable {
+public struct CreateIndexRequest: Request {
     public var headers: HTTPHeaders = HTTPHeaders()
     
     public let name: String
@@ -312,26 +312,33 @@ public struct CreateIndexRequest: Request, Encodable {
         guard self.aliases != nil || self.mappings != nil || self.settings != nil else {
             return .failure(.noBodyForRequest)
         }
-        return serializer.encode(self).mapError {
+        let body = Body(aliases: self.aliases, mappings: self.mappings, settings: self.settings)
+        return serializer.encode(body).mapError {
             error -> MakeBodyError in
             return .wrapped(error)
         }
     }
     
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(self.mappings, forKey: .mappings)
-        try container.encodeIfPresent(self.settings, forKey: .settings)
-        if let aliases = self.aliases {
-            let dic = Dictionary(uniqueKeysWithValues: aliases.map{ ($0.name, $0.metaData)})
-            try container.encode(dic, forKey: .aliases)
+    struct Body: Encodable {
+        public let aliases: [IndexAlias]?
+        public let mappings: [String: MappingMetaData]?
+        public let settings: [String: CodableValue]?
+        
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encodeIfPresent(self.mappings, forKey: .mappings)
+            try container.encodeIfPresent(self.settings, forKey: .settings)
+            if let aliases = self.aliases {
+                let dic = Dictionary(uniqueKeysWithValues: aliases.map{ ($0.name, $0.metaData)})
+                try container.encode(dic, forKey: .aliases)
+            }
         }
-    }
-    
-    enum CodingKeys: CodingKey {
-        case aliases
-        case mappings
-        case settings
+        
+        enum CodingKeys: CodingKey {
+            case aliases
+            case mappings
+            case settings
+        }
     }
 }
 
