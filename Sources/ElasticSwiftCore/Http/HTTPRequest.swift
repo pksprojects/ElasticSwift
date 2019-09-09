@@ -6,14 +6,13 @@
 //
 
 import Foundation
-import NIO
 import NIOHTTP1
 import Logging
 
 //MARK:- HTTPRequest
 
-/// Class representing HTTP request for Elasticsearch
-public class HTTPRequest {
+/// Represents a HTTP request for Elasticsearch
+public struct HTTPRequest {
     
     public let version: HTTPVersion
     public let method: HTTPMethod
@@ -78,6 +77,8 @@ public class HTTPRequest {
     }
     
 }
+
+extension HTTPRequest: Equatable {}
 
 //MARK:- HTTPReqeustBuilder
 

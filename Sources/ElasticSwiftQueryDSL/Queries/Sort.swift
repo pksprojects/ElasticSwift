@@ -8,7 +8,7 @@
 
 import Foundation
 import ElasticSwiftCore
-
+import ElasticSwiftCodableUtils
 
 public final class SortBuilders {
     
@@ -72,7 +72,7 @@ protocol SortBuilder {
     func build() -> Sort
 }
 
-public class Sort {
+public struct Sort {
     
     private static let ORDER = "order"
     private static let MODE = "mode"
@@ -103,14 +103,92 @@ public class Sort {
                 Sort.MODE : self.mode?.rawValue
                 ]]
     }
+    
+    
 }
 
-public enum SortOrder: String {
+extension Sort: Codable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let dic = try container.decode([String: CodableValue].self)
+        let item = dic.first!
+        self.field = item.key
+        if let order = item.value.value as? SortOrder {
+            self.sortOrder = order
+            self.mode = nil
+        } else if let subDic = item.value.value as? [String: String] {
+            if let order = subDic[Sort.ORDER] {
+                if let sortOrder = SortOrder(rawValue: order) {
+                    self.sortOrder = sortOrder
+                } else {
+                    throw Swift.DecodingError.typeMismatch(SortOrder.self, .init(codingPath: container.codingPath, debugDescription: "Unable to serialize value \(order) as SortOrder"))
+                }
+            } else {
+                throw Swift.DecodingError.valueNotFound(SortOrder.self, .init(codingPath: container.codingPath, debugDescription: "No value for SortOrder with key order"))
+            }
+            if let mode = subDic[Sort.MODE] {
+                if let sortMode = SortMode(rawValue: mode) {
+                    self.mode = sortMode
+                } else {
+                    throw Swift.DecodingError.typeMismatch(SortMode.self, .init(codingPath: container.codingPath, debugDescription: "Unable to serialize value \(mode) as SortMode"))
+                }
+            } else {
+                self.mode = nil
+            }
+        } else {
+            throw Swift.DecodingError.dataCorrupted(.init(codingPath: container.codingPath, debugDescription: "Unable to serialize sort from  \(dic)"))
+        }
+        
+        self.fieldTypeisArray = self.mode != nil
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if self.fieldTypeisArray {
+            var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.field))
+            try nested.encode(self.sortOrder, forKey: .key(named: Sort.ORDER))
+            try nested.encode(self.mode, forKey: .key(named: Sort.MODE))
+        } else {
+            try container.encode(self.sortOrder, forKey: .key(named: self.field))
+        }
+    }
+    
+    private struct CodingKeys: CodingKey {
+        var stringValue: String
+        
+        init?(stringValue: String) {
+            self.stringValue = stringValue
+        }
+        
+        var intValue: Int?
+        
+        init?(intValue: Int) {
+            self.intValue = intValue
+            self.stringValue = String(intValue)
+        }
+        
+        public static func key(named name: String) -> CodingKeys {
+            return CodingKeys(stringValue: name)!
+        }
+        
+    }
+}
+
+extension Sort: Equatable {
+    public static func == (lhs: Sort, rhs: Sort) -> Bool {
+        return lhs.field == rhs.field
+            && lhs.sortOrder == rhs.sortOrder
+            && lhs.mode == rhs.mode
+            && lhs.fieldTypeisArray == rhs.fieldTypeisArray
+    }
+}
+
+public enum SortOrder: String, Codable {
     case asc = "asc"
     case desc = "desc"
 }
 
-public enum SortMode: String {
+public enum SortMode: String, Codable {
     case max = "max"
     case min = "min"
     case avg = "avg"

@@ -11,7 +11,11 @@ import ElasticSwiftCore
 
 // MARK:- Nested Query
 
-internal class NestedQuery: Query {
+internal struct NestedQuery: Query {
+    //TODO remove at time of implementation and conform to Equatable
+    func isEqualTo(_ other: Query) -> Bool {
+        return self.name == other.name
+    }
     public let name: String = ""
     
     public init(withBuilder builder: NestedQueryBuilder) {
@@ -28,7 +32,11 @@ internal class NestedQuery: Query {
 
 // MARK:- HasChild Query
 
-internal class HasChildQuery: Query {
+internal struct HasChildQuery: Query {
+    //TODO remove at time of implementation and conform to Equatable
+    func isEqualTo(_ other: Query) -> Bool {
+        return self.name == other.name
+    }
     public let name: String = ""
     
     public init(withBuilder builder: HasChildQueryBuilder) {
@@ -45,7 +53,11 @@ internal class HasChildQuery: Query {
 
 // MARK:- HasParent Query
 
-internal class HasParentQuery: Query {
+internal struct HasParentQuery: Query {
+    //TODO remove at time of implementation and conform to Equatable
+    func isEqualTo(_ other: Query) -> Bool {
+        return self.name == other.name
+    }
     public let name: String = ""
     
     public init(withBuilder builder: HasParentQueryBuilder) {
@@ -62,7 +74,11 @@ internal class HasParentQuery: Query {
 
 // MARK:- ParentId Query
 
-internal class ParentIdQuery: Query {
+internal struct ParentIdQuery: Query {
+    //TODO remove at time of implementation and conform to Equatable
+    func isEqualTo(_ other: Query) -> Bool {
+        return self.name == other.name
+    }
     public let name: String = ""
     
     public init(withBuilder builder: ParentIdQueryBuilder) {

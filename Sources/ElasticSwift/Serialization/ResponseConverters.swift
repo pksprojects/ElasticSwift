@@ -24,8 +24,7 @@ public class ResponseConverters {
                 return callback(.failure(error))
             case .success(let response):
                 
-                if var body = response.body, let bytes = body.readBytes(length: body.readableBytes) {
-                    let data = Data(bytes)
+                if let data = response.body {
                     guard (!response.status.isError()) else {
                         
                         /// handle GetResponse 404
@@ -75,8 +74,7 @@ public class ResponseConverters {
             case .success(let response):
                 
                 guard (response.status.is2xxSuccessful() || response.status == .notFound) else {
-                    if var body = response.body, let bytes = body.readBytes(length: body.readableBytes) {
-                        let data = Data(bytes)
+                    if let data = response.body {
                         let decodedError: Result<ElasticsearchError, DecodingError> = serializer.decode(data: data)
                         switch decodedError {
                         case .failure(let error):

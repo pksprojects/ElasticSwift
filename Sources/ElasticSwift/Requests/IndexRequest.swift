@@ -12,7 +12,7 @@ import ElasticSwiftCore
 
 //MARK:- Index Requet Builder
 
-public class IndexRequestBuilder<T: Codable>: RequestBuilder {
+public class IndexRequestBuilder<T: Codable>: RequestBuilder where T: Equatable {
     
     public typealias RequestType = IndexRequest<T>
     
@@ -119,7 +119,7 @@ public class IndexRequestBuilder<T: Codable>: RequestBuilder {
 
 //MARK:- Index Request
 
-public class IndexRequest<T: Codable>: Request {
+public struct IndexRequest<T: Codable>: Request where T: Equatable {
     
     public var headers: HTTPHeaders = HTTPHeaders()
     
@@ -221,4 +221,6 @@ public class IndexRequest<T: Codable>: Request {
     }
     
 }
+
+extension IndexRequest: Equatable {}
 

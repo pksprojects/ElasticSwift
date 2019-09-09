@@ -68,7 +68,7 @@ public class UpdateByQueryRequestBuilder: RequestBuilder {
 
 // MARK:- Update By Query Request
 
-public class UpdateByQueryRequest: Request {
+public struct UpdateByQueryRequest: Request {
     public var headers: HTTPHeaders = HTTPHeaders()
     
     public let index: String
@@ -143,37 +143,64 @@ public class UpdateByQueryRequest: Request {
     }
     
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-        var dic = [String: Any]()
-        /// TODO: Need to look for alternate for encoding, decoding and again encoding for script
-        if let script = self.script {
-            let result = serializer.encode(script)
-            switch result {
-            case .success(let data):
-                do {
-                dic["script"] = try JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
-                } catch {
-                    return .failure(.wrapped(error))
-                }
-            case .failure(let error):
-                return .failure(.wrapped(error))
-            }
-        }
-        
-        if let query = self.query {
-            dic["query"] = query.toDic()
-        }
-        
-        if dic.isEmpty {
+        if self.query == nil && self.script == nil {
             return .failure(.noBodyForRequest)
         }
-        
-        do {
-            let data = try JSONSerialization.data(withJSONObject: dic, options: [])
-            return .success(data)
-        } catch {
-            return .failure(.wrapped(error))
+        let body = Body(query: self.query, script: self.script)
+        return serializer.encode(body).mapError { error -> MakeBodyError in
+            return MakeBodyError.wrapped(error)
         }
     }
     
+    struct Body: Codable {
+        public let query: Query?
+        public let script: Script?
+        
+        init(query: Query?, script: Script?) {
+            self.query = query
+            self.script = script
+        }
+        
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self.query = try container.decodeQueryIfPresent(forKey: .query)
+            self.script = try container.decode(Script.self, forKey: .script)
+        }
+        
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encodeIfPresent(self.query, forKey: .query)
+            try container.encodeIfPresent(self.script, forKey: .script)
+        }
+        
+        enum CodingKeys: String, CodingKey {
+            case query
+            case script
+        }
+    }
+}
+
+extension UpdateByQueryRequest: Equatable {
+    public static func == (lhs: UpdateByQueryRequest, rhs: UpdateByQueryRequest) -> Bool {
+        return lhs.index == rhs.index
+            && lhs.type == rhs.type
+            && lhs.script == rhs.script
+            && lhs.refresh == rhs.refresh
+            && lhs.conflicts == rhs.conflicts
+            && lhs.routing == rhs.routing
+            && lhs.scrollSize == rhs.scrollSize
+            && lhs.from == rhs.from
+            && lhs.size == rhs.size
+            && matchQueries(lhs.query, rhs.query)
+    }
     
+    private static func matchQueries(_ lhs: Query? , _ rhs: Query?) -> Bool {
+        if lhs == nil && rhs == nil {
+            return true
+        }
+        if let lhs = lhs, let rhs = rhs {
+            return lhs.isEqualTo(rhs)
+        }
+        return false
+    }
 }

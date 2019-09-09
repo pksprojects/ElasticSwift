@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ElasticSwift::ElasticSwiftNetworking"
-               BuildableName = "ElasticSwiftNetworking.framework"
-               BlueprintName = "ElasticSwiftNetworking"
+               BlueprintIdentifier = "ElasticSwift::ElasticSwiftQueryDSL"
+               BuildableName = "ElasticSwiftQueryDSL.framework"
+               BlueprintName = "ElasticSwiftQueryDSL"
                ReferencedContainer = "container:ElasticSwift.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -28,9 +28,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ElasticSwift::ElasticSwiftQueryDSL"
-               BuildableName = "ElasticSwiftQueryDSL.framework"
-               BlueprintName = "ElasticSwiftQueryDSL"
+               BlueprintIdentifier = "ElasticSwift::ElasticSwiftCore"
+               BuildableName = "ElasticSwiftCore.framework"
+               BlueprintName = "ElasticSwiftCore"
                ReferencedContainer = "container:ElasticSwift.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -70,9 +70,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ElasticSwift::ElasticSwiftCore"
-               BuildableName = "ElasticSwiftCore.framework"
-               BlueprintName = "ElasticSwiftCore"
+               BlueprintIdentifier = "ElasticSwift::ElasticSwiftNetworking"
+               BuildableName = "ElasticSwiftNetworking.framework"
+               BlueprintName = "ElasticSwiftNetworking"
                ReferencedContainer = "container:ElasticSwift.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -86,6 +86,20 @@
       codeCoverageEnabled = "YES"
       onlyGenerateCoverageForSpecifiedTargets = "YES">
       <CodeCoverageTargets>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "ElasticSwift::ElasticSwift"
+            BuildableName = "ElasticSwift.framework"
+            BlueprintName = "ElasticSwift"
+            ReferencedContainer = "container:ElasticSwift.xcodeproj">
+         </BuildableReference>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "ElasticSwift::ElasticSwiftCodableUtils"
+            BuildableName = "ElasticSwiftCodableUtils.framework"
+            BlueprintName = "ElasticSwiftCodableUtils"
+            ReferencedContainer = "container:ElasticSwift.xcodeproj">
+         </BuildableReference>
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "ElasticSwift::ElasticSwiftCore"
@@ -105,20 +119,6 @@
             BlueprintIdentifier = "ElasticSwift::ElasticSwiftQueryDSL"
             BuildableName = "ElasticSwiftQueryDSL.framework"
             BlueprintName = "ElasticSwiftQueryDSL"
-            ReferencedContainer = "container:ElasticSwift.xcodeproj">
-         </BuildableReference>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "ElasticSwift::ElasticSwift"
-            BuildableName = "ElasticSwift.framework"
-            BlueprintName = "ElasticSwift"
-            ReferencedContainer = "container:ElasticSwift.xcodeproj">
-         </BuildableReference>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "ElasticSwift::ElasticSwiftCodableUtils"
-            BuildableName = "ElasticSwiftCodableUtils.framework"
-            BlueprintName = "ElasticSwiftCodableUtils"
             ReferencedContainer = "container:ElasticSwift.xcodeproj">
          </BuildableReference>
       </CodeCoverageTargets>

@@ -10,7 +10,11 @@ import ElasticSwiftCore
 
 // MARK:- MoreLikeThis Query
 
-internal class MoreLikeThisQuery: Query {
+internal struct MoreLikeThisQuery: Query {
+    //TODO remove at time of implementation and conform to Equatable
+    func isEqualTo(_ other: Query) -> Bool {
+        return self.name == other.name
+    }
     public let name: String = ""
     
     public init(withBuilder builder: MoreLikeThisQueryBuilder) {
@@ -27,7 +31,11 @@ internal class MoreLikeThisQuery: Query {
 
 // MARK:- Script Query
 
-internal class ScriptQuery: Query {
+internal struct ScriptQuery: Query {
+    //TODO remove at time of implementation and conform to Equatable
+    func isEqualTo(_ other: Query) -> Bool {
+        return self.name == other.name
+    }
     public let name: String = ""
     
     public init(withBuilder builder: ScriptQueryBuilder) {
@@ -44,7 +52,11 @@ internal class ScriptQuery: Query {
 
 // MARK:- Percolate Query
 
-internal class PercoloteQuery: Query {
+internal struct PercoloteQuery: Query {
+    //TODO remove at time of implementation and conform to Equatable
+    func isEqualTo(_ other: Query) -> Bool {
+        return self.name == other.name
+    }
     public let name: String = ""
     
     public init(withBuilder builder: PercoloteQueryBuilder) {
@@ -61,7 +73,11 @@ internal class PercoloteQuery: Query {
 
 // MARK:- Wrapper Query
 
-internal class WrapperQuery: Query {
+internal struct WrapperQuery: Query {
+    //TODO remove at time of implementation and conform to Equatable
+    func isEqualTo(_ other: Query) -> Bool {
+        return self.name == other.name
+    }
     public let name: String = ""
     
     public init(withBuilder builder: WrapperQueryBuilder) {

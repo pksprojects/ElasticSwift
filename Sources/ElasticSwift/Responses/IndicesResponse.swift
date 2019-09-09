@@ -12,7 +12,7 @@ import ElasticSwiftCodableUtils
 
 //MARK:- Create Index Response
 
-public struct CreateIndexResponse: Codable {
+public struct CreateIndexResponse: Codable, Equatable {
     
     public let acknowledged: Bool
     public let shardsAcknowledged: Bool
@@ -34,7 +34,7 @@ public struct CreateIndexResponse: Codable {
 
 //MARK:- Get Index Response
 
-public struct GetIndexResponse: Codable {
+public struct GetIndexResponse: Codable, Equatable {
     
     public let aliases: [IndexAlias]
     public let mappings: [String: MappingMetaData]
@@ -102,7 +102,7 @@ public struct GetIndexResponse: Codable {
     }
 }
 
-public struct AcknowledgedResponse: Codable {
+public struct AcknowledgedResponse: Codable, Equatable {
     
     public let acknowledged: Bool
     
@@ -117,10 +117,10 @@ public struct MappingMetaData: Codable {
     public let fields: Fields?
     public var properties: [String: MappingMetaData]?
     
-    public struct Fields: Codable {
+    public struct Fields: Codable, Equatable {
         public let keyword: Keyword
         
-        public struct Keyword: Codable {
+        public struct Keyword: Codable, Equatable {
             public let type: String
             public let ignoreAbove: Int?
             
@@ -132,6 +132,8 @@ public struct MappingMetaData: Codable {
     }
     
 }
+
+extension MappingMetaData: Equatable {}
 
 public struct AliasMetaData: Codable {
     
@@ -148,7 +150,9 @@ public struct AliasMetaData: Codable {
     }
 }
 
-public struct IndexSettings: Codable {
+extension AliasMetaData: Equatable {}
+
+public struct IndexSettings: Codable, Equatable {
     
     public let creationDate: String
     public let numberOfShards: String
@@ -192,7 +196,7 @@ public struct IndexSettings: Codable {
     
 }
 
-public struct IndexVersion: Codable {
+public struct IndexVersion: Codable, Equatable {
     public let created: String
     public let updated: String?
     
@@ -261,11 +265,11 @@ public struct IndexAlias: Codable {
     }
 }
 
-
+extension IndexAlias: Equatable {}
 
 //MARK:- INDEX Exists Response
 
-public class IndexExistsResponse: Codable {
+public struct IndexExistsResponse: Codable, Equatable {
     
     public let exists: Bool
     

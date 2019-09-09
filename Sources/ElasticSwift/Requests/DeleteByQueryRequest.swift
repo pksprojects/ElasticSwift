@@ -60,7 +60,7 @@ public class DeleteByQueryRequestBuilder: RequestBuilder {
 // MARK:- Delete By Query Request
 
 /// Class representing `_delete_by_query` request
-public class DeleteByQueryRequest: Request {
+public struct DeleteByQueryRequest: Request {
     
     public typealias ResponseType = DeleteByQueryResponse
     
@@ -142,17 +142,43 @@ public class DeleteByQueryRequest: Request {
     }
     
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-        
-        let dic = ["query": self.query.toDic()]
-        
-        do {
-            let data = try JSONSerialization.data(withJSONObject: dic, options: [])
-            return .success(data)
-        } catch {
-            return .failure(.wrapped(error))
+        let body = Body(query: self.query)
+        return serializer.encode(body).mapError { error -> MakeBodyError in
+            return MakeBodyError.wrapped(error)
         }
     }
     
+    struct Body: Encodable {
+        let query: Query
+        
+        init(query: Query) {
+            self.query = query
+        }
+        
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodinKeys.self)
+            try container.encode(self.query, forKey: .query)
+        }
+        
+        enum CodinKeys: String, CodingKey {
+            case query
+        }
+    }
+    
+}
+
+extension DeleteByQueryRequest: Equatable {
+    public static func == (lhs: DeleteByQueryRequest, rhs: DeleteByQueryRequest) -> Bool {
+        return lhs.index == rhs.index
+            && lhs.type == rhs.type
+            && lhs.query.isEqualTo(rhs.query)
+            && lhs.refresh == rhs.refresh
+            && lhs.conflicts == rhs.conflicts
+            && lhs.routing == rhs.routing
+            && lhs.scrollSize == rhs.scrollSize
+            && lhs.from == rhs.from
+            && lhs.size == rhs.size
+    }
 }
 
 public enum ConflictStrategy: String {

@@ -119,7 +119,7 @@ public class SearchRequestBuilder: RequestBuilder {
 
 //MARK:- Search Request
 
-public class SearchRequest: Request {
+public struct SearchRequest: Request {
     
     public var headers: HTTPHeaders = HTTPHeaders()
     
@@ -135,7 +135,19 @@ public class SearchRequest: Request {
     public let explain: Bool?
     public let minScore: Decimal?
     
-    init(withBuilder builder: SearchRequestBuilder) throws {
+    public init(index: String, type: String?, from: Int16?, size: Int16?, query: Query?, sort: Sort?, fetchSource: Bool?, explain: Bool?, minScore: Decimal?) {
+        self.index = index
+        self.type = type
+        self.from = from
+        self.size = size
+        self.query = query
+        self.sort = sort
+        self.fetchSource = fetchSource
+        self.explain = explain
+        self.minScore = minScore
+    }
+    
+    internal init(withBuilder builder: SearchRequestBuilder) throws {
         self.index = builder.index ?? "_all"
         self.type = builder.type
         self.query = builder.query
@@ -164,34 +176,68 @@ public class SearchRequest: Request {
     }
     
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        let body = Body(query: self.query, sort: self.sort, size: self.size, from: self.from, source: self.fetchSource, explain: self.explain, minScore: self.minScore)
+        return serializer.encode(body).mapError { error -> MakeBodyError in
+            return MakeBodyError.wrapped(error)
+        }
+    }
+    
+    struct Body: Encodable {
+        public let query: Query?
+        public let sort: Sort?
+        public let size: Int16?
+        public let from: Int16?
+        public let source: Bool?
+        public let explain: Bool?
+        public let minScore: Decimal?
         
-        var dic = [String: Any]()
-        if let query = self.query {
-            dic["query"] = query.toDic()
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encodeIfPresent(self.query, forKey: .query)
+            try container.encodeIfPresent(self.sort, forKey: .sort)
+            try container.encodeIfPresent(self.size, forKey: .size)
+            try container.encodeIfPresent(self.from, forKey: .from)
+            try container.encodeIfPresent(self.source, forKey: .source)
+            try container.encodeIfPresent(self.explain, forKey: .explain)
+            try container.encodeIfPresent(self.minScore, forKey: .minScore)
         }
-        if let sort = self.sort {
-            dic["sort"] = sort.toDic()
+        
+        enum CodingKeys: String, CodingKey {
+            case query
+            case sort
+            case size
+            case from
+            case source = "_source"
+            case explain
+            case minScore = "min_score"
         }
-        if let size = self.size {
-            dic["size"] = size
+    }
+}
+
+extension SearchRequest: Equatable {
+    public static func == (lhs: SearchRequest, rhs: SearchRequest) -> Bool {
+        return lhs.index == rhs.index
+            && lhs.explain == rhs.explain
+            && lhs.fetchSource == rhs.fetchSource
+            && lhs.from == rhs.from
+            && lhs.endPoint == rhs.endPoint
+            && lhs.headers == rhs.headers
+            && lhs.method == rhs.method
+            && lhs.minScore == rhs.minScore
+            && lhs.queryParams == rhs.queryParams
+            && lhs.size == rhs.size
+            && lhs.sort == rhs.sort
+            && lhs.type == rhs.type
+            && SearchRequest.matchQueries(lhs.query, rhs.query)
+    }
+    
+    private static func matchQueries(_ lhs: Query? , _ rhs: Query?) -> Bool {
+        if lhs == nil && rhs == nil {
+            return true
         }
-        if let from = self.from {
-            dic["from"] = from
+        if let lhs = lhs, let rhs = rhs {
+            return lhs.isEqualTo(rhs)
         }
-        if let fetchSource = self.fetchSource {
-            dic["_source"] = fetchSource
-        }
-        if let explain = self.explain {
-            dic["explain"] = explain
-        }
-        if let minSore = self.minScore {
-            dic["min_score"] = minSore
-        }
-        do {
-            let data = try JSONSerialization.data(withJSONObject: dic, options: [])
-            return .success(data)
-        } catch {
-            return .failure(.wrapped(error))
-        }
+        return false
     }
 }

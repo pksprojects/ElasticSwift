@@ -476,3 +476,454 @@ extension EncodableValue: Equatable {
         }
     }
 }
+
+public extension KeyedDecodingContainer {
+    
+    func decodeBool(forKey key: KeyedDecodingContainer<K>.Key) throws -> Bool {
+        return try decode(Bool.self, forKey: key)
+    }
+    
+    func decodeString(forKey key: KeyedDecodingContainer<K>.Key) throws -> String {
+        return try decode(String.self, forKey: key)
+    }
+    
+    func decodeInt(forKey key: KeyedDecodingContainer<K>.Key) throws -> Int {
+        return try decode(Int.self, forKey: key)
+    }
+    
+    func decodeInt8(forKey key: KeyedDecodingContainer<K>.Key) throws -> Int8 {
+        return try decode(Int8.self, forKey: key)
+    }
+    
+    func decodeInt16(forKey key: KeyedDecodingContainer<K>.Key) throws -> Int16 {
+        return try decode(Int16.self, forKey: key)
+    }
+    
+    func decodeInt32(forKey key: KeyedDecodingContainer<K>.Key) throws -> Int32 {
+        return try decode(Int32.self, forKey: key)
+    }
+    
+    func decodeInt64(forKey key: KeyedDecodingContainer<K>.Key) throws -> Int64 {
+        return try decode(Int64.self, forKey: key)
+    }
+    
+    func decodeUInt(forKey key: KeyedDecodingContainer<K>.Key) throws -> UInt {
+        return try decode(UInt.self, forKey: key)
+    }
+    
+    func decodeUInt8(forKey key: KeyedDecodingContainer<K>.Key) throws -> UInt8 {
+        return try decode(UInt8.self, forKey: key)
+    }
+    
+    func decodeUInt16(forKey key: KeyedDecodingContainer<K>.Key) throws -> UInt16 {
+        return try decode(UInt16.self, forKey: key)
+    }
+    
+    func decodeUInt32(forKey key: KeyedDecodingContainer<K>.Key) throws -> UInt32 {
+        return try decode(UInt32.self, forKey: key)
+    }
+    
+    func decodeUInt64(forKey key: KeyedDecodingContainer<K>.Key) throws -> UInt64 {
+        return try decode(UInt64.self, forKey: key)
+    }
+    
+    func decodeDouble(forKey key: KeyedDecodingContainer<K>.Key) throws -> Double {
+        return try decode(Double.self, forKey: key)
+    }
+    
+    func decodeDecimal(forKey key: KeyedDecodingContainer<K>.Key) throws -> Decimal {
+        return try decode(Decimal.self, forKey: key)
+    }
+    
+    func decodeFloat(forKey key: KeyedDecodingContainer<K>.Key) throws -> Float {
+        return try decode(Float.self, forKey: key)
+    }
+    
+    func decodeDic<k, v: Decodable>(forKey key: KeyedDecodingContainer<K>.Key) throws -> Dictionary<k, v> where k: Hashable & Decodable {
+        return try decode(Dictionary<k, v>.self, forKey: key)
+    }
+    
+    func decodeArray<T: Decodable>(forKey key: KeyedDecodingContainer<K>.Key) throws -> [T] {
+        return try decode([T].self, forKey: key)
+    }
+    
+    func decodeBoolIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Bool? {
+        return try decodeIfPresent(Bool.self, forKey: key)
+    }
+    
+    func decodeStringIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> String? {
+        return try decodeIfPresent(String.self, forKey: key)
+    }
+    
+    func decodeIntIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Int? {
+        return try decodeIfPresent(Int.self, forKey: key)
+    }
+    
+    func decodeInt8IfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Int8? {
+        return try decodeIfPresent(Int8.self, forKey: key)
+    }
+    
+    func decodeInt16IfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Int16? {
+        return try decodeIfPresent(Int16.self, forKey: key)
+    }
+    
+    func decodeInt32IfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Int32? {
+        return try decodeIfPresent(Int32.self, forKey: key)
+    }
+    
+    func decodeInt64IfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Int64? {
+        return try decodeIfPresent(Int64.self, forKey: key)
+    }
+    
+    func decodeUIntIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> UInt? {
+        return try decodeIfPresent(UInt.self, forKey: key)
+    }
+    
+    func decodeUInt8IfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> UInt8? {
+        return try decodeIfPresent(UInt8.self, forKey: key)
+    }
+    
+    func decodetUInt16IfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> UInt16? {
+        return try decodeIfPresent(UInt16.self, forKey: key)
+    }
+    
+    func decodeUInt32IfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> UInt32? {
+        return try decodeIfPresent(UInt32.self, forKey: key)
+    }
+    
+    func decodeUInt64IfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> UInt64? {
+        return try decodeIfPresent(UInt64.self, forKey: key)
+    }
+    
+    func decodeDoubleIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Double? {
+        return try decodeIfPresent(Double.self, forKey: key)
+    }
+    
+    func decodeDecimalIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Decimal? {
+        return try decodeIfPresent(Decimal.self, forKey: key)
+    }
+    
+    func decodeFloatIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Float? {
+        return try decodeIfPresent(Float.self, forKey: key)
+    }
+    
+    func decodeDicIfPresent<k, v: Decodable>(forKey key: KeyedDecodingContainer<K>.Key) throws -> Dictionary<k, v>? where k: Hashable & Decodable {
+        return try decodeIfPresent(Dictionary<k, v>.self, forKey: key)
+    }
+    
+    func decodeArrayIfPresent<T: Decodable>(forKey key: KeyedDecodingContainer<K>.Key) throws -> [T]? {
+        return try decodeIfPresent([T].self, forKey: key)
+    }
+    
+}
+
+extension UnkeyedDecodingContainer {
+    
+    mutating func decodeBool() throws -> Bool {
+        return try decode(Bool.self)
+    }
+    
+    mutating func decodeString() throws -> String {
+        return try decode(String.self)
+    }
+    
+    mutating func decodeInt() throws -> Int {
+        return try decode(Int.self)
+    }
+    
+    mutating func decodeInt8() throws -> Int8 {
+        return try decode(Int8.self)
+    }
+    
+    mutating func decodeInt16() throws -> Int16 {
+        return try decode(Int16.self)
+    }
+    
+    mutating func decodeInt32() throws -> Int32 {
+        return try decode(Int32.self)
+    }
+    
+    mutating func decodeInt64() throws -> Int64 {
+        return try decode(Int64.self)
+    }
+    
+    mutating func decodeUInt() throws -> UInt {
+        return try decode(UInt.self)
+    }
+    
+    mutating func decodeUInt8() throws -> UInt8 {
+        return try decode(UInt8.self)
+    }
+    
+    mutating func decodeUInt16() throws -> UInt16 {
+        return try decode(UInt16.self)
+    }
+    
+    mutating func decodeUInt32() throws -> UInt32 {
+        return try decode(UInt32.self)
+    }
+    
+    mutating func decodeUInt64() throws -> UInt64 {
+        return try decode(UInt64.self)
+    }
+    
+    mutating func decodeDouble() throws -> Double {
+        return try decode(Double.self)
+    }
+    
+    mutating func decodeDecimal() throws -> Decimal {
+        return try decode(Decimal.self)
+    }
+    
+    mutating func decodeFloat() throws -> Float {
+        return try decode(Float.self)
+    }
+    
+    mutating func decodeDic<k, v: Decodable>() throws -> Dictionary<k, v> where k: Hashable & Decodable {
+        return try decode(Dictionary<k, v>.self)
+    }
+    
+    mutating func decodeArray<T: Decodable>() throws -> [T] {
+        return try decode([T].self)
+    }
+    
+    mutating func decodeBoolIfPresent() throws -> Bool? {
+        return try decodeIfPresent(Bool.self)
+    }
+    
+    mutating func decodeStringIfPresent() throws -> String? {
+        return try decodeIfPresent(String.self)
+    }
+    
+    mutating func decodeIntIfPresent() throws -> Int? {
+        return try decodeIfPresent(Int.self)
+    }
+    
+    mutating func decodeInt8IfPresent() throws -> Int8? {
+        return try decodeIfPresent(Int8.self)
+    }
+    
+    mutating func decodeInt16IfPresent() throws -> Int16? {
+        return try decodeIfPresent(Int16.self)
+    }
+    
+    mutating func decodeInt32IfPresent() throws -> Int32? {
+        return try decodeIfPresent(Int32.self)
+    }
+    
+    mutating func decodeInt64IfPresent() throws -> Int64? {
+        return try decodeIfPresent(Int64.self)
+    }
+    
+    mutating func decodeUIntIfPresent() throws -> UInt? {
+        return try decodeIfPresent(UInt.self)
+    }
+    
+    mutating func decodeUInt8IfPresent() throws -> UInt8? {
+        return try decodeIfPresent(UInt8.self)
+    }
+    
+    mutating func decodeUInt16IfPresent() throws -> UInt16? {
+        return try decodeIfPresent(UInt16.self)
+    }
+    
+    mutating func decodeUInt32IfPresent() throws -> UInt32? {
+        return try decodeIfPresent(UInt32.self)
+    }
+    
+    mutating func decodeUInt64IfPresent() throws -> UInt64? {
+        return try decodeIfPresent(UInt64.self)
+    }
+    
+    mutating func decodeDoubleIfPresent() throws -> Double? {
+        return try decodeIfPresent(Double.self)
+    }
+    
+    mutating func decodeDecimalIfPresent() throws -> Decimal? {
+        return try decodeIfPresent(Decimal.self)
+    }
+    
+    mutating func decodeIfPresentFloat() throws -> Float? {
+        return try decodeIfPresent(Float.self)
+    }
+    
+    mutating func decodeIfPresentDic<k, v: Decodable>() throws -> Dictionary<k, v>? where k: Hashable & Decodable {
+        return try decodeIfPresent(Dictionary<k, v>.self)
+    }
+    
+    mutating func decodeIfPresentArray<T: Decodable>() throws -> [T]? {
+        return try decodeIfPresent([T].self)
+    }
+    
+}
+
+extension SingleValueDecodingContainer {
+    
+    /// Decodes a single value of the given type.
+    ///
+    /// - returns: A value of the requested type.
+    /// - throws: `DecodingError.typeMismatch` if the encountered encoded value
+    ///   cannot be converted to the requested type.
+    /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
+    ///   is null.
+    public func decodeBool() throws -> Bool {
+        return try decode(Bool.self)
+    }
+
+    /// Decodes a single value of the given type.
+    ///
+    /// - parameter type: The type to decode as.
+    /// - returns: A value of the requested type.
+    /// - throws: `DecodingError.typeMismatch` if the encountered encoded value
+    ///   cannot be converted to the requested type.
+    /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
+    ///   is null.
+    public func decodeString() throws -> String {
+        return try decode(String.self)
+    }
+
+    /// Decodes a single value of the given type.
+    ///
+    /// - parameter type: The type to decode as.
+    /// - returns: A value of the requested type.
+    /// - throws: `DecodingError.typeMismatch` if the encountered encoded value
+    ///   cannot be converted to the requested type.
+    /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
+    ///   is null.
+    public func decodeDouble() throws -> Double {
+        return try decode(Double.self)
+    }
+
+    /// Decodes a single value of the given type.
+    ///
+    /// - parameter type: The type to decode as.
+    /// - returns: A value of the requested type.
+    /// - throws: `DecodingError.typeMismatch` if the encountered encoded value
+    ///   cannot be converted to the requested type.
+    /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
+    ///   is null.
+    public func decodeFloat() throws -> Float {
+        return try decode(Float.self)
+    }
+
+    /// Decodes a single value of the given type.
+    ///
+    /// - parameter type: The type to decode as.
+    /// - returns: A value of the requested type.
+    /// - throws: `DecodingError.typeMismatch` if the encountered encoded value
+    ///   cannot be converted to the requested type.
+    /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
+    ///   is null.
+    public func decodeInt() throws -> Int {
+        return try decode(Int.self)
+    }
+
+    /// Decodes a single value of the given type.
+    ///
+    /// - parameter type: The type to decode as.
+    /// - returns: A value of the requested type.
+    /// - throws: `DecodingError.typeMismatch` if the encountered encoded value
+    ///   cannot be converted to the requested type.
+    /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
+    ///   is null.
+    public func decodeInt8() throws -> Int8 {
+        return try decode(Int8.self)
+    }
+
+    /// Decodes a single value of the given type.
+    ///
+    /// - parameter type: The type to decode as.
+    /// - returns: A value of the requested type.
+    /// - throws: `DecodingError.typeMismatch` if the encountered encoded value
+    ///   cannot be converted to the requested type.
+    /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
+    ///   is null.
+    public func decodeInt16() throws -> Int16 {
+        return try decode(Int16.self)
+    }
+
+    /// Decodes a single value of the given type.
+    ///
+    /// - parameter type: The type to decode as.
+    /// - returns: A value of the requested type.
+    /// - throws: `DecodingError.typeMismatch` if the encountered encoded value
+    ///   cannot be converted to the requested type.
+    /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
+    ///   is null.
+    public func decodeInt32() throws -> Int32 {
+        return try decode(Int32.self)
+    }
+
+    /// Decodes a single value of the given type.
+    ///
+    /// - parameter type: The type to decode as.
+    /// - returns: A value of the requested type.
+    /// - throws: `DecodingError.typeMismatch` if the encountered encoded value
+    ///   cannot be converted to the requested type.
+    /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
+    ///   is null.
+    public func decodeInt64() throws -> Int64 {
+        return try decode(Int64.self)
+    }
+
+    /// Decodes a single value of the given type.
+    ///
+    /// - parameter type: The type to decode as.
+    /// - returns: A value of the requested type.
+    /// - throws: `DecodingError.typeMismatch` if the encountered encoded value
+    ///   cannot be converted to the requested type.
+    /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
+    ///   is null.
+    public func decodeUInt() throws -> UInt {
+        return try decode(UInt.self)
+    }
+
+    /// Decodes a single value of the given type.
+    ///
+    /// - parameter type: The type to decode as.
+    /// - returns: A value of the requested type.
+    /// - throws: `DecodingError.typeMismatch` if the encountered encoded value
+    ///   cannot be converted to the requested type.
+    /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
+    ///   is null.
+    public func decodeUInt8() throws -> UInt8 {
+        return try decode(UInt8.self)
+    }
+
+    /// Decodes a single value of the given type.
+    ///
+    /// - parameter type: The type to decode as.
+    /// - returns: A value of the requested type.
+    /// - throws: `DecodingError.typeMismatch` if the encountered encoded value
+    ///   cannot be converted to the requested type.
+    /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
+    ///   is null.
+    public func decodeUInt16() throws -> UInt16 {
+        return try decode(UInt16.self)
+    }
+
+    /// Decodes a single value of the given type.
+    ///
+    /// - parameter type: The type to decode as.
+    /// - returns: A value of the requested type.
+    /// - throws: `DecodingError.typeMismatch` if the encountered encoded value
+    ///   cannot be converted to the requested type.
+    /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
+    ///   is null.
+    public func decodeUInt32() throws -> UInt32 {
+        return try decode(UInt32.self)
+    }
+
+    /// Decodes a single value of the given type.
+    ///
+    /// - parameter type: The type to decode as.
+    /// - returns: A value of the requested type.
+    /// - throws: `DecodingError.typeMismatch` if the encountered encoded value
+    ///   cannot be converted to the requested type.
+    /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
+    ///   is null.
+    public func decodeUInt64() throws -> UInt64 {
+        return try decode(UInt64.self)
+    }
+    
+}

@@ -57,11 +57,24 @@ public protocol ScoreFunctionBuilder {
 
 // MARK:- ScoreFunction Protocol
 
-public protocol ScoreFunction {
+public protocol ScoreFunction: Codable {
     
     var name: String { get }
     
+    func isEqualTo(_ other: ScoreFunction) -> Bool
+    
     func toDic() -> [String: Any]
+}
+
+extension ScoreFunction where Self: Equatable {
+    
+    public func isEqualTo(_ other: ScoreFunction) -> Bool {
+        if let o = other as? Self {
+            return self == o
+        }
+        return false
+    }
+    
 }
 
 // MARK:- Weight Builder
@@ -355,7 +368,7 @@ public class FieldValueFactorFunctionBuilder: ScoreFunctionBuilder {
     
     private var _field: String?
     private var _factor: Decimal?
-    private var _modifier: FieldValueScoreFunction.Modifier?
+    private var _modifier: FieldValueFactorScoreFunction.Modifier?
     private var _missing: Decimal?
     
     public init() {}
@@ -371,7 +384,7 @@ public class FieldValueFactorFunctionBuilder: ScoreFunctionBuilder {
         return self
     }
     @discardableResult
-    public func set(modifier: FieldValueScoreFunction.Modifier) -> FieldValueFactorFunctionBuilder {
+    public func set(modifier: FieldValueFactorScoreFunction.Modifier) -> FieldValueFactorFunctionBuilder {
         self._modifier = modifier
         return self
     }
@@ -387,25 +400,25 @@ public class FieldValueFactorFunctionBuilder: ScoreFunctionBuilder {
     public var factor: Decimal? {
         return self._factor
     }
-    public var modifier: FieldValueScoreFunction.Modifier? {
+    public var modifier: FieldValueFactorScoreFunction.Modifier? {
         return self._modifier
     }
     public var missing: Decimal? {
         return self._missing
     }
     
-    public func build() throws -> FieldValueScoreFunction {
-        return try FieldValueScoreFunction(withBuilder: self)
+    public func build() throws -> FieldValueFactorScoreFunction {
+        return try FieldValueFactorScoreFunction(withBuilder: self)
     }
     
 }
 
 // MARK:- Weight Score Function
 
-public class WeightScoreFunction: ScoreFunction {
-    public var name: String = "weight"
+public struct WeightScoreFunction: ScoreFunction {
+    public let name: String = "weight"
     
-    var weight: Decimal
+    public let weight: Decimal
     
     public init(_ weight: Decimal) {
         self.weight = weight
@@ -425,17 +438,34 @@ public class WeightScoreFunction: ScoreFunction {
     }
 }
 
+extension WeightScoreFunction {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
+        self.weight = try container.decodeDecimal(forKey: .key(named: self.name))
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: DynamicCodingKeys.self)
+        try container.encode(self.weight, forKey: .key(named: self.name))
+    }
+}
+
+extension WeightScoreFunction: Equatable {
+    
+    public static func == (lhs: WeightScoreFunction, rhs: WeightScoreFunction) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.weight == rhs.weight
+    }
+}
+
 // MARK:- Randon Score Function
 
-public class RandomScoreFunction: ScoreFunction {
+public struct RandomScoreFunction: ScoreFunction {
     
-    private static let SEED = "seed"
-    private static let FIELD = "field"
+    public let name: String = "random_score"
     
-    public var name: String = "random_score"
-    
-    var seed: Int
-    var field: String
+    public let seed: Int
+    public let field: String
     
     public init(field: String, seed: Int) {
         self.seed = seed
@@ -457,21 +487,45 @@ public class RandomScoreFunction: ScoreFunction {
     }
     
     public func toDic() -> [String : Any] {
-        return [self.name: [RandomScoreFunction.SEED: self.seed,
-                            RandomScoreFunction.FIELD: self.field]]
+        return [self.name: [CodingKeys.seed.rawValue: self.seed,
+                            CodingKeys.field.rawValue: self.field]]
+    }
+}
+
+extension RandomScoreFunction {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
+        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.name))
+        self.seed = try nested.decodeInt(forKey: .seed)
+        self.field = try nested.decodeString(forKey: .field)
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: DynamicCodingKeys.self)
+        var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.name))
+        try nested.encode(self.seed, forKey: .seed)
+        try nested.encode(self.field, forKey: .field)
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case seed
+        case field
+    }
+}
+
+extension RandomScoreFunction: Equatable {
+    public static func == (lhs: RandomScoreFunction, rhs: RandomScoreFunction) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.seed == rhs.seed
+            && lhs.field == rhs.field
     }
 }
 
 // MARK: Script Score Function
 
-public class ScriptScoreFunction: ScoreFunction {
+public struct ScriptScoreFunction: ScoreFunction {
     
-    private static let SOURCE = "source"
-    private static let LANG = "lang"
-    private static let PARAMS = "params"
-    private static let SCRIPT = "script"
-    
-    public var name: String = "script_score"
+    public let name: String = "script_score"
     
     public let script: Script
     
@@ -489,18 +543,32 @@ public class ScriptScoreFunction: ScoreFunction {
     }
     
     public func toDic() -> [String : Any] {
-        var dic: [String: Any] = [:]
-        
-        dic[ScriptScoreFunction.SOURCE] = self.script.source
-        
-        if let lang = self.script.lang, !lang.isEmpty {
-            dic[ScriptScoreFunction.PARAMS] = lang
-        }
-        
-        if let params = self.script.params, !params.isEmpty {
-            dic[ScriptScoreFunction.PARAMS] = params
-        }
-        return [self.name: [ScriptScoreFunction.SCRIPT: dic]]
+        return [self.name: [CodingKeys.script.rawValue: self.script.toDic()]]
+    }
+}
+
+extension ScriptScoreFunction {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
+        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.name))
+        self.script = try nested.decode(Script.self, forKey: .script)
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: DynamicCodingKeys.self)
+        var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.name))
+        try nested.encode(self.script, forKey: .script)
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case script
+    }
+}
+
+extension ScriptScoreFunction: Equatable {
+    public static func == (lhs: ScriptScoreFunction, rhs: ScriptScoreFunction) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.script == rhs.script
     }
 }
 
@@ -524,6 +592,10 @@ public class LinearDecayScoreFunction: DecayScoreFunction {
         
         super.init(type: .linear, field: builder.field!, origin: builder.origin!, scale: builder.scale!, offset: builder.offset!, decay: builder.decay!, multiValueMode: builder.multiValueMode)
     }
+    
+    public required init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+    }
 }
 
 // MARK:- Gauss Score Function
@@ -545,6 +617,10 @@ public class GaussScoreFunction: DecayScoreFunction {
         }
         
         super.init(type: .gauss, field: builder.field!, origin: builder.origin!, scale: builder.scale!, offset: builder.offset!, decay: builder.decay!, multiValueMode: builder.multiValueMode)
+    }
+    
+    public required init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
     }
 }
 
@@ -568,17 +644,15 @@ public class ExponentialDecayScoreFunction: DecayScoreFunction {
         
         super.init(type: .exp, field: builder.field!, origin: builder.origin!, scale: builder.scale!, offset: builder.offset!, decay: builder.decay!, multiValueMode: builder.multiValueMode)
     }
+    
+    public required init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+    }
 }
 
 // MARK:- Decay Score Function
 
 public class DecayScoreFunction: ScoreFunction {
-    
-    private static let ORIGIN = "origin"
-    private static let SCALE = "scale"
-    private static let OFFSET = "offset"
-    private static let DECAY = "decay"
-    private static let MULTI_VALUE_MODE = "multi_value_mode"
     
     public let name: String
     public let field: String
@@ -603,33 +677,104 @@ public class DecayScoreFunction: ScoreFunction {
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [
             self.field: [
-                DecayScoreFunction.ORIGIN: self.origin,
-                DecayScoreFunction.SCALE: self.scale,
+                CodingKeys.origin.rawValue: self.origin,
+                CodingKeys.scale.rawValue: self.scale,
             ]
         ]
-        if var subDic = dic[self.field] as? [String: Any] {
-            subDic[DecayScoreFunction.OFFSET] = self.offset
+        if let offset = self.offset {
+            if var subDic = dic[self.field] as? [String: Any] {
+                subDic[CodingKeys.offset.rawValue] = offset
+            }
         }
-        if var subDic = dic[self.field] as? [String: Any] {
-            subDic[DecayScoreFunction.DECAY] = self.decay
+        
+        if let decay = self.decay {
+            if var subDic = dic[self.field] as? [String: Any] {
+                subDic[CodingKeys.decay.rawValue] = decay
+            }
         }
         
         if let multiValueMode =  self.multiValueMode {
-            dic[DecayScoreFunction.MULTI_VALUE_MODE] = multiValueMode
+            dic[CodingKeys.multiValueMode.rawValue] = multiValueMode
         }
         
         return [self.name: dic]
     }
     
+    public required init(from decoder: Decoder) throws {
+        let container =  try decoder.container(keyedBy: DynamicCodingKeys.self)
+        
+        var name: String?
+        
+        for type in DecayScoreFunctionType.allCases {
+            if container.contains(.key(named: type.rawValue)) {
+                name = type.rawValue
+            }
+        }
+    
+        guard name != nil else {
+            throw Swift.DecodingError.dataCorrupted(.init(codingPath: container.codingPath, debugDescription: "Unable to identify name"))
+        }
+        
+        self.name = name!
+        
+        let nested = try container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: self.name))
+        
+        guard nested.allKeys.count == 1 else {
+            throw Swift.DecodingError.dataCorrupted(.init(codingPath: container.codingPath, debugDescription: "Unable to identify field"))
+        }
+        
+        self.field = nested.allKeys.first!.stringValue
+        
+        let fieldContainer = try nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.field))
+        
+        self.origin = try fieldContainer.decodeString(forKey: .origin)
+        self.scale = try fieldContainer.decodeString(forKey: .scale)
+        self.offset = try fieldContainer.decodeStringIfPresent(forKey: .offset)
+        self.decay = try fieldContainer.decodeDecimalIfPresent(forKey: .decay)
+        
+        self.multiValueMode = try nested.decodeIfPresent(MultiValueMode.self, forKey: .key(named: CodingKeys.multiValueMode.rawValue))
+        
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: DynamicCodingKeys.self)
+        var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: self.name))
+        var fieldContainer = nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.field))
+        try fieldContainer.encode(self.origin, forKey: .origin)
+        try fieldContainer.encode(self.scale, forKey: .scale)
+        try fieldContainer.encodeIfPresent(self.offset, forKey: .offset)
+        try fieldContainer.encodeIfPresent(self.decay, forKey: .decay)
+        try nested.encodeIfPresent(self.multiValueMode, forKey: .key(named: CodingKeys.multiValueMode.rawValue))
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case origin
+        case scale
+        case offset
+        case decay
+        case multiValueMode = "multi_value_mode"
+    }
 }
 
-public enum DecayScoreFunctionType: String {
+extension DecayScoreFunction: Equatable {
+    public static func == (lhs: DecayScoreFunction, rhs: DecayScoreFunction) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.field == rhs.field
+            && lhs.origin == rhs.origin
+            && lhs.scale == rhs.origin
+            && lhs.offset == rhs.offset
+            && lhs.decay == rhs.decay
+            && lhs.multiValueMode == rhs.multiValueMode
+    }
+}
+
+public enum DecayScoreFunctionType: String, Codable, CaseIterable {
     case linear
     case gauss
     case exp
 }
 
-public enum MultiValueMode: String {
+public enum MultiValueMode: String, Codable {
     case min
     case max
     case avg
@@ -638,12 +783,7 @@ public enum MultiValueMode: String {
 
 // MARK:- Field Value Score Function
 
-public class FieldValueScoreFunction: ScoreFunction {
-    
-    private static let FIELD = "field"
-    private static let FACTOR = "factor"
-    private static let MODIFIER = "modifier"
-    private static let MISSING = "missing"
+public struct FieldValueFactorScoreFunction: ScoreFunction {
     
     public let name: String = "field_value_factor"
     
@@ -652,14 +792,14 @@ public class FieldValueScoreFunction: ScoreFunction {
     public let modifier: Modifier?
     public let missing: Decimal?
     
-    public init(field: String, factor: Decimal, modifier: FieldValueScoreFunction.Modifier? = nil, missing: Decimal? = nil) {
+    public init(field: String, factor: Decimal, modifier: FieldValueFactorScoreFunction.Modifier? = nil, missing: Decimal? = nil) {
         self.field = field
         self.factor = factor
         self.modifier = modifier
         self.missing = missing
     }
     
-    internal convenience init(withBuilder builder: FieldValueFactorFunctionBuilder) throws {
+    internal init(withBuilder builder: FieldValueFactorFunctionBuilder) throws {
         
         guard builder.field != nil else {
             throw ScoreFunctionBuilderError.missingRequiredField("field")
@@ -674,19 +814,19 @@ public class FieldValueScoreFunction: ScoreFunction {
     
     public func toDic() -> [String : Any] {
         var dic: [String: Any] = [
-            FieldValueScoreFunction.FIELD: self.field,
-            FieldValueScoreFunction.FACTOR: self.factor
+            CodingKeys.field.rawValue: self.field,
+            CodingKeys.factor.rawValue: self.factor
         ]
         if let modifier = self.modifier {
-            dic[FieldValueScoreFunction.MODIFIER] = modifier.rawValue
+            dic[CodingKeys.modifier.rawValue] = modifier.rawValue
         }
         if let missing = self.missing {
-            dic[FieldValueScoreFunction.MISSING] = missing
+            dic[CodingKeys.missing.rawValue] = missing
         }
         return [self.name: dic]
     }
     
-    public enum Modifier: String {
+    public enum Modifier: String, Codable {
         case none
         case log
         case log1p
@@ -700,25 +840,45 @@ public class FieldValueScoreFunction: ScoreFunction {
     }
 }
 
+extension FieldValueFactorScoreFunction {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
+        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.name))
+        self.field = try nested.decodeString(forKey: .field)
+        self.factor = try nested.decodeDecimal(forKey: .factor)
+        self.missing = try nested.decodeDecimalIfPresent(forKey: .missing)
+        self.modifier = try nested.decodeIfPresent(Modifier.self, forKey: .modifier)
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: DynamicCodingKeys.self)
+        var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.name))
+        try nested.encode(self.field, forKey: .field)
+        try nested.encode(self.factor, forKey: .factor)
+        try nested.encodeIfPresent(self.modifier, forKey: .modifier)
+        try nested.encodeIfPresent(self.missing, forKey: .missing)
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case field
+        case factor
+        case modifier
+        case missing
+    }
+}
+
+extension FieldValueFactorScoreFunction: Equatable {
+    public static func == (lhs: FieldValueFactorScoreFunction, rhs: FieldValueFactorScoreFunction) -> Bool {
+        return lhs.field == rhs.field
+            && lhs.factor == rhs.factor
+            && lhs.modifier == rhs.modifier
+            && lhs.missing == rhs.missing
+    }
+}
+
 // MARK:- ScoreFunctionBuilder Error
 
 /// Error(s) thrown by ScoreFunctionBuilder
 public enum ScoreFunctionBuilderError: Error {
     case missingRequiredField(String)
 }
-
-//public class Script {
-//    
-//    public let source: String
-//    public let params: [String: Any]
-//
-//    convenience public init(source: String) {
-//        self.init(source: source, params: [String: Any]())
-//    }
-//
-//    public init(source: String, params: [String: Any]) {
-//        self.source = source
-//        self.params = params
-//    }
-//
-//}

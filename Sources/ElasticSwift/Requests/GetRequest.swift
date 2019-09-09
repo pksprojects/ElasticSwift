@@ -60,7 +60,7 @@ public class GetRequestBuilder: RequestBuilder {
 
 //MARK:- Get Request
 
-public class GetRequest: Request {
+public struct GetRequest: Request {
     
     public var headers: HTTPHeaders = HTTPHeaders()
     
@@ -107,3 +107,5 @@ public class GetRequest: Request {
         return .failure(.noBodyForRequest)
     }
 }
+
+extension GetRequest: Equatable {}

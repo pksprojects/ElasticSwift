@@ -89,7 +89,7 @@ public class DeleteRequestBuilder: RequestBuilder {
 
 //MARK:- Delete Request
 
-public class DeleteRequest: Request {
+public struct DeleteRequest: Request {
     
     public var headers: HTTPHeaders = HTTPHeaders()
     
@@ -155,3 +155,5 @@ public class DeleteRequest: Request {
     }
     
 }
+
+extension DeleteRequest: Equatable {}

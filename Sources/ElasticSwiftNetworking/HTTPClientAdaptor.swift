@@ -28,13 +28,15 @@ public final class DefaultHTTPClientAdaptor: ManagedHTTPClientAdaptor {
     public func performRequest(_ request: HTTPRequest, callback: @escaping (_ result: Result<HTTPResponse, Error>) -> Void ) {
         self.client.execute(request: request).map { parts in
             var responseHead: HTTPResponseHead? = nil
-            var responseBody: ByteBuffer? = nil
+            var responseBody: Data? = nil
             for part in parts {
                 switch part {
                 case .head(let head):
                     responseHead = head
-                case .body(let buffer):
-                    responseBody = buffer
+                case .body(var buffer):
+                    if let bytes = buffer.readBytes(length: buffer.readableBytes) {
+                        responseBody = Data(bytes)
+                    }
                 case .end(_):
                     let response = HTTPResponse(request: request, status: responseHead!.status, headers: responseHead!.headers, body: responseBody)
                     return callback(.success(response))
@@ -102,9 +104,7 @@ public final class URLSessionAdaptor: ManagedHTTPClientAdaptor {
                 
             }
             if let resData = data {
-                var buff = self.allocator.buffer(capacity: resData.count)
-                buff.writeBytes(resData)
-                responseBuilder.set(body: buff)
+                responseBuilder.set(body: resData)
             }
             
             do {
