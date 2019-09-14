@@ -1,6 +1,8 @@
 import XCTest
-@testable import ElasticSwiftTests
 
-XCTMain([
-    testCase(ElasticSwiftTests.allTests),
-])
+import ElasticSwiftTests
+
+var tests = [XCTestCaseEntry]()
+tests += ElasticSwiftTests.__allTests()
+
+XCTMain(tests)

@@ -1,17 +1,35 @@
-language: swift
-osx_image: xcode10.2
-xcode_project: ElasticSwift.xcodeproj
-xcode_scheme: ElasticSwiftTests
+language: generic
+matrix:
+  include:
+    - os: linux
+      dist: bionic
+      sudo: required
+      install:
+        - cd $HOME
+        - sudo apt-get install -y clang libicu-dev
+        - wget -q -O swift.tar.gz https://swift.org/builds/swift-5.0.3-release/ubuntu1804/swift-5.0.3-RELEASE/swift-5.0.3-RELEASE-ubuntu18.04.tar.gz
+        - mkdir swift-RELEASE
+        - tar xzf swift.tar.gz -C swift-RELEASE --strip-components=1
+        - export PATH="${HOME}/swift-RELEASE/usr/bin:${PATH}"
+        - cd $TRAVIS_BUILD_DIR
+    - os: osx
+      sudo: required
+      osx_image: xcode11
+      install:
+        - cd $TRAVIS_BUILD_DIR
+      after_success:
+        - xcodebuild -quiet -scheme ElasticSwift-Package build test
+        - bash <(curl -s https://codecov.io/bash) -J 'ElasticSwift' -J 'ElasticSwiftCore' -J 'ElasticSwiftCodableUtils' -J 'ElasticSwiftNetworking' -J 'ElasticSwiftQueryDSL'
+
 before_install:
-  - brew update >/dev/null
-  - brew cask install homebrew/cask-versions/adoptopenjdk8
-  - brew install elasticsearch
-  - brew services start elasticsearch
+  - cd $HOME
+  - wget -q -O elasticsearch.tar.gz https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.8.3.tar.gz
+  - mkdir elasticsearch
+  - tar xzf swift.tar.gz -C elasticsearch --strip-components=1
+  - cd elasticsearch
+  - bin/elasticsearch -d -p pid
 before_script:
   - sleep 10
 script:
   - swift build
   - swift test
-after_success:
-  - xcodebuild -quiet -scheme ElasticSwift-Package build test
-  - bash <(curl -s https://codecov.io/bash) -J 'ElasticSwift' -J 'ElasticSwiftCore' -J 'ElasticSwiftCodableUtils' -J 'ElasticSwiftNetworking' -J 'ElasticSwiftQueryDSL'
