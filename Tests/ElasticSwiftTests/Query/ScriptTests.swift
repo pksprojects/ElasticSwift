@@ -49,8 +49,10 @@ class ScriptTests: XCTestCase {
         
         let encodedStr = String(data: encoded, encoding: .utf8)!
         
+        let decoded = try JSONDecoder().decode(Script.self, from: encoded)
+        
         logger.debug("Script Encode test: \(encodedStr)")
-    XCTAssertEqual("{\"lang\":\"expression\",\"params\":{\"multiplier\":2},\"source\":\"doc['my_field'] * multiplier\"}", encodedStr)
+        XCTAssertEqual(decoded, script)
     }
     
     func testScript_decode() throws {
