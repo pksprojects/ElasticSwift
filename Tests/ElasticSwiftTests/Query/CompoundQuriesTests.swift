@@ -20,7 +20,7 @@ class CompoundQuriesTest: XCTestCase {
         
         let data = try! JSONEncoder().encode(query)
         
-        XCTAssertEqual("{\"constant_score\":{\"filter\":{\"match_all\":{}},\"boost\":1.1}}", String(data: data, encoding: .utf8)!)
+    XCTAssertEqual("{\"constant_score\":{\"filter\":{\"match_all\":{}},\"boost\":1.1}}".data(using: .utf8)!, data)
         
     }
     
@@ -47,7 +47,7 @@ class CompoundQuriesTest: XCTestCase {
         
         let data = try! JSONEncoder().encode(query)
         
-    XCTAssertEqual("{\"bool\":{\"filter\":[{\"match_all\":{}},{\"match_none\":{}}],\"must\":[{\"match_all\":{}}],\"must_not\":[{\"match_none\":{}}]}}", String(data: data, encoding: .utf8)!)
+    XCTAssertEqual("{\"bool\":{\"filter\":[{\"match_all\":{}},{\"match_none\":{}}],\"must\":[{\"match_all\":{}}],\"must_not\":[{\"match_none\":{}}]}}".data(using: .utf8)!, data)
     }
     
     func testBoolQuery_decode() throws {
@@ -83,7 +83,7 @@ class CompoundQuriesTest: XCTestCase {
             .build()
     
         let data = try! JSONEncoder().encode(query)
-        XCTAssertEqual("{\"function_score\":{\"query\":{\"match_all\":{}},\"functions\":[{\"linear\":{\"date\":{\"decay\":0.5,\"offset\":\"5d\",\"origin\":\"2013-09-17\",\"scale\":\"10d\"}}}]}}", String(data: data, encoding: .utf8)!)
+        XCTAssertEqual("{\"function_score\":{\"query\":{\"match_all\":{}},\"functions\":[{\"linear\":{\"date\":{\"decay\":0.5,\"offset\":\"5d\",\"origin\":\"2013-09-17\",\"scale\":\"10d\"}}}]}}".data(using: .utf8)!, data)
         
     }
 }

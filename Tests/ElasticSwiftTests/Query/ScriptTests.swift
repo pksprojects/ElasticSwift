@@ -27,7 +27,7 @@ class ScriptTests: XCTestCase {
         
         logger.debug("Script Encode test: \(encodedStr)")
         
-        XCTAssertEqual("{\"script\":\"ctx._source.likes++\"}", encodedStr)
+        XCTAssertEqual("{\"script\":\"ctx._source.likes++\"}".data(using: .utf8)!, encoded)
     }
     
     func testScript_decode_short() throws {
@@ -49,10 +49,8 @@ class ScriptTests: XCTestCase {
         
         let encodedStr = String(data: encoded, encoding: .utf8)!
         
-        let decoded = try JSONDecoder().decode(Script.self, from: encoded)
-        
         logger.debug("Script Encode test: \(encodedStr)")
-        XCTAssertEqual(decoded, script)
+    XCTAssertEqual("{\"lang\":\"expression\",\"params\":{\"multiplier\":2},\"source\":\"doc['my_field'] * multiplier\"}".data(using: .utf8)!, encoded)
     }
     
     func testScript_decode() throws {
