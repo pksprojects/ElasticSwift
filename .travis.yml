@@ -18,7 +18,7 @@ matrix:
       install:
         - cd $TRAVIS_BUILD_DIR
       after_success:
-        - xcodebuild -quiet -scheme ElasticSwift-Package build test
+        - xcodebuild -quiet -enableCodeCoverage YES -scheme ElasticSwift-Package clean build test
         - bash <(curl -s https://codecov.io/bash) -J 'ElasticSwift' -J 'ElasticSwiftCore' -J 'ElasticSwiftCodableUtils' -J 'ElasticSwiftNetworking' -J 'ElasticSwiftQueryDSL'
 
 before_install:

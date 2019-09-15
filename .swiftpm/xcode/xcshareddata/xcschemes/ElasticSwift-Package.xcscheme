@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "9999"
+   LastUpgradeVersion = "1100"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,24 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ElasticSwift::ElasticSwiftQueryDSL"
-               BuildableName = "ElasticSwiftQueryDSL.framework"
-               BlueprintName = "ElasticSwiftQueryDSL"
-               ReferencedContainer = "container:ElasticSwift.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ElasticSwift::ElasticSwift"
-               BuildableName = "ElasticSwift.framework"
+               BlueprintIdentifier = "ElasticSwift"
+               BuildableName = "ElasticSwift"
                BlueprintName = "ElasticSwift"
-               ReferencedContainer = "container:ElasticSwift.xcodeproj">
+               ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -42,10 +28,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ElasticSwift::ElasticSwiftCore"
-               BuildableName = "ElasticSwiftCore.framework"
-               BlueprintName = "ElasticSwiftCore"
-               ReferencedContainer = "container:ElasticSwift.xcodeproj">
+               BlueprintIdentifier = "ElasticSwiftQueryDSL"
+               BuildableName = "ElasticSwiftQueryDSL"
+               BlueprintName = "ElasticSwiftQueryDSL"
+               ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -56,10 +42,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ElasticSwift::ElasticSwiftNetworking"
-               BuildableName = "ElasticSwiftNetworking.framework"
+               BlueprintIdentifier = "ElasticSwiftNetworking"
+               BuildableName = "ElasticSwiftNetworking"
                BlueprintName = "ElasticSwiftNetworking"
-               ReferencedContainer = "container:ElasticSwift.xcodeproj">
+               ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -70,10 +56,38 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ElasticSwift::ElasticSwiftCodableUtils"
-               BuildableName = "ElasticSwiftCodableUtils.framework"
+               BlueprintIdentifier = "ElasticSwiftCore"
+               BuildableName = "ElasticSwiftCore"
+               BlueprintName = "ElasticSwiftCore"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ElasticSwiftCodableUtils"
+               BuildableName = "ElasticSwiftCodableUtils"
                BlueprintName = "ElasticSwiftCodableUtils"
-               ReferencedContainer = "container:ElasticSwift.xcodeproj">
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ElasticSwiftTests"
+               BuildableName = "ElasticSwiftTests"
+               BlueprintName = "ElasticSwiftTests"
+               ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -82,55 +96,16 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES"
-      codeCoverageEnabled = "YES"
-      onlyGenerateCoverageForSpecifiedTargets = "YES">
-      <CodeCoverageTargets>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "ElasticSwift::ElasticSwift"
-            BuildableName = "ElasticSwift.framework"
-            BlueprintName = "ElasticSwift"
-            ReferencedContainer = "container:ElasticSwift.xcodeproj">
-         </BuildableReference>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "ElasticSwift::ElasticSwiftCodableUtils"
-            BuildableName = "ElasticSwiftCodableUtils.framework"
-            BlueprintName = "ElasticSwiftCodableUtils"
-            ReferencedContainer = "container:ElasticSwift.xcodeproj">
-         </BuildableReference>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "ElasticSwift::ElasticSwiftCore"
-            BuildableName = "ElasticSwiftCore.framework"
-            BlueprintName = "ElasticSwiftCore"
-            ReferencedContainer = "container:ElasticSwift.xcodeproj">
-         </BuildableReference>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "ElasticSwift::ElasticSwiftNetworking"
-            BuildableName = "ElasticSwiftNetworking.framework"
-            BlueprintName = "ElasticSwiftNetworking"
-            ReferencedContainer = "container:ElasticSwift.xcodeproj">
-         </BuildableReference>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "ElasticSwift::ElasticSwiftQueryDSL"
-            BuildableName = "ElasticSwiftQueryDSL.framework"
-            BlueprintName = "ElasticSwiftQueryDSL"
-            ReferencedContainer = "container:ElasticSwift.xcodeproj">
-         </BuildableReference>
-      </CodeCoverageTargets>
+      shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
          <TestableReference
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ElasticSwift::ElasticSwiftTests"
-               BuildableName = "ElasticSwiftTests.xctest"
+               BlueprintIdentifier = "ElasticSwiftTests"
+               BuildableName = "ElasticSwiftTests"
                BlueprintName = "ElasticSwiftTests"
-               ReferencedContainer = "container:ElasticSwift.xcodeproj">
+               ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -152,6 +127,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "ElasticSwift"
+            BuildableName = "ElasticSwift"
+            BlueprintName = "ElasticSwift"
+            ReferencedContainer = "container:">
+         </BuildableReference>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

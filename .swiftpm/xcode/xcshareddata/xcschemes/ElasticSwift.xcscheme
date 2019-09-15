@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
    LastUpgradeVersion = "1100"
-   version = "1.7">
+   version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ElasticSwift::ElasticSwiftCodableUtils"
-               BuildableName = "ElasticSwiftCodableUtils.framework"
-               BlueprintName = "ElasticSwiftCodableUtils"
-               ReferencedContainer = "container:ElasticSwift.xcodeproj">
+               BlueprintIdentifier = "ElasticSwift"
+               BuildableName = "ElasticSwift"
+               BlueprintName = "ElasticSwift"
+               ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -27,8 +27,8 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
-      <TestPlans>
-      </TestPlans>
+      <Testables>
+      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -50,10 +50,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "ElasticSwift::ElasticSwiftCodableUtils"
-            BuildableName = "ElasticSwiftCodableUtils.framework"
-            BlueprintName = "ElasticSwiftCodableUtils"
-            ReferencedContainer = "container:ElasticSwift.xcodeproj">
+            BlueprintIdentifier = "ElasticSwift"
+            BuildableName = "ElasticSwift"
+            BlueprintName = "ElasticSwift"
+            ReferencedContainer = "container:">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>
