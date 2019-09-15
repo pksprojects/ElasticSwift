@@ -164,7 +164,7 @@ extension MyFailureClass: Encodable {
     
 }
 
-class MyError: Error {
+struct MyError: Error {
     
     private let msg: String
     
