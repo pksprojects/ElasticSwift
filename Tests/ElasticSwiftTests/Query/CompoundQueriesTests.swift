@@ -13,7 +13,7 @@ import Logging
 @testable import ElasticSwiftCodableUtils
 
 
-class CompoundQuriesTest: XCTestCase {
+class CompoundQueriesTest: XCTestCase {
     
     let logger = Logger(label: "org.pksprojects.ElasticSwiftTests.QueryDSL.CompoundQuriesTest")
     
