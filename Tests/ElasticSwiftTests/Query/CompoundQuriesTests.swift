@@ -6,13 +6,16 @@
 //
 
 import XCTest
+import Logging
 
 @testable import ElasticSwift
 @testable import ElasticSwiftQueryDSL
+@testable import ElasticSwiftCodableUtils
 
 
 class CompoundQuriesTest: XCTestCase {
     
+    let logger = Logger(label: "org.pksprojects.ElasticSwiftTests.QueryDSL.CompoundQuriesTest")
     
     func testConstantScoreQuery_encode() throws {
         
@@ -20,7 +23,14 @@ class CompoundQuriesTest: XCTestCase {
         
         let data = try! JSONEncoder().encode(query)
         
-    XCTAssertEqual("{\"constant_score\":{\"filter\":{\"match_all\":{}},\"boost\":1.1}}".data(using: .utf8)!, data)
+        let encodedStr = String(data: data, encoding: .utf8)!
+        
+        logger.debug("Script Encode test: \(encodedStr)")
+        
+        let dic = try JSONDecoder().decode([String:CodableValue].self, from: data)
+        
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: "{\"constant_score\":{\"filter\":{\"match_all\":{}},\"boost\":1.1}}".data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
         
     }
     
@@ -36,7 +46,6 @@ class CompoundQuriesTest: XCTestCase {
         
     }
     
-    
     func testBoolQuery_encode() throws {
         let query = try BoolQueryBuilder()
             .filter(query: MatchAllQuery())
@@ -47,7 +56,14 @@ class CompoundQuriesTest: XCTestCase {
         
         let data = try! JSONEncoder().encode(query)
         
-    XCTAssertEqual("{\"bool\":{\"filter\":[{\"match_all\":{}},{\"match_none\":{}}],\"must\":[{\"match_all\":{}}],\"must_not\":[{\"match_none\":{}}]}}".data(using: .utf8)!, data)
+        let encodedStr = String(data: data, encoding: .utf8)!
+        
+        logger.debug("Script Encode test: \(encodedStr)")
+        
+        let dic = try JSONDecoder().decode([String:CodableValue].self, from: data)
+        
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: "{\"bool\":{\"filter\":[{\"match_all\":{}},{\"match_none\":{}}],\"must\":[{\"match_all\":{}}],\"must_not\":[{\"match_none\":{}}]}}".data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
     }
     
     func testBoolQuery_decode() throws {
@@ -83,7 +99,15 @@ class CompoundQuriesTest: XCTestCase {
             .build()
     
         let data = try! JSONEncoder().encode(query)
-        XCTAssertEqual("{\"function_score\":{\"query\":{\"match_all\":{}},\"functions\":[{\"linear\":{\"date\":{\"decay\":0.5,\"offset\":\"5d\",\"origin\":\"2013-09-17\",\"scale\":\"10d\"}}}]}}".data(using: .utf8)!, data)
+        
+        let encodedStr = String(data: data, encoding: .utf8)!
+        
+        logger.debug("Script Encode test: \(encodedStr)")
+        
+        let dic = try JSONDecoder().decode([String:CodableValue].self, from: data)
+        
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: "{\"function_score\":{\"query\":{\"match_all\":{}},\"functions\":[{\"linear\":{\"date\":{\"decay\":0.5,\"offset\":\"5d\",\"origin\":\"2013-09-17\",\"scale\":\"10d\"}}}]}}".data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
         
     }
 }

@@ -10,6 +10,7 @@ import Logging
 
 @testable import ElasticSwift
 @testable import ElasticSwiftQueryDSL
+@testable import ElasticSwiftCodableUtils
 
 class ScriptTests: XCTestCase {
     
@@ -27,7 +28,11 @@ class ScriptTests: XCTestCase {
         
         logger.debug("Script Encode test: \(encodedStr)")
         
-        XCTAssertEqual("{\"script\":\"ctx._source.likes++\"}".data(using: .utf8)!, encoded)
+        let decodedDic = try JSONDecoder().decode([String: CodableValue].self, from: encoded)
+        
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: "{\"script\":\"ctx._source.likes++\"}".data(using: .utf8)!)
+        
+        XCTAssertEqual(expectedDic, decodedDic)
     }
     
     func testScript_decode_short() throws {
@@ -50,7 +55,11 @@ class ScriptTests: XCTestCase {
         let encodedStr = String(data: encoded, encoding: .utf8)!
         
         logger.debug("Script Encode test: \(encodedStr)")
-    XCTAssertEqual("{\"lang\":\"expression\",\"params\":{\"multiplier\":2},\"source\":\"doc['my_field'] * multiplier\"}".data(using: .utf8)!, encoded)
+        
+        let decodedDic = try JSONDecoder().decode([String: CodableValue].self, from: encoded)
+        
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: "{\"lang\":\"expression\",\"params\":{\"multiplier\":2},\"source\":\"doc['my_field'] * multiplier\"}".data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, decodedDic)
     }
     
     func testScript_decode() throws {

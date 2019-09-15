@@ -10,6 +10,7 @@ import Logging
 
 @testable import ElasticSwift
 @testable import ElasticSwiftQueryDSL
+@testable import ElasticSwiftCodableUtils
 
 
 class ScoreFunctionTests: XCTestCase {
@@ -26,7 +27,11 @@ class ScoreFunctionTests: XCTestCase {
         
         logger.debug("WeightScoreFunction Encode test: \(dataStr)")
         
-        XCTAssertEqual("{\"weight\":11.234}", dataStr)
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+        
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: "{\"weight\":11.234}".data(using: .utf8)!)
+        
+        XCTAssertEqual(expectedDic, dic)
         
     }
     
@@ -57,7 +62,11 @@ class ScoreFunctionTests: XCTestCase {
         
         logger.debug("RandomScoreFunction Encode test: \(dataStr)")
         
-        XCTAssertEqual("{\"random_score\":{\"seed\":10,\"field\":\"_seq_no\"}}".data(using: .utf8)!, data)
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+        
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: "{\"random_score\":{\"seed\":10,\"field\":\"_seq_no\"}}".data(using: .utf8)!)
+        
+        XCTAssertEqual(expectedDic, dic)
         
     }
     
@@ -90,7 +99,11 @@ class ScoreFunctionTests: XCTestCase {
         
         logger.debug("ScriptScoreFunction Encode test: \(dataStr)")
         
-        XCTAssertEqual("{\"script_score\":{\"script\":\"Math.log(2 + doc['likes'].value)\"}}".data(using: .utf8), data)
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+        
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: "{\"script_score\":{\"script\":\"Math.log(2 + doc['likes'].value)\"}}".data(using: .utf8)!)
+        
+        XCTAssertEqual(expectedDic, dic)
         
     }
     
@@ -122,8 +135,11 @@ class ScoreFunctionTests: XCTestCase {
         let dataStr = String(data: data, encoding: .utf8)!
         
         logger.debug("FieldValueFactorScoreFunction Encode test: \(dataStr)")
-    XCTAssertEqual("{\"field_value_factor\":{\"missing\":1,\"factor\":1.2,\"field\":\"likes\",\"modifier\":\"sqrt\"}}".data(using: .utf8), data)
         
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+        
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: "{\"field_value_factor\":{\"missing\":1,\"factor\":1.2,\"field\":\"likes\",\"modifier\":\"sqrt\"}}".data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
     }
     
     func testFieldValueFactorScoreFunction_decode() throws {
@@ -158,8 +174,11 @@ class ScoreFunctionTests: XCTestCase {
         let dataStr = String(data: data, encoding: .utf8)!
         
         logger.debug("LinearDecayScoreFunction Encode test: \(dataStr)")
-    XCTAssertEqual("{\"linear\":{\"date\":{\"decay\":0.5,\"offset\":\"5d\",\"origin\":\"2013-09-17\",\"scale\":\"10d\"}}}".data(using: .utf8)!, data)
         
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+        
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: "{\"linear\":{\"date\":{\"decay\":0.5,\"offset\":\"5d\",\"origin\":\"2013-09-17\",\"scale\":\"10d\"}}}".data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
     }
     
     func testLinearDecayScoreFunction_decode() throws {
@@ -196,8 +215,11 @@ class ScoreFunctionTests: XCTestCase {
         let dataStr = String(data: data, encoding: .utf8)!
         
         logger.debug("GaussScoreFunction Encode test: \(dataStr)")
-    XCTAssertEqual("{\"gauss\":{\"date\":{\"decay\":0.5,\"offset\":\"5d\",\"origin\":\"2013-09-17\",\"scale\":\"10d\"}}}".data(using: .utf8), data)
         
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+        
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: "{\"gauss\":{\"date\":{\"decay\":0.5,\"offset\":\"5d\",\"origin\":\"2013-09-17\",\"scale\":\"10d\"}}}".data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
     }
     
     func testGaussDecayScoreFunction_decode() throws {
@@ -234,8 +256,11 @@ class ScoreFunctionTests: XCTestCase {
         let dataStr = String(data: data, encoding: .utf8)!
         
         logger.debug("ExponentialDecayScoreFunction Encode test: \(dataStr)")
-    XCTAssertEqual("{\"exp\":{\"date\":{\"decay\":0.5,\"offset\":\"5d\",\"origin\":\"2013-09-17\",\"scale\":\"10d\"}}}".data(using: .utf8)!, data)
         
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+        
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: "{\"exp\":{\"date\":{\"decay\":0.5,\"offset\":\"5d\",\"origin\":\"2013-09-17\",\"scale\":\"10d\"}}}".data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
     }
     
     func testExponentialDecayScoreFunction_decode() throws {
