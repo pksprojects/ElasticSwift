@@ -15,7 +15,20 @@ import Logging
 
 class CompoundQueriesTest: XCTestCase {
     
-    let logger = Logger(label: "org.pksprojects.ElasticSwiftTests.QueryDSL.CompoundQuriesTest")
+    let logger = Logger(label: "org.pksprojects.ElasticSwiftTests.QueryDSL.CompoundQuriesTest", factory: logFactory)
+    
+    override func setUp() {
+        // Put setup code here. This method is called before the invocation of each test method in the class.
+        super.setUp()
+        XCTAssert(isLoggingConfigured)
+        logger.info("====================TEST=START===============================")
+    }
+
+    override func tearDown() {
+        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        super.tearDown()
+        logger.info("====================TEST=END===============================")
+    }
     
     func testConstantScoreQuery_encode() throws {
         
