@@ -9,7 +9,7 @@ public typealias Host = URL
 
 public class ElasticClient {
     
-    private let logger = Logger(label: "org.pksprojects.ElasticSwfit.RestClient")
+    private let logger = Logger(label: "org.pksprojects.ElasticSwfit.ElasticClient")
     
     let transport: Transport
     
