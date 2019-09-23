@@ -649,29 +649,7 @@ extension EncodableWrapper {
         self.init(value)
     }
     
-}
-
-/// Wrapper for `Decodable` values similar to `AnyDecodable` where value always conforms to `Decodable`
-public struct EncodableValue: EncodableWrapper {
-    
-    public let value: Encodable
-    
-    public init<T>(_ value: T) where T: Encodable {
-        self.value = value
-    }
-}
-
-extension EncodableValue: ExpressibleByNilLiteral {}
-extension EncodableValue: ExpressibleByBooleanLiteral {}
-extension EncodableValue: ExpressibleByIntegerLiteral {}
-extension EncodableValue: ExpressibleByFloatLiteral {}
-extension EncodableValue: ExpressibleByStringLiteral {}
-extension EncodableValue: ExpressibleByExtendedGraphemeClusterLiteral {}
-
-extension EncodableValue: ExpressibleByArrayLiteral {
-    public typealias ArrayLiteralElement = EncodableValue
-    
-    public init(arrayLiteral elements: EncodableValue...)  {
+    public init(arrayLiteral elements: Self...)  {
         if let elements = elements.map({ $0.value as? Bool }) as? [Bool] {
             self.init(elements)
         } else if let elements = elements.map({ $0.value as? Int }) as? [Int] {
@@ -708,15 +686,8 @@ extension EncodableValue: ExpressibleByArrayLiteral {
             self.init(elements)
         }
     }
-}
-
-extension EncodableValue: ExpressibleByDictionaryLiteral {
-    public typealias Key = String
     
-    public typealias Value = EncodableValue
-    
-    
-    public init(dictionaryLiteral elements: (String, EncodableValue)...) {
+    public init(dictionaryLiteral elements: (String, Self)...) {
         if let elements = elements.map({ ($0.0, $0.1.value as? Bool) }) as? [(String, Bool)] {
             self.init([String: Bool](elements, uniquingKeysWith: { first, _ in first }))
         } else if let elements = elements.map({ ($0.0, $0.1.value as? Int) }) as? [(String, Int)] {
@@ -732,36 +703,13 @@ extension EncodableValue: ExpressibleByDictionaryLiteral {
         } else if let elements = elements.map({ ($0.0, $0.1.value as? NullValue) }) as? [(String, NullValue)] {
             self.init([String: NullValue](elements, uniquingKeysWith: { first, _ in first }))
         } else {
-            self.init([String: EncodableValue](elements, uniquingKeysWith: { first, _ in first }))
+            self.init([String: Self](elements, uniquingKeysWith: { first, _ in first }))
         }
     }
 }
 
-extension EncodableValue: CustomStringConvertible {
-    public var description: String {
-        get {
-            if let value = self.value as? CustomStringConvertible {
-                return value.description
-            }
-            return "\(value)"
-        }
-    }
-}
-
-extension EncodableValue: CustomDebugStringConvertible {
-    public var debugDescription: String {
-        get {
-            if let value = self.value as? CustomDebugStringConvertible {
-                return value.debugDescription
-            }
-            return self.description
-        }
-    }
-}
-
-extension EncodableValue: Equatable {
-    
-    public static func == (lhs: EncodableValue, rhs: EncodableValue) -> Bool {
+extension EncodableWrapper where Self: Equatable {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
         switch (lhs.value, rhs.value) {
         case let (lhs as Bool, rhs as Bool):
             return lhs == rhs
@@ -807,7 +755,7 @@ extension EncodableValue: Equatable {
             return lhs == rhs
         case let (lhs as [String: String], rhs as [String: String]):
             return lhs == rhs
-        case let (lhs as [String: EncodableValue], rhs as [String: EncodableValue]):
+        case let (lhs as [String: Self], rhs as [String: Self]):
             return lhs == rhs
         case let (lhs as [Bool], rhs as [Bool]):
             return lhs == rhs
@@ -841,13 +789,64 @@ extension EncodableValue: Equatable {
             return lhs == rhs
         case let (lhs as [NullValue], rhs as [NullValue]):
             return lhs == rhs
-        case let (lhs as [EncodableValue], rhs as [EncodableValue]):
+        case let (lhs as [Self], rhs as [Self]):
             return lhs == rhs
         default:
             return false
         }
     }
 }
+
+/// Wrapper for `Decodable` values similar to `AnyDecodable` where value always conforms to `Decodable`
+public struct EncodableValue: EncodableWrapper {
+    
+    public let value: Encodable
+    
+    public init<T>(_ value: T) where T: Encodable {
+        self.value = value
+    }
+}
+
+extension EncodableValue: ExpressibleByNilLiteral {}
+extension EncodableValue: ExpressibleByBooleanLiteral {}
+extension EncodableValue: ExpressibleByIntegerLiteral {}
+extension EncodableValue: ExpressibleByFloatLiteral {}
+extension EncodableValue: ExpressibleByStringLiteral {}
+extension EncodableValue: ExpressibleByExtendedGraphemeClusterLiteral {}
+
+extension EncodableValue: ExpressibleByArrayLiteral {
+    public typealias ArrayLiteralElement = EncodableValue
+}
+
+extension EncodableValue: ExpressibleByDictionaryLiteral {
+    public typealias Key = String
+    
+    public typealias Value = EncodableValue
+}
+
+extension EncodableValue: CustomStringConvertible {
+    public var description: String {
+        get {
+            if let value = self.value as? CustomStringConvertible {
+                return value.description
+            }
+            return "\(value)"
+        }
+    }
+}
+
+extension EncodableValue: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        get {
+            if let value = self.value as? CustomDebugStringConvertible {
+                return value.debugDescription
+            }
+            return self.description
+        }
+    }
+}
+
+extension EncodableValue: Equatable {}
 
 // MARK:- Codable Helper Extensions
 
