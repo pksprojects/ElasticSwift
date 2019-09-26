@@ -6,22 +6,26 @@
 //
 
 import XCTest
+import Logging
 
 @testable import ElasticSwift
 @testable import ElasticSwiftCore
 
 class SerializationTests: XCTestCase {
+    
+    let logger = Logger(label: "org.pksprojects.ElasticSwiftTests.Serialization.SerializationTests", factory: logFactory)
 
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
         super.setUp()
-        print("====================TEST=START===============================")
+        XCTAssert(isLoggingConfigured)
+        logger.info("====================TEST=START===============================")
     }
 
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
-        print("====================TEST=END===============================")
+        logger.info("====================TEST=END===============================")
     }
     
     func test_01_encode() throws {
@@ -35,11 +39,11 @@ class SerializationTests: XCTestCase {
         switch result {
         case .success(let data):
             let str = String(data: data, encoding: .utf8)
-            print("Encoded: \(String(describing: str))")
+            logger.info("Encoded: \(String(describing: str))")
             XCTAssertNotNil(str, "Encoded value can't be nil")
             XCTAssert("{\"value\":\"value\"}" == str!, "Validation on Encoded Value Failed")
         case .failure(let error):
-            print("Error: \(error)")
+            logger.error("Error: \(error)")
             XCTAssert(false, "Encoding Failed!")
         }
         
@@ -56,11 +60,10 @@ class SerializationTests: XCTestCase {
         switch result {
         case .success(let data):
             let str = String(data: data, encoding: .utf8)
-            print("Encoded: \(String(describing: str))")
+            logger.info("Encoded: \(String(describing: str))")
             XCTAssert(false, "Encoding Failure Failed!")
         case .failure(let error):
-            print("Expected Error: ", error)
-            debugPrint("Expected Error: ", error)
+            logger.error("Expected Error: \(error)")
             XCTAssert(type(of: error) == EncodingError.self, "Unexpected Error observed: \(error)")
             XCTAssert(type(of: error.value) == MyFailureClass.self, "Unexpected input value \(error.value)")
             XCTAssert(type(of: error.error) == MyError.self, "Unexpected internal Error: \(error.error.self)")
@@ -80,10 +83,10 @@ class SerializationTests: XCTestCase {
         
         switch result {
         case .success(let myclass):
-            print("Decoded: \(myclass.description)")
+            logger.info("Decoded: \(myclass.description)")
             XCTAssert("MyClass[value: value]" == myclass.description, "Validation on Decoded Value Failed")
         case .failure(let error):
-            print("Unexpected Error: \(error.localizedDescription)")
+            logger.info("Unexpected Error: \(error.localizedDescription)")
             XCTAssert(false, "Encoding Failed!")
         }
         
@@ -99,11 +102,10 @@ class SerializationTests: XCTestCase {
         
         switch result {
         case .success(let myclass):
-            print("Decoded: \(String(describing: myclass))")
+            logger.info("Decoded: \(String(describing: myclass))")
             XCTAssert(false, "Decoding Failure Failed!")
         case .failure(let error):
-            print("Expected Error: ", error)
-            debugPrint("Expected Error: ", error)
+            logger.error("Expected Error: \(error)")
             XCTAssert(type(of: error) == DecodingError.self, "Unexpected Error observed: \(error)")
             XCTAssert(error.data == data!, "Unexpected input value \(error.data)")
             XCTAssert(error.type == MyClass.self, "Unexpected Type")

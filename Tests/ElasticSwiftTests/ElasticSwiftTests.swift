@@ -1,16 +1,35 @@
 import XCTest
+import Logging
 
 @testable import ElasticSwift
 @testable import ElasticSwiftQueryDSL
 @testable import ElasticSwiftCodableUtils
 
+let logFactory: ((String) -> LogHandler) = { label -> LogHandler in
+    var handler = StreamLogHandler.standardOutput(label: label)
+    handler.logLevel = .debug
+    return handler
+}
+
+let isLoggingConfigured: Bool = {
+    LoggingSystem.bootstrap { label in
+        var handler = StreamLogHandler.standardOutput(label: label)
+        handler.logLevel = .debug
+        return handler
+    }
+    return true
+}()
+
 class ElasticSwiftTests: XCTestCase {
+    
+    let logger = Logger(label: "org.pksprojects.ElasticSwiftTests.ElasticSwiftTests", factory: logFactory)
     
     var client: ElasticClient?
     
     override func setUp() {
         super.setUp()
-        print("====================TEST=START===============================")
+        XCTAssert(isLoggingConfigured)
+        logger.info("====================TEST=START===============================")
         self.client = ElasticClient()
 //        let cred = ClientCredential(username: "elastic", password: "elastic")
 //        let ssl = SSLConfiguration(certPath: "/usr/local/Cellar/kibana/6.1.2/config/certs/elastic-certificates.der", isSelf: true)
@@ -21,18 +40,18 @@ class ElasticSwiftTests: XCTestCase {
     override func tearDown() {
         super.tearDown()
         
-        print("====================TEST=END===============================")
+        logger.info("====================TEST=END===============================")
     }
     
     func testPlay() {
         
-        //print(JSON(["field":"value"]).rawString()!)
+        //logger.info(JSON(["field":"value"]).rawString()!)
         var query = [String: Any]()
         query["query"] = ["field":"value"]
-        //print(JSON(query).rawString()!)
+        //logger.info(JSON(query).rawString()!)
         //var query2 = [String: Any]()
         //query2["query"] = JSON(["field": [:]]).rawString()!
-        //print(JSON(query2).rawString()!)
+        //logger.info(JSON(query2).rawString()!)
         sleep(1)
     }
     
@@ -50,10 +69,10 @@ class ElasticSwiftTests: XCTestCase {
             
             switch result {
                 case .failure(let error):
-                    print("Error", error)
+                    logger.error("Error: \(error)")
                     XCTAssert(false)
                 case .success(let response):
-                    print("Response: ", response)
+                    logger.info("Response: \(response)")
                     XCTAssert(response.acknowledged, "\(response.acknowledged)")
                     XCTAssert(response.index == "test", "\(response.index)")
                     XCTAssert(response.shardsAcknowledged, "\(response.shardsAcknowledged)")
@@ -66,9 +85,9 @@ class ElasticSwiftTests: XCTestCase {
             
             switch result {
                 case .failure(let error):
-                    print("Error", error)
+                    logger.error("Error: \(error)")
                 case .success(let response):
-                    print("Response", response)
+                    logger.info("Response: \(response)")
             }
             
             self.client?.indices.create(createIndexRequest, completionHandler: handler)
@@ -86,10 +105,10 @@ class ElasticSwiftTests: XCTestCase {
             
             switch result {
                 case .failure(let error):
-                    print("Error", error)
+                    logger.error("Error: \(error)")
                     XCTAssert(false)
                 case .success(let response):
-                    print("Response", response)
+                    logger.info("Response: \(response)")
                     XCTAssert(response.settings.providedName == "test", "Index: \(response.settings.providedName)")
             }
             e.fulfill()
@@ -108,10 +127,10 @@ class ElasticSwiftTests: XCTestCase {
             
             switch result {
             case .failure(let error):
-                print("Error: ", error)
+                logger.error("Error: \(error)")
                 XCTAssert(false, error.localizedDescription)
             case .success(let response):
-                print("Response: ", response)
+                logger.info("Response: \(response)")
                 XCTAssert(response.index == "test", "Index: \(response.index)")
                 XCTAssert(response.id == "0", "_id \(response.id)")
                 XCTAssert(response.type == "_doc", "Type: \(response.type)")
@@ -139,10 +158,10 @@ class ElasticSwiftTests: XCTestCase {
             
             switch result {
             case .failure(let error):
-                print("Error: ", error)
+                logger.error("Error: \(error)")
                 XCTAssert(false, error.localizedDescription)
             case .success(let response):
-                print("Response: ", response)
+                logger.info("Response: \(response)")
                 XCTAssert(response.index == "test", "Index: \(response.index)")
                 XCTAssert(response.type == "_doc", "Type: \(response.type)")
                 XCTAssert(!response.result.isEmpty, "Resule: \(response.result)")
@@ -169,10 +188,10 @@ class ElasticSwiftTests: XCTestCase {
             
             switch result {
             case .failure(let error):
-                print("Error: ", String(reflecting: error))
+                logger.error("Error: \(String(reflecting: error))")
                 XCTAssert(false, String(reflecting: error))
             case .success(let response):
-                print("Response: ", response)
+                logger.info("Response: \(response)")
                 XCTAssert(response.found, "Found: \(response.found)")
                 XCTAssert(response.index == "test", "Index: \(response.index)")
                 XCTAssert(response.id == "0", "_id: \(response.id)")
@@ -193,9 +212,9 @@ class ElasticSwiftTests: XCTestCase {
             
             switch result {
             case .failure(let error):
-                print("Error", error)
+                logger.error("Error: \(error)")
             case .success(let response):
-                print("Found", response.result)
+                logger.info("Found \(response.result)")
             }
             client?.execute(request: request, completionHandler: handler)
         }
@@ -220,10 +239,10 @@ class ElasticSwiftTests: XCTestCase {
             
             switch result {
             case .failure(let error):
-                print("Error: ", error)
+                logger.error("Error: \(error)")
                 XCTAssert(false, error.localizedDescription)
             case .success(let response):
-                print("Respone", response)
+                logger.info("Response: \(response)")
                 XCTAssert(response.result == "deleted", "Result: \(response.result)")
                 XCTAssert(response.id == "0", "_id: \(response.id)")
                 XCTAssert(response.index == "test", "index: \(response.index)")
@@ -242,9 +261,9 @@ class ElasticSwiftTests: XCTestCase {
             
             switch result {
             case .failure(let error):
-                print("Error: ", error)
+                logger.error("Error: \(error)")
             case .success(let response):
-                print("Result", response.result)
+                logger.info("Result: \(response.result)")
             }
             
             self.client?.execute(request: request, completionHandler: handler)
@@ -269,7 +288,7 @@ class ElasticSwiftTests: XCTestCase {
             
             switch result {
             case .failure(let error):
-                print("Error: ", error)
+                logger.error("Error: \(error)")
                 XCTAssert(false)
             case .success(let response):
                 XCTAssertNotNil(response.hits)
@@ -296,9 +315,9 @@ class ElasticSwiftTests: XCTestCase {
             
             switch result {
             case .failure(let error):
-                print("Error", error)
+                logger.error("Error: \(error)")
             case .success(let response):
-                print("Found", response.result)
+                logger.info("Found \(response.result)")
             }
             self.client?.search(request, completionHandler: handler)
         }
@@ -324,10 +343,10 @@ class ElasticSwiftTests: XCTestCase {
         func existsFalseHander(_ result: Result<IndexExistsResponse, Error>) -> Void {
             switch result {
             case .failure(let error):
-                print("Error: ", error)
+                logger.error("Error: \(error)")
                 XCTAssert(false, error.localizedDescription)
             case .success(let response):
-                print("Response: ", response)
+                logger.info("Response: \(response)")
                 XCTAssert(!response.exists, "IndexExists: \(response.exists)")
             }
             e.fulfill()
@@ -338,10 +357,10 @@ class ElasticSwiftTests: XCTestCase {
             
             switch result {
             case .failure(let error):
-                print("Error", error)
+                logger.error("Error: \(error)")
                 XCTAssert(false, error.localizedDescription)
             case .success(let response):
-                print("Response: ", response)
+                logger.info("Response: \(response)")
                 XCTAssert(response.acknowledged, "Acknowleged: \(response.acknowledged)")
             }
             self.client?.indices.exists(getIndexRequest, completionHandler: existsFalseHander)
@@ -351,10 +370,10 @@ class ElasticSwiftTests: XCTestCase {
         func existsTrueHander(_ result: Result<IndexExistsResponse, Error>) -> Void {
             switch result {
             case .failure(let error):
-                print("Error: ", error)
+                logger.error("Error: \(error)")
                 XCTAssert(false, error.localizedDescription)
             case .success(let response):
-                print("Response: ", response)
+                logger.info("Response: \(response)")
                 XCTAssert(response.exists, "IndexExists: \(response.exists)")
             }
             self.client?.indices.delete(deleteRequest, completionHandler: handler)
@@ -366,9 +385,9 @@ class ElasticSwiftTests: XCTestCase {
             
             switch result {
             case .failure(let error):
-                print("Error", error)
+                logger.error("Error: \(error)")
             case .success(let response):
-                print("Response: ", response)
+                logger.info("Response: \(response)")
             }
             self.client?.indices.exists(existsRequest, completionHandler: existsTrueHander)
         }
@@ -396,18 +415,18 @@ class ElasticSwiftTests: XCTestCase {
         self.client?.index(indexRequest) { result in
             switch result {
             case .success(let response):
-                print("Response:", response)
+                self.logger.info("Response: \(response)")
             case .failure(let error):
-                print("Error: ", error)
+                self.logger.error("Error: \(error)")
             }
             self.client?.update(updateRequest) { result in
                 switch result {
                 case .success(let response):
-                    print("Updated Response: ", response)
+                    self.logger.info("Updated Response: \(response)")
                     XCTAssertTrue(response.id == "0", "id: \(response.id)")
                     XCTAssertTrue(response.result == "updated", "result: \(response.result)")
                 case .failure(let error):
-                    print("Error: ", error)
+                    self.logger.error("Error: \(error)")
                     XCTAssertTrue(false)
                 }
                 e.fulfill()
@@ -434,18 +453,18 @@ class ElasticSwiftTests: XCTestCase {
         self.client?.index(indexRequest) { result in
             switch result {
             case .success(let response):
-                print("Response:", response)
+                self.logger.info("Response: \(response)")
             case .failure(let error):
-                print("Error: ", error)
+                self.logger.error("Error: \(error)")
             }
             self.client?.update(updateRequest) { result in
                 switch result {
                 case .success(let response):
-                    print("Updated Response: ", response)
+                    self.logger.info("Updated Response: \(response)")
                     XCTAssertTrue(response.id == "1", "id: \(response.id)")
                     XCTAssertTrue(response.result == "updated", "result: \(response.result)")
                 case .failure(let error):
-                    print("Error: ", error)
+                    self.logger.error("Error: \(error)")
                     XCTAssertTrue(false)
                 }
                 e.fulfill()
@@ -471,18 +490,18 @@ class ElasticSwiftTests: XCTestCase {
         self.client?.index(indexRequest) { result in
             switch result {
             case .success(let response):
-                print("Response:", response)
+                self.logger.info("Response: \(response)")
             case .failure(let error):
-                print("Error: ", error)
+                self.logger.error("Error: \(error)")
             }
             self.client?.update(updateRequest) { result in
                 switch result {
                 case .success(let response):
-                    print("Updated Response: ", response)
+                    self.logger.info("Updated Response: \(response)")
                     XCTAssertTrue(response.id == "2", "id: \(response.id)")
                     XCTAssertTrue(response.result == "noop", "result: \(response.result)")
                 case .failure(let error):
-                    print("Error: ", error)
+                    self.logger.error("Error: \(error)")
                     XCTAssertTrue(false)
                 }
                 e.fulfill()
@@ -509,18 +528,18 @@ class ElasticSwiftTests: XCTestCase {
         self.client?.index(indexRequest) { result in
             switch result {
             case .success(let response):
-                print("Response:", response)
+                self.logger.info("Response: \(response)")
             case .failure(let error):
-                print("Error: ", error)
+                self.logger.error("Error: \(error)")
             }
             self.client?.update(updateRequest) { result in
                 switch result {
                 case .success(let response):
-                    print("Updated Response: ", response)
+                    self.logger.info("Updated Response: \(response)")
                     XCTAssertTrue(response.id == "3", "id: \(response.id)")
                     XCTAssertTrue(response.result != "noop", "result: \(response.result)")
                 case .failure(let error):
-                    print("Error: ", error)
+                    self.logger.error("Error: \(error)")
                     XCTAssertTrue(false)
                 }
                 e.fulfill()
@@ -545,11 +564,11 @@ class ElasticSwiftTests: XCTestCase {
         self.client?.update(updateRequest) { result in
             switch result {
             case .success(let response):
-                print("Updated Response: ", response)
+                self.logger.info("Updated Response: \(response)")
                 XCTAssertTrue(response.id == "abcdef", "id: \(response.id)")
                 XCTAssertTrue(response.result == "created", "result: \(response.result)")
             case .failure(let error):
-                print("Error: ", error)
+                self.logger.error("Error: \(error)")
                 XCTAssertTrue(false)
             }
             e.fulfill()
@@ -575,11 +594,11 @@ class ElasticSwiftTests: XCTestCase {
         self.client?.update(updateRequest) { result in
             switch result {
             case .success(let response):
-                print("Updated Response: ", response)
+                self.logger.info("Updated Response: \(response)")
                 XCTAssertTrue(response.id == "abcdefg", "id: \(response.id)")
                 XCTAssertTrue(response.result == "created", "result: \(response.result)")
             case .failure(let error):
-                print("Error: ", error)
+                self.logger.error("Error: \(error)")
                 XCTAssertTrue(false)
             }
             e.fulfill()
@@ -603,11 +622,11 @@ class ElasticSwiftTests: XCTestCase {
         self.client?.update(updateRequest) { result in
             switch result {
             case .success(let response):
-                print("Updated Response: ", response)
+                self.logger.info("Updated Response: \(response)")
                 XCTAssertTrue(response.id == "3docAsUpsert", "id: \(response.id)")
                 XCTAssertTrue(response.result == "created", "result: \(response.result)")
             case .failure(let error):
-                print("Error: ", error)
+                self.logger.error("Error: \(error)")
                 XCTAssertTrue(false)
             }
             e.fulfill()
@@ -625,10 +644,10 @@ class ElasticSwiftTests: XCTestCase {
             
             switch result {
             case .failure(let error):
-                print("Error: ", error)
+                logger.error("Error: \(error)")
                 XCTAssert(false, error.localizedDescription)
             case .success(let response):
-                print("Respone", response)
+                logger.info("Response: \(response)")
                 XCTAssert(response.deleted == 1, "Result: \(response.deleted)")
             }
             e.fulfill()
@@ -651,9 +670,9 @@ class ElasticSwiftTests: XCTestCase {
             
             switch result {
             case .failure(let error):
-                print("Error: ", error)
+                logger.error("Error: \(error)")
             case .success(let response):
-                print("Result", response.result)
+                logger.info("Result: \(response.result)")
             }
             
             self.client?.deleteByQuery(request, completionHandler: handler)
@@ -679,10 +698,10 @@ class ElasticSwiftTests: XCTestCase {
             
             switch result {
             case .failure(let error):
-                print("Error: ", error)
+                logger.error("Error: \(error)")
                 XCTAssert(false, error.localizedDescription)
             case .success(let response):
-                print("Respone", response)
+                logger.info("Response: \(response)")
                 XCTAssert(response.updated == 1, "Result: \(response.updated)")
             }
             e.fulfill()
@@ -705,9 +724,9 @@ class ElasticSwiftTests: XCTestCase {
             
             switch result {
             case .failure(let error):
-                print("Error: ", error)
+                logger.error("Error: \(error)")
             case .success(let response):
-                print("Result", response.result)
+                logger.info("Result: \(response.result)")
             }
             
             self.client?.updateByQuery(request, completionHandler: handler)
@@ -733,10 +752,10 @@ class ElasticSwiftTests: XCTestCase {
             
             switch result {
             case .failure(let error):
-                print("Error: ", error)
+                logger.error("Error: \(error)")
                 XCTAssert(false, error.localizedDescription)
             case .success(let response):
-                print("Respone", response)
+                logger.info("Response: \(response)")
                 XCTAssert(response.updated == 1, "Result: \(response.updated)")
             }
             e.fulfill()
@@ -760,9 +779,9 @@ class ElasticSwiftTests: XCTestCase {
             
             switch result {
             case .failure(let error):
-                print("Error: ", error)
+                logger.error("Error: \(error)")
             case .success(let response):
-                print("Result", response.result)
+                logger.info("Result: \(response.result)")
             }
             
             self.client?.updateByQuery(request, completionHandler: handler)
@@ -786,10 +805,10 @@ class ElasticSwiftTests: XCTestCase {
             
             switch result {
             case .failure(let error):
-                print("Error", error)
+                logger.error("Error: \(error)")
                 XCTAssert(false, error.localizedDescription)
             case .success(let response):
-                print("Response: ", response)
+                logger.info("Response: \(response)")
                 XCTAssertNotNil(response.responses, "Responses: \(response.responses)")
             }
             e.fulfill()
@@ -806,9 +825,9 @@ class ElasticSwiftTests: XCTestCase {
             
             switch result {
             case .failure(let error):
-                print("Error", error)
+                logger.error("Error: \(error)")
             case .success(let response):
-                print("Response: ", response)
+                logger.info("Response: \(response)")
             }
             self.client?.mget(request, completionHandler: handler)
         }
@@ -832,10 +851,10 @@ class ElasticSwiftTests: XCTestCase {
             
             switch result {
             case .failure(let error):
-                print("Error", error)
+                logger.error("Error: \(error)")
                 XCTAssert(false, error.localizedDescription)
             case .success(let response):
-                print("Response: ", response)
+                logger.info("Response: \(response)")
                 XCTAssert(response.acknowledged, "Acknowleged: \(response.acknowledged)")
             }
             e.fulfill()
@@ -847,9 +866,9 @@ class ElasticSwiftTests: XCTestCase {
             
             switch result {
             case .failure(let error):
-                print("Error", error)
+                logger.error("Error \(error)")
             case .success(let response):
-                print("Response: ", response)
+                logger.info("Response: \(response)")
             }
             self.client?.execute(request: request, completionHandler: handler)
         }
