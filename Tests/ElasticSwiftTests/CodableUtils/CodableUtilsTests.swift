@@ -165,7 +165,7 @@ class CodableUtilsTests: XCTestCase {
             print("Value: ", v)
         }
         
-        XCTAssertEqual(expectdNil["nilVal"]!.value as! NullValue, .null)
+        XCTAssertEqual(expectdNil["nilVal"]!.value as! NilValue, .nil)
     }
     
     func test_06_CodableValue_decode() throws {
