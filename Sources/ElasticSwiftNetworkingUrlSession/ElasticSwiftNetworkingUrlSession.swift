@@ -1,10 +1,11 @@
 //
-//  File.swift
-//  
+//  ElasticSwiftNetworkingUrlSession.swift
+//  ElasticSwiftNetworkingUrlSession
 //
 //  Created by Prafull Kumar Soni on 9/27/19.
 //
 
+#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
 import Foundation
 import ElasticSwiftCore
 import Logging
@@ -13,7 +14,6 @@ import NIOHTTP1
 // MARK: - URLSessionAdaptor
 
 /// Implementation of `ManagedHTTPClientAdaptor` backed by `URLSession`.
-@available(iOS 10.0, macOS 10.10, tvOS 10, watchOS 3, *)
 public final class URLSessionAdaptor: ManagedHTTPClientAdaptor {
     
     private let logger = Logger(label: "org.pksprojects.ElasticSwfit.Networking.URLSessionAdaptor")
@@ -62,7 +62,8 @@ public final class URLSessionAdaptor: ManagedHTTPClientAdaptor {
     }
 }
 
-@available(iOS 10.0, macOS 10.10, tvOS 10, watchOS 3, *)
+// MARK:- URLSessionAdaptor Configuration
+
 public class URLSessionAdaptorConfiguration: HTTPAdaptorConfiguration {
     
     public let adaptor: ManagedHTTPClientAdaptor.Type
@@ -84,7 +85,8 @@ public class URLSessionAdaptorConfiguration: HTTPAdaptorConfiguration {
     
 }
 
-@available(iOS 10.0, macOS 10.10, tvOS 10, watchOS 3, *)
+//MARK:- SSL Configuration
+
 public class SSLConfiguration {
     
     let certPath: String
@@ -96,3 +98,4 @@ public class SSLConfiguration {
     }
 }
 
+#endif

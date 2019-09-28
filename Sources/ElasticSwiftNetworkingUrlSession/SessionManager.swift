@@ -1,11 +1,12 @@
 //
-//  Connection.swift
-//  ElasticSwift
+//  SessionManager.swift
+//  ElasticSwiftNetworkingUrlSession
 //
 //  Created by Prafull Kumar Soni on 5/21/17.
 //
 //
 
+#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
 import Foundation
 import Logging
 import NIOHTTP1
@@ -16,7 +17,6 @@ import ElasticSwiftCore
 /**
  Class maintaining URLSession for a Host
  */
-@available(iOS 10.0, macOS 10.10, tvOS 10, watchOS 3, *)
 class SessionManager: NSObject, URLSessionDelegate {
 
     private let logger = Logger(label: "org.pksprojects.ElasticSwift.Networking.SessionManager")
@@ -74,7 +74,6 @@ class SessionManager: NSObject, URLSessionDelegate {
     }
 }
 
-@available(iOS 10.0, macOS 10.10, tvOS 10, watchOS 3, *)
 extension SessionManager {
     func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         guard challenge.previousFailureCount == 0 else {
@@ -107,7 +106,7 @@ extension SessionManager {
 }
 
 // MARK:- Helper extension
-@available(iOS 10.0, macOS 10.10, tvOS 10, watchOS 3, *)
+
 public extension SecCertificate {
     
     /**
@@ -151,3 +150,4 @@ public extension SecCertificate {
     }
     
 }
+#endif
