@@ -17,8 +17,8 @@ let package = Package(
             name: "ElasticSwiftNetworkingNIO",
             targets: ["ElasticSwiftNetworkingNIO"]),
         .library(
-            name: "ElasticSwiftNetworkingUrlSession",
-            targets: ["ElasticSwiftNetworkingUrlSession"]),
+            name: "ElasticSwiftNetworking",
+            targets: ["ElasticSwiftNetworking"]),
         .library(
             name: "ElasticSwiftCore",
             targets: ["ElasticSwiftCore"]),
@@ -47,7 +47,7 @@ let package = Package(
             name: "ElasticSwiftNetworkingNIO",
             dependencies: ["ElasticSwiftCore", "Logging", "NIO", "NIOHTTP1", "NIOFoundationCompat", "NIOSSL", "NIOTransportServices", "NIOConcurrencyHelpers"]),
         .target(
-            name: "ElasticSwiftNetworkingUrlSession",
+            name: "ElasticSwiftNetworking",
             dependencies: ["ElasticSwiftCore", "Logging", "NIOHTTP1"]),
         .target(
             name: "ElasticSwiftCore",
@@ -57,6 +57,6 @@ let package = Package(
             dependencies: []),
         .testTarget(
             name: "ElasticSwiftTests",
-            dependencies: ["ElasticSwift", "ElasticSwiftQueryDSL", "ElasticSwiftCore", "ElasticSwiftCodableUtils", "ElasticSwiftNetworkingNIO", "ElasticSwiftNetworkingUrlSession"]),
+            dependencies: ["ElasticSwift", "ElasticSwiftQueryDSL", "ElasticSwiftCore", "ElasticSwiftCodableUtils", "ElasticSwiftNetworkingNIO", "ElasticSwiftNetworking"]),
     ]
 )

@@ -1,6 +1,6 @@
 //
 //  SessionManager.swift
-//  ElasticSwiftNetworkingUrlSession
+//  ElasticSwiftNetworking
 //
 //  Created by Prafull Kumar Soni on 5/21/17.
 //

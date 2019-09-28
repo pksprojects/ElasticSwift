@@ -5,8 +5,8 @@ import ElasticSwiftCore
 #if canImport(ElasticSwiftNetworkingNIO)
 import ElasticSwiftNetworkingNIO
 #endif
-#if canImport(ElasticSwiftNetworkingUrlSession)  && !os(Linux)
-import ElasticSwiftNetworkingUrlSession
+#if canImport(ElasticSwiftNetworking)  && !os(Linux)
+import ElasticSwiftNetworking
 #endif
 
 
@@ -187,7 +187,7 @@ public class Settings {
         self.init(forHosts: hosts.map({ return URL(string: $0)! }), withCredentials: credentials, adaptor: clientAdaptor, serializer: serializer)
     }
     
-    #if (canImport(ElasticSwiftNetworkingUrlSession) && !os(Linux)) ||  canImport(ElasticSwiftNetworkingNIO)
+    #if (canImport(ElasticSwiftNetworking) && !os(Linux)) ||  canImport(ElasticSwiftNetworkingNIO)
     /// default settings for ElasticClient with host
     public static func `default`(_ host: String) -> Settings {
         #if canImport(ElasticSwiftNetworkingNIO) && (os(macOS) || os(Linux))
@@ -198,7 +198,7 @@ public class Settings {
     }
     #endif
     
-    #if canImport(ElasticSwiftNetworkingUrlSession) && !os(Linux)
+    #if canImport(ElasticSwiftNetworking) && !os(Linux)
     public static func urlSession(_ host: String) -> Settings {
         return Settings(forHost: host, adaptorConfig: URLSessionAdaptorConfiguration.default)
     }

@@ -1,6 +1,6 @@
 //
-//  ElasticSwiftNetworkingUrlSession.swift
-//  ElasticSwiftNetworkingUrlSession
+//  ElasticSwiftNetworking.swift
+//  ElasticSwiftNetworking
 //
 //  Created by Prafull Kumar Soni on 9/27/19.
 //
