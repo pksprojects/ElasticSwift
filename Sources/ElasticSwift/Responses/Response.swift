@@ -9,19 +9,6 @@
 import Foundation
 import ElasticSwiftCodableUtils
 
-public class ESResponse {
-    
-    public let data: Data?
-    public let httpResponse: URLResponse?
-    public let error: Error?
-    
-    init(data: Data? ,httpResponse: URLResponse?, error: Error?) {
-        self.data = data
-        self.httpResponse = httpResponse
-        self.error = error
-    }
-}
-
 //MARK:- Get Response
 
 public struct GetResponse<T: Codable>: Codable, Equatable where T: Equatable {
