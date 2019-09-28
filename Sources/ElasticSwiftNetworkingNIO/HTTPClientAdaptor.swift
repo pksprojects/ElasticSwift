@@ -1,6 +1,6 @@
 //
 //  HTTPClientAdaptor.swift
-//  ElasticSwiftNetworking
+//  ElasticSwiftNetworkingNIO
 //
 //  Created by Prafull Kumar Soni on 7/26/19.
 //
@@ -10,6 +10,9 @@ import Foundation
 import Logging
 import NIOHTTP1
 import NIO
+#if canImport(NIOSSL)
+import NIOSSL
+#endif
 import ElasticSwiftCore
 
 // MARK: - DefaultHTTPClientAdaptor
@@ -51,8 +54,11 @@ public final class DefaultHTTPClientAdaptor: ManagedHTTPClientAdaptor {
     private static func createHttpClientConfig(from adaptorConfig: HTTPAdaptorConfiguration) -> HTTPClientConfiguration {
         
         let config = adaptorConfig as! HTTPClientAdaptorConfiguration
+        #if canImport(NIOSSL)
         return HTTPClientConfiguration(eventLoopProvider: config.eventLoopProvider, sslContext: config.sslcontext, timeouts: config.timeouts)
+        #else
+        return HTTPClientConfiguration(eventLoopProvider: config.eventLoopProvider, timeouts: config.timeouts)
+        #endif
     }
     
 }
-

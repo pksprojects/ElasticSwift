@@ -1,9 +1,18 @@
+//
+//  ElasticSwiftNetworkingNIO.swift
+//  ElasticSwiftNetworkingNIO
+//
+//  Created by Prafull Kumar Soni on 9/27/19.
+//
+
 import Foundation
 import Logging
 import NIO
 import NIOHTTP1
 import NIOTLS
+#if canImport(NIOSSL)
 import NIOSSL
+#endif
 import ElasticSwiftCore
 
 //MARK:- Timeouts
@@ -33,6 +42,7 @@ public class HTTPClientAdaptorConfiguration: HTTPAdaptorConfiguration {
     
     public let eventLoopProvider: EventLoopProvider
     
+    #if canImport(NIOSSL)
     // ssl config for swift-nio-ssl based clients
     public let sslcontext: NIOSSLContext?
 
@@ -43,6 +53,16 @@ public class HTTPClientAdaptorConfiguration: HTTPAdaptorConfiguration {
         self.adaptor = adaptor
     }
     
+    #else
+    
+    public init(adaptor: ManagedHTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self, eventLoopProvider: EventLoopProvider = .create(threads: 1), timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS) {
+        self.eventLoopProvider = eventLoopProvider
+        self.timeouts = timeouts
+        self.adaptor = adaptor
+    }
+    
+    #endif
+    
     public static var `default`: HTTPAdaptorConfiguration {
         get {
             return HTTPClientAdaptorConfiguration()
@@ -50,4 +70,3 @@ public class HTTPClientAdaptorConfiguration: HTTPAdaptorConfiguration {
     }
     
 }
-
