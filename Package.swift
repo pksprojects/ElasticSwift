@@ -14,8 +14,11 @@ let package = Package(
             name: "ElasticSwiftQueryDSL",
             targets: ["ElasticSwiftQueryDSL"]),
         .library(
-            name: "ElasticSwiftNetworking",
-            targets: ["ElasticSwiftNetworking"]),
+            name: "ElasticSwiftNetworkingNIO",
+            targets: ["ElasticSwiftNetworkingNIO"]),
+        .library(
+            name: "ElasticSwiftNetworkingUrlSession",
+            targets: ["ElasticSwiftNetworkingUrlSession"]),
         .library(
             name: "ElasticSwiftCore",
             targets: ["ElasticSwiftCore"]),
@@ -36,13 +39,16 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "ElasticSwift",
-            dependencies: ["ElasticSwiftCore", "ElasticSwiftQueryDSL", "ElasticSwiftNetworking", "ElasticSwiftCodableUtils", "Logging", "NIO", "NIOHTTP1", "NIOFoundationCompat", "NIOSSL", "NIOTransportServices"]),
+            dependencies: ["ElasticSwiftCore", "ElasticSwiftQueryDSL", "ElasticSwiftCodableUtils", "Logging", "NIOHTTP1", "NIOConcurrencyHelpers"]),
         .target(
             name: "ElasticSwiftQueryDSL",
             dependencies: ["ElasticSwiftCore", "ElasticSwiftCodableUtils", "Logging"]),
         .target(
-            name: "ElasticSwiftNetworking",
-            dependencies: ["ElasticSwiftCore", "Logging", "NIO", "NIOHTTP1", "NIOFoundationCompat", "NIOSSL", "NIOTransportServices"]),
+            name: "ElasticSwiftNetworkingNIO",
+            dependencies: ["ElasticSwiftCore", "Logging", "NIO", "NIOHTTP1", "NIOFoundationCompat", "NIOSSL", "NIOTransportServices", "NIOConcurrencyHelpers"]),
+        .target(
+            name: "ElasticSwiftNetworkingUrlSession",
+            dependencies: ["ElasticSwiftCore", "Logging", "NIOHTTP1"]),
         .target(
             name: "ElasticSwiftCore",
             dependencies: ["Logging", "NIOHTTP1"]),
@@ -51,6 +57,6 @@ let package = Package(
             dependencies: []),
         .testTarget(
             name: "ElasticSwiftTests",
-            dependencies: ["ElasticSwift", "ElasticSwiftQueryDSL", "ElasticSwiftNetworking", "ElasticSwiftCore", "ElasticSwiftCodableUtils"]),
+            dependencies: ["ElasticSwift", "ElasticSwiftQueryDSL", "ElasticSwiftCore", "ElasticSwiftCodableUtils", "ElasticSwiftNetworkingNIO", "ElasticSwiftNetworkingUrlSession"]),
     ]
 )

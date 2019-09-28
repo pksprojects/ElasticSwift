@@ -8,9 +8,7 @@
 import Foundation
 import NIO
 import NIOHTTP1
-#if canImport(NIOSSL)
 import NIOSSL
-#endif
 import Logging
 import ElasticSwiftCore
 
@@ -23,9 +21,7 @@ public class HTTPClient {
     private let eventLoopGroup: EventLoopGroup
     private let hostURL: URL
     private let configuration: HTTPClientConfiguration
-    #if canImport(NIOSSL)
     private let sslContext: NIOSSLContext?
-    #endif
     private let timeouts: Timeouts?
     
     init(forHost host: URL, configuration: HTTPClientConfiguration) {
@@ -38,15 +34,13 @@ public class HTTPClient {
         }
         self.hostURL = host
         self.configuration = configuration
-        #if canImport(NIOSSL)
         self.sslContext = configuration.sslContext
-        #endif
         self.timeouts = configuration.timeouts
     }
     
     public func execute(request: HTTPRequest) -> EventLoopFuture<[HTTPClientResponsePart]> {
         let promise = self.eventLoopGroup.next().makePromise(of: [HTTPClientResponsePart].self)
-        #if canImport(NIOSSL)
+        
         let bootstrap: ClientBootstrap
         if let sslContext = self.sslContext {
             bootstrap = ClientBootstrap(group: eventLoopGroup)
@@ -75,22 +69,7 @@ public class HTTPClient {
                     }
             }
         }
-        #else
-        let bootstrap = ClientBootstrap(group: self.eventLoopGroup)
-            .channelOption(ChannelOptions.socket(SocketOptionLevel(SOL_SOCKET), SO_REUSEADDR), value: 1)
-            .channelInitializer { channel in
-                channel.pipeline.addHTTPClientHandlers()
-                    .flatMap {
-                        channel.pipeline.addHandler(HTTPChannelHandler(for: request, promise: promise))
-                }.flatMap {
-                    if let readTimeout = self.timeouts?.read {
-                        return channel.pipeline.addHandler(IdleStateHandler(readTimeout: readTimeout))
-                    } else {
-                        return channel.eventLoop.makeSucceededFuture(())
-                    }
-                }
-        }
-        #endif
+        
         if let connectTimeout = self.timeouts?.connect {
             _ = bootstrap.connectTimeout(connectTimeout)
         }
@@ -115,7 +94,6 @@ public class HTTPClientConfiguration {
     
     public let eventLoopProvider: EventLoopProvider
     
-    #if canImport(NIOSSL)
     public let sslContext: NIOSSLContext?
     
     public init(eventLoopProvider: EventLoopProvider = .create(threads: 1), sslContext: NIOSSLContext? = nil, timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS) {
@@ -123,12 +101,6 @@ public class HTTPClientConfiguration {
         self.sslContext = sslContext
         self.timeouts = timeouts
     }
-    #else
-    public init(eventLoopProvider: EventLoopProvider = .create(threads: 1), timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS) {
-        self.eventLoopProvider = eventLoopProvider
-        self.timeouts = timeouts
-    }
-    #endif
     
 }
 
