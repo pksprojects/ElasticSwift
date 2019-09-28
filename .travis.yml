@@ -2,6 +2,28 @@ language: generic
 matrix:
   include:
     - os: linux
+      dist: xenial
+      sudo: required
+      install:
+        - cd $HOME
+        - sudo apt-get install -y clang libicu-dev
+        - wget -q -O swift.tar.gz https://swift.org/builds/swift-5.0.3-release/ubuntu1604/swift-5.0.3-RELEASE/swift-5.0.3-RELEASE-ubuntu16.04.tar.gz
+        - mkdir swift-RELEASE
+        - tar xzf swift.tar.gz -C swift-RELEASE --strip-components=1
+        - export PATH="${HOME}/swift-RELEASE/usr/bin:${PATH}"
+        - cd $TRAVIS_BUILD_DIR
+    - os: linux
+      dist: xenial
+      sudo: required
+      install:
+        - cd $HOME
+        - sudo apt-get install -y clang libicu-dev
+        - wget -q -O swift.tar.gz https://swift.org/builds/swift-5.1-release/ubuntu1604/swift-5.1-RELEASE/swift-5.1-RELEASE-ubuntu16.04.tar.gz
+        - mkdir swift-RELEASE
+        - tar xzf swift.tar.gz -C swift-RELEASE --strip-components=1
+        - export PATH="${HOME}/swift-RELEASE/usr/bin:${PATH}"
+        - cd $TRAVIS_BUILD_DIR
+    - os: linux
       dist: bionic
       sudo: required
       install:
