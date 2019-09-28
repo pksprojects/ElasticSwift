@@ -1,6 +1,6 @@
 //
-//  File.swift
-//  ElasticSwift
+//  HTTPClient.swift
+//  ElasticSwiftNetworkingNIO
 //
 //  Created by Prafull Kumar Soni on 6/16/19.
 //

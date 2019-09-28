@@ -2,7 +2,13 @@ import Foundation
 import Logging
 import NIOHTTP1
 import ElasticSwiftCore
+#if canImport(ElasticSwiftNetworkingNIO)
+import ElasticSwiftNetworkingNIO
+#endif
+#if canImport(ElasticSwiftNetworking)  && !os(Linux)
 import ElasticSwiftNetworking
+#endif
+
 
 public typealias Host = URL
 
@@ -25,10 +31,11 @@ public class ElasticClient {
         self.clusterClient = ClusterClient(withClient: self)
     }
     
+    #if canImport(ElasticSwiftNetworkingNIO)
     public convenience init() {
         self.init(settings: Settings.default)
     }
-    
+    #endif
     private var credentials: ClientCredential? {
         get {
             return self._settings.credentials
@@ -180,21 +187,26 @@ public class Settings {
         self.init(forHosts: hosts.map({ return URL(string: $0)! }), withCredentials: credentials, adaptor: clientAdaptor, serializer: serializer)
     }
     
+    #if (canImport(ElasticSwiftNetworking) && !os(Linux)) ||  canImport(ElasticSwiftNetworkingNIO)
     /// default settings for ElasticClient with host
     public static func `default`(_ host: String) -> Settings {
-        #if os(iOS) || os(tvOS) || os(watchOS)
-          return urlSession(host)
+        #if canImport(ElasticSwiftNetworkingNIO) && (os(macOS) || os(Linux))
+                return swiftNIO(host)
         #else
-          return swiftNIO(host)
+          return urlSession(host)
         #endif
     }
+    #endif
     
-    public static func swiftNIO(_ host: String) -> Settings {
-        return Settings(forHost: host, adaptorConfig: HTTPClientAdaptorConfiguration.default)
-    }
-    
+    #if canImport(ElasticSwiftNetworking) && !os(Linux)
     public static func urlSession(_ host: String) -> Settings {
         return Settings(forHost: host, adaptorConfig: URLSessionAdaptorConfiguration.default)
+    }
+    #endif
+    
+    #if canImport(ElasticSwiftNetworkingNIO)
+    public static func swiftNIO(_ host: String) -> Settings {
+        return Settings(forHost: host, adaptorConfig: HTTPClientAdaptorConfiguration.default)
     }
     
     /// default settings for ElasticClient for localhost/development use
@@ -203,6 +215,7 @@ public class Settings {
             return swiftNIO("http://localhost:9200")
         }
     }
+    #endif
     
 }
 

@@ -195,7 +195,7 @@ class ElasticSwiftTests: XCTestCase {
                 XCTAssert(response.found, "Found: \(response.found)")
                 XCTAssert(response.index == "test", "Index: \(response.index)")
                 XCTAssert(response.id == "0", "_id: \(response.id)")
-                XCTAssert(response.type == "_doc", "Found: \(response.type)")
+                XCTAssert(response.type == "_doc", "Found: \(String(describing: response.type))")
             }
             e.fulfill()
         }

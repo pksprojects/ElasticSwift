@@ -1,11 +1,12 @@
 //
-//  Connection.swift
-//  ElasticSwift
+//  SessionManager.swift
+//  ElasticSwiftNetworking
 //
 //  Created by Prafull Kumar Soni on 5/21/17.
 //
 //
 
+#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
 import Foundation
 import Logging
 import NIOHTTP1
@@ -16,7 +17,6 @@ import ElasticSwiftCore
 /**
  Class maintaining URLSession for a Host
  */
-
 class SessionManager: NSObject, URLSessionDelegate {
 
     private let logger = Logger(label: "org.pksprojects.ElasticSwift.Networking.SessionManager")
@@ -24,7 +24,6 @@ class SessionManager: NSObject, URLSessionDelegate {
     private var session: URLSession?
     private let url: URL
     
-    #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
     private var sslConfig: SSLConfiguration?
     
     init(forHost url: URL, sslConfig: SSLConfiguration? = nil) {
@@ -35,15 +34,7 @@ class SessionManager: NSObject, URLSessionDelegate {
         let queue = OperationQueue()
         self.session = URLSession(configuration: config, delegate: self, delegateQueue: queue)
     }
-    #else
-    init(forHost url: URL) {
-        self.url = url
-        super.init()
-        let config = URLSessionConfiguration.ephemeral
-        let queue = OperationQueue()
-        self.session = URLSession(configuration: config, delegate: self, delegateQueue: queue)
-    }
-    #endif
+    
     func createReqeust(_ httpRequest: HTTPRequest) -> URLRequest {
         var components =  URLComponents()
         components.queryItems = httpRequest.queryParams
@@ -83,9 +74,6 @@ class SessionManager: NSObject, URLSessionDelegate {
     }
 }
 
-
-#if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
-// URLSession basic SSL support for apple platform
 extension SessionManager {
     func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         guard challenge.previousFailureCount == 0 else {
@@ -117,11 +105,8 @@ extension SessionManager {
     }
 }
 
-#endif
-
 // MARK:- Helper extension
 
-#if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
 public extension SecCertificate {
     
     /**
