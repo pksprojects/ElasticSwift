@@ -845,7 +845,98 @@ class ElasticSwiftTests: XCTestCase {
         waitForExpectations(timeout: 10)
     }
     
-    func test_21_DeleteIndex() throws {
+    func test_21_ReIndex() throws {
+        let e = expectation(description: "execution complete")
+        
+        let source =  ReIndexRequest.Source(index: "test")
+        let dest = ReIndexRequest.Destination.init(index: "testdest")
+        
+        let reIndexRequest =  try ReIndexRequestBuilder()
+            .set(source: source)
+            .set(destination: dest)
+            .set(refresh: true)
+            .set(timeout: "1m")
+            .set(waitForCompletion: true)
+            .build()
+        
+        
+        func resultHandler(_ result: Result<ReIndexResponse, Error>) -> Void {
+            switch result {
+            case .failure(let error):
+                logger.error("Error: \(error)")
+                XCTAssert(false, error.localizedDescription)
+            case .success(let response):
+                logger.info("Response: \(response)")
+            }
+            e.fulfill()
+        }
+        
+        /// make sure index exists
+        func handler(_ result: Result<IndexResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                logger.error("Error: \(error)")
+                XCTAssert(false, error.localizedDescription)
+            case .success(let response):
+                logger.info("Response: \(response)")
+            }
+            self.client?.reIndex(reIndexRequest, completionHandler: resultHandler)
+        }
+        var msg = Message()
+        msg.msg = "Test Message No Id"
+        let request = try IndexRequestBuilder<Message>()
+            .set(index: "test")
+            .set(type: "_doc")
+            .set(source: msg)
+            .build()
+        
+        self.client?.execute(request: request, completionHandler: handler)
+        waitForExpectations(timeout: 10)
+    }
+    
+    func test_22_ReIndexRequestBuilder_throws() throws {
+        let e = expectation(description: "execution complete")
+        
+        XCTAssertThrowsError(try ReIndexRequestBuilder().set(size: 100).set(slices: 10).set(requestsPerSecond: 0).set(waitForActiveShards: "all").build(), "missing source", { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? RequestBuilderError {
+                switch error {
+                case .missingRequiredField(let field):
+                    XCTAssertEqual("source", field)
+                    e.fulfill()
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        })
+        
+        waitForExpectations(timeout: 10)
+    }
+    
+    func test_23_ReIndexRequestBuilder_throws_2() throws {
+        let e = expectation(description: "execution complete")
+        
+        let source = ReIndexRequest.Source(index: "test")
+        let script = Script("if (ctx._source.foo == 'bar') {ctx._version++; ctx._source.remove('foo')}", lang: "painless")
+        
+        XCTAssertThrowsError(try ReIndexRequestBuilder().set(source: source).set(script: script).build(), "missing destination", { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? RequestBuilderError {
+                switch error {
+                case .missingRequiredField(let field):
+                    XCTAssertEqual("destination", field)
+                    e.fulfill()
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        })
+        
+        waitForExpectations(timeout: 10)
+    }
+    
+    func test_999_DeleteIndex() throws {
         let e = expectation(description: "execution complete")
         func handler(_ result: Result<AcknowledgedResponse, Error>) -> Void {
             

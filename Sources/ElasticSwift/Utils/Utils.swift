@@ -6,20 +6,20 @@
 //
 //
 
-public enum VersionType: String {
+public enum VersionType: String, Codable {
     case `internal`
     case external
     case externalGte = "external_gte"
     case force
 }
 
-public enum IndexRefresh: String {
+public enum IndexRefresh: String, Codable {
     case `true`
     case `false`
     case waitFor = "wait_for"
 }
 
-public enum OpType: String {
+public enum OpType: String, Codable {
     case index
     case create
 }

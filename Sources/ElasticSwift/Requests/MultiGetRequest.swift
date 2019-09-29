@@ -148,7 +148,7 @@ public class MultiGetRequestBuilder: RequestBuilder {
 
 // MARK:- Multi-Get Request
 
-public struct MultiGetRequest: Request, Encodable {
+public struct MultiGetRequest: Request {
     
     public var headers: HTTPHeaders = HTTPHeaders()
     
@@ -244,29 +244,14 @@ public struct MultiGetRequest: Request, Encodable {
     }
     
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-        return serializer.encode(self).mapError { error -> MakeBodyError in
+        let body = Body(docs: self.items)
+        return serializer.encode(body).mapError { error -> MakeBodyError in
             return .wrapped(error)
         }
     }
     
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(self.items, forKey: CodingKeys.key(named: "docs")!)
-    }
-    
-    private struct CodingKeys: CodingKey {
-        var stringValue: String
-        var intValue: Int?
-        init?(stringValue: String) {
-            self.stringValue = stringValue
-        }
-        init?(intValue: Int) {
-            self.intValue = intValue
-            stringValue = "\(intValue)"
-        }
-        static func key(named name: String) -> CodingKeys? {
-            return CodingKeys(stringValue: name)
-        }
+    struct Body: Encodable {
+        public let docs: [Item]
     }
     
     public struct Item: Codable, Equatable {

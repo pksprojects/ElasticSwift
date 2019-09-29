@@ -299,3 +299,45 @@ public struct UpdateResponse: Codable, Equatable {
         case result
     }
 }
+
+// MARK:- ReIndex Response
+
+public struct ReIndexResponse: Codable, Equatable {
+    
+    public let took: Int
+    public let timeout: Bool
+    public let created: Int
+    public let updated: Int
+    public let deleted: Int
+    public let batches: Int
+    public let versionConflicts: Int
+    public let noops: Int
+    public let retries: Retries
+    public let throttledMillis: Int
+    public let requestsPerSecond: Int
+    public let throttledUntilMillis: Int
+    public let total: Int
+    public let failures: [CodableValue]
+    
+    public struct Retries: Codable, Equatable {
+        public let bulk: Int
+        public let search: Int
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case took
+        case timeout = "timed_out"
+        case created
+        case updated
+        case deleted
+        case batches
+        case versionConflicts = "version_conflicts"
+        case noops
+        case retries
+        case throttledMillis = "throttled_millis"
+        case requestsPerSecond = "requests_per_second"
+        case throttledUntilMillis = "throttled_until_millis"
+        case total
+        case failures
+    }
+}
