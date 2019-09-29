@@ -83,6 +83,10 @@ extension ElasticClient {
     public func mget(_ multiGetRequest: MultiGetRequest, completionHandler: @escaping (_ result: Result<MultiGetResponse, Error>) -> Void) -> Void {
         return self.execute(request: multiGetRequest, options: .default, completionHandler: completionHandler)
     }
+    
+    public func reIndex(_ reIndexRequest: ReIndexRequest, completionHandler: @escaping (_ result: Result<ReIndexResponse, Error>) -> Void) -> Void {
+        return self.execute(request: reIndexRequest, options: .default, completionHandler: completionHandler)
+    }
 }
 
 extension ElasticClient {
@@ -117,6 +121,10 @@ extension ElasticClient {
     
     public func mget(_ multiGetRequest: MultiGetRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<MultiGetResponse, Error>) -> Void) -> Void {
         return self.execute(request: multiGetRequest, options: options, completionHandler: completionHandler)
+    }
+    
+    public func reIndex(_ reIndexRequest: ReIndexRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<ReIndexResponse, Error>) -> Void) -> Void {
+        return self.execute(request: reIndexRequest, options: options, completionHandler: completionHandler)
     }
 }
 

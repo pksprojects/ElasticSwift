@@ -151,16 +151,24 @@ public struct ReIndexRequest: Request {
     }
     
     internal init(withBuilder builder: ReIndexRequestBuilder) throws {
-        self.source = builder.source!
-        self.destination = builder.destination!
-        self.script = builder.script
+        
+        
+        guard builder.source != nil else {
+            throw RequestBuilderError.missingRequiredField("source")
+        }
+        
+        guard builder.destination != nil else {
+            throw RequestBuilderError.missingRequiredField("destination")
+        }
+        
+        self.init(source: builder.source!, destination: builder.destination!, script: builder.script, size: builder.size)
+        
         self.refresh = builder.refresh
         self.timeout = builder.timeout
         self.waitForActiveShards = builder.waitForActiveShards
         self.waitForCompletion = builder.waitForCompletion
         self.requestsPerSecond = builder.requestsPerSecond
         self.slices = builder.slices
-        self.size = builder.size
     }
     
     public var queryParams: [URLQueryItem] {
@@ -206,6 +214,13 @@ public struct ReIndexRequest: Request {
         public let destination: Destination
         public let script: Script?
         public let size: Int?
+        
+        enum CodingKeys: String, CodingKey {
+            case source
+            case destination = "dest"
+            case script
+            case size
+        }
     }
     
     public struct Source: Encodable, Equatable {
