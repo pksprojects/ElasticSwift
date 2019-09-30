@@ -202,7 +202,7 @@ public class TermVectorsRequestBuilder: RequestBuilder {
     }
     
     public func build() throws -> TermVectorsRequest {
-        try TermVectorsRequest(withBuilder: self)
+        return try TermVectorsRequest(withBuilder: self)
     }
 }
 
