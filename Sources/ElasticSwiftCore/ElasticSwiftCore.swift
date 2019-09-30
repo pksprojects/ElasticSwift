@@ -87,6 +87,11 @@ public enum QueryParams: String {
     case realTime = "realtime"
     case preference
     case storedFields = "stored_fields"
+    case termStatistics = "term_statistics"
+    case fieldStatistics = "field_statistics"
+    case offsets
+    case positions
+    case payloads
 }
 
 enum EndPointCategory: String {

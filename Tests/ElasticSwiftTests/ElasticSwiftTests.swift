@@ -936,6 +936,33 @@ class ElasticSwiftTests: XCTestCase {
         waitForExpectations(timeout: 10)
     }
     
+    func test_24_TermVectorsRequest() throws {
+        let e = expectation(description: "execution complete")
+        
+        func handler(_ result: Result<TermVectorsResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                logger.error("Error: \(error)")
+                XCTAssert(false, error.localizedDescription)
+            case .success(let response):
+                logger.info("Response: \(response)")
+                XCTAssert(response.found, "Found: \(response.found)")
+            }
+            e.fulfill()
+        }
+        
+        let request = try TermVectorsRequestBuilder()
+            .set(doc: ["fullname": "John Doe", "text": "twitter test test test"])
+            .set(index: "test")
+            .set(type: "_doc")
+            .build()
+        
+        self.client?.termVectors(request, completionHandler: handler)
+        
+        waitForExpectations(timeout: 10)
+    }
+    
     func test_999_DeleteIndex() throws {
         let e = expectation(description: "execution complete")
         func handler(_ result: Result<AcknowledgedResponse, Error>) -> Void {

@@ -57,6 +57,7 @@ extension ElasticSwiftTests {
         ("test_21_ReIndex", test_21_ReIndex),
         ("test_22_ReIndexRequestBuilder_throws", test_22_ReIndexRequestBuilder_throws),
         ("test_23_ReIndexRequestBuilder_throws_2", test_23_ReIndexRequestBuilder_throws_2),
+        ("test_24_TermVectorsRequest", test_24_TermVectorsRequest),
         ("test_999_DeleteIndex", test_999_DeleteIndex),
         ("testPlay", testPlay),
     ]
