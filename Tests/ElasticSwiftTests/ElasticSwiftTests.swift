@@ -1059,6 +1059,10 @@ class ElasticSwiftTests: XCTestCase {
             .set(index: "test")
             .set(type: "_doc")
             .set(fields: ["fullname", "text"])
+            .set(offsets: true)
+            .set(termStatistics: true)
+            .set(positions: true)
+            .set(payloads: true)
             .set(fieldStatistics: false)
             .build()
         
@@ -1099,7 +1103,9 @@ class ElasticSwiftTests: XCTestCase {
             .set(id: "1")
             .set(index: "twitter")
             .set(type: "_doc")
-            .set(fields: ["text"])
+            .set(fields: ["fullname", "text"])
+            .set(realtime: true)
+            .set(perFieldAnalyzer: ["fullname": "keyword"])
             .build()
         
         var indexRequest = try IndexRequestBuilder<Tweet>()

@@ -396,7 +396,7 @@ public struct TermVectorsResponse: Codable, Equatable {
         
         public init(from decoder: Decoder) throws {
             let container =  try decoder.container(keyedBy: CodingKeys.self)
-            self.fieldStatistics = try container.decode(FieldStatistics.self, forKey: .fieldStatistics)
+            self.fieldStatistics = try container.decodeIfPresent(FieldStatistics.self, forKey: .fieldStatistics)
             let dic =  try container.decode([String: TermStatistics].self, forKey: .terms)
             self.terms = dic.map { key, value -> Term in
                 return Term(term: key, termStatistics: value)
@@ -434,7 +434,7 @@ public struct TermVectorsResponse: Codable, Equatable {
             self.term = term
             self.docFreq = termStatistics.docFreq
             self.termFreq =  termStatistics.termFreq
-            self.tokens = termStatistics.tokens
+            self.tokens = termStatistics.tokens ?? []
             self.ttf = termStatistics.ttf
         }
         
@@ -444,7 +444,7 @@ public struct TermVectorsResponse: Codable, Equatable {
         
         public let docFreq: Int?
         public let termFreq: Int
-        public let tokens: [Token]
+        public let tokens: [Token]?
         public let ttf: Int?
         
         enum CodingKeys: String, CodingKey {
