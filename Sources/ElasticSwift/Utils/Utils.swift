@@ -34,23 +34,23 @@ extension URLQueryItem {
     }
     
     init(name: QueryParams, value: Bool?) {
-        self.init(name: name.rawValue, value: String(describing: value))
+        self.init(name: name.rawValue, value: value?.description)
     }
     
     init(name: QueryParams, value: Int?) {
-        self.init(name: name.rawValue, value: String(describing: value))
+        self.init(name: name.rawValue, value: value?.description)
     }
     
     init(name: QueryParams, value: Float?) {
-        self.init(name: name.rawValue, value: String(describing: value))
+        self.init(name: name.rawValue, value: value?.description)
     }
     
     init(name: QueryParams, value: Double?) {
-        self.init(name: name.rawValue, value: String(describing: value))
+        self.init(name: name.rawValue, value: value?.description)
     }
     
     init(name: QueryParams, value: Decimal?) {
-        self.init(name: name.rawValue, value: String(describing: value))
+        self.init(name: name.rawValue, value: value?.description)
     }
     
 }

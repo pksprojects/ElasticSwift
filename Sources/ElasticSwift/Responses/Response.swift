@@ -425,10 +425,10 @@ public struct TermVectorsResponse: Codable, Equatable {
     
     public struct Term: Codable, Equatable {
         public let term: String
-        public let docFreq: Int
+        public let docFreq: Int?
         public let termFreq: Int
         public let tokens: [Token]
-        public let ttf: Int
+        public let ttf: Int?
         
         public init(term: String, termStatistics: TermStatistics) {
             self.term = term
@@ -442,12 +442,12 @@ public struct TermVectorsResponse: Codable, Equatable {
     
     public struct TermStatistics: Codable, Equatable {
         
-        public let docFreq: Int
+        public let docFreq: Int?
         public let termFreq: Int
         public let tokens: [Token]
-        public let ttf: Int
+        public let ttf: Int?
         
-        enum CodinKeys: String, Codable {
+        enum CodingKeys: String, CodingKey {
             case docFreq = "doc_freq"
             case termFreq = "term_freq"
             case tokens
@@ -456,7 +456,7 @@ public struct TermVectorsResponse: Codable, Equatable {
     }
     
     public struct Token: Codable, Equatable {
-        public let payload: String
+        public let payload: String?
         public let position: Int
         public let startOffset: Int
         public let endOffset: Int
