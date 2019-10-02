@@ -115,6 +115,9 @@ public struct MappingMetaData: Codable {
     
     public let type: String?
     public let fields: Fields?
+    public let analyzer: String?
+    public let store: Bool?
+    public let termVector: String?
     public var properties: [String: MappingMetaData]?
     
     public struct Fields: Codable, Equatable {
@@ -129,6 +132,15 @@ public struct MappingMetaData: Codable {
                 case ignoreAbove = "ignore_above"
             }
         }
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case type
+        case fields
+        case analyzer
+        case store
+        case termVector = "term_vector"
+        case properties
     }
     
 }

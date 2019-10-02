@@ -1169,9 +1169,9 @@ class ElasticSwiftTests: XCTestCase {
                 ]
             ])
             .set(mappings:  [
-                "_doc": MappingMetaData(type: nil, fields: nil, properties: [
-                    "text": MappingMetaData(type: "text", fields: nil, properties: nil),
-                    "fullname": MappingMetaData(type: "text", fields: nil, properties: nil)
+                "_doc": MappingMetaData(type: nil, fields: nil, analyzer: nil, store: nil, termVector: nil, properties: [
+                    "text": MappingMetaData(type: "text", fields: nil, analyzer: "fulltext_analyzer", store: true, termVector: "with_positions_offsets_payloads", properties: nil),
+                    "fullname": MappingMetaData(type: "text", fields: nil, analyzer: "fulltext_analyzer", store: nil, termVector: "with_positions_offsets_payloads", properties: nil)
                 ])
             ])
             .build()
