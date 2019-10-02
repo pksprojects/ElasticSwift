@@ -936,6 +936,258 @@ class ElasticSwiftTests: XCTestCase {
         waitForExpectations(timeout: 10)
     }
     
+    func test_24_TermVectorsRequest() throws {
+        let e = expectation(description: "execution complete")
+        
+        func handler(_ result: Result<TermVectorsResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                logger.error("Error: \(error)")
+                XCTAssert(false, error.localizedDescription)
+            case .success(let response):
+                logger.info("Response: \(response)")
+                XCTAssert(response.found, "Found: \(response.found)")
+            }
+            e.fulfill()
+        }
+        
+        let request = try TermVectorsRequestBuilder()
+            .set(doc: ["fullname": "John Doe", "text": "twitter test test test"])
+            .set(index: "test")
+            .set(type: "_doc")
+            .build()
+        
+        self.client?.termVectors(request, completionHandler: handler)
+        
+        waitForExpectations(timeout: 10)
+    }
+    
+    func test_25_TermVectorsRequestBuilder_throws() throws {
+        let e = expectation(description: "execution complete")
+        
+        XCTAssertThrowsError(try TermVectorsRequestBuilder().build(), "missing index", { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? RequestBuilderError {
+                switch error {
+                case .missingRequiredField(let field):
+                    XCTAssertEqual("index", field)
+                    e.fulfill()
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        })
+        
+        waitForExpectations(timeout: 10)
+    }
+    
+    func test_26_TermVectorsRequestBuilder_throws_2() throws {
+        let e = expectation(description: "execution complete")
+        
+        XCTAssertThrowsError(try TermVectorsRequestBuilder().set(index: "index").build(), "missing type", { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? RequestBuilderError {
+                switch error {
+                case .missingRequiredField(let field):
+                    XCTAssertEqual("type", field)
+                    e.fulfill()
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        })
+        
+        waitForExpectations(timeout: 10)
+    }
+    
+    func test_27_TermVectorsRequestBuilder_throws_3() throws {
+        let e = expectation(description: "execution complete")
+        
+        XCTAssertThrowsError(try TermVectorsRequestBuilder().set(index: "index").set(type: "type").build(), "missing id and doc", { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? RequestBuilderError {
+                switch error {
+                case .missingRequiredField(let field):
+                    XCTAssertEqual("id or doc", field)
+                    e.fulfill()
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        })
+        
+        waitForExpectations(timeout: 10)
+    }
+    
+    func test_28_TermVectorsRequestBuilder_throws_4() throws {
+        let e = expectation(description: "execution complete")
+        
+        XCTAssertNoThrow(try TermVectorsRequestBuilder().set(index: "index").set(type: "type").set(id: "id").build(), "Should not throw")
+        e.fulfill()
+        
+        waitForExpectations(timeout: 10)
+    }
+    
+    func test_29_TermVectorsRequestBuilder_throws_5() throws {
+        let e = expectation(description: "execution complete")
+        
+        XCTAssertNoThrow(try TermVectorsRequestBuilder().set(index: "index").set(type: "type").set(doc: ["test": "test"]).build(), "Should not throw")
+        e.fulfill()
+        
+        waitForExpectations(timeout: 10)
+    }
+    
+    func test_30_TermVectorsRequest_2() throws {
+        let e = expectation(description: "execution complete")
+        
+        func handler(_ result: Result<TermVectorsResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                logger.error("Error: \(error)")
+                XCTAssert(false, error.localizedDescription)
+            case .success(let response):
+                logger.info("Response: \(response)")
+                XCTAssert(response.found, "Found: \(response.found)")
+            }
+            e.fulfill()
+        }
+        
+        let request = try TermVectorsRequestBuilder()
+            .set(doc: ["fullname": "John Doe", "text": "twitter test test test"])
+            .set(index: "test")
+            .set(type: "_doc")
+            .set(fields: ["fullname", "text"])
+            .set(offsets: true)
+            .set(termStatistics: true)
+            .set(positions: true)
+            .set(payloads: true)
+            .set(fieldStatistics: false)
+            .build()
+        
+        self.client?.termVectors(request, completionHandler: handler)
+        
+        waitForExpectations(timeout: 10)
+    }
+    
+    func test_31_TermVectorsRequest_3() throws {
+        let e = expectation(description: "execution complete")
+        
+        let deleteIndexReqeust = try DeleteIndexRequestBuilder().set(name: "twitter").build()
+        
+        func handler(_ result: Result<TermVectorsResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                logger.error("Error: \(error)")
+                XCTAssert(false, error.localizedDescription)
+            case .success(let response):
+                logger.info("Response: \(response)")
+                XCTAssert(response.found, "Found: \(response.found)")
+            }
+            self.client?.indices.delete(deleteIndexReqeust) { result in
+                switch result {
+                case .failure(let error):
+                    self.logger.error("Error: \(error)")
+                    XCTAssert(false, error.localizedDescription)
+                case .success(let response):
+                    self.logger.info("Response: \(response)")
+                    XCTAssert(response.acknowledged, "Acknowledged: \(response.acknowledged)")
+                }
+            }
+            e.fulfill()
+        }
+        
+        let request = try TermVectorsRequestBuilder()
+            .set(id: "1")
+            .set(index: "twitter")
+            .set(type: "_doc")
+            .set(fields: ["fullname", "text"])
+            .set(realtime: true)
+            .set(perFieldAnalyzer: ["fullname": "keyword"])
+            .build()
+        
+        var indexRequest = try IndexRequestBuilder<Tweet>()
+            .set(index: "twitter")
+            .set(type: "_doc")
+            .set(source: Tweet(fullname: "John Doe", text: "twitter test test test "))
+            .set(id: "1")
+            .build()
+        
+        var indexRequest2 = try IndexRequestBuilder<Tweet>()
+            .set(index: "twitter")
+            .set(type: "_doc")
+            .set(source: Tweet(fullname: "John Doe", text: "Another twitter test ..."))
+            .set(id: "2")
+            .build()
+        indexRequest.refresh = .true
+        indexRequest2.refresh = .true
+        
+        func createIndexHandler(_ result: Result<CreateIndexResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                logger.error("Error: \(error)")
+                XCTAssert(false, error.localizedDescription)
+            case .success(let response):
+                logger.info("Response: \(response)")
+                XCTAssert(response.acknowledged, "Acknowledged: \(response.acknowledged)")
+                self.client?.index(indexRequest) { result in
+                    switch result {
+                    case .failure(let error):
+                        self.logger.error("Error: \(error)")
+                        XCTAssert(false, error.localizedDescription)
+                    case .success(let response):
+                        self.logger.info("Response: \(response)")
+                        XCTAssert(response.id == "1", "ID: \(response.id)")
+                    }
+                }
+                self.client?.index(indexRequest2) { result in
+                    switch result {
+                    case .failure(let error):
+                        self.logger.error("Error: \(error)")
+                        XCTAssert(false, error.localizedDescription)
+                    case .success(let response):
+                        self.logger.info("Response: \(response)")
+                        XCTAssert(response.id == "2", "ID: \(response.id)")
+                        self.client?.termVectors(request, completionHandler: handler)
+                    }
+                }
+            }
+        }
+        
+        let createIndexRequest = try CreateIndexRequestBuilder()
+            .set(name: "twitter")
+            .set(settings:  [
+                "index": [
+                    "number_of_shards": 1,
+                    "number_of_replicas": 0
+                ],
+                "analysis": [
+                    "analyzer": [
+                        "fulltext_analyzer": [
+                            "type": "custom",
+                            "tokenizer": "whitespace",
+                            "filter": ["lowercase", "type_as_payload"]
+                        ]
+                    ]
+                ]
+            ])
+            .set(mappings:  [
+                "_doc": MappingMetaData(type: nil, fields: nil, analyzer: nil, store: nil, termVector: nil, properties: [
+                    "text": MappingMetaData(type: "text", fields: nil, analyzer: "fulltext_analyzer", store: true, termVector: "with_positions_offsets_payloads", properties: nil),
+                    "fullname": MappingMetaData(type: "text", fields: nil, analyzer: "fulltext_analyzer", store: nil, termVector: "with_positions_offsets_payloads", properties: nil)
+                ])
+            ])
+            .build()
+        
+        
+        self.client?.indices.create(createIndexRequest, completionHandler: createIndexHandler)
+        
+        waitForExpectations(timeout: 10)
+    }
+    
     func test_999_DeleteIndex() throws {
         let e = expectation(description: "execution complete")
         func handler(_ result: Result<AcknowledgedResponse, Error>) -> Void {
@@ -990,4 +1242,9 @@ struct Message: Codable, Equatable {
     init(_ msg: String) {
         self.msg = msg
     }
+}
+
+struct Tweet: Codable, Equatable {
+    public let fullname: String
+    public let text: String
 }

@@ -87,6 +87,10 @@ extension ElasticClient {
     public func reIndex(_ reIndexRequest: ReIndexRequest, completionHandler: @escaping (_ result: Result<ReIndexResponse, Error>) -> Void) -> Void {
         return self.execute(request: reIndexRequest, options: .default, completionHandler: completionHandler)
     }
+    
+    public func termVectors(_ termVectorsRequest: TermVectorsRequest, completionHandler: @escaping (_ result: Result<TermVectorsResponse, Error>) -> Void) -> Void {
+        return self.execute(request: termVectorsRequest, options: .default, completionHandler: completionHandler)
+    }
 }
 
 extension ElasticClient {
@@ -125,6 +129,10 @@ extension ElasticClient {
     
     public func reIndex(_ reIndexRequest: ReIndexRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<ReIndexResponse, Error>) -> Void) -> Void {
         return self.execute(request: reIndexRequest, options: options, completionHandler: completionHandler)
+    }
+    
+    public func termVectors(_ termVectorsRequest: TermVectorsRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<TermVectorsResponse, Error>) -> Void) -> Void {
+        return self.execute(request: termVectorsRequest, options: options, completionHandler: completionHandler)
     }
 }
 

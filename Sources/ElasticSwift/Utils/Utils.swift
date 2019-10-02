@@ -6,6 +6,9 @@
 //
 //
 
+import Foundation
+import ElasticSwiftCore
+
 public enum VersionType: String, Codable {
     case `internal`
     case external
@@ -22,4 +25,32 @@ public enum IndexRefresh: String, Codable {
 public enum OpType: String, Codable {
     case index
     case create
+}
+
+extension URLQueryItem {
+    
+    init(name: QueryParams, value: String?) {
+        self.init(name: name.rawValue, value: value)
+    }
+    
+    init(name: QueryParams, value: Bool?) {
+        self.init(name: name.rawValue, value: value?.description)
+    }
+    
+    init(name: QueryParams, value: Int?) {
+        self.init(name: name.rawValue, value: value?.description)
+    }
+    
+    init(name: QueryParams, value: Float?) {
+        self.init(name: name.rawValue, value: value?.description)
+    }
+    
+    init(name: QueryParams, value: Double?) {
+        self.init(name: name.rawValue, value: value?.description)
+    }
+    
+    init(name: QueryParams, value: Decimal?) {
+        self.init(name: name.rawValue, value: value?.description)
+    }
+    
 }

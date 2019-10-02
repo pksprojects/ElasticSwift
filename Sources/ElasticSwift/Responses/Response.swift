@@ -341,3 +341,131 @@ public struct ReIndexResponse: Codable, Equatable {
         case failures
     }
 }
+
+// MARK:- TermVectors Response
+
+public struct TermVectorsResponse: Codable, Equatable {
+    
+    public let id: String?
+    public let index: String
+    public let type: String
+    public let version: Int?
+    public let found: Bool
+    public let took: Int
+    public let termVerctors: [TermVector]
+    
+    public init(from decoder: Decoder) throws {
+        let container =  try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decodeStringIfPresent(forKey: .id)
+        self.index =  try container.decodeString(forKey: .index)
+        self.type = try container.decodeString(forKey: .type)
+        self.version = try container.decodeIntIfPresent(forKey: .version)
+        self.found = try container.decodeBool(forKey: .found)
+        self.took = try container.decodeInt(forKey: .took)
+        let dic = try container.decode([String: TermVectorMetaData].self, forKey: .termVerctors)
+        self.termVerctors = dic.map { key, value -> TermVector in
+            return TermVector(field: key, fieldStatistics: value.fieldStatistics, terms: value.terms)
+        }
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case id = "_id"
+        case index = "_index"
+        case type = "_type"
+        case version
+        case found
+        case took
+        case termVerctors = "term_vectors"
+    }
+    
+    public struct TermVector: Codable, Equatable {
+        public let field: String
+        public let fieldStatistics: FieldStatistics?
+        public let terms: [Term]
+        
+        enum CodingKeys: String, CodingKey {
+            case field
+            case fieldStatistics = "field_statistics"
+            case terms
+        }
+    }
+    
+    public struct TermVectorMetaData: Codable, Equatable {
+        public let fieldStatistics: FieldStatistics?
+        public let terms: [Term]
+        
+        public init(from decoder: Decoder) throws {
+            let container =  try decoder.container(keyedBy: CodingKeys.self)
+            self.fieldStatistics = try container.decodeIfPresent(FieldStatistics.self, forKey: .fieldStatistics)
+            let dic =  try container.decode([String: TermStatistics].self, forKey: .terms)
+            self.terms = dic.map { key, value -> Term in
+                return Term(term: key, termStatistics: value)
+            }
+        }
+        
+        enum CodingKeys: String, CodingKey {
+            case fieldStatistics = "field_statistics"
+            case terms
+        }
+    }
+    
+    
+    public struct FieldStatistics: Codable, Equatable {
+        
+        public let docCount: Int
+        public let sumDocFreq: Int
+        public let sumTtf: Int
+        
+        enum CodingKeys: String, CodingKey {
+            case docCount = "doc_count"
+            case sumDocFreq = "sum_doc_freq"
+            case sumTtf = "sum_ttf"
+        }
+    }
+    
+    public struct Term: Codable, Equatable {
+        public let term: String
+        public let docFreq: Int?
+        public let termFreq: Int
+        public let tokens: [Token]
+        public let ttf: Int?
+        
+        public init(term: String, termStatistics: TermStatistics) {
+            self.term = term
+            self.docFreq = termStatistics.docFreq
+            self.termFreq =  termStatistics.termFreq
+            self.tokens = termStatistics.tokens ?? []
+            self.ttf = termStatistics.ttf
+        }
+        
+    }
+    
+    public struct TermStatistics: Codable, Equatable {
+        
+        public let docFreq: Int?
+        public let termFreq: Int
+        public let tokens: [Token]?
+        public let ttf: Int?
+        
+        enum CodingKeys: String, CodingKey {
+            case docFreq = "doc_freq"
+            case termFreq = "term_freq"
+            case tokens
+            case ttf
+        }
+    }
+    
+    public struct Token: Codable, Equatable {
+        public let payload: String?
+        public let position: Int
+        public let startOffset: Int
+        public let endOffset: Int
+        
+        enum CodingKeys: String, CodingKey {
+            case payload
+            case position
+            case startOffset = "start_offset"
+            case endOffset = "end_offset"
+        }
+    }
+}
