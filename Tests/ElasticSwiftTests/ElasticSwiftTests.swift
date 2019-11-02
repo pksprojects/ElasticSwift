@@ -1201,7 +1201,7 @@ class ElasticSwiftTests: XCTestCase {
                 XCTAssert(false, error.localizedDescription)
             case .success(let response):
                 logger.info("Response: \(response)")
-                XCTAssert(response.responses.count == 2, "Found: \(response.responses)")
+                XCTAssert(response.responses.count == 1, "Found: \(response.responses)")
             }
             self.client?.indices.delete(deleteIndexReqeust) { result in
                 switch result {
