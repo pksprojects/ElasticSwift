@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1100"
+   LastUpgradeVersion = "1120"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -31,6 +31,20 @@
                BlueprintIdentifier = "ElasticSwiftQueryDSL"
                BuildableName = "ElasticSwiftQueryDSL"
                BlueprintName = "ElasticSwiftQueryDSL"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ElasticSwiftNetworkingNIO"
+               BuildableName = "ElasticSwiftNetworkingNIO"
+               BlueprintName = "ElasticSwiftNetworkingNIO"
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
@@ -96,7 +110,52 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      onlyGenerateCoverageForSpecifiedTargets = "YES">
+      <CodeCoverageTargets>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "ElasticSwift"
+            BuildableName = "ElasticSwift"
+            BlueprintName = "ElasticSwift"
+            ReferencedContainer = "container:">
+         </BuildableReference>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "ElasticSwiftCodableUtils"
+            BuildableName = "ElasticSwiftCodableUtils"
+            BlueprintName = "ElasticSwiftCodableUtils"
+            ReferencedContainer = "container:">
+         </BuildableReference>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "ElasticSwiftCore"
+            BuildableName = "ElasticSwiftCore"
+            BlueprintName = "ElasticSwiftCore"
+            ReferencedContainer = "container:">
+         </BuildableReference>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "ElasticSwiftNetworking"
+            BuildableName = "ElasticSwiftNetworking"
+            BlueprintName = "ElasticSwiftNetworking"
+            ReferencedContainer = "container:">
+         </BuildableReference>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "ElasticSwiftNetworkingNIO"
+            BuildableName = "ElasticSwiftNetworkingNIO"
+            BlueprintName = "ElasticSwiftNetworkingNIO"
+            ReferencedContainer = "container:">
+         </BuildableReference>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "ElasticSwiftQueryDSL"
+            BuildableName = "ElasticSwiftQueryDSL"
+            BlueprintName = "ElasticSwiftQueryDSL"
+            ReferencedContainer = "container:">
+         </BuildableReference>
+      </CodeCoverageTargets>
       <Testables>
          <TestableReference
             skipped = "NO">

@@ -4,6 +4,7 @@ import Logging
 @testable import ElasticSwift
 @testable import ElasticSwiftQueryDSL
 @testable import ElasticSwiftCodableUtils
+@testable import ElasticSwiftNetworkingNIO
 
 let logFactory: ((String) -> LogHandler) = { label -> LogHandler in
     var handler = StreamLogHandler.standardOutput(label: label)
@@ -30,7 +31,7 @@ class ElasticSwiftTests: XCTestCase {
         super.setUp()
         XCTAssert(isLoggingConfigured)
         logger.info("====================TEST=START===============================")
-        self.client = ElasticClient(settings: Settings.swiftNIO("http://localhost:9200"))
+        self.client = ElasticClient(settings: Settings(forHost: "http://localhost:9200", adaptorConfig: AsyncHTTPClientAdaptorConfiguration.default))
 //        let cred = ClientCredential(username: "elastic", password: "elastic")
 //        let ssl = SSLConfiguration(certPath: "/usr/local/Cellar/kibana/6.1.2/config/certs/elastic-certificates.der", isSelf: true)
 //        let settings = Settings(forHosts: ["https://localhost:9200"], withCredentials: cred, withSSL: true, sslConfig: ssl)
@@ -58,7 +59,7 @@ class ElasticSwiftTests: XCTestCase {
     func test_01_Client() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
-        let settings = Settings.default
+        let settings = Settings(forHost: "http://localhost:9200", adaptorConfig: AsyncHTTPClientAdaptorConfiguration.default)
         let client = ElasticClient(settings: settings)
         XCTAssertNotNil(client)
     }
@@ -1200,7 +1201,7 @@ class ElasticSwiftTests: XCTestCase {
                 XCTAssert(false, error.localizedDescription)
             case .success(let response):
                 logger.info("Response: \(response)")
-                XCTAssert(response.responses.count == 1, "Found: \(response.responses)")
+                XCTAssert(response.responses.count == 2, "Found: \(response.responses)")
             }
             self.client?.indices.delete(deleteIndexReqeust) { result in
                 switch result {
@@ -1233,7 +1234,7 @@ class ElasticSwiftTests: XCTestCase {
         
         var mrequest = try MultiTermVectorsRequestBuilder()
             .add(request: request)
-            //.add(request: request2)
+            .add(request: request2)
             .build()
         
         var indexRequest = try IndexRequestBuilder<Tweet>()
@@ -1313,7 +1314,7 @@ class ElasticSwiftTests: XCTestCase {
         
         self.client?.indices.create(createIndexRequest, completionHandler: createIndexHandler)
         
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 10)
     }
     
     func test_999_DeleteIndex() throws {
