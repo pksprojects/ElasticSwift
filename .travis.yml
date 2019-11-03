@@ -18,7 +18,7 @@ matrix:
       install:
         - cd $HOME
         - sudo apt-get install -y clang libicu-dev
-        - wget -q -O swift.tar.gz https://swift.org/builds/swift-5.1.1-release/ubuntu1604/swift-5.1-RELEASE/swift-5.1-RELEASE-ubuntu16.04.tar.gz
+        - wget -q -O swift.tar.gz https://swift.org/builds/swift-5.1.1-release/ubuntu1604/swift-5.1-RELEASE/swift-5.1.1-RELEASE-ubuntu16.04.tar.gz
         - mkdir swift-RELEASE
         - tar xzf swift.tar.gz -C swift-RELEASE --strip-components=1
         - export PATH="${HOME}/swift-RELEASE/usr/bin:${PATH}"
@@ -40,7 +40,7 @@ matrix:
       install:
         - cd $HOME
         - sudo apt-get install -y clang libicu-dev
-        - wget -q -O swift.tar.gz https://swift.org/builds/swift-5.1.1-release/ubuntu1804/swift-5.1-RELEASE/swift-5.1-RELEASE-ubuntu18.04.tar.gz
+        - wget -q -O swift.tar.gz https://swift.org/builds/swift-5.1.1-release/ubuntu1804/swift-5.1-RELEASE/swift-5.1.1-RELEASE-ubuntu18.04.tar.gz
         - mkdir swift-RELEASE
         - tar xzf swift.tar.gz -C swift-RELEASE --strip-components=1
         - export PATH="${HOME}/swift-RELEASE/usr/bin:${PATH}"
