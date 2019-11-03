@@ -189,13 +189,6 @@ public struct MultiTermVectorsRequest: Request {
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
         let docs = self.requests?.map({ Doc($0) })
         let body =  Body.init(docs: docs, parameters: self.parameters, ids: self.ids)
-        let result = serializer.encode(body)
-        switch result {
-        case .success(let data):
-            print("\(String(data: data, encoding: .utf8))")
-        case .failure(let error):
-            print(error)
-        }
         return serializer.encode(body).mapError { error -> MakeBodyError in
             return .wrapped(error)
         }
