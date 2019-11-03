@@ -230,7 +230,7 @@ public class Settings {
     
     #if canImport(ElasticSwiftNetworkingNIO)
     public static func swiftNIO(_ host: String) -> Settings {
-        return Settings(forHost: host, adaptorConfig: HTTPClientAdaptorConfiguration.default)
+        return Settings(forHost: host, adaptorConfig: AsyncHTTPClientAdaptorConfiguration.default)
     }
     
     /// default settings for ElasticClient for localhost/development use

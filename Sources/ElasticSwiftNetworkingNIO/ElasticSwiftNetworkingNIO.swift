@@ -8,16 +8,12 @@
 import Foundation
 import Logging
 import NIO
-import NIOHTTP1
-import NIOTLS
-#if canImport(NIOSSL)
-import NIOSSL
-#endif
 import ElasticSwiftCore
+import AsyncHTTPClient
 
 //MARK:- Timeouts
 
-public class Timeouts {
+public struct Timeouts {
     
     public static let DEFAULT_TIMEOUTS: Timeouts = Timeouts(read: TimeAmount.milliseconds(1000), connect: TimeAmount.milliseconds(3000))
     
@@ -31,41 +27,36 @@ public class Timeouts {
     
 }
 
+extension Timeouts: Equatable {}
+
 //MARK:- HTTPAdaptorConfiguration
 
 /// Class holding HTTPAdaptor Config
-public class HTTPClientAdaptorConfiguration: HTTPAdaptorConfiguration {
+public class AsyncHTTPClientAdaptorConfiguration: HTTPAdaptorConfiguration {
     
     public let adaptor: ManagedHTTPClientAdaptor.Type
     
-    public let timeouts: Timeouts?
+    public let clientConfig: HTTPClient.Configuration
     
-    public let eventLoopProvider: EventLoopProvider
-    
-    #if canImport(NIOSSL)
-    // ssl config for swift-nio-ssl based clients
-    public let sslcontext: NIOSSLContext?
+    public let eventLoopProvider: HTTPClient.EventLoopGroupProvider
 
-    public init(adaptor: ManagedHTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self, eventLoopProvider: EventLoopProvider = .create(threads: 1), timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS, sslContext: NIOSSLContext? = nil) {
+    public init(adaptor: ManagedHTTPClientAdaptor.Type = AsyncHTTPClientAdaptor.self, eventLoopProvider: HTTPClient.EventLoopGroupProvider = .createNew, timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS) {
         self.eventLoopProvider = eventLoopProvider
-        self.timeouts = timeouts
-        self.sslcontext = sslContext
         self.adaptor = adaptor
+        var config = HTTPClient.Configuration()
+        config.timeout = .init(connect: timeouts?.connect, read: timeouts?.read)
+        self.clientConfig = config
     }
     
-    #else
-    
-    public init(adaptor: ManagedHTTPClientAdaptor.Type = DefaultHTTPClientAdaptor.self, eventLoopProvider: EventLoopProvider = .create(threads: 1), timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS) {
+    public init(adaptor: ManagedHTTPClientAdaptor.Type = AsyncHTTPClientAdaptor.self, eventLoopProvider: HTTPClient.EventLoopGroupProvider = .createNew, asyncClientConfig: HTTPClient.Configuration) {
         self.eventLoopProvider = eventLoopProvider
-        self.timeouts = timeouts
         self.adaptor = adaptor
+        self.clientConfig = asyncClientConfig
     }
-    
-    #endif
     
     public static var `default`: HTTPAdaptorConfiguration {
         get {
-            return HTTPClientAdaptorConfiguration()
+            return AsyncHTTPClientAdaptorConfiguration()
         }
     }
     
