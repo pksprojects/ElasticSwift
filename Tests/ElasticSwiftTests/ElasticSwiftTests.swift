@@ -30,7 +30,7 @@ class ElasticSwiftTests: XCTestCase {
         super.setUp()
         XCTAssert(isLoggingConfigured)
         logger.info("====================TEST=START===============================")
-        self.client = ElasticClient()
+        self.client = ElasticClient(settings: Settings.swiftNIO("http://localhost:9200"))
 //        let cred = ClientCredential(username: "elastic", password: "elastic")
 //        let ssl = SSLConfiguration(certPath: "/usr/local/Cellar/kibana/6.1.2/config/certs/elastic-certificates.der", isSelf: true)
 //        let settings = Settings(forHosts: ["https://localhost:9200"], withCredentials: cred, withSSL: true, sslConfig: ssl)
@@ -1129,19 +1129,18 @@ class ElasticSwiftTests: XCTestCase {
             switch result {
             case .failure(let error):
                 logger.error("Error: \(error)")
-                XCTAssert(false, error.localizedDescription)
             case .success(let response):
                 logger.info("Response: \(response)")
                 XCTAssert(response.acknowledged, "Acknowledged: \(response.acknowledged)")
-                self.client?.index(indexRequest) { result in
-                    switch result {
-                    case .failure(let error):
-                        self.logger.error("Error: \(error)")
-                        XCTAssert(false, error.localizedDescription)
-                    case .success(let response):
-                        self.logger.info("Response: \(response)")
-                        XCTAssert(response.id == "1", "ID: \(response.id)")
-                    }
+            }
+            self.client?.index(indexRequest) { result in
+                switch result {
+                case .failure(let error):
+                    self.logger.error("Error: \(error)")
+                    XCTAssert(false, error.localizedDescription)
+                case .success(let response):
+                    self.logger.info("Response: \(response)")
+                    XCTAssert(response.id == "1", "ID: \(response.id)")
                 }
                 self.client?.index(indexRequest2) { result in
                     switch result {
@@ -1186,6 +1185,135 @@ class ElasticSwiftTests: XCTestCase {
         self.client?.indices.create(createIndexRequest, completionHandler: createIndexHandler)
         
         waitForExpectations(timeout: 10)
+    }
+    
+    func test_32_MultiTermVectorsRequest() throws {
+        let e = expectation(description: "execution complete")
+        
+        let deleteIndexReqeust = try DeleteIndexRequestBuilder().set(name: "twitter").build()
+        
+        func handler(_ result: Result<MultiTermVectorsResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                logger.error("Error: \(error)")
+                XCTAssert(false, error.localizedDescription)
+            case .success(let response):
+                logger.info("Response: \(response)")
+                XCTAssert(response.responses.count == 1, "Found: \(response.responses)")
+            }
+            self.client?.indices.delete(deleteIndexReqeust) { result in
+                switch result {
+                case .failure(let error):
+                    self.logger.error("Error: \(error)")
+                    XCTAssert(false, error.localizedDescription)
+                case .success(let response):
+                    self.logger.info("Response: \(response)")
+                    XCTAssert(response.acknowledged, "Acknowledged: \(response.acknowledged)")
+                }
+                e.fulfill()
+            }
+        }
+        
+        let request = try TermVectorsRequestBuilder()
+            .set(id: "1")
+            .set(index: "twitter")
+            .set(type: "_doc")
+            .set(fields: ["fullname", "text"])
+            .set(perFieldAnalyzer: ["fullname": "keyword"])
+            .build()
+        
+        let request2 = try TermVectorsRequestBuilder()
+            .set(id: "2")
+            .set(index: "twitter")
+            .set(type: "_doc")
+            .set(fields: ["fullname"])
+            .set(perFieldAnalyzer: ["fullname": "keyword"])
+            .build()
+        
+        var mrequest = try MultiTermVectorsRequestBuilder()
+            .add(request: request)
+            //.add(request: request2)
+            .build()
+        
+        var indexRequest = try IndexRequestBuilder<Tweet>()
+            .set(index: "twitter")
+            .set(type: "_doc")
+            .set(source: Tweet(fullname: "John Doe", text: "twitter test test test "))
+            .set(id: "1")
+            .build()
+        
+        var indexRequest2 = try IndexRequestBuilder<Tweet>()
+            .set(index: "twitter")
+            .set(type: "_doc")
+            .set(source: Tweet(fullname: "John Doe", text: "Another twitter test ..."))
+            .set(id: "2")
+            .build()
+        indexRequest.refresh = .true
+        indexRequest2.refresh = .true
+        
+        func createIndexHandler(_ result: Result<CreateIndexResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                logger.error("Error: \(error)")
+                //XCTAssert(false, error.localizedDescription)
+            case .success(let response):
+                logger.info("Response: \(response)")
+                XCTAssert(response.acknowledged, "Acknowledged: \(response.acknowledged)")
+            }
+            self.client?.index(indexRequest) { result in
+                switch result {
+                case .failure(let error):
+                    self.logger.error("Error: \(error)")
+                    XCTAssert(false, error.localizedDescription)
+                case .success(let response):
+                    self.logger.info("Response: \(response)")
+                    XCTAssert(response.id == "1", "ID: \(response.id)")
+                }
+                self.client?.index(indexRequest2) { result in
+                    switch result {
+                    case .failure(let error):
+                        self.logger.error("Error: \(error)")
+                        XCTAssert(false, error.localizedDescription)
+                    case .success(let response):
+                        self.logger.info("Response: \(response)")
+                        XCTAssert(response.id == "2", "ID: \(response.id)")
+                    }
+                    self.client?.mtermVectors(mrequest, completionHandler: handler)
+                }
+            }
+        }
+        
+        let createIndexRequest = try CreateIndexRequestBuilder()
+            .set(name: "twitter")
+            .set(settings:  [
+                "index": [
+                    "number_of_shards": 1,
+                    "number_of_replicas": 0
+                ],
+                "analysis": [
+                    "analyzer": [
+                        "fulltext_analyzer": [
+                            "type": "custom",
+                            "tokenizer": "whitespace",
+                            "filter": ["lowercase", "type_as_payload"]
+                        ]
+                    ]
+                ]
+            ])
+            .set(mappings:  [
+                "_doc": MappingMetaData(type: nil, fields: nil, analyzer: nil, store: nil, termVector: nil, properties: [
+                    "text": MappingMetaData(type: "text", fields: nil, analyzer: "fulltext_analyzer", store: true, termVector: "with_positions_offsets_payloads", properties: nil),
+                    "fullname": MappingMetaData(type: "text", fields: nil, analyzer: "fulltext_analyzer", store: nil, termVector: "with_positions_offsets_payloads", properties: nil)
+                ])
+            ])
+            .build()
+        
+        
+        self.client?.indices.create(createIndexRequest, completionHandler: createIndexHandler)
+        
+        waitForExpectations(timeout: 20)
     }
     
     func test_999_DeleteIndex() throws {

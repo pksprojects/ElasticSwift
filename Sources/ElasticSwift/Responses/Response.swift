@@ -469,3 +469,17 @@ public struct TermVectorsResponse: Codable, Equatable {
         }
     }
 }
+
+// MARK:- Multi Term Vectors Response
+
+public struct MultiTermVectorsResponse: Codable {
+    
+    public let responses: [TermVectorsResponse]
+    
+    enum CodingKeys: String, CodingKey {
+        case responses = "docs"
+    }
+    
+}
+
+extension MultiTermVectorsResponse: Equatable {}

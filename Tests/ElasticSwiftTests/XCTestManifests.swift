@@ -65,6 +65,7 @@ extension ElasticSwiftTests {
         ("test_29_TermVectorsRequestBuilder_throws_5", test_29_TermVectorsRequestBuilder_throws_5),
         ("test_30_TermVectorsRequest_2", test_30_TermVectorsRequest_2),
         ("test_31_TermVectorsRequest_3", test_31_TermVectorsRequest_3),
+        ("test_32_MultiTermVectorsRequest", test_32_MultiTermVectorsRequest),
         ("test_999_DeleteIndex", test_999_DeleteIndex),
         ("testPlay", testPlay),
     ]

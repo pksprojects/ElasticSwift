@@ -91,6 +91,10 @@ extension ElasticClient {
     public func termVectors(_ termVectorsRequest: TermVectorsRequest, completionHandler: @escaping (_ result: Result<TermVectorsResponse, Error>) -> Void) -> Void {
         return self.execute(request: termVectorsRequest, options: .default, completionHandler: completionHandler)
     }
+    
+    public func mtermVectors(_ mtermVectorsRequest: MultiTermVectorsRequest, completionHandler: @escaping (_ result: Result<MultiTermVectorsResponse, Error>) -> Void) -> Void {
+        return self.execute(request: mtermVectorsRequest, options: .default, completionHandler: completionHandler)
+    }
 }
 
 extension ElasticClient {
@@ -133,6 +137,10 @@ extension ElasticClient {
     
     public func termVectors(_ termVectorsRequest: TermVectorsRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<TermVectorsResponse, Error>) -> Void) -> Void {
         return self.execute(request: termVectorsRequest, options: options, completionHandler: completionHandler)
+    }
+    
+    public func mtermVectors(_ mtermVectorsRequest: MultiTermVectorsRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<MultiTermVectorsResponse, Error>) -> Void) -> Void {
+        return self.execute(request: mtermVectorsRequest, options: options, completionHandler: completionHandler)
     }
 }
 
