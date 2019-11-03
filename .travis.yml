@@ -47,7 +47,7 @@ matrix:
         - cd $TRAVIS_BUILD_DIR
     - os: osx
       sudo: required
-      osx_image: xcode11
+      osx_image: xcode11.2
       install:
         - cd $TRAVIS_BUILD_DIR
       after_success:
