@@ -1129,19 +1129,18 @@ class ElasticSwiftTests: XCTestCase {
             switch result {
             case .failure(let error):
                 logger.error("Error: \(error)")
-                XCTAssert(false, error.localizedDescription)
             case .success(let response):
                 logger.info("Response: \(response)")
                 XCTAssert(response.acknowledged, "Acknowledged: \(response.acknowledged)")
-                self.client?.index(indexRequest) { result in
-                    switch result {
-                    case .failure(let error):
-                        self.logger.error("Error: \(error)")
-                        XCTAssert(false, error.localizedDescription)
-                    case .success(let response):
-                        self.logger.info("Response: \(response)")
-                        XCTAssert(response.id == "1", "ID: \(response.id)")
-                    }
+            }
+            self.client?.index(indexRequest) { result in
+                switch result {
+                case .failure(let error):
+                    self.logger.error("Error: \(error)")
+                    XCTAssert(false, error.localizedDescription)
+                case .success(let response):
+                    self.logger.info("Response: \(response)")
+                    XCTAssert(response.id == "1", "ID: \(response.id)")
                 }
                 self.client?.index(indexRequest2) { result in
                     switch result {

@@ -29,7 +29,7 @@ public final class DefaultHTTPClientAdaptor: ManagedHTTPClientAdaptor {
     }
     
     public func performRequest(_ request: HTTPRequest, callback: @escaping (_ result: Result<HTTPResponse, Error>) -> Void ) {
-        self.client.execute(request: request).map { parts in
+        self.client.execute(request: request).map { parts -> HTTPResponse in
             var responseHead: HTTPResponseHead? = nil
             var responseBody: Data? = nil
             for part in parts {
@@ -40,15 +40,23 @@ public final class DefaultHTTPClientAdaptor: ManagedHTTPClientAdaptor {
                     if let bytes = buffer.readBytes(length: buffer.readableBytes) {
                         responseBody = Data(bytes)
                     }
-                case .end(_):
-                    let response = HTTPResponse(request: request, status: responseHead!.status, headers: responseHead!.headers, body: responseBody)
-                    return callback(.success(response))
+                case .end(let headers):
+                    if let headers = headers {
+                        responseHead?.headers.add(contentsOf: headers)
+                    }
                 }
             }
+            let response = HTTPResponse(request: request, status: responseHead!.status, headers: responseHead!.headers, body: responseBody)
+            return response
             
-        }.recover { error  in
-            return callback(.failure(error))
-        }.whenSuccess({})
+        }.whenComplete { result in
+            switch result {
+            case .failure(let error):
+                return callback(.failure(error))
+            case .success(let response):
+                return callback(.success(response))
+            }
+        }
     }
     
     private static func createHttpClientConfig(from adaptorConfig: HTTPAdaptorConfiguration) -> HTTPClientConfiguration {
