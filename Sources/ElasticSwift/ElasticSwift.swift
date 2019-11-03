@@ -28,11 +28,6 @@ public class ElasticClient {
         self.clusterClient = ClusterClient(withClient: self)
     }
     
-    #if canImport(ElasticSwiftNetworkingNIO)
-    public convenience init() {
-        self.init(settings: Settings.default)
-    }
-    #endif
     private var credentials: ClientCredential? {
         get {
             return self._settings.credentials
