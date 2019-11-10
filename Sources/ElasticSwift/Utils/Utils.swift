@@ -25,6 +25,8 @@ public enum IndexRefresh: String, Codable {
 public enum OpType: String, Codable {
     case index
     case create
+    case update
+    case delete
 }
 
 extension URLQueryItem {
@@ -51,6 +53,10 @@ extension URLQueryItem {
     
     init(name: QueryParams, value: Decimal?) {
         self.init(name: name.rawValue, value: value?.description)
+    }
+    
+    init(name: QueryParams, value: [String]?) {
+        self.init(name: name.rawValue, value: value?.joined(separator: ","))
     }
     
 }

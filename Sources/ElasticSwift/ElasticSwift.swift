@@ -87,6 +87,10 @@ extension ElasticClient {
     public func mtermVectors(_ mtermVectorsRequest: MultiTermVectorsRequest, completionHandler: @escaping (_ result: Result<MultiTermVectorsResponse, Error>) -> Void) -> Void {
         return self.execute(request: mtermVectorsRequest, options: .default, completionHandler: completionHandler)
     }
+    
+    public func bulk(_ bulkRequest: BulkRequest, completionHandler: @escaping (_ result: Result<BulkResponse, Error>) -> Void) -> Void {
+        return self.execute(request: bulkRequest, options: .default, completionHandler: completionHandler)
+    }
 }
 
 extension ElasticClient {
@@ -133,6 +137,10 @@ extension ElasticClient {
     
     public func mtermVectors(_ mtermVectorsRequest: MultiTermVectorsRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<MultiTermVectorsResponse, Error>) -> Void) -> Void {
         return self.execute(request: mtermVectorsRequest, options: options, completionHandler: completionHandler)
+    }
+    
+    public func bulk(_ bulkRequest: BulkRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<BulkResponse, Error>) -> Void) -> Void {
+        return self.execute(request: bulkRequest, options: options, completionHandler: completionHandler)
     }
 }
 
@@ -258,6 +266,11 @@ public extension ElasticClient {
         var headers = HTTPHeaders()
         headers.add(contentsOf: defaultHeaders())
         headers.add(contentsOf: authHeader())
+        
+        if request.headers.contains(name: "Content-Type") || options.headers.contains(name: "Content-Type") {
+            headers.remove(name: "Content-Type")
+        }
+        
         headers.add(contentsOf: request.headers)
         headers.add(contentsOf: options.headers)
         

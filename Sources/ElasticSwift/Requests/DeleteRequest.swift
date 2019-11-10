@@ -89,7 +89,7 @@ public class DeleteRequestBuilder: RequestBuilder {
 
 //MARK:- Delete Request
 
-public struct DeleteRequest: Request {
+public struct DeleteRequest: Request, BulkableRequest {
     
     public var headers: HTTPHeaders = HTTPHeaders()
     
@@ -152,6 +152,10 @@ public struct DeleteRequest: Request {
     
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
         return .failure(.noBodyForRequest)
+    }
+    
+    public var opType: OpType {
+        return .delete
     }
     
 }

@@ -120,7 +120,7 @@ public class UpdateRequestBuilder: RequestBuilder {
 
 //MARK:- Update Request
 
-public struct UpdateRequest: Request {
+public struct UpdateRequest: Request, BulkableRequest {
     
     public var headers: HTTPHeaders = HTTPHeaders()
     
@@ -275,6 +275,10 @@ public struct UpdateRequest: Request {
             case docAsUpsert = "doc_as_upsert"
             case scriptedUpsert = "scripted_upsert"
         }
+    }
+    
+    public var opType: OpType {
+        return .update
     }
 }
 

@@ -1317,6 +1317,56 @@ class ElasticSwiftTests: XCTestCase {
         waitForExpectations(timeout: 10)
     }
     
+    func test_33_BulkRequest() throws {
+        let e = expectation(description: "execution complete")
+        func handler(_ result: Result<BulkResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                logger.error("Error: \(error)")
+                XCTAssert(false, error.localizedDescription)
+            case .success(let response):
+                logger.info("Response: \(response)")
+                XCTAssert(response.errors == true, "Acknowleged: \(response.errors)")
+                XCTAssert(response.items.count == 4, "ItemResponses: \(response.items.count)")
+            }
+            e.fulfill()
+        }
+        let deleteDocRequest = DeleteRequest(index: "test", type: "_doc", id: "0")
+        let indexRequest = IndexRequest<Message>(index: "test", id: "0", source: Message("Test"))
+        var indexRequest2 = IndexRequest<Message>(index: "test", id: "0", source: Message("Test"))
+        indexRequest2.opType = .create
+        let updateRequest = try UpdateRequestBuilder()
+            .set(doc: ["msg": "TestUpdated"])
+            .set(index: "test")
+            .set(type: "_doc")
+            .set(id: "0")
+            .build()
+        
+        var bulkRequest = try BulkRequestBuilder()
+            .add(request:  indexRequest)
+            .add(request:  indexRequest2)
+            .add(request:  updateRequest)
+            .add(request: deleteDocRequest)
+            .build()
+        
+        /// make sure index exists
+        func handler1(_ result: Result<CreateIndexResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                logger.error("Error \(error)")
+            case .success(let response):
+                logger.info("Response: \(response)")
+            }
+            self.client?.bulk(bulkRequest, completionHandler: handler)
+        }
+        
+        let request1 = CreateIndexRequest("test")
+        self.client?.execute(request: request1, completionHandler: handler1)
+        waitForExpectations(timeout: 10)
+    }
+    
     func test_999_DeleteIndex() throws {
         let e = expectation(description: "execution complete")
         func handler(_ result: Result<AcknowledgedResponse, Error>) -> Void {
