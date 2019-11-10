@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import ElasticSwiftCore
 import ElasticSwiftCodableUtils
 
 //MARK:- Get Response
@@ -483,3 +484,89 @@ public struct MultiTermVectorsResponse: Codable {
 }
 
 extension MultiTermVectorsResponse: Equatable {}
+
+public struct BulkResponse: Codable {
+    public let took: Int
+    public let errors: Bool
+    public let items: [BulkResponseItem]
+    
+    public struct BulkResponseItem: Codable, Equatable {
+        public let opType: OpType
+        public let response: SuccessResponse?
+        public let failure: Failure?
+        
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
+            
+            guard container.allKeys.first != nil else {
+                throw Swift.DecodingError.dataCorrupted(.init(codingPath: container.codingPath, debugDescription: "Unable to Determine OpType CodingKey in \(container.allKeys)"))
+            }
+            
+            let opTypeKey = container.allKeys.first!
+            if let opType = OpType(rawValue: opTypeKey.stringValue) {
+                self.opType = opType
+            } else {
+                throw Swift.DecodingError.dataCorruptedError(forKey: container.allKeys.first!, in: container, debugDescription: "Unable to determine OpType from value: \(opTypeKey.stringValue)")
+            }
+            do {
+                self.response = try container.decode(SuccessResponse.self, forKey: opTypeKey)
+                self.failure = nil
+            } catch {
+                self.response = nil
+                self.failure = try container.decode(Failure.self, forKey: opTypeKey)
+            }
+        }
+    }
+    
+    public struct SuccessResponse: Codable, Equatable {
+        public let index: String
+        public let type: String
+        public let id: String
+        public let status: Int
+        public let result: Result
+        public let shards: Shards
+        public let version: Int
+        public let seqNo: Int
+        public let primaryTerm: Int
+        
+        enum CodingKeys: String, CodingKey {
+            case index = "_index"
+            case type = "_type"
+            case id = "_id"
+            case status
+            case result
+            case shards = "_shards"
+            case seqNo = "_seq_no"
+            case primaryTerm = "_primary_term"
+            case version = "_version"
+        }
+    }
+    
+    public struct Failure: Codable, Equatable {
+        public let index: String
+        public let type: String
+        public let id: String
+        public let cause: ElasticError
+        public let status: Int
+        public let aborted: Bool?
+        
+        enum CodingKeys: String, CodingKey {
+            case index = "_index"
+            case type = "_type"
+            case id = "_id"
+            case cause = "error"
+            case status
+            case aborted
+        }
+    }
+    
+    public enum Result: String, Codable {
+        case created
+        case updated
+        case deleted
+        case notFount = "not_found"
+        case noop
+    }
+}
+
+extension BulkResponse: Equatable {}
