@@ -46,6 +46,7 @@ target '<Your Target Name>' do
     pod 'ElasticSwiftNetworking', '~> 1.0.0-alpha.9'
 end
 ```
+`Note:- ElasticSwiftNetworkingNIO is not available as a pod`
 
 Then, run the following command:
 
@@ -69,43 +70,48 @@ dependencies: [
 
 ### Client
 
-Creating `ElasticClient`.
+Creating `Settings` & `ElasticClient`.
+
+Using `ElasticSwiftNetworking` (`URLSession` based implementation)
 
 ```swift
 import ElasticSwift
+import ElasticSwiftNetworking
 
-var settings = Settings.default // Creates default settings for client
+var settings = Settings(forHost: "http://localhost:9200", adaptorConfig: URLSessionAdaptorConfiguration.default) // Creates default settings for client
 var client = ElasticClient(settings: settings) // Creates client with specified settings
 
-var client = ElasticClient() // Creates client with default settings
-
 ```
-
-Creating `Settings` for specified host.
+Using `ElasticSwiftNetworkingNIO` (`SwiftNIO/AsyncHTTPClient` based implementation)
 
 ```swift
+import ElasticSwift
+import ElasticSwiftNetworkingNIO
 
-// with host address as string
-var settings = Settings.default(forHost: "http://samplehost:port")
-
-// with host address
-var host = Host(string: "http://samplehost:port")
-var settings = Settings(forHost: host, adaptorConfig: HTTPClientAdaptorConfiguration.default)
+var settings = Settings(forHost: "http://localhost:9200", adaptorConfig: AsyncHTTPClientAdaptorConfiguration.default) // Creates default settings for client
+var client = ElasticClient(settings: settings) // Creates client with specified settings
 
 ```
+
+Add Elasticsearch credentials 
 
 ```swift
 
 let cred = BasicClientCredential(username: "elastic", password: "elastic")
+let settings = Settings(forHost: "http://localhost:9200", withCredentials: cred, adaptorConfig: AsyncHTTPClientAdaptorConfiguration.default)
+
+```
+
+Configuring SSL when using `ElasticSwiftNetworking`
+
+```swift
+
 let certPath = "/path/to/certificate.der"
 let sslConfig = SSLConfiguration(certPath: certPath, isSelf: true)
 let adaptorConfig = URLSessionAdaptorConfiguration(sslConfig: sslConfig)
 let settings = Settings(forHosts: ["https://samplehost:port"], withCredentials: cred, adaptorConfig: adaptorConfig)
-let client = RestClient(settings: settings)
 
 ```
-
-When creating default settings it creates settings for `http://localhost:9200`.
 
 ### Index
 
