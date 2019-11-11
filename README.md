@@ -39,11 +39,11 @@ platform :ios, '10.0'
 use_frameworks!
 
 target '<Your Target Name>' do
-    pod 'ElasticSwift', '~> 1.0.0-alpha.9'
-    pod 'ElasticSwiftCore', '~> 1.0.0-alpha.9'
-    pod 'ElasticSwiftQueryDSL', '~> 1.0.0-alpha.9'
-    pod 'ElasticSwiftCodableUtils', '~> 1.0.0-alpha.9'
-    pod 'ElasticSwiftNetworking', '~> 1.0.0-alpha.9'
+    pod 'ElasticSwift', '~> 1.0.0-alpha.10'
+    pod 'ElasticSwiftCore', '~> 1.0.0-alpha.10'
+    pod 'ElasticSwiftQueryDSL', '~> 1.0.0-alpha.10'
+    pod 'ElasticSwiftCodableUtils', '~> 1.0.0-alpha.10'
+    pod 'ElasticSwiftNetworking', '~> 1.0.0-alpha.10'
 end
 ```
 `Note:- ElasticSwiftNetworkingNIO is not available as a pod`
@@ -62,7 +62,7 @@ Once you have your Swift package set up, adding ElasticSwift as a dependency is 
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/pksprojects/ElasticSwift.git", from: "1.0.0-alpha.9")
+    .package(url: "https://github.com/pksprojects/ElasticSwift.git", from: "1.0.0-alpha.10")
 ]
 ```
 

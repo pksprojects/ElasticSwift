@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
     s.name         = "ElasticSwiftNetworkingNIO"
-    s.version      = "1.0.0-alpha.9"
+    s.version      = "1.0.0-alpha.10"
     s.summary      = "Networking layer of ElasticSwift"
     s.description  = "ElasticSwift allows you to bring prower of elasticsearch in your apps on macOS, iOS, tvOS, watchOS and linux."
   
@@ -19,13 +19,13 @@ Pod::Spec.new do |s|
     s.source_files = 'Sources/ElasticSwiftNetworkingNIO/**/*.swift'
   
     s.dependency 'ElasticSwiftCore', "#{s.version}"
-    s.dependency 'SwiftNIO', '~> 2.2.0'
-    s.dependency 'SwiftNIOHTTP1', '~> 2.2.0'
-    s.dependency 'SwiftNIOTLS', '~> 2.2.0'
-    s.dependency 'SwiftNIOConcurrencyHelpers', '~> 2.2.0'
-    s.dependency 'SwiftNIOFoundationCompat', '~> 2.2.0'
-    s.dependency 'SwiftNIOTransportServices', '~> 1.0.3'
-    s.dependency 'Logging', '~> 1.1.0'
+    s.dependency 'SwiftNIO', '~> 2.9.0'
+    s.dependency 'SwiftNIOHTTP1', '~> 2.9.0'
+    s.dependency 'SwiftNIOTLS', '~> 2.9.0'
+    s.dependency 'SwiftNIOConcurrencyHelpers', '~> 2.9.0'
+    s.dependency 'SwiftNIOFoundationCompat', '~> 2.9.0'
+    s.dependency 'SwiftNIOTransportServices', '~> 1.2.0'
+    s.dependency 'Logging', '~> 1.1.1'
   
 end
 

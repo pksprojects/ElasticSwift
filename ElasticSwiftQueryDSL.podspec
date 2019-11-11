@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
     s.name         = "ElasticSwiftQueryDSL"
-    s.version      = "1.0.0-alpha.9"
+    s.version      = "1.0.0-alpha.10"
     s.summary      = "Elasticsearch QueryDSL for ElasticSwift"
     s.description  = "ElasticSwift allows you to bring prower of elasticsearch in your apps on macOS, iOS, tvOS, watchOS and linux."
   
@@ -20,6 +20,6 @@ Pod::Spec.new do |s|
   
     s.dependency 'ElasticSwiftCodableUtils', "#{s.version}"
     s.dependency 'ElasticSwiftCore', "#{s.version}"
-    s.dependency 'Logging', '~> 1.1.0'
+    s.dependency 'Logging', '~> 1.1.1'
   
 end
