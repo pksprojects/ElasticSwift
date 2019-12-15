@@ -12,6 +12,7 @@ import ElasticSwiftCodableUtils
 
 //MARK:- Get Response
 
+/// A response for get request
 public struct GetResponse<T: Codable>: Codable, Equatable where T: Equatable {
     
     public let index: String
