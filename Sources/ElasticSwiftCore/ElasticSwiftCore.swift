@@ -92,6 +92,8 @@ public enum QueryParams: String {
     case offsets
     case positions
     case payloads
+    case scroll
+    case restTotalHitsAsInt = "rest_total_hits_as_int"
 }
 
 enum EndPointCategory: String {
