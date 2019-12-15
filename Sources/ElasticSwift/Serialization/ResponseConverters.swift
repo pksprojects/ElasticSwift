@@ -8,14 +8,33 @@
 import Foundation
 import ElasticSwiftCore
 
+/// closure that handles `HTTPResponse`
+/// - Parameters:
+///    - result: result with either a success http response or Error
 public typealias HTTPResponseHandler = (_ result: Result<HTTPResponse, Error>) -> Void
+
+/// closure that handles codable result
+/// - Parameters:
+///    - result: result with either a success T response or Error
 public typealias ResultCallback<T: Codable> = (_ result: Result<T, Error>) -> Void
+
+/// closure that handles result of response conversion
+/// - Parameters:
+///     - serializer: serializer to use for response converstion
+///     - callback: closure to be called after conversion.
 public typealias ResponseConverter<T: Codable> = (_ serializer: Serializer, _ callback: @escaping ResultCallback<T>) -> HTTPResponseHandler
 
+
+/// Classs with various response converters
 public class ResponseConverters {
     
+    /// Utility class private initializer.
     private init() {}
     
+    /// Response Converter with default implementation to handle most common scenarios for response serialization
+    /// - Parameters:
+    ///   - serializer: serializer to use for response converstion.
+    ///   - callback: result callback to be called after conversion.
     public static func defaultConverter<T: Codable>(serializer: Serializer, callback: @escaping ResultCallback<T>) -> HTTPResponseHandler {
         return { result -> Void in
             
@@ -64,7 +83,10 @@ public class ResponseConverters {
         }
     }
 
-    
+    /// Response Converter to handle index exists responses
+    /// - Parameters:
+    ///   - serializer: serializer to use for response converstion.
+    ///   - callback: result callback to be called after conversion.
     public static func indexExistsResponseConverter(serializer: Serializer, callback: @escaping ResultCallback<IndexExistsResponse>) -> HTTPResponseHandler {
         return { result -> Void in
             

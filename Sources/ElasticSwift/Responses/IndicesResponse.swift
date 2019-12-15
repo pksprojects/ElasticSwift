@@ -12,6 +12,7 @@ import ElasticSwiftCodableUtils
 
 //MARK:- Create Index Response
 
+/// A response for create index request
 public struct CreateIndexResponse: Codable, Equatable {
     
     public let acknowledged: Bool
@@ -34,10 +35,16 @@ public struct CreateIndexResponse: Codable, Equatable {
 
 //MARK:- Get Index Response
 
+/// A response for a get index request
 public struct GetIndexResponse: Codable, Equatable {
     
+    /// index aliases
     public let aliases: [IndexAlias]
+    
+    /// index mappings
     public let mappings: [String: MappingMetaData]
+    
+    /// index settings
     public let settings: IndexSettings
     
     init(aliases: [IndexAlias]=[], mappings: [String: MappingMetaData]=[:], settings: IndexSettings) {
@@ -102,8 +109,10 @@ public struct GetIndexResponse: Codable, Equatable {
     }
 }
 
+/// A response for requests that support acknowledgements.
 public struct AcknowledgedResponse: Codable, Equatable {
     
+    /// acknowlegement
     public let acknowledged: Bool
     
     init(acknowledged: Bool) {
@@ -111,6 +120,7 @@ public struct AcknowledgedResponse: Codable, Equatable {
     }
 }
 
+/// Mapping configuration for a type
 public struct MappingMetaData: Codable {
     
     public let type: String?
@@ -147,6 +157,7 @@ public struct MappingMetaData: Codable {
 
 extension MappingMetaData: Equatable {}
 
+/// index alias meta data
 public struct AliasMetaData: Codable {
     
     public let indexRouting: String?
@@ -164,6 +175,7 @@ public struct AliasMetaData: Codable {
 
 extension AliasMetaData: Equatable {}
 
+/// index settings
 public struct IndexSettings: Codable, Equatable {
     
     public let creationDate: String
@@ -218,6 +230,7 @@ public struct IndexVersion: Codable, Equatable {
     }
 }
 
+/// A index alias
 public struct IndexAlias: Codable {
     
     public let name: String
@@ -281,6 +294,7 @@ extension IndexAlias: Equatable {}
 
 //MARK:- INDEX Exists Response
 
+/// A wrapper for response for the index exists request
 public struct IndexExistsResponse: Codable, Equatable {
     
     public let exists: Bool
