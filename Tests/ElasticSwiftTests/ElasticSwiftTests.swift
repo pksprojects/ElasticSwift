@@ -11,13 +11,20 @@ class ElasticSwiftTests: XCTestCase {
     
     let logger = Logger(label: "org.pksprojects.ElasticSwiftTests.ElasticSwiftTests", factory: logFactory)
     
-    var client: ElasticClient?
+    private let client: ElasticClient = {
+        let cred = BasicClientCredential(username: esConnection.uname, password: esConnection.passwd)
+        let adaptorConfig = AsyncHTTPClientAdaptorConfiguration.default
+        let settings = (esConnection.isProtected) ?
+            Settings(forHost: esConnection.host, withCredentials: cred, adaptorConfig: adaptorConfig) :
+            Settings(forHost: esConnection.host,adaptorConfig: adaptorConfig)
+        return ElasticClient(settings: settings)
+    }()
     
     override func setUp() {
         super.setUp()
         XCTAssert(isLoggingConfigured)
         logger.info("====================TEST=START===============================")
-        self.client = ElasticClient(settings: Settings(forHost: "http://localhost:9200", withCredentials: BasicClientCredential(username: "elastic", password: "elastic"), adaptorConfig: AsyncHTTPClientAdaptorConfiguration.default))
+//        self.client = ElasticClient(settings: Settings(forHost: "http://localhost:9200", withCredentials: BasicClientCredential(username: "elastic", password: "elastic"), adaptorConfig: AsyncHTTPClientAdaptorConfiguration.default))
 //        let cred = ClientCredential(username: "elastic", password: "elastic")
 //        let ssl = SSLConfiguration(certPath: "/usr/local/Cellar/kibana/6.1.2/config/certs/elastic-certificates.der", isSelf: true)
 //        let settings = Settings(forHosts: ["https://localhost:9200"], withCredentials: cred, withSSL: true, sslConfig: ssl)
@@ -50,63 +57,6 @@ class ElasticSwiftTests: XCTestCase {
         XCTAssertNotNil(client)
     }
     
-    func test_02_CreateIndex() throws {
-        let e = expectation(description: "execution complete")
-        func handler(_ result: Result<CreateIndexResponse, Error>) -> Void {
-            
-            switch result {
-                case .failure(let error):
-                    logger.error("Error: \(error)")
-                    XCTAssert(false)
-                case .success(let response):
-                    logger.info("Response: \(response)")
-                    XCTAssert(response.acknowledged, "\(response.acknowledged)")
-                    XCTAssert(response.index == "test", "\(response.index)")
-                    XCTAssert(response.shardsAcknowledged, "\(response.shardsAcknowledged)")
-            }
-            e.fulfill()
-        }
-        let createIndexRequest = CreateIndexRequest("test")
-        
-        func handler1(_ result: Result<AcknowledgedResponse, Error>) -> Void {
-            
-            switch result {
-                case .failure(let error):
-                    logger.error("Error: \(error)")
-                case .success(let response):
-                    logger.info("Response: \(response)")
-            }
-            
-            self.client?.indices.create(createIndexRequest, completionHandler: handler)
-        }
-        let deleteIndexRequest = DeleteIndexRequest("test")
-        
-        self.client?.indices.delete(deleteIndexRequest, completionHandler: handler1)
-        
-        waitForExpectations(timeout: 10)
-    }
-    
-    func test_03_GetIndex() throws {
-        let e = expectation(description: "execution complete")
-        func handler(_ result: Result<GetIndexResponse, Error>) -> Void {
-            
-            switch result {
-                case .failure(let error):
-                    logger.error("Error: \(error)")
-                    XCTAssert(false)
-                case .success(let response):
-                    logger.info("Response: \(response)")
-                    XCTAssert(response.settings.providedName == "test", "Index: \(response.settings.providedName)")
-            }
-            e.fulfill()
-        }
-        let request = GetIndexRequest("test")
-        
-        self.client?.indices.get(request, completionHandler: handler)
-        
-        waitForExpectations(timeout: 10)
-    }
-    
     func test_04_Index() throws {
         let e = expectation(description: "execution complete")
         
@@ -134,7 +84,7 @@ class ElasticSwiftTests: XCTestCase {
             .set(source: msg)
             .build()
         
-        self.client?.execute(request: request, completionHandler: handler)
+        self.client.execute(request: request, completionHandler: handler)
         waitForExpectations(timeout: 10)
     }
     
@@ -163,7 +113,7 @@ class ElasticSwiftTests: XCTestCase {
             .set(source: msg)
             .build()
         
-        self.client?.execute(request: request, completionHandler: handler)
+        self.client.execute(request: request, completionHandler: handler)
         waitForExpectations(timeout: 10)
     }
     
@@ -203,7 +153,7 @@ class ElasticSwiftTests: XCTestCase {
             case .success(let response):
                 logger.info("Found \(response.result)")
             }
-            client?.execute(request: request, completionHandler: handler)
+            self.client.execute(request: request, completionHandler: handler)
         }
         var msg = Message()
         msg.msg = "Test Message"
@@ -214,7 +164,7 @@ class ElasticSwiftTests: XCTestCase {
             .set(source: msg)
             .build()
         
-        self.client?.execute(request: request1, completionHandler: handler1)
+        self.client.execute(request: request1, completionHandler: handler1)
         waitForExpectations(timeout: 10)
     }
     
@@ -253,7 +203,7 @@ class ElasticSwiftTests: XCTestCase {
                 logger.info("Result: \(response.result)")
             }
             
-            self.client?.execute(request: request, completionHandler: handler)
+            self.client.execute(request: request, completionHandler: handler)
         }
         var msg = Message()
         msg.msg = "Test Message"
@@ -263,124 +213,8 @@ class ElasticSwiftTests: XCTestCase {
             .set(id: "0")
             .set(source: msg)
             .build()
-        self.client?.execute(request: request1, completionHandler: handler1)
+        self.client.execute(request: request1, completionHandler: handler1)
         
-        waitForExpectations(timeout: 10)
-    }
-    
-    func test_08_Search() throws {
-        let e = expectation(description: "execution complete")
-        
-        func handler(_ result: Result<SearchResponse<Message>, Error>) -> Void {
-            
-            switch result {
-            case .failure(let error):
-                logger.error("Error: \(error)")
-                XCTAssert(false)
-            case .success(let response):
-                XCTAssertNotNil(response.hits)
-                XCTAssertTrue(response.hits.hits.count > 0, "Count \(response.hits.hits.count)")
-            }
-            
-            e.fulfill()
-        }
-        let queryBuilder = QueryBuilders.boolQuery()
-        let match = try QueryBuilders.matchQuery().set(field: "msg").set(value: "Message").build()
-        queryBuilder.must(query: match)
-        let sort =  SortBuilders.fieldSort("msg.keyword")
-            .set(order: .asc)
-            .build()
-        let request = try SearchRequestBuilder()
-            .set(indices: "test")
-            .set(types: "_doc")
-            .set(query: try! queryBuilder.build())
-            .set(sort: sort)
-            .build()
-        
-        /// make sure doc exists
-        func handler1(_ result: Result<IndexResponse, Error>) -> Void {
-            
-            switch result {
-            case .failure(let error):
-                logger.error("Error: \(error)")
-            case .success(let response):
-                logger.info("Found \(response.result)")
-            }
-            self.client?.search(request, completionHandler: handler)
-        }
-        var msg = Message()
-        msg.msg = "Message"
-        var request1 =  try IndexRequestBuilder<Message>()
-            .set(index: "test")
-            .set(source: msg)
-            .build()
-        request1.refresh = .true
-        self.client?.execute(request: request1, completionHandler: handler1)
-        
-        waitForExpectations(timeout: 10)
-    }
-    
-    func test_09_IndexExists() throws {
-        let e = expectation(description: "execution complete")
-        
-        let existsRequest = IndexExistsRequest("test")
-        
-        let getIndexRequest = GetIndexRequest("test")
-        
-        func existsFalseHander(_ result: Result<IndexExistsResponse, Error>) -> Void {
-            switch result {
-            case .failure(let error):
-                logger.error("Error: \(error)")
-                XCTAssert(false, error.localizedDescription)
-            case .success(let response):
-                logger.info("Response: \(response)")
-                XCTAssert(!response.exists, "IndexExists: \(response.exists)")
-            }
-            e.fulfill()
-        }
-        
-        
-        func handler(_ result: Result<AcknowledgedResponse, Error>) -> Void {
-            
-            switch result {
-            case .failure(let error):
-                logger.error("Error: \(error)")
-                XCTAssert(false, error.localizedDescription)
-            case .success(let response):
-                logger.info("Response: \(response)")
-                XCTAssert(response.acknowledged, "Acknowleged: \(response.acknowledged)")
-            }
-            self.client?.indices.exists(getIndexRequest, completionHandler: existsFalseHander)
-        }
-        let deleteRequest = DeleteIndexRequest("test")
-        
-        func existsTrueHander(_ result: Result<IndexExistsResponse, Error>) -> Void {
-            switch result {
-            case .failure(let error):
-                logger.error("Error: \(error)")
-                XCTAssert(false, error.localizedDescription)
-            case .success(let response):
-                logger.info("Response: \(response)")
-                XCTAssert(response.exists, "IndexExists: \(response.exists)")
-            }
-            self.client?.indices.delete(deleteRequest, completionHandler: handler)
-        }
-        
-        
-        /// make sure index exists
-        func createIndexRequestHandler(_ result: Result<CreateIndexResponse, Error>) -> Void {
-            
-            switch result {
-            case .failure(let error):
-                logger.error("Error: \(error)")
-            case .success(let response):
-                logger.info("Response: \(response)")
-            }
-            self.client?.indices.exists(existsRequest, completionHandler: existsTrueHander)
-        }
-        
-        let createIndexRequest = CreateIndexRequest("test")
-        self.client?.indices.create(createIndexRequest, completionHandler: createIndexRequestHandler)
         waitForExpectations(timeout: 10)
     }
     
@@ -399,14 +233,14 @@ class ElasticSwiftTests: XCTestCase {
         let msg = Message("Test Message")
         let indexRequest = IndexRequest(index: "test", id: "0", source: msg)
         
-        self.client?.index(indexRequest) { result in
+        self.client.index(indexRequest) { result in
             switch result {
             case .success(let response):
                 self.logger.info("Response: \(response)")
             case .failure(let error):
                 self.logger.error("Error: \(error)")
             }
-            self.client?.update(updateRequest) { result in
+            self.client.update(updateRequest) { result in
                 switch result {
                 case .success(let response):
                     self.logger.info("Updated Response: \(response)")
@@ -437,14 +271,14 @@ class ElasticSwiftTests: XCTestCase {
         let msg = Message("Test Message")
         let indexRequest = IndexRequest(index: "test", id: "1", source: msg)
         
-        self.client?.index(indexRequest) { result in
+        self.client.index(indexRequest) { result in
             switch result {
             case .success(let response):
                 self.logger.info("Response: \(response)")
             case .failure(let error):
                 self.logger.error("Error: \(error)")
             }
-            self.client?.update(updateRequest) { result in
+            self.client.update(updateRequest) { result in
                 switch result {
                 case .success(let response):
                     self.logger.info("Updated Response: \(response)")
@@ -474,14 +308,14 @@ class ElasticSwiftTests: XCTestCase {
         let msg = Message("Test Message")
         let indexRequest = IndexRequest(index: "test", id: "2", source: msg)
         
-        self.client?.index(indexRequest) { result in
+        self.client.index(indexRequest) { result in
             switch result {
             case .success(let response):
                 self.logger.info("Response: \(response)")
             case .failure(let error):
                 self.logger.error("Error: \(error)")
             }
-            self.client?.update(updateRequest) { result in
+            self.client.update(updateRequest) { result in
                 switch result {
                 case .success(let response):
                     self.logger.info("Updated Response: \(response)")
@@ -512,14 +346,14 @@ class ElasticSwiftTests: XCTestCase {
         let msg = Message("Test Message")
         let indexRequest = IndexRequest(index: "test", id: "3", source: msg)
         
-        self.client?.index(indexRequest) { result in
+        self.client.index(indexRequest) { result in
             switch result {
             case .success(let response):
                 self.logger.info("Response: \(response)")
             case .failure(let error):
                 self.logger.error("Error: \(error)")
             }
-            self.client?.update(updateRequest) { result in
+            self.client.update(updateRequest) { result in
                 switch result {
                 case .success(let response):
                     self.logger.info("Updated Response: \(response)")
@@ -548,7 +382,7 @@ class ElasticSwiftTests: XCTestCase {
             .set(upsert: ["msg": "Test Message"])
             .build()
         
-        self.client?.update(updateRequest) { result in
+        self.client.update(updateRequest) { result in
             switch result {
             case .success(let response):
                 self.logger.info("Updated Response: \(response)")
@@ -578,7 +412,7 @@ class ElasticSwiftTests: XCTestCase {
             .set(upsert: [:])
             .build()
         
-        self.client?.update(updateRequest) { result in
+        self.client.update(updateRequest) { result in
             switch result {
             case .success(let response):
                 self.logger.info("Updated Response: \(response)")
@@ -606,7 +440,7 @@ class ElasticSwiftTests: XCTestCase {
             .set(docAsUpsert: true)
             .build()
         
-        self.client?.update(updateRequest) { result in
+        self.client.update(updateRequest) { result in
             switch result {
             case .success(let response):
                 self.logger.info("Updated Response: \(response)")
@@ -662,7 +496,7 @@ class ElasticSwiftTests: XCTestCase {
                 logger.info("Result: \(response.result)")
             }
             
-            self.client?.deleteByQuery(request, completionHandler: handler)
+            self.client.deleteByQuery(request, completionHandler: handler)
         }
         var msg = Message()
         msg.msg = "DeleteByQuery"
@@ -672,7 +506,7 @@ class ElasticSwiftTests: XCTestCase {
             .set(source: msg)
             .build()
         request1.refresh = .true
-        self.client?.execute(request: request1, completionHandler: handler1)
+        self.client.execute(request: request1, completionHandler: handler1)
         
         waitForExpectations(timeout: 10)
     }
@@ -716,7 +550,7 @@ class ElasticSwiftTests: XCTestCase {
                 logger.info("Result: \(response.result)")
             }
             
-            self.client?.updateByQuery(request, completionHandler: handler)
+            self.client.updateByQuery(request, completionHandler: handler)
         }
         var msg = Message()
         msg.msg = "UpdateByQuery"
@@ -726,7 +560,7 @@ class ElasticSwiftTests: XCTestCase {
             .set(source: msg)
             .build()
         request1.refresh = .true
-        self.client?.execute(request: request1, completionHandler: handler1)
+        self.client.execute(request: request1, completionHandler: handler1)
         
         waitForExpectations(timeout: 10)
     }
@@ -771,7 +605,7 @@ class ElasticSwiftTests: XCTestCase {
                 logger.info("Result: \(response.result)")
             }
             
-            self.client?.updateByQuery(request, completionHandler: handler)
+            self.client.updateByQuery(request, completionHandler: handler)
         }
         var msg = Message()
         msg.msg = "UpdateByQuery2"
@@ -781,7 +615,7 @@ class ElasticSwiftTests: XCTestCase {
             .set(source: msg)
             .build()
         request1.refresh = .true
-        self.client?.execute(request: request1, completionHandler: handler1)
+        self.client.execute(request: request1, completionHandler: handler1)
         
         waitForExpectations(timeout: 10)
     }
@@ -816,7 +650,7 @@ class ElasticSwiftTests: XCTestCase {
             case .success(let response):
                 logger.info("Response: \(response)")
             }
-            self.client?.mget(request, completionHandler: handler)
+            self.client.mget(request, completionHandler: handler)
         }
         
         var msg = Message()
@@ -828,7 +662,7 @@ class ElasticSwiftTests: XCTestCase {
             .set(source: msg)
             .build()
         request1.refresh = .true
-        self.client?.index(request1, completionHandler: handler1)
+        self.client.index(request1, completionHandler: handler1)
         waitForExpectations(timeout: 10)
     }
     
@@ -868,7 +702,7 @@ class ElasticSwiftTests: XCTestCase {
             case .success(let response):
                 logger.info("Response: \(response)")
             }
-            self.client?.reIndex(reIndexRequest, completionHandler: resultHandler)
+            self.client.reIndex(reIndexRequest, completionHandler: resultHandler)
         }
         var msg = Message()
         msg.msg = "Test Message No Id"
@@ -878,7 +712,7 @@ class ElasticSwiftTests: XCTestCase {
             .set(source: msg)
             .build()
         
-        self.client?.execute(request: request, completionHandler: handler)
+        self.client.execute(request: request, completionHandler: handler)
         waitForExpectations(timeout: 10)
     }
     
@@ -945,7 +779,7 @@ class ElasticSwiftTests: XCTestCase {
             .set(type: "_doc")
             .build()
         
-        self.client?.termVectors(request, completionHandler: handler)
+        self.client.termVectors(request, completionHandler: handler)
         
         waitForExpectations(timeout: 10)
     }
@@ -1053,7 +887,7 @@ class ElasticSwiftTests: XCTestCase {
             .set(fieldStatistics: false)
             .build()
         
-        self.client?.termVectors(request, completionHandler: handler)
+        self.client.termVectors(request, completionHandler: handler)
         
         waitForExpectations(timeout: 10)
     }
@@ -1073,7 +907,7 @@ class ElasticSwiftTests: XCTestCase {
                 logger.info("Response: \(response)")
                 XCTAssert(response.found, "Found: \(response.found)")
             }
-            self.client?.indices.delete(deleteIndexReqeust) { result in
+            self.client.indices.delete(deleteIndexReqeust) { result in
                 switch result {
                 case .failure(let error):
                     self.logger.error("Error: \(error)")
@@ -1120,7 +954,7 @@ class ElasticSwiftTests: XCTestCase {
                 logger.info("Response: \(response)")
                 XCTAssert(response.acknowledged, "Acknowledged: \(response.acknowledged)")
             }
-            self.client?.index(indexRequest) { result in
+            self.client.index(indexRequest) { result in
                 switch result {
                 case .failure(let error):
                     self.logger.error("Error: \(error)")
@@ -1129,7 +963,7 @@ class ElasticSwiftTests: XCTestCase {
                     self.logger.info("Response: \(response)")
                     XCTAssert(response.id == "1", "ID: \(response.id)")
                 }
-                self.client?.index(indexRequest2) { result in
+                self.client.index(indexRequest2) { result in
                     switch result {
                     case .failure(let error):
                         self.logger.error("Error: \(error)")
@@ -1137,7 +971,7 @@ class ElasticSwiftTests: XCTestCase {
                     case .success(let response):
                         self.logger.info("Response: \(response)")
                         XCTAssert(response.id == "2", "ID: \(response.id)")
-                        self.client?.termVectors(request, completionHandler: handler)
+                        self.client.termVectors(request, completionHandler: handler)
                     }
                 }
             }
@@ -1169,7 +1003,7 @@ class ElasticSwiftTests: XCTestCase {
             .build()
         
         
-        self.client?.indices.create(createIndexRequest, completionHandler: createIndexHandler)
+        self.client.indices.create(createIndexRequest, completionHandler: createIndexHandler)
         
         waitForExpectations(timeout: 10)
     }
@@ -1189,7 +1023,7 @@ class ElasticSwiftTests: XCTestCase {
                 logger.info("Response: \(response)")
                 XCTAssert(response.responses.count == 2, "Found: \(response.responses)")
             }
-            self.client?.indices.delete(deleteIndexReqeust) { result in
+            self.client.indices.delete(deleteIndexReqeust) { result in
                 switch result {
                 case .failure(let error):
                     self.logger.error("Error: \(error)")
@@ -1249,7 +1083,7 @@ class ElasticSwiftTests: XCTestCase {
                 logger.info("Response: \(response)")
                 XCTAssert(response.acknowledged, "Acknowledged: \(response.acknowledged)")
             }
-            self.client?.index(indexRequest) { result in
+            self.client.index(indexRequest) { result in
                 switch result {
                 case .failure(let error):
                     self.logger.error("Error: \(error)")
@@ -1258,7 +1092,7 @@ class ElasticSwiftTests: XCTestCase {
                     self.logger.info("Response: \(response)")
                     XCTAssert(response.id == "1", "ID: \(response.id)")
                 }
-                self.client?.index(indexRequest2) { result in
+                self.client.index(indexRequest2) { result in
                     switch result {
                     case .failure(let error):
                         self.logger.error("Error: \(error)")
@@ -1267,7 +1101,7 @@ class ElasticSwiftTests: XCTestCase {
                         self.logger.info("Response: \(response)")
                         XCTAssert(response.id == "2", "ID: \(response.id)")
                     }
-                    self.client?.mtermVectors(mrequest, completionHandler: handler)
+                    self.client.mtermVectors(mrequest, completionHandler: handler)
                 }
             }
         }
@@ -1298,7 +1132,7 @@ class ElasticSwiftTests: XCTestCase {
             .build()
         
         
-        self.client?.indices.create(createIndexRequest, completionHandler: createIndexHandler)
+        self.client.indices.create(createIndexRequest, completionHandler: createIndexHandler)
         
         waitForExpectations(timeout: 10)
     }
@@ -1345,44 +1179,11 @@ class ElasticSwiftTests: XCTestCase {
             case .success(let response):
                 logger.info("Response: \(response)")
             }
-            self.client?.bulk(bulkRequest, completionHandler: handler)
+            self.client.bulk(bulkRequest, completionHandler: handler)
         }
         
         let request1 = CreateIndexRequest("test")
-        self.client?.execute(request: request1, completionHandler: handler1)
-        waitForExpectations(timeout: 10)
-    }
-    
-    func test_999_DeleteIndex() throws {
-        let e = expectation(description: "execution complete")
-        func handler(_ result: Result<AcknowledgedResponse, Error>) -> Void {
-            
-            switch result {
-            case .failure(let error):
-                logger.error("Error: \(error)")
-                XCTAssert(false, error.localizedDescription)
-            case .success(let response):
-                logger.info("Response: \(response)")
-                XCTAssert(response.acknowledged, "Acknowleged: \(response.acknowledged)")
-            }
-            e.fulfill()
-        }
-        let request = DeleteIndexRequest("test")
-        
-        /// make sure index exists
-        func handler1(_ result: Result<CreateIndexResponse, Error>) -> Void {
-            
-            switch result {
-            case .failure(let error):
-                logger.error("Error \(error)")
-            case .success(let response):
-                logger.info("Response: \(response)")
-            }
-            self.client?.execute(request: request, completionHandler: handler)
-        }
-        
-        let request1 = CreateIndexRequest("test")
-        self.client?.execute(request: request1, completionHandler: handler1)
+        self.client.execute(request: request1, completionHandler: handler1)
         waitForExpectations(timeout: 10)
     }
     

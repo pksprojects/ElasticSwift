@@ -11,20 +11,57 @@ import Foundation
 @testable import Logging
 
 
+let env = ProcessInfo.processInfo.environment
+
+public let loggerLevel: Logger.Level = {
+    let logLevel = env["LOG_LEVEL"]
+    if let value = logLevel, let level = Logger.Level.init(rawValue: value)  {
+            return level
+    } else {
+        return .debug
+    }
+}()
+
 public let logFactory: ((String) -> LogHandler) = { label -> LogHandler in
     var handler = StreamLogHandler.standardOutput(label: label)
-    handler.logLevel = .debug
+    handler.logLevel = loggerLevel
     return handler
 }
 
 public let isLoggingConfigured: Bool = {
     LoggingSystem.bootstrap { label in
         var handler = StreamLogHandler.standardOutput(label: label)
-        handler.logLevel = .debug
+        handler.logLevel = loggerLevel
         return handler
     }
     return true
 }()
+
+
+public let esConnection: ESConnection = {
+    var url = URL(string: "http://localhost:9200")!
+    let urlString = env["ES_URL"]
+    if let esString = urlString, let esUrl = URL(string: esString) {
+        url = esUrl
+    }
+    let uname = env["ES_UNAME"] ?? "elastic"
+    let passwd = env["ES_PASSWD"] ?? "elastic"
+    let isProtected = Bool(env["IS_PROTECTED"] ?? "") ?? true
+    let isSecure = Bool(env["IS_SECURE"] ?? "") ?? false
+    let cert = env["SSL_CERT"]
+    
+    return ESConnection(host: url, uname: uname, passwd: passwd, isProtected: isProtected, isSecure: isSecure, certPath: cert)
+}()
+
+public struct ESConnection {
+    public let host: URL
+    public let uname: String
+    public let passwd: String
+    public let isProtected: Bool
+    public let isSecure: Bool
+    public let certPath: String?
+}
+
 
 /// Copy of `Logging.StreamLogHandler` with modifications to include label in log output
 ///
