@@ -58,6 +58,16 @@ let package = Package(
             dependencies: []),
         .testTarget(
             name: "ElasticSwiftTests",
-            dependencies: ["ElasticSwift", "ElasticSwiftQueryDSL", "ElasticSwiftCore", "ElasticSwiftCodableUtils", "ElasticSwiftNetworkingNIO", "ElasticSwiftNetworking"]),
+            dependencies: ["ElasticSwift", "ElasticSwiftQueryDSL", "ElasticSwiftCore", "ElasticSwiftCodableUtils", "ElasticSwiftNetworkingNIO", "ElasticSwiftNetworking", "UnitTestSettings"]),
+        .testTarget(
+            name: "ElasticSwiftCodableUtilsTests",
+            dependencies: ["ElasticSwiftCodableUtils", "Logging", "UnitTestSettings"]),
+        .testTarget(
+            name: "ElasticSwiftQueryDSLTests",
+            dependencies: ["ElasticSwiftQueryDSL", "Logging", "UnitTestSettings"]),
+        .target(
+            name: "UnitTestSettings",
+            dependencies: ["Logging"],
+            path: "Tests/UnitTestSettings"),
     ]
 )

@@ -1,18 +1,20 @@
 //
-//  CodableUtilsTests.swift
-//  
+//  ElasticSwiftCodableUtilsTests.swift
+//  ElasticSwiftCodableUtilsTests
+//
 //
 //  Created by Prafull Kumar Soni on 9/15/19.
 //
 
 import XCTest
 import Logging
+import UnitTestSettings
 
 @testable import ElasticSwiftCodableUtils
 
-class CodableUtilsTests: XCTestCase {
+class ElasticSwiftCodableUtilsTests: XCTestCase {
     
-    let logger = Logger(label: "org.pksprojects.ElasticSwiftTests.CodableUtils.CodableUtilsTests", factory: logFactory)
+    let logger = Logger(label: "org.pksprojects.ElasticSwiftCodableUtilsTests.CodableUtilsTests", factory: logFactory)
     
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.

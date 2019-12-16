@@ -7,6 +7,7 @@
 
 import XCTest
 import Logging
+import UnitTestSettings
 
 @testable import ElasticSwift
 @testable import ElasticSwiftCore

@@ -1,25 +1,11 @@
 import XCTest
 import Logging
+import UnitTestSettings
 
 @testable import ElasticSwift
 @testable import ElasticSwiftQueryDSL
 @testable import ElasticSwiftCodableUtils
 @testable import ElasticSwiftNetworkingNIO
-
-let logFactory: ((String) -> LogHandler) = { label -> LogHandler in
-    var handler = StreamLogHandler.standardOutput(label: label)
-    handler.logLevel = .debug
-    return handler
-}
-
-let isLoggingConfigured: Bool = {
-    LoggingSystem.bootstrap { label in
-        var handler = StreamLogHandler.standardOutput(label: label)
-        handler.logLevel = .debug
-        return handler
-    }
-    return true
-}()
 
 class ElasticSwiftTests: XCTestCase {
     
@@ -31,7 +17,7 @@ class ElasticSwiftTests: XCTestCase {
         super.setUp()
         XCTAssert(isLoggingConfigured)
         logger.info("====================TEST=START===============================")
-        self.client = ElasticClient(settings: Settings(forHost: "http://localhost:9200", adaptorConfig: AsyncHTTPClientAdaptorConfiguration.default))
+        self.client = ElasticClient(settings: Settings(forHost: "http://localhost:9200", withCredentials: BasicClientCredential(username: "elastic", password: "elastic"), adaptorConfig: AsyncHTTPClientAdaptorConfiguration.default))
 //        let cred = ClientCredential(username: "elastic", password: "elastic")
 //        let ssl = SSLConfiguration(certPath: "/usr/local/Cellar/kibana/6.1.2/config/certs/elastic-certificates.der", isSelf: true)
 //        let settings = Settings(forHosts: ["https://localhost:9200"], withCredentials: cred, withSSL: true, sslConfig: ssl)

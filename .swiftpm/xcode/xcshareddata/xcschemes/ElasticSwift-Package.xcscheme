@@ -167,6 +167,36 @@
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ElasticSwiftCodableUtilsTests"
+               BuildableName = "ElasticSwiftCodableUtilsTests"
+               BlueprintName = "ElasticSwiftCodableUtilsTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "UnitTestSettings"
+               BuildableName = "UnitTestSettings"
+               BlueprintName = "UnitTestSettings"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ElasticSwiftQueryDSLTests"
+               BuildableName = "ElasticSwiftQueryDSLTests"
+               BlueprintName = "ElasticSwiftQueryDSLTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

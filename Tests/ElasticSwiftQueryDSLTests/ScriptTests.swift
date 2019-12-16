@@ -1,20 +1,20 @@
 //
 //  ScriptTests.swift
-//  ElasticSwiftTests
+//  ElasticSwiftQueryDSLTests
 //
 //  Created by Prafull Kumar Soni on 9/2/19.
 //
 
 import XCTest
 import Logging
+import UnitTestSettings
 
-@testable import ElasticSwift
 @testable import ElasticSwiftQueryDSL
 @testable import ElasticSwiftCodableUtils
 
 class ScriptTests: XCTestCase {
     
-    let logger = Logger(label: "org.pksprojects.ElasticSwiftTests.QueryDSL.ScriptTests", factory: logFactory)
+    let logger = Logger(label: "org.pksprojects.ElasticSwiftQueryDSLTests.ScriptTests", factory: logFactory)
     
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
