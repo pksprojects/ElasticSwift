@@ -15,7 +15,7 @@ import AsyncHTTPClient
 
 public struct Timeouts {
     
-    public static let DEFAULT_TIMEOUTS: Timeouts = Timeouts(read: TimeAmount.milliseconds(1000), connect: TimeAmount.milliseconds(3000))
+    public static let DEFAULT_TIMEOUTS: Timeouts = Timeouts(read: TimeAmount.milliseconds(5000), connect: TimeAmount.milliseconds(5000))
     
     public let read: TimeAmount?
     public let connect: TimeAmount?
