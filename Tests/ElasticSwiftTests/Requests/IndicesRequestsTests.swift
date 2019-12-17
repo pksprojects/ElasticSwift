@@ -28,15 +28,52 @@ class IndicesRequestsTests: XCTestCase {
         return ElasticClient(settings: settings)
     }()
     
+    private let indexName = "\(TEST_INDEX_PREFIX)_\(IndicesRequestsTests.self)".lowercased()
+    
     override func setUp() {
         super.setUp()
         XCTAssert(isLoggingConfigured)
         logger.info("====================TEST=START===============================")
+        let e = expectation(description: "execution complete")
+        func handler(_ result: Result<CreateIndexResponse, Error>) -> Void {
+            
+            switch result {
+                case .failure(let error):
+                    logger.error("Error: \(error)")
+                    XCTAssert(false)
+                case .success(let response):
+                    XCTAssert(response.acknowledged, "\(response.acknowledged)")
+                    XCTAssert(response.index == indexName, "\(response.index)")
+                    XCTAssert(response.shardsAcknowledged, "\(response.shardsAcknowledged)")
+            }
+            e.fulfill()
+        }
+        let createIndexRequest = CreateIndexRequest(indexName)
+        
+        self.client.indices.create(createIndexRequest, completionHandler: handler)
+        
+        waitForExpectations(timeout: 10)
     }
         
     override func tearDown() {
         super.tearDown()
+        let e = expectation(description: "execution complete")
+        func handler(_ result: Result<AcknowledgedResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                logger.error("Error: \(error)")
+                XCTAssert(false, error.localizedDescription)
+            case .success(let response):
+                XCTAssert(response.acknowledged, "Acknowleged: \(response.acknowledged)")
+            }
+            e.fulfill()
+        }
+        let request = DeleteIndexRequest(indexName)
         
+        client.indices.delete(request, completionHandler: handler)
+        
+        waitForExpectations(timeout: 10)
         logger.info("====================TEST=END===============================")
     }
     

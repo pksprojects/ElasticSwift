@@ -13,6 +13,11 @@ import Foundation
 
 let env = ProcessInfo.processInfo.environment
 
+public let TEST_INDEX_PREFIX: String = {
+    let prefix = env["TEST_INDEX_PREFIX"]
+    return prefix ?? "es_test_index"
+} ()
+
 public let loggerLevel: Logger.Level = {
     let logLevel = env["LOG_LEVEL"]
     if let value = logLevel, let level = Logger.Level.init(rawValue: value)  {

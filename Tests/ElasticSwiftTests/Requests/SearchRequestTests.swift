@@ -28,11 +28,31 @@ class SearchRequestTests: XCTestCase {
         return ElasticClient(settings: settings)
     }()
     
+    private let indexName = "\(TEST_INDEX_PREFIX)_\(SearchRequestTests.self)".lowercased()
+    
     override func setUp() {
         super.setUp()
         XCTAssert(isLoggingConfigured)
         logger.info("====================TEST=START===============================")
-    
+        let e = expectation(description: "execution complete")
+        func handler(_ result: Result<CreateIndexResponse, Error>) -> Void {
+            
+            switch result {
+                case .failure(let error):
+                    logger.error("Error: \(error)")
+                    XCTAssert(false)
+                case .success(let response):
+                    XCTAssert(response.acknowledged, "\(response.acknowledged)")
+                    XCTAssert(response.index == indexName, "\(response.index)")
+                    XCTAssert(response.shardsAcknowledged, "\(response.shardsAcknowledged)")
+            }
+            e.fulfill()
+        }
+        let createIndexRequest = CreateIndexRequest(indexName)
+        
+        self.client.indices.create(createIndexRequest, completionHandler: handler)
+        
+        waitForExpectations(timeout: 10)
 //        let cred = ClientCredential(username: "elastic", password: "elastic")
 //        let ssl = SSLConfiguration(certPath: "/usr/local/Cellar/kibana/6.1.2/config/certs/elastic-certificates.der", isSelf: true)
 //        let settings = Settings(forHosts: ["https://localhost:9200"], withCredentials: cred, withSSL: true, sslConfig: ssl)
@@ -41,7 +61,23 @@ class SearchRequestTests: XCTestCase {
         
     override func tearDown() {
         super.tearDown()
+        let e = expectation(description: "execution complete")
+        func handler(_ result: Result<AcknowledgedResponse, Error>) -> Void {
+            
+            switch result {
+            case .failure(let error):
+                logger.error("Error: \(error)")
+                XCTAssert(false, error.localizedDescription)
+            case .success(let response):
+                XCTAssert(response.acknowledged, "Acknowleged: \(response.acknowledged)")
+            }
+            e.fulfill()
+        }
+        let request = DeleteIndexRequest(indexName)
         
+        client.indices.delete(request, completionHandler: handler)
+        
+        waitForExpectations(timeout: 10)
         logger.info("====================TEST=END===============================")
     }
     
@@ -68,7 +104,7 @@ class SearchRequestTests: XCTestCase {
             .set(order: .asc)
             .build()
         let request = try SearchRequestBuilder()
-            .set(indices: "test")
+            .set(indices: indexName)
             .set(types: "_doc")
             .set(query: try! queryBuilder.build())
             .set(sort: sort)
@@ -88,7 +124,7 @@ class SearchRequestTests: XCTestCase {
         var msg = Message()
         msg.msg = "Message"
         var request1 =  try IndexRequestBuilder<Message>()
-            .set(index: "test")
+            .set(index: indexName)
             .set(source: msg)
             .build()
         request1.refresh = .true
