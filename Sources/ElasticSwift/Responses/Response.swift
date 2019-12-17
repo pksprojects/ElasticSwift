@@ -364,9 +364,18 @@ public struct TermVectorsResponse: Codable, Equatable {
         self.version = try container.decodeIntIfPresent(forKey: .version)
         self.found = try container.decodeBool(forKey: .found)
         self.took = try container.decodeInt(forKey: .took)
-        let dic = try container.decode([String: TermVectorMetaData].self, forKey: .termVerctors)
-        self.termVerctors = dic.map { key, value -> TermVector in
-            return TermVector(field: key, fieldStatistics: value.fieldStatistics, terms: value.terms)
+        do {
+            let dic = try container.decode([String: TermVectorMetaData].self, forKey: .termVerctors)
+            self.termVerctors = dic.map { key, value -> TermVector in
+                return TermVector(field: key, fieldStatistics: value.fieldStatistics, terms: value.terms)
+            }
+        } catch Swift.DecodingError.keyNotFound(let key, let context) {
+            if key.stringValue == CodingKeys.termVerctors.stringValue {
+                self.termVerctors = []
+            } else {
+                throw Swift.DecodingError.keyNotFound(key, context)
+            }
+            
         }
     }
     
