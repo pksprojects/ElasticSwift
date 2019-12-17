@@ -52,21 +52,21 @@ private class RoundRobinQueue<T> {
     
     private var elements: [T]
     
-    private var index: Atomic<Int>
+    private var index: NIOAtomic<Int>
     
     private let max: Int
     
     init(capacity: Int) {
         self.elements = Array<T>()
         self.elements.reserveCapacity(capacity)
-        self.index = Atomic(value: 0)
+        self.index = NIOAtomic.makeAtomic(value: 0)
         self.max = capacity
     }
     
     public init(_ elements: [T]) {
         self.elements = elements
         self.elements.reserveCapacity(elements.count)
-        self.index = Atomic(value: 0)
+        self.index = NIOAtomic.makeAtomic(value: 0)
         self.max = self.elements.count
     }
     
