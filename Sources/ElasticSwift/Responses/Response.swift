@@ -69,12 +69,14 @@ public struct SearchResponse<T: Codable>: Codable, Equatable where T: Equatable 
     public let timedOut: Bool
     public let shards: Shards
     public let hits: Hits<T>
+    public let scrollId: String?
     
     enum CodingKeys: String, CodingKey {
         case took
         case timedOut = "timed_out"
         case shards = "_shards"
         case hits
+        case scrollId = "_scroll_id"
     }
 }
 
@@ -495,6 +497,8 @@ public struct MultiTermVectorsResponse: Codable {
 
 extension MultiTermVectorsResponse: Equatable {}
 
+// MARK:- Bulk Response
+
 public struct BulkResponse: Codable {
     public let took: Int
     public let errors: Bool
@@ -580,3 +584,19 @@ public struct BulkResponse: Codable {
 }
 
 extension BulkResponse: Equatable {}
+
+// MARK:- Clear Scroll Response
+
+public struct ClearScrollResponse: Codable {
+    
+    public let succeeded: Bool
+    public let numFreed: Int
+    
+    enum CodingKeys: String, CodingKey {
+        case succeeded
+        case numFreed = "num_freed"
+    }
+    
+}
+
+extension ClearScrollResponse: Equatable {}

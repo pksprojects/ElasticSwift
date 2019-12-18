@@ -1226,18 +1226,6 @@ class ElasticSwiftTests: XCTestCase {
         self.client.execute(request: request1, completionHandler: handler1)
         waitForExpectations(timeout: 10)
     }
-    
-//    static var allTests = [
-//        ("testPlay", testPlay),
-//        ("testClient", testClient),
-//        ("testCreateIndex", testCreateIndex),
-//        ("testGetIndex", testGetIndex),
-//        ("testIndex", testIndex),
-//        ("testIndexNoId", testIndexNoId),
-//        ("testGet", testGet),
-//        ("testDelete", testDelete),
-//        ("testDeleteIndex", testDeleteIndex)
-//    ]
 }
 
 struct Message: Codable, Equatable {

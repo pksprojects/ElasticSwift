@@ -104,6 +104,26 @@ extension ElasticClient {
         return self.execute(request: serachRequest, options: .default, completionHandler: completionHandler)
     }
     
+    /// Asynchronously executes a search using the Search Scroll API.
+    ///
+    /// [Search Scroll API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html)
+    /// - Parameters:
+    ///   - serachRequest: the request
+    ///   - completionHandler: callback to be invoked upon request completion.
+    public func scroll<T: Codable>(_ scrollRequest: SearchScrollRequest, completionHandler: @escaping (_ result: Result<SearchResponse<T>, Error>) -> Void) -> Void {
+        return self.execute(request: scrollRequest, options: .default, completionHandler: completionHandler)
+    }
+    
+    /// Asynchronously clears one or more scroll ids using the Clear Scroll API.
+    ///
+    /// [Clear Scroll API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html#_clear_scroll_api)
+    /// - Parameters:
+    ///   - serachRequest: the request
+    ///   - completionHandler: callback to be invoked upon request completion.
+    public func clearScroll(_ clearScrollRequest: ClearScrollRequest, completionHandler: @escaping (_ result: Result<ClearScrollResponse, Error>) -> Void) -> Void {
+        return self.execute(request: clearScrollRequest, options: .default, completionHandler: completionHandler)
+    }
+    
     /// Asynchronously executes a delete by query request.
     ///
     /// [Delete By Query API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete-by-query.html)
@@ -230,6 +250,28 @@ extension ElasticClient {
     ///   - completionHandler: callback to be invoked upon request completion.
     public func search<T: Codable>(_ serachRequest: SearchRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<SearchResponse<T>, Error>) -> Void) -> Void {
         return self.execute(request: serachRequest, options: options, completionHandler: completionHandler)
+    }
+    
+    /// Asynchronously executes a search using the Search Scroll API.
+    ///
+    /// [Search Scroll API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html)
+    /// - Parameters:
+    ///   - serachRequest: the request
+    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - completionHandler: callback to be invoked upon request completion.
+    public func scroll<T: Codable>(_ scrollRequest: SearchScrollRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<SearchResponse<T>, Error>) -> Void) -> Void {
+        return self.execute(request: scrollRequest, options: options, completionHandler: completionHandler)
+    }
+    
+    /// Asynchronously clears one or more scroll ids using the Clear Scroll API.
+    ///
+    /// [Clear Scroll API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html#_clear_scroll_api)
+    /// - Parameters:
+    ///   - serachRequest: the request
+    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - completionHandler: callback to be invoked upon request completion.
+    public func clearScroll(_ clearScrollRequest: ClearScrollRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<ClearScrollResponse, Error>) -> Void) -> Void {
+        return self.execute(request: clearScrollRequest, options: options, completionHandler: completionHandler)
     }
     
     /// Asynchronously executes a delete by query request.

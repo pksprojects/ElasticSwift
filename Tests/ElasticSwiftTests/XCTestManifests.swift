@@ -57,6 +57,7 @@ extension SearchRequestTests {
     // to regenerate.
     static let __allTests__SearchRequestTests = [
         ("test_01_Search", test_01_Search),
+        ("test_02_Search_Scroll_Request", test_02_Search_Scroll_Request),
     ]
 }
 

@@ -385,13 +385,15 @@ public struct SearchScrollRequest: Request {
     }
     
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-        return.failure(.noBodyForRequest)
+        let body =  Body(scroll: self.scroll, scrollId: self.scrollId)
+        return serializer.encode(body).mapError { error -> MakeBodyError in
+            return .wrapped(error)
+        }
     }
-    
     
     private struct Body: Encodable {
         
-        public let scroll: Scroll
+        public let scroll: Scroll?
         public let scrollId: String
         
         enum CodingKeys: String, CodingKey {
@@ -475,19 +477,20 @@ public struct ClearScrollRequest: Request {
         if self.scrollIds.contains("_all") {
             return "_search/scroll/_all"
         } else {
-            return "_search/scroll"
+            return "_search/scroll/\(self.scrollIds.joined(separator: ","))"
         }
     }
     
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-        if self.scrollIds.contains("_all") {
-            return .failure(.noBodyForRequest)
-        } else {
-            let body = Body(scrollId: self.scrollIds)
-            return serializer.encode(body).mapError { error -> MakeBodyError in
-                return MakeBodyError.wrapped(error)
-            }
-        }
+        return .failure(.noBodyForRequest)
+//        if self.scrollIds.contains("_all") {
+//            return .failure(.noBodyForRequest)
+//        } else {
+//            let body = Body(scrollId: self.scrollIds)
+//            return serializer.encode(body).mapError { error -> MakeBodyError in
+//                return MakeBodyError.wrapped(error)
+//            }
+//        }
     }
     
     private struct Body: Codable, Equatable {
