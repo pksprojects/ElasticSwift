@@ -7,6 +7,7 @@
 
 import Foundation
 import ElasticSwiftCore
+import Logging
 
 /// closure that handles `HTTPResponse`
 /// - Parameters:
@@ -28,6 +29,8 @@ public typealias ResponseConverter<T: Codable> = (_ serializer: Serializer, _ ca
 /// Classs with various response converters
 public class ResponseConverters {
     
+    private static let logger = Logger(label: "org.pksprojects.ElasticSwift.Serialization.ResponseConverters")
+    
     /// Utility class private initializer.
     private init() {}
     
@@ -44,6 +47,7 @@ public class ResponseConverters {
             case .success(let response):
                 
                 if let data = response.body {
+                    logger.trace("Converter : defaultConverter; Response body as string: \(String(data: data, encoding: .utf8) ?? "")")
                     guard (!response.status.isError()) else {
                         
                         /// handle GetResponse 404
