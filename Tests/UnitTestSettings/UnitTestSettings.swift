@@ -20,7 +20,7 @@ public let TEST_INDEX_PREFIX: String = {
 
 public let loggerLevel: Logger.Level = {
     let logLevel = env["LOG_LEVEL"]
-    if let value = logLevel, let level = Logger.Level.init(rawValue: value)  {
+    if let value = logLevel, let level = Logger.Level(rawValue: value.lowercased())  {
             return level
     } else {
         return .debug
