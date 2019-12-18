@@ -18,15 +18,8 @@ import UnitTestSettings
 class IndicesRequestsTests: XCTestCase {
     
     let logger = Logger(label: "org.pksprojects.ElasticSwiftTests.Requests.IndicesRequestsTests", factory: logFactory)
-        
-    private let client: ElasticClient = {
-        let cred = BasicClientCredential(username: esConnection.uname, password: esConnection.passwd)
-        let adaptorConfig = AsyncHTTPClientAdaptorConfiguration.default
-        let settings = (esConnection.isProtected) ?
-            Settings(forHost: esConnection.host, withCredentials: cred, adaptorConfig: adaptorConfig) :
-            Settings(forHost: esConnection.host,adaptorConfig: adaptorConfig)
-        return ElasticClient(settings: settings)
-    }()
+    
+    private let client = elasticClient
     
     private let indexName = "\(TEST_INDEX_PREFIX)_\(IndicesRequestsTests.self)".lowercased()
     

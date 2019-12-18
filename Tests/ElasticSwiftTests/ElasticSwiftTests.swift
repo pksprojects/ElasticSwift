@@ -7,18 +7,20 @@ import UnitTestSettings
 @testable import ElasticSwiftCodableUtils
 @testable import ElasticSwiftNetworkingNIO
 
+let elasticClient: ElasticClient = {
+    let cred = BasicClientCredential(username: esConnection.uname, password: esConnection.passwd)
+    let adaptorConfig = AsyncHTTPClientAdaptorConfiguration.default
+    let settings = (esConnection.isProtected) ?
+        Settings(forHost: esConnection.host, withCredentials: cred, adaptorConfig: adaptorConfig) :
+        Settings(forHost: esConnection.host,adaptorConfig: adaptorConfig)
+    return ElasticClient(settings: settings)
+}()
+
 class ElasticSwiftTests: XCTestCase {
     
     let logger = Logger(label: "org.pksprojects.ElasticSwiftTests.ElasticSwiftTests", factory: logFactory)
     
-    private let client: ElasticClient = {
-        let cred = BasicClientCredential(username: esConnection.uname, password: esConnection.passwd)
-        let adaptorConfig = AsyncHTTPClientAdaptorConfiguration.default
-        let settings = (esConnection.isProtected) ?
-            Settings(forHost: esConnection.host, withCredentials: cred, adaptorConfig: adaptorConfig) :
-            Settings(forHost: esConnection.host,adaptorConfig: adaptorConfig)
-        return ElasticClient(settings: settings)
-    }()
+    private let client = elasticClient
     
     private let indexName = "\(TEST_INDEX_PREFIX)_\(ElasticSwiftTests.self)".lowercased()
     
