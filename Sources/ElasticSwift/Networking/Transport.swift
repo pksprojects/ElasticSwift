@@ -18,7 +18,7 @@ import ElasticSwiftCore
  */
 internal class Transport {
     
-    private let logger = Logger(label: "org.pksprojects.ElasticSwfit.Transport")
+    private static let logger = Logger(label: "org.pksprojects.ElasticSwfit.Transport")
     
     let hosts: [URL]
     

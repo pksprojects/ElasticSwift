@@ -13,7 +13,7 @@ public typealias Host = URL
 /// Elasticsearch Client
 public class ElasticClient {
     
-    private let logger = Logger(label: "org.pksprojects.ElasticSwfit.ElasticClient")
+    private static let logger = Logger(label: "org.pksprojects.ElasticSwfit.ElasticClient")
     
     /// http reqeusts executer of the client
     let transport: Transport
