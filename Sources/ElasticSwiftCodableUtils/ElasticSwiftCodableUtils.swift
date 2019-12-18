@@ -7,40 +7,38 @@
 
 import Foundation
 
-//MARK:- ValueWrapper
+// MARK: - ValueWrapper
 
 /// Protocol for wraping a value for the associated type.
 public protocol ValueWrapper {
-    
     associatedtype ValueType
-    
+
     var value: ValueType { get }
-    
+
     init(_ value: ValueType)
 }
 
 extension ValueWrapper {
-    
-    public init(nilLiteral: ()) {
+    public init(nilLiteral _: ()) {
         self.init(NilValue.nil as! Self.ValueType)
     }
-    
+
     public init(booleanLiteral value: Bool) {
         self.init(value as! Self.ValueType)
     }
-    
+
     public init(integerLiteral value: Int) {
         self.init(value as! Self.ValueType)
     }
-    
+
     public init(floatLiteral value: Double) {
         self.init(value as! Self.ValueType)
     }
-    
+
     public init(stringLiteral value: String) {
         self.init(value as! Self.ValueType)
     }
-    
+
     public init(extendedGraphemeClusterLiteral value: String) {
         self.init(value as! Self.ValueType)
     }
@@ -59,7 +57,7 @@ extension ValueWrapper where Self: Encodable {
 extension ValueWrapper where Self: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        
+
         if container.decodeNil() {
             self.init(NilValue.nil as! Self.ValueType)
         } else if let bool = try? container.decodeBool() {
@@ -110,8 +108,8 @@ extension ValueWrapper where Self: Decodable {
 
 extension ValueWrapper where Self: ExpressibleByArrayLiteral {
     public typealias ArrayLiteralElement = Self
-    
-    public init(arrayLiteral elements: Self...)  {
+
+    public init(arrayLiteral elements: Self...) {
         if let elements = elements.map({ $0.value as? Bool }) as? [Bool] {
             self.init(elements as! Self.ValueType)
         } else if let elements = elements.map({ $0.value as? Int }) as? [Int] {
@@ -152,10 +150,9 @@ extension ValueWrapper where Self: ExpressibleByArrayLiteral {
 
 extension ValueWrapper where Self: ExpressibleByDictionaryLiteral {
     public typealias Key = String
-    
+
     public typealias Value = Self
-    
-    
+
     public init(dictionaryLiteral elements: (String, Self)...) {
         if let elements = elements.map({ ($0.0, $0.1.value as? Bool) }) as? [(String, Bool)] {
             self.init([String: Bool](elements, uniquingKeysWith: { first, _ in first }) as! Self.ValueType)
@@ -268,52 +265,47 @@ extension ValueWrapper where Self: Equatable {
 
 extension ValueWrapper where Self: CustomStringConvertible {
     public var description: String {
-        get {
-            if let value = self.value as? CustomStringConvertible {
-                return value.description
-            }
-            return "\(value)"
+        if let value = self.value as? CustomStringConvertible {
+            return value.description
         }
+        return "\(value)"
     }
 }
 
 extension ValueWrapper where Self: CustomDebugStringConvertible {
     public var debugDescription: String {
-        get {
-            if let value = self.value as? CustomDebugStringConvertible {
-                return value.debugDescription
-            } else if let self = self as? CustomStringConvertible {
-                return self.description
-            } else {
-                return "\(value)"
-            }
+        if let value = self.value as? CustomDebugStringConvertible {
+            return value.debugDescription
+        } else if let self = self as? CustomStringConvertible {
+            return self.description
+        } else {
+            return "\(value)"
         }
     }
 }
 
-//MARK:- CodableValue
+// MARK: - CodableValue
 
 /// Wrapper for `Codable` values similar to `AnyCodable` where value always conforms to `Codable`
 public struct CodableValue: ValueWrapper, Codable {
-    
     public typealias ValueType = Codable
-    
+
     public let value: Codable
-    
+
     public init(_ value: Codable) {
         self.value = value
     }
-    
+
     init<T>(_ value: T) where T: Codable {
         self.value = value
     }
 }
 
-extension CodableValue: ExpressibleByNilLiteral{}
-extension CodableValue: ExpressibleByStringLiteral{}
-extension CodableValue: ExpressibleByBooleanLiteral{}
-extension CodableValue: ExpressibleByIntegerLiteral{}
-extension CodableValue: ExpressibleByFloatLiteral{}
+extension CodableValue: ExpressibleByNilLiteral {}
+extension CodableValue: ExpressibleByStringLiteral {}
+extension CodableValue: ExpressibleByBooleanLiteral {}
+extension CodableValue: ExpressibleByIntegerLiteral {}
+extension CodableValue: ExpressibleByFloatLiteral {}
 
 extension CodableValue: ExpressibleByArrayLiteral {}
 extension CodableValue: ExpressibleByDictionaryLiteral {}
@@ -324,11 +316,10 @@ extension CodableValue: CustomStringConvertible {}
 
 extension CodableValue: CustomDebugStringConvertible {}
 
-//MARK:- DecodableValue
+// MARK: - DecodableValue
 
 /// Wrapper for `Decodable` values similar to `AnyDecodable` where value always conforms to `Decodable`
 public struct DecodableValue: ValueWrapper, Decodable {
-
     public typealias ValueType = Decodable
 
     public let value: Decodable
@@ -340,14 +331,13 @@ public struct DecodableValue: ValueWrapper, Decodable {
     init<T>(_ value: T) where T: Decodable {
         self.value = value
     }
-
 }
 
-extension DecodableValue: ExpressibleByNilLiteral{}
-extension DecodableValue: ExpressibleByStringLiteral{}
-extension DecodableValue: ExpressibleByBooleanLiteral{}
-extension DecodableValue: ExpressibleByIntegerLiteral{}
-extension DecodableValue: ExpressibleByFloatLiteral{}
+extension DecodableValue: ExpressibleByNilLiteral {}
+extension DecodableValue: ExpressibleByStringLiteral {}
+extension DecodableValue: ExpressibleByBooleanLiteral {}
+extension DecodableValue: ExpressibleByIntegerLiteral {}
+extension DecodableValue: ExpressibleByFloatLiteral {}
 
 extension DecodableValue: ExpressibleByArrayLiteral {}
 extension DecodableValue: ExpressibleByDictionaryLiteral {}
@@ -358,11 +348,10 @@ extension DecodableValue: CustomStringConvertible {}
 
 extension DecodableValue: CustomDebugStringConvertible {}
 
-//MARK:- EncodableValue
+// MARK: - EncodableValue
 
 /// Wrapper for `Decodable` values similar to `AnyDecodable` where value always conforms to `Decodable`
 public struct EncodableValue: ValueWrapper, Encodable {
-
     public typealias ValueType = Encodable
 
     public let value: Encodable
@@ -374,14 +363,13 @@ public struct EncodableValue: ValueWrapper, Encodable {
     init<T>(_ value: T) where T: Encodable {
         self.value = value
     }
-
 }
 
-extension EncodableValue: ExpressibleByNilLiteral{}
-extension EncodableValue: ExpressibleByStringLiteral{}
-extension EncodableValue: ExpressibleByBooleanLiteral{}
-extension EncodableValue: ExpressibleByIntegerLiteral{}
-extension EncodableValue: ExpressibleByFloatLiteral{}
+extension EncodableValue: ExpressibleByNilLiteral {}
+extension EncodableValue: ExpressibleByStringLiteral {}
+extension EncodableValue: ExpressibleByBooleanLiteral {}
+extension EncodableValue: ExpressibleByIntegerLiteral {}
+extension EncodableValue: ExpressibleByFloatLiteral {}
 
 extension EncodableValue: ExpressibleByArrayLiteral {}
 extension EncodableValue: ExpressibleByDictionaryLiteral {}
@@ -392,13 +380,13 @@ extension EncodableValue: CustomStringConvertible {}
 
 extension EncodableValue: CustomDebugStringConvertible {}
 
-//MARK:- NilValue
+// MARK: - NilValue
 
 public enum NilValue: Codable, ExpressibleByNilLiteral, Equatable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if container.decodeNil() {
-            self =  .nil
+            self = .nil
         }
         throw Swift.DecodingError.dataCorruptedError(in: container, debugDescription: "Non null value can't be used to decode Nil")
     }
@@ -408,17 +396,16 @@ public enum NilValue: Codable, ExpressibleByNilLiteral, Equatable {
         try contianer.encodeNil()
     }
 
-    public init(nilLiteral: ()) {
+    public init(nilLiteral _: ()) {
         self = .nil
     }
 
     case `nil`
 }
 
-// MARK:- Codable Helper Extensions
+// MARK: - Codable Helper Extensions
 
 public extension KeyedDecodingContainer {
-    
     /// Decodes a value of `Bool` type for the given key.
     ///
     /// - parameter key: The key that the decoded value is associated with.
@@ -433,7 +420,7 @@ public extension KeyedDecodingContainer {
     func decodeBool(forKey key: KeyedDecodingContainer<K>.Key) throws -> Bool {
         return try decode(Bool.self, forKey: key)
     }
-    
+
     /// Decodes a value of `String` type for the given key.
     ///
     /// - parameter key: The key that the decoded value is associated with.
@@ -448,7 +435,7 @@ public extension KeyedDecodingContainer {
     func decodeString(forKey key: KeyedDecodingContainer<K>.Key) throws -> String {
         return try decode(String.self, forKey: key)
     }
-    
+
     /// Decodes a value of `Int` type for the given key.
     ///
     /// - parameter key: The key that the decoded value is associated with.
@@ -463,7 +450,7 @@ public extension KeyedDecodingContainer {
     func decodeInt(forKey key: KeyedDecodingContainer<K>.Key) throws -> Int {
         return try decode(Int.self, forKey: key)
     }
-    
+
     /// Decodes a value of `Int8` type for the given key.
     ///
     /// - parameter key: The key that the decoded value is associated with.
@@ -478,7 +465,7 @@ public extension KeyedDecodingContainer {
     func decodeInt8(forKey key: KeyedDecodingContainer<K>.Key) throws -> Int8 {
         return try decode(Int8.self, forKey: key)
     }
-    
+
     /// Decodes a value of `Int16` type for the given key.
     ///
     /// - parameter key: The key that the decoded value is associated with.
@@ -493,7 +480,7 @@ public extension KeyedDecodingContainer {
     func decodeInt16(forKey key: KeyedDecodingContainer<K>.Key) throws -> Int16 {
         return try decode(Int16.self, forKey: key)
     }
-    
+
     /// Decodes a value of `Int32` type for the given key.
     ///
     /// - parameter key: The key that the decoded value is associated with.
@@ -508,7 +495,7 @@ public extension KeyedDecodingContainer {
     func decodeInt32(forKey key: KeyedDecodingContainer<K>.Key) throws -> Int32 {
         return try decode(Int32.self, forKey: key)
     }
-    
+
     /// Decodes a value of `Int64` type for the given key.
     ///
     /// - parameter key: The key that the decoded value is associated with.
@@ -523,7 +510,7 @@ public extension KeyedDecodingContainer {
     func decodeInt64(forKey key: KeyedDecodingContainer<K>.Key) throws -> Int64 {
         return try decode(Int64.self, forKey: key)
     }
-    
+
     /// Decodes a value of `UInt` type for the given key.
     ///
     /// - parameter key: The key that the decoded value is associated with.
@@ -538,7 +525,7 @@ public extension KeyedDecodingContainer {
     func decodeUInt(forKey key: KeyedDecodingContainer<K>.Key) throws -> UInt {
         return try decode(UInt.self, forKey: key)
     }
-    
+
     /// Decodes a value of `UInt8` type for the given key.
     ///
     /// - parameter key: The key that the decoded value is associated with.
@@ -553,7 +540,7 @@ public extension KeyedDecodingContainer {
     func decodeUInt8(forKey key: KeyedDecodingContainer<K>.Key) throws -> UInt8 {
         return try decode(UInt8.self, forKey: key)
     }
-    
+
     /// Decodes a value of `UInt16` type for the given key.
     ///
     /// - parameter key: The key that the decoded value is associated with.
@@ -568,7 +555,7 @@ public extension KeyedDecodingContainer {
     func decodeUInt16(forKey key: KeyedDecodingContainer<K>.Key) throws -> UInt16 {
         return try decode(UInt16.self, forKey: key)
     }
-    
+
     /// Decodes a value of `UInt32` type for the given key.
     ///
     /// - parameter key: The key that the decoded value is associated with.
@@ -583,7 +570,7 @@ public extension KeyedDecodingContainer {
     func decodeUInt32(forKey key: KeyedDecodingContainer<K>.Key) throws -> UInt32 {
         return try decode(UInt32.self, forKey: key)
     }
-    
+
     /// Decodes a value of `UInt64` type for the given key.
     ///
     /// - parameter key: The key that the decoded value is associated with.
@@ -598,7 +585,7 @@ public extension KeyedDecodingContainer {
     func decodeUInt64(forKey key: KeyedDecodingContainer<K>.Key) throws -> UInt64 {
         return try decode(UInt64.self, forKey: key)
     }
-    
+
     /// Decodes a value of `Double` type for the given key.
     ///
     /// - parameter key: The key that the decoded value is associated with.
@@ -613,7 +600,7 @@ public extension KeyedDecodingContainer {
     func decodeDouble(forKey key: KeyedDecodingContainer<K>.Key) throws -> Double {
         return try decode(Double.self, forKey: key)
     }
-    
+
     /// Decodes a value of `Decimal` type for the given key.
     ///
     /// - parameter key: The key that the decoded value is associated with.
@@ -628,7 +615,7 @@ public extension KeyedDecodingContainer {
     func decodeDecimal(forKey key: KeyedDecodingContainer<K>.Key) throws -> Decimal {
         return try decode(Decimal.self, forKey: key)
     }
-    
+
     /// Decodes a value of `Float` type for the given key.
     ///
     /// - parameter key: The key that the decoded value is associated with.
@@ -643,7 +630,7 @@ public extension KeyedDecodingContainer {
     func decodeFloat(forKey key: KeyedDecodingContainer<K>.Key) throws -> Float {
         return try decode(Float.self, forKey: key)
     }
-    
+
     /// Decodes a value of `Dictionary<k, v>` type  where `k: Hashable & Decodable`  and `v: Decodable` for the given key.
     ///
     /// - parameter key: The key that the decoded value is associated with.
@@ -655,10 +642,10 @@ public extension KeyedDecodingContainer {
     ///   for the given key.
     /// - throws: `DecodingError.valueNotFound` if `self` has a null entry for
     ///   the given key.
-    func decodeDic<k, v: Decodable>(forKey key: KeyedDecodingContainer<K>.Key) throws -> Dictionary<k, v> where k: Hashable & Decodable {
-        return try decode(Dictionary<k, v>.self, forKey: key)
+    func decodeDic<k, v: Decodable>(forKey key: KeyedDecodingContainer<K>.Key) throws -> [k: v] where k: Hashable & Decodable {
+        return try decode([k: v].self, forKey: key)
     }
-    
+
     /// Decodes a value of `Array<T>` type where `T: Decodable` for the given key.
     ///
     /// - parameter key: The key that the decoded value is associated with.
@@ -676,7 +663,6 @@ public extension KeyedDecodingContainer {
 }
 
 public extension KeyedDecodingContainer {
-    
     /// Decodes a value of `Bool` type for the given key, if present.
     ///
     /// This method returns `nil` if the container does not have a value
@@ -692,7 +678,7 @@ public extension KeyedDecodingContainer {
     func decodeBoolIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Bool? {
         return try decodeIfPresent(Bool.self, forKey: key)
     }
-    
+
     /// Decodes a value of `String` type for the given key, if present.
     ///
     /// This method returns `nil` if the container does not have a value
@@ -708,7 +694,7 @@ public extension KeyedDecodingContainer {
     func decodeStringIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> String? {
         return try decodeIfPresent(String.self, forKey: key)
     }
-    
+
     /// Decodes a value of `Int` type for the given key, if present.
     ///
     /// This method returns `nil` if the container does not have a value
@@ -724,7 +710,7 @@ public extension KeyedDecodingContainer {
     func decodeIntIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Int? {
         return try decodeIfPresent(Int.self, forKey: key)
     }
-    
+
     /// Decodes a value of `Int8` type for the given key, if present.
     ///
     /// This method returns `nil` if the container does not have a value
@@ -740,7 +726,7 @@ public extension KeyedDecodingContainer {
     func decodeInt8IfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Int8? {
         return try decodeIfPresent(Int8.self, forKey: key)
     }
-    
+
     /// Decodes a value of `Int16` type for the given key, if present.
     ///
     /// This method returns `nil` if the container does not have a value
@@ -756,7 +742,7 @@ public extension KeyedDecodingContainer {
     func decodeInt16IfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Int16? {
         return try decodeIfPresent(Int16.self, forKey: key)
     }
-    
+
     /// Decodes a value of `Int32` type for the given key, if present.
     ///
     /// This method returns `nil` if the container does not have a value
@@ -772,7 +758,7 @@ public extension KeyedDecodingContainer {
     func decodeInt32IfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Int32? {
         return try decodeIfPresent(Int32.self, forKey: key)
     }
-    
+
     /// Decodes a value of `Int64` type for the given key, if present.
     ///
     /// This method returns `nil` if the container does not have a value
@@ -788,7 +774,7 @@ public extension KeyedDecodingContainer {
     func decodeInt64IfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Int64? {
         return try decodeIfPresent(Int64.self, forKey: key)
     }
-    
+
     /// Decodes a value of `UInt` type for the given key, if present.
     ///
     /// This method returns `nil` if the container does not have a value
@@ -804,7 +790,7 @@ public extension KeyedDecodingContainer {
     func decodeUIntIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> UInt? {
         return try decodeIfPresent(UInt.self, forKey: key)
     }
-    
+
     /// Decodes a value of `UInt8` type for the given key, if present.
     ///
     /// This method returns `nil` if the container does not have a value
@@ -820,7 +806,7 @@ public extension KeyedDecodingContainer {
     func decodeUInt8IfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> UInt8? {
         return try decodeIfPresent(UInt8.self, forKey: key)
     }
-    
+
     /// Decodes a value of `UInt16` type for the given key, if present.
     ///
     /// This method returns `nil` if the container does not have a value
@@ -836,7 +822,7 @@ public extension KeyedDecodingContainer {
     func decodetUInt16IfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> UInt16? {
         return try decodeIfPresent(UInt16.self, forKey: key)
     }
-    
+
     /// Decodes a value of `UInt32` type for the given key, if present.
     ///
     /// This method returns `nil` if the container does not have a value
@@ -852,7 +838,7 @@ public extension KeyedDecodingContainer {
     func decodeUInt32IfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> UInt32? {
         return try decodeIfPresent(UInt32.self, forKey: key)
     }
-    
+
     /// Decodes a value of `UInt64` type for the given key, if present.
     ///
     /// This method returns `nil` if the container does not have a value
@@ -868,7 +854,7 @@ public extension KeyedDecodingContainer {
     func decodeUInt64IfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> UInt64? {
         return try decodeIfPresent(UInt64.self, forKey: key)
     }
-    
+
     /// Decodes a value of `Double` type for the given key, if present.
     ///
     /// This method returns `nil` if the container does not have a value
@@ -884,7 +870,7 @@ public extension KeyedDecodingContainer {
     func decodeDoubleIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Double? {
         return try decodeIfPresent(Double.self, forKey: key)
     }
-    
+
     /// Decodes a value of `Decimal` type for the given key, if present.
     ///
     /// This method returns `nil` if the container does not have a value
@@ -900,7 +886,7 @@ public extension KeyedDecodingContainer {
     func decodeDecimalIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Decimal? {
         return try decodeIfPresent(Decimal.self, forKey: key)
     }
-    
+
     /// Decodes a value of `Float` type for the given key, if present.
     ///
     /// This method returns `nil` if the container does not have a value
@@ -916,7 +902,7 @@ public extension KeyedDecodingContainer {
     func decodeFloatIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Float? {
         return try decodeIfPresent(Float.self, forKey: key)
     }
-    
+
     /// Decodes a value of `Dictionary<k, v>` type where `k: Hashable & Decodable`  and `v: Decodable` for the given key, if present.
     ///
     /// This method returns `nil` if the container does not have a value
@@ -929,10 +915,10 @@ public extension KeyedDecodingContainer {
     ///   the value is a null value.
     /// - throws: `DecodingError.typeMismatch` if the encountered encoded value
     ///   is not convertible to `Dictionary<k, v>`  type.
-    func decodeDicIfPresent<k, v: Decodable>(forKey key: KeyedDecodingContainer<K>.Key) throws -> Dictionary<k, v>? where k: Hashable & Decodable {
-        return try decodeIfPresent(Dictionary<k, v>.self, forKey: key)
+    func decodeDicIfPresent<k, v: Decodable>(forKey key: KeyedDecodingContainer<K>.Key) throws -> [k: v]? where k: Hashable & Decodable {
+        return try decodeIfPresent([k: v].self, forKey: key)
     }
-    
+
     /// Decodes a value of `Array<T>` type where `T: Decodable` for the given key, if present.
     ///
     /// This method returns `nil` if the container does not have a value
@@ -951,7 +937,6 @@ public extension KeyedDecodingContainer {
 }
 
 public extension UnkeyedDecodingContainer {
-    
     /// Decodes a value of `Bool` type.
     ///
     /// - parameter type: The type of value to decode.
@@ -964,7 +949,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeBool() throws -> Bool {
         return try decode(Bool.self)
     }
-    
+
     /// Decodes a value of `String` type.
     ///
     /// - returns: A value of `Bool` type, if present for the given key
@@ -976,7 +961,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeString() throws -> String {
         return try decode(String.self)
     }
-    
+
     /// Decodes a value of `Int` type.
     ///
     /// - returns: A value of `Int` type, if present for the given key
@@ -988,7 +973,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeInt() throws -> Int {
         return try decode(Int.self)
     }
-    
+
     /// Decodes a value of `Int8` type.
     ///
     /// - returns: A value of `Int8` type, if present for the given key
@@ -1000,7 +985,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeInt8() throws -> Int8 {
         return try decode(Int8.self)
     }
-    
+
     /// Decodes a value of `Int16` type.
     ///
     /// - returns: A value of `Int16` type, if present for the given key
@@ -1012,7 +997,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeInt16() throws -> Int16 {
         return try decode(Int16.self)
     }
-    
+
     /// Decodes a value of `Int32` type.
     ///
     /// - returns: A value of `Int32` type, if present for the given key
@@ -1024,7 +1009,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeInt32() throws -> Int32 {
         return try decode(Int32.self)
     }
-    
+
     /// Decodes a value of `Int64` type.
     ///
     /// - returns: A value of `Int64` type, if present for the given key
@@ -1036,7 +1021,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeInt64() throws -> Int64 {
         return try decode(Int64.self)
     }
-    
+
     /// Decodes a value of `UInt` type.
     ///
     /// - returns: A value of `UInt` type, if present for the given key
@@ -1048,7 +1033,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeUInt() throws -> UInt {
         return try decode(UInt.self)
     }
-    
+
     /// Decodes a value of `UInt8` type.
     ///
     /// - returns: A value of `UInt8` type, if present for the given key
@@ -1060,7 +1045,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeUInt8() throws -> UInt8 {
         return try decode(UInt8.self)
     }
-    
+
     /// Decodes a value of `UInt16` type.
     ///
     /// - returns: A value of `UInt16` type, if present for the given key
@@ -1072,7 +1057,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeUInt16() throws -> UInt16 {
         return try decode(UInt16.self)
     }
-    
+
     /// Decodes a value of `UInt32` type.
     ///
     /// - returns: A value of `UInt32` type, if present for the given key
@@ -1084,7 +1069,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeUInt32() throws -> UInt32 {
         return try decode(UInt32.self)
     }
-    
+
     /// Decodes a value of `UInt64` type.
     ///
     /// - returns: A value of `UInt64` type, if present for the given key
@@ -1096,7 +1081,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeUInt64() throws -> UInt64 {
         return try decode(UInt64.self)
     }
-    
+
     /// Decodes a value of `Double` type.
     ///
     /// - returns: A value of `Double` type, if present for the given key
@@ -1108,7 +1093,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeDouble() throws -> Double {
         return try decode(Double.self)
     }
-    
+
     /// Decodes a value of `Decimal` type.
     ///
     /// - returns: A value of `Decimal` type, if present for the given key
@@ -1120,7 +1105,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeDecimal() throws -> Decimal {
         return try decode(Decimal.self)
     }
-    
+
     /// Decodes a value of `Float` type.
     ///
     /// - returns: A value of `Float` type, if present for the given key
@@ -1132,7 +1117,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeFloat() throws -> Float {
         return try decode(Float.self)
     }
-    
+
     /// Decodes a value of `Dictionary<k, v>` type where `k: Hashable & Decodable` and `v: Decodable`.
     ///
     /// - returns: A value of `Dictionary<k, v>` type, if present for the given key
@@ -1141,10 +1126,10 @@ public extension UnkeyedDecodingContainer {
     ///   is not convertible to `Dictionary<k, v>`type.
     /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
     ///   is null, or of there are no more values to decode.
-    mutating func decodeDic<k, v: Decodable>() throws -> Dictionary<k, v> where k: Hashable & Decodable {
-        return try decode(Dictionary<k, v>.self)
+    mutating func decodeDic<k, v: Decodable>() throws -> [k: v] where k: Hashable & Decodable {
+        return try decode([k: v].self)
     }
-    
+
     /// Decodes a value of `Array<T>` type where `T: Decodable`.
     ///
     /// - returns: A value of `Array<T>` type, if present for the given key
@@ -1159,7 +1144,6 @@ public extension UnkeyedDecodingContainer {
 }
 
 public extension UnkeyedDecodingContainer {
-    
     /// Decodes a value of `Bool` type, if present.
     ///
     /// This method returns `nil` if the container has no elements left to
@@ -1174,7 +1158,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeBoolIfPresent() throws -> Bool? {
         return try decodeIfPresent(Bool.self)
     }
-    
+
     /// Decodes a value of `String` type, if present.
     ///
     /// This method returns `nil` if the container has no elements left to
@@ -1188,7 +1172,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeStringIfPresent() throws -> String? {
         return try decodeIfPresent(String.self)
     }
-    
+
     /// Decodes a value of `Int` type, if present.
     ///
     /// This method returns `nil` if the container has no elements left to
@@ -1202,7 +1186,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeIntIfPresent() throws -> Int? {
         return try decodeIfPresent(Int.self)
     }
-    
+
     /// Decodes a value of `Int8` type, if present.
     ///
     /// This method returns `nil` if the container has no elements left to
@@ -1216,7 +1200,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeInt8IfPresent() throws -> Int8? {
         return try decodeIfPresent(Int8.self)
     }
-    
+
     /// Decodes a value of `Int16` type, if present.
     ///
     /// This method returns `nil` if the container has no elements left to
@@ -1230,7 +1214,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeInt16IfPresent() throws -> Int16? {
         return try decodeIfPresent(Int16.self)
     }
-    
+
     /// Decodes a value of `Int32` type, if present.
     ///
     /// This method returns `nil` if the container has no elements left to
@@ -1244,7 +1228,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeInt32IfPresent() throws -> Int32? {
         return try decodeIfPresent(Int32.self)
     }
-    
+
     /// Decodes a value of `Int64` type, if present.
     ///
     /// This method returns `nil` if the container has no elements left to
@@ -1258,7 +1242,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeInt64IfPresent() throws -> Int64? {
         return try decodeIfPresent(Int64.self)
     }
-    
+
     /// Decodes a value of `UInt` type, if present.
     ///
     /// This method returns `nil` if the container has no elements left to
@@ -1272,7 +1256,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeUIntIfPresent() throws -> UInt? {
         return try decodeIfPresent(UInt.self)
     }
-    
+
     /// Decodes a value of `UInt8` type, if present.
     ///
     /// This method returns `nil` if the container has no elements left to
@@ -1286,7 +1270,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeUInt8IfPresent() throws -> UInt8? {
         return try decodeIfPresent(UInt8.self)
     }
-    
+
     /// Decodes a value of `UInt16` type, if present.
     ///
     /// This method returns `nil` if the container has no elements left to
@@ -1300,7 +1284,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeUInt16IfPresent() throws -> UInt16? {
         return try decodeIfPresent(UInt16.self)
     }
-    
+
     /// Decodes a value of `UInt32` type, if present.
     ///
     /// This method returns `nil` if the container has no elements left to
@@ -1314,7 +1298,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeUInt32IfPresent() throws -> UInt32? {
         return try decodeIfPresent(UInt32.self)
     }
-    
+
     /// Decodes a value of `UInt64` type, if present.
     ///
     /// This method returns `nil` if the container has no elements left to
@@ -1328,7 +1312,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeUInt64IfPresent() throws -> UInt64? {
         return try decodeIfPresent(UInt64.self)
     }
-    
+
     /// Decodes a value of `Double` type, if present.
     ///
     /// This method returns `nil` if the container has no elements left to
@@ -1342,7 +1326,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeDoubleIfPresent() throws -> Double? {
         return try decodeIfPresent(Double.self)
     }
-    
+
     /// Decodes a value of `Decimal` type, if present.
     ///
     /// This method returns `nil` if the container has no elements left to
@@ -1356,7 +1340,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeDecimalIfPresent() throws -> Decimal? {
         return try decodeIfPresent(Decimal.self)
     }
-    
+
     /// Decodes a value of `Float` type, if present.
     ///
     /// This method returns `nil` if the container has no elements left to
@@ -1370,7 +1354,7 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeIfPresentFloat() throws -> Float? {
         return try decodeIfPresent(Float.self)
     }
-    
+
     /// Decodes a value of `Dictionary<k, v>` type where `k: Hashable & Decodable` and `v: Decodable`, if present.
     ///
     /// This method returns `nil` if the container has no elements left to
@@ -1381,10 +1365,10 @@ public extension UnkeyedDecodingContainer {
     ///   is a null value, or if there are no more elements to decode.
     /// - throws: `DecodingError.typeMismatch` if the encountered encoded value
     ///   is not convertible to `Dictionary<k, v>`  type.
-    mutating func decodeIfPresentDic<k, v: Decodable>() throws -> Dictionary<k, v>? where k: Hashable & Decodable {
-        return try decodeIfPresent(Dictionary<k, v>.self)
+    mutating func decodeIfPresentDic<k, v: Decodable>() throws -> [k: v]? where k: Hashable & Decodable {
+        return try decodeIfPresent([k: v].self)
     }
-    
+
     /// Decodes a value of `Array<T>` type where `T: Decodable`, if present.
     ///
     /// This method returns `nil` if the container has no elements left to
@@ -1398,11 +1382,9 @@ public extension UnkeyedDecodingContainer {
     mutating func decodeIfPresentArray<T: Decodable>() throws -> [T]? {
         return try decodeIfPresent([T].self)
     }
-    
 }
 
 public extension SingleValueDecodingContainer {
-    
     /// Decodes a single value of `Bool` type.
     ///
     /// - returns: A value of `Bool` type.
@@ -1556,7 +1538,7 @@ public extension SingleValueDecodingContainer {
     func decodeUInt64() throws -> UInt64 {
         return try decode(UInt64.self)
     }
-    
+
     /// Decodes a single value of `Decimal` type.
     ///
     /// - returns: A value of `Decimal` type.
@@ -1567,7 +1549,7 @@ public extension SingleValueDecodingContainer {
     func decodeDecimal() throws -> Decimal {
         return try decode(Decimal.self)
     }
-    
+
     /// Decodes a single value of `Dictionary<k, v>` type where `k: Hashable & Decodable`  and `v: Decodable`.
     ///
     /// - returns: A value of `Dictionary<k, v>` type.
@@ -1575,10 +1557,10 @@ public extension SingleValueDecodingContainer {
     ///   cannot be converted to `Dictionary<k, v>` type.
     /// - throws: `DecodingError.valueNotFound` if the encountered encoded value
     ///   is null.
-    func decodeDic<k, v: Decodable>() throws -> Dictionary<k, v> where k: Hashable & Decodable {
-        return try decode(Dictionary<k, v>.self)
+    func decodeDic<k, v: Decodable>() throws -> [k: v] where k: Hashable & Decodable {
+        return try decode([k: v].self)
     }
-    
+
     /// Decodes a single value of `Array<T>` type where `T: Decodable`.
     ///
     /// - returns: A value of `Array<T>` type.
@@ -1589,5 +1571,4 @@ public extension SingleValueDecodingContainer {
     func decodeArray<T: Decodable>() throws -> [T] {
         return try decode([T].self)
     }
-    
 }

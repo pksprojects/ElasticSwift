@@ -6,16 +6,15 @@
 //  Created by Prafull Kumar Soni on 9/15/19.
 //
 
-import XCTest
 import Logging
 import UnitTestSettings
+import XCTest
 
 @testable import ElasticSwiftCodableUtils
 
 class ElasticSwiftCodableUtilsTests: XCTestCase {
-    
     let logger = Logger(label: "org.pksprojects.ElasticSwiftCodableUtilsTests.CodableUtilsTests", factory: logFactory)
-    
+
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
         super.setUp()
@@ -28,7 +27,7 @@ class ElasticSwiftCodableUtilsTests: XCTestCase {
         super.tearDown()
         logger.info("====================TEST=END===============================")
     }
-    
+
     func test_01_CodableValue_decode() throws {
         let json = """
         {
@@ -44,7 +43,7 @@ class ElasticSwiftCodableUtilsTests: XCTestCase {
             }
         }
         """.data(using: .utf8)!
-        
+
         let dictionary = try JSONDecoder().decode([String: CodableValue].self, from: json)
 
         XCTAssertEqual(dictionary["boolean"]?.value as! Bool, true)
@@ -54,7 +53,7 @@ class ElasticSwiftCodableUtilsTests: XCTestCase {
         XCTAssertEqual(dictionary["array"]?.value as! [Int], [1, 2, 3])
         XCTAssertEqual(dictionary["nested"]?.value as! [String: String], ["a": "alpha", "b": "bravo", "c": "charlie"])
     }
-    
+
     func test_02_CodableValue_encode() throws {
         let dictionary: [String: CodableValue] = [
             "boolean": true,
@@ -68,7 +67,7 @@ class ElasticSwiftCodableUtilsTests: XCTestCase {
                 "c": "charlie",
             ],
         ]
-        
+
         let json = try JSONEncoder().encode(dictionary)
         let encodedJSON = try JSONDecoder().decode(CodableValue.self, from: json)
 
@@ -90,7 +89,7 @@ class ElasticSwiftCodableUtilsTests: XCTestCase {
 
         XCTAssertEqual(encodedJSON, expectedJSON)
     }
-    
+
     func test_03_DecodableValue_decode() throws {
         let json = """
         {
@@ -106,7 +105,7 @@ class ElasticSwiftCodableUtilsTests: XCTestCase {
             }
         }
         """.data(using: .utf8)!
-        
+
         let dictionary = try JSONDecoder().decode([String: DecodableValue].self, from: json)
 
         XCTAssertEqual(dictionary["boolean"]?.value as! Bool, true)
@@ -116,7 +115,7 @@ class ElasticSwiftCodableUtilsTests: XCTestCase {
         XCTAssertEqual(dictionary["array"]?.value as! [Int], [1, 2, 3])
         XCTAssertEqual(dictionary["nested"]?.value as! [String: String], ["a": "alpha", "b": "bravo", "c": "charlie"])
     }
-    
+
     func test_04_EncodableValue_encode() throws {
         let dictionary: [String: EncodableValue] = [
             "boolean": true,
@@ -130,7 +129,7 @@ class ElasticSwiftCodableUtilsTests: XCTestCase {
                 "c": "charlie",
             ],
         ]
-        
+
         let json = try JSONEncoder().encode(dictionary)
         let encodedJSON = try JSONDecoder().decode(DecodableValue.self, from: json)
 
@@ -152,36 +151,36 @@ class ElasticSwiftCodableUtilsTests: XCTestCase {
 
         XCTAssertEqual(encodedJSON, expectedJSON)
     }
-    
+
     func test_05_CodableValue_decode() throws {
         let json = """
         {
             "nilVal": null
         }
         """.data(using: .utf8)!
-        
+
         let expectdNil = try JSONDecoder().decode([String: CodableValue].self, from: json)
-        
+
         expectdNil.forEach { k, v in
             print("Key: ", k)
             print("Value: ", v)
         }
-        
+
         XCTAssertEqual(expectdNil["nilVal"]!.value as! NilValue, .nil)
     }
-    
+
     func test_06_CodableValue_decode() throws {
         let json = """
         {
             "nilVal": null
         }
         """.data(using: .utf8)!
-        
+
         let expectdNil = try JSONDecoder().decode([String: CodableValue?].self, from: json)
-        
+
         XCTAssertEqual(expectdNil["nilVal"]!, nil)
     }
-    
+
     func test_07_EncodableValue_encode() throws {
         let dictionary: [String: DecodableValue] = [
             "boolean": true,
@@ -192,7 +191,7 @@ class ElasticSwiftCodableUtilsTests: XCTestCase {
                 "a": "alpha",
                 "b": "bravo",
                 "c": "charlie",
-                "d": nil
+                "d": nil,
             ],
         ]
 

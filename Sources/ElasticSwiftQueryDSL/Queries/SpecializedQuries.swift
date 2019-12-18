@@ -5,89 +5,77 @@
 //  Created by Prafull Kumar Soni on 4/14/18.
 //
 
-import Foundation
 import ElasticSwiftCore
+import Foundation
 
-// MARK:- MoreLikeThis Query
+// MARK: - MoreLikeThis Query
 
 internal struct MoreLikeThisQuery: Query {
-    //TODO remove at time of implementation and conform to Equatable
+    // TODO: remove at time of implementation and conform to Equatable
     func isEqualTo(_ other: Query) -> Bool {
-        return self.name == other.name
+        return name == other.name
     }
+
     public let name: String = ""
-    
-    public init(withBuilder builder: MoreLikeThisQueryBuilder) {
-        
-    }
-    
-    public func toDic() -> [String : Any] {
+
+    public init(withBuilder _: MoreLikeThisQueryBuilder) {}
+
+    public func toDic() -> [String: Any] {
         let dic: [String: Any] = [:]
         return dic
     }
-    
-    
 }
 
-// MARK:- Script Query
+// MARK: - Script Query
 
 internal struct ScriptQuery: Query {
-    //TODO remove at time of implementation and conform to Equatable
+    // TODO: remove at time of implementation and conform to Equatable
     func isEqualTo(_ other: Query) -> Bool {
-        return self.name == other.name
+        return name == other.name
     }
+
     public let name: String = ""
-    
-    public init(withBuilder builder: ScriptQueryBuilder) {
-        
-    }
-    
-    public func toDic() -> [String : Any] {
+
+    public init(withBuilder _: ScriptQueryBuilder) {}
+
+    public func toDic() -> [String: Any] {
         let dic: [String: Any] = [:]
         return dic
     }
-    
-    
 }
 
-// MARK:- Percolate Query
+// MARK: - Percolate Query
 
 internal struct PercoloteQuery: Query {
-    //TODO remove at time of implementation and conform to Equatable
+    // TODO: remove at time of implementation and conform to Equatable
     func isEqualTo(_ other: Query) -> Bool {
-        return self.name == other.name
+        return name == other.name
     }
+
     public let name: String = ""
-    
-    public init(withBuilder builder: PercoloteQueryBuilder) {
-        
-    }
-    
-    public func toDic() -> [String : Any] {
+
+    public init(withBuilder _: PercoloteQueryBuilder) {}
+
+    public func toDic() -> [String: Any] {
         let dic: [String: Any] = [:]
         return dic
     }
-    
-    
 }
 
-// MARK:- Wrapper Query
+// MARK: - Wrapper Query
 
 internal struct WrapperQuery: Query {
-    //TODO remove at time of implementation and conform to Equatable
+    // TODO: remove at time of implementation and conform to Equatable
     func isEqualTo(_ other: Query) -> Bool {
-        return self.name == other.name
+        return name == other.name
     }
+
     public let name: String = ""
-    
-    public init(withBuilder builder: WrapperQueryBuilder) {
-        
-    }
-    
-    public func toDic() -> [String : Any] {
+
+    public init(withBuilder _: WrapperQueryBuilder) {}
+
+    public func toDic() -> [String: Any] {
         let dic: [String: Any] = [:]
         return dic
     }
-    
-    
 }

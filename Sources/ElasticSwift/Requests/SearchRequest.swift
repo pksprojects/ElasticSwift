@@ -6,17 +6,16 @@
 //
 //
 
-import Foundation
-import NIOHTTP1
 import ElasticSwiftCore
 import ElasticSwiftQueryDSL
+import Foundation
+import NIOHTTP1
 
-//MARK:- Search Request Builder
+// MARK: - Search Request Builder
 
 public class SearchRequestBuilder: RequestBuilder {
-    
     public typealias RequestType = SearchRequest
-    
+
     private var _index: String?
     private var _type: String?
     private var _from: Int16?
@@ -27,112 +26,120 @@ public class SearchRequestBuilder: RequestBuilder {
     private var _explain: Bool?
     private var _minScore: Decimal?
     private var _scroll: Scroll?
-    
+
     public init() {}
-    
+
     @discardableResult
     public func set(indices: String...) -> Self {
-        self._index = indices.compactMap({$0}).joined(separator: ",")
+        _index = indices.compactMap { $0 }.joined(separator: ",")
         return self
     }
-    
+
     @available(*, deprecated, message: "Elasticsearch has deprecated use of custom types and will be remove in 7.0")
     @discardableResult
     public func set(types: String...) -> Self {
-        self._type = types.compactMap({$0}).joined(separator: ",")
+        _type = types.compactMap { $0 }.joined(separator: ",")
         return self
     }
-    
+
     @discardableResult
     public func set(from: Int16) -> Self {
-        self._from = from
+        _from = from
         return self
     }
-    
+
     @discardableResult
     public func set(size: Int16) -> Self {
-        self._size = size
+        _size = size
         return self
     }
-    
+
     @discardableResult
     public func set(query: Query) -> Self {
-        self._query = query
+        _query = query
         return self
     }
-    
+
     @discardableResult
     public func set(sort: Sort) -> Self {
-        self._sort = sort
+        _sort = sort
         return self
     }
-    
+
     @discardableResult
     public func fetchSource(_ fetchSource: Bool) -> Self {
-        self._fetchSource = fetchSource
+        _fetchSource = fetchSource
         return self
     }
-    
+
     @discardableResult
     public func explain(_ explain: Bool) -> Self {
-        self._explain = explain
+        _explain = explain
         return self
     }
-    
+
     @discardableResult
     public func set(minScore: Decimal) -> Self {
-        self._minScore = minScore
+        _minScore = minScore
         return self
     }
-    
+
     @discardableResult
     public func set(scroll: Scroll) -> Self {
-        self._scroll = scroll
+        _scroll = scroll
         return self
     }
-    
+
     public var index: String? {
-        return self._index
+        return _index
     }
+
     public var type: String? {
-        return self._type
+        return _type
     }
+
     public var from: Int16? {
-        return self._from
+        return _from
     }
+
     public var size: Int16? {
-        return self._size
+        return _size
     }
+
     public var query: Query? {
-        return self._query
+        return _query
     }
+
     public var sort: Sort? {
-        return self._sort
+        return _sort
     }
+
     public var fetchSource: Bool? {
-        return self._fetchSource
+        return _fetchSource
     }
+
     public var explain: Bool? {
-        return self._explain
+        return _explain
     }
+
     public var minScore: Decimal? {
-        return self._minScore
+        return _minScore
     }
+
     public var scroll: Scroll? {
-        return self._scroll
+        return _scroll
     }
-    
+
     public func build() throws -> SearchRequest {
         return try SearchRequest(withBuilder: self)
     }
 }
 
-//MARK:- Search Request
+// MARK: - Search Request
 
 public struct SearchRequest: Request {
-    
     public var headers: HTTPHeaders = HTTPHeaders()
-    
+
     public let index: String
     public let type: String?
     public let from: Int16?
@@ -142,9 +149,9 @@ public struct SearchRequest: Request {
     public let fetchSource: Bool?
     public let explain: Bool?
     public let minScore: Decimal?
-    
+
     public var scroll: Scroll?
-    
+
     public init(index: String, type: String?, from: Int16?, size: Int16?, query: Query?, sort: Sort?, fetchSource: Bool?, explain: Bool?, minScore: Decimal?, scroll: Scroll?) {
         self.index = index
         self.type = type
@@ -157,53 +164,47 @@ public struct SearchRequest: Request {
         self.minScore = minScore
         self.scroll = scroll
     }
-    
+
     internal init(withBuilder builder: SearchRequestBuilder) throws {
-        self.index = builder.index ?? "_all"
-        self.type = builder.type
-        self.query = builder.query
-        self.from = builder.from
-        self.size = builder.size
-        self.sort = builder.sort
-        self.fetchSource = builder.fetchSource
-        self.explain = builder.explain
-        self.minScore = builder.minScore
-        self.scroll = builder.scroll
+        index = builder.index ?? "_all"
+        type = builder.type
+        query = builder.query
+        from = builder.from
+        size = builder.size
+        sort = builder.sort
+        fetchSource = builder.fetchSource
+        explain = builder.explain
+        minScore = builder.minScore
+        scroll = builder.scroll
     }
-    
+
     public var method: HTTPMethod {
-        get {
-            return .POST
-        }
+        return .POST
     }
-    
+
     public var endPoint: String {
-        get {
-            var path = self.index
-            if let type = self.type {
-                path += "/" + type
-            }
-            return  path + "/_search"
+        var path = index
+        if let type = self.type {
+            path += "/" + type
         }
+        return path + "/_search"
     }
-    
+
     public var queryParams: [URLQueryItem] {
-        get {
-            var queryItems = [URLQueryItem]()
-            if let scroll = self.scroll {
-                queryItems.append(URLQueryItem(name: QueryParams.scroll, value: scroll.keepAlive))
-            }
-            return queryItems
+        var queryItems = [URLQueryItem]()
+        if let scroll = self.scroll {
+            queryItems.append(URLQueryItem(name: QueryParams.scroll, value: scroll.keepAlive))
         }
+        return queryItems
     }
-    
+
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-        let body = Body(query: self.query, sort: self.sort, size: self.size, from: self.from, source: self.fetchSource, explain: self.explain, minScore: self.minScore)
+        let body = Body(query: query, sort: sort, size: size, from: from, source: fetchSource, explain: explain, minScore: minScore)
         return serializer.encode(body).mapError { error -> MakeBodyError in
-            return MakeBodyError.wrapped(error)
+            MakeBodyError.wrapped(error)
         }
     }
-    
+
     struct Body: Encodable {
         public let query: Query?
         public let sort: Sort?
@@ -212,18 +213,18 @@ public struct SearchRequest: Request {
         public let source: Bool?
         public let explain: Bool?
         public let minScore: Decimal?
-        
+
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encodeIfPresent(self.query, forKey: .query)
-            try container.encodeIfPresent(self.sort, forKey: .sort)
-            try container.encodeIfPresent(self.size, forKey: .size)
-            try container.encodeIfPresent(self.from, forKey: .from)
-            try container.encodeIfPresent(self.source, forKey: .source)
-            try container.encodeIfPresent(self.explain, forKey: .explain)
-            try container.encodeIfPresent(self.minScore, forKey: .minScore)
+            try container.encodeIfPresent(query, forKey: .query)
+            try container.encodeIfPresent(sort, forKey: .sort)
+            try container.encodeIfPresent(size, forKey: .size)
+            try container.encodeIfPresent(from, forKey: .from)
+            try container.encodeIfPresent(source, forKey: .source)
+            try container.encodeIfPresent(explain, forKey: .explain)
+            try container.encodeIfPresent(minScore, forKey: .minScore)
         }
-        
+
         enum CodingKeys: String, CodingKey {
             case query
             case sort
@@ -252,9 +253,9 @@ extension SearchRequest: Equatable {
             && lhs.type == rhs.type
             && SearchRequest.matchQueries(lhs.query, rhs.query)
     }
-    
-    private static func matchQueries(_ lhs: Query? , _ rhs: Query?) -> Bool {
-        if lhs == nil && rhs == nil {
+
+    private static func matchQueries(_ lhs: Query?, _ rhs: Query?) -> Bool {
+        if lhs == nil, rhs == nil {
             return true
         }
         if let lhs = lhs, let rhs = rhs {
@@ -264,26 +265,25 @@ extension SearchRequest: Equatable {
     }
 }
 
-// MARK:- Scroll
+// MARK: - Scroll
 
 public struct Scroll: Codable {
-    
     public let keepAlive: String
-    
+
     public init(keepAlive: String) {
         self.keepAlive = keepAlive
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
-        try container.encode(self.keepAlive)
+        try container.encode(keepAlive)
     }
-    
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        self.keepAlive = try container.decodeString()
+        keepAlive = try container.decodeString()
     }
-    
+
     public static var ONE_MINUTE: Scroll {
         return Scroll(keepAlive: "1m")
     }
@@ -291,197 +291,185 @@ public struct Scroll: Codable {
 
 extension Scroll: Equatable {}
 
-
-// MARK:- Search Scroll Request Builder
+// MARK: - Search Scroll Request Builder
 
 public class SearchScrollRequestBuilder: RequestBuilder {
-    
     public typealias RequestType = SearchScrollRequest
-    
+
     private var _scrollId: String?
     private var _scroll: Scroll?
     private var _restTotalHitsAsInt: Bool?
-    
+
     public init() {}
-    
+
     @discardableResult
     public func set(scrollId: String) -> Self {
-        self._scrollId = scrollId
+        _scrollId = scrollId
         return self
     }
-    
+
     @discardableResult
     public func set(scroll: Scroll) -> Self {
-        self._scroll = scroll
+        _scroll = scroll
         return self
     }
-    
+
     @discardableResult
     public func set(restTotalHitsAsInt: Bool) -> Self {
-        self._restTotalHitsAsInt = restTotalHitsAsInt
+        _restTotalHitsAsInt = restTotalHitsAsInt
         return self
     }
-    
+
     public var scrollId: String? {
-        return self._scrollId
+        return _scrollId
     }
+
     public var scroll: Scroll? {
-        return self._scroll
+        return _scroll
     }
+
     public var restTotalHitsAsInt: Bool? {
-        return self._restTotalHitsAsInt
+        return _restTotalHitsAsInt
     }
-    
+
     public func build() throws -> SearchScrollRequest {
         return try SearchScrollRequest(withBuilder: self)
     }
 }
 
-// MARK:- Search Scroll Request
+// MARK: - Search Scroll Request
 
 public struct SearchScrollRequest: Request {
-    
     public let scrollId: String
     public let scroll: Scroll?
-    
+
     public var restTotalHitsAsInt: Bool?
-    
+
     public init(scrollId: String, scroll: Scroll?) {
         self.scrollId = scrollId
         self.scroll = scroll
     }
-    
+
     internal init(withBuilder builder: SearchScrollRequestBuilder) throws {
-        
         guard builder.scrollId != nil else {
             throw RequestBuilderError.missingRequiredField("scrollId")
         }
-        
-        self.scrollId = builder.scrollId!
-        self.scroll = builder.scroll
-        self.restTotalHitsAsInt = builder.restTotalHitsAsInt
+
+        scrollId = builder.scrollId!
+        scroll = builder.scroll
+        restTotalHitsAsInt = builder.restTotalHitsAsInt
     }
-    
+
     public var headers: HTTPHeaders {
         return HTTPHeaders()
     }
-    
+
     public var queryParams: [URLQueryItem] {
         var params = [URLQueryItem]()
         if let totalHitsAsInt = self.restTotalHitsAsInt {
-            params.append(URLQueryItem.init(name: QueryParams.restTotalHitsAsInt, value: totalHitsAsInt))
+            params.append(URLQueryItem(name: QueryParams.restTotalHitsAsInt, value: totalHitsAsInt))
         }
         return params
     }
-    
+
     public var method: HTTPMethod {
-        get {
-            return .POST
-        }
+        return .POST
     }
-    
+
     public var endPoint: String {
         return "_search/scroll"
     }
-    
+
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-        let body =  Body(scroll: self.scroll, scrollId: self.scrollId)
+        let body = Body(scroll: scroll, scrollId: scrollId)
         return serializer.encode(body).mapError { error -> MakeBodyError in
-            return .wrapped(error)
+            .wrapped(error)
         }
     }
-    
+
     private struct Body: Encodable {
-        
         public let scroll: Scroll?
         public let scrollId: String
-        
+
         enum CodingKeys: String, CodingKey {
             case scroll
             case scrollId = "scroll_id"
         }
-        
     }
-    
 }
 
 extension SearchScrollRequest: Equatable {}
 
-
-// MARK:- Clear Scroll Request Builder
+// MARK: - Clear Scroll Request Builder
 
 public class ClearScrollRequestBuilder: RequestBuilder {
-    
     public typealias RequestType = ClearScrollRequest
-    
+
     private var _scrollIds: [String] = []
-    
+
     public init() {}
-    
+
     @discardableResult
     public func set(scrollIds: String...) -> Self {
-        self._scrollIds = scrollIds
+        _scrollIds = scrollIds
         return self
     }
-    
+
     public var scrollIds: [String] {
-        return self._scrollIds
+        return _scrollIds
     }
-    
+
     public func build() throws -> ClearScrollRequest {
         return try ClearScrollRequest(withBuilder: self)
     }
 }
 
-
-// MARK:- Clear Scroll Request
+// MARK: - Clear Scroll Request
 
 public struct ClearScrollRequest: Request {
-    
     public let scrollIds: [String]
-    
+
     public init(scrollId: String) {
         self.init(scrollIds: [scrollId])
     }
-    
+
     public init(scrollIds: [String]) {
         self.scrollIds = scrollIds
     }
-    
+
     internal init(withBuilder builder: ClearScrollRequestBuilder) throws {
-        
         guard !builder.scrollIds.isEmpty else {
             throw RequestBuilderError.atlestOneElementRequired("scrollIds")
         }
-        
+
         if builder.scrollIds.contains("_all") {
-            self.scrollIds = ["_all"]
+            scrollIds = ["_all"]
         } else {
-            self.scrollIds = builder.scrollIds
+            scrollIds = builder.scrollIds
         }
     }
-    
+
     public var headers: HTTPHeaders {
         return HTTPHeaders()
     }
-    
+
     public var queryParams: [URLQueryItem] {
         return []
     }
-    
+
     public var method: HTTPMethod {
         return .DELETE
     }
-    
+
     public var endPoint: String {
-        if self.scrollIds.contains("_all") {
+        if scrollIds.contains("_all") {
             return "_search/scroll/_all"
         } else {
-            return "_search/scroll/\(self.scrollIds.joined(separator: ","))"
+            return "_search/scroll/\(scrollIds.joined(separator: ","))"
         }
     }
-    
-    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+
+    public func makeBody(_: Serializer) -> Result<Data, MakeBodyError> {
         return .failure(.noBodyForRequest)
 //        if self.scrollIds.contains("_all") {
 //            return .failure(.noBodyForRequest)
@@ -492,39 +480,37 @@ public struct ClearScrollRequest: Request {
 //            }
 //        }
     }
-    
+
     private struct Body: Codable, Equatable {
-        
         public let scrollId: [String]
-        
+
         public init(scrollId: [String]) {
             self.scrollId = scrollId
         }
-        
+
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
                 let id = try container.decodeString(forKey: .scrollId)
-                self.scrollId = [id]
+                scrollId = [id]
             } catch Swift.DecodingError.typeMismatch {
-                self.scrollId = try container.decodeArray(forKey: .scrollId)
+                scrollId = try container.decodeArray(forKey: .scrollId)
             }
         }
-        
+
         public func encode(to encoder: Encoder) throws {
-            var container =  encoder.container(keyedBy: CodingKeys.self)
-            if self.scrollId.count == 1 {
-                try container.encode(self.scrollId.first!, forKey: .scrollId)
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            if scrollId.count == 1 {
+                try container.encode(scrollId.first!, forKey: .scrollId)
             } else {
-                try container.encode(self.scrollId, forKey: .scrollId)
+                try container.encode(scrollId, forKey: .scrollId)
             }
         }
-        
+
         enum CodingKeys: String, CodingKey {
             case scrollId = "scroll_id"
         }
     }
-    
 }
 
 extension ClearScrollRequest: Equatable {}

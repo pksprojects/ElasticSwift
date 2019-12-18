@@ -10,18 +10,17 @@ import Foundation
 /// @testable import to include labels in log output
 @testable import Logging
 
-
 let env = ProcessInfo.processInfo.environment
 
 public let TEST_INDEX_PREFIX: String = {
     let prefix = env["TEST_INDEX_PREFIX"]
     return prefix ?? "es_test_index"
-} ()
+}()
 
 public let loggerLevel: Logger.Level = {
     let logLevel = env["LOG_LEVEL"]
-    if let value = logLevel, let level = Logger.Level(rawValue: value.lowercased())  {
-            return level
+    if let value = logLevel, let level = Logger.Level(rawValue: value.lowercased()) {
+        return level
     } else {
         return .debug
     }
@@ -42,7 +41,6 @@ public let isLoggingConfigured: Bool = {
     return true
 }()
 
-
 public let esConnection: ESConnection = {
     var url = URL(string: "http://localhost:9200")!
     let urlString = env["ES_URL"]
@@ -54,7 +52,7 @@ public let esConnection: ESConnection = {
     let isProtected = Bool(env["IS_PROTECTED"] ?? "") ?? true
     let isSecure = Bool(env["IS_SECURE"] ?? "") ?? false
     let cert = env["SSL_CERT"]
-    
+
     return ESConnection(host: url, uname: uname, passwd: passwd, isProtected: isProtected, isSecure: isSecure, certPath: cert)
 }()
 
@@ -66,7 +64,6 @@ public struct ESConnection {
     public let isSecure: Bool
     public let certPath: String?
 }
-
 
 /// Copy of `Logging.StreamLogHandler` with modifications to include label in log output
 ///
@@ -90,16 +87,16 @@ public struct StreamLogHandler: LogHandler {
     private var prettyMetadata: String?
     public var metadata = Logger.Metadata() {
         didSet {
-            self.prettyMetadata = self.prettify(self.metadata)
+            prettyMetadata = prettify(metadata)
         }
     }
 
     public subscript(metadataKey metadataKey: String) -> Logger.Metadata.Value? {
         get {
-            return self.metadata[metadataKey]
+            return metadata[metadataKey]
         }
         set {
-            self.metadata[metadataKey] = newValue
+            metadata[metadataKey] = newValue
         }
     }
 
@@ -112,13 +109,13 @@ public struct StreamLogHandler: LogHandler {
     public func log(level: Logger.Level,
                     message: Logger.Message,
                     metadata: Logger.Metadata?,
-                    file: String, function: String, line: UInt) {
+                    file _: String, function _: String, line _: UInt) {
         let prettyMetadata = metadata?.isEmpty ?? true
             ? self.prettyMetadata
-            : self.prettify(self.metadata.merging(metadata!, uniquingKeysWith: { _, new in new }))
+            : prettify(self.metadata.merging(metadata!, uniquingKeysWith: { _, new in new }))
 
         var stream = self.stream
-        stream.write("\(self.timestamp()) \(level) \(self.label) :\(prettyMetadata.map { " \($0)" } ?? "") \(message)\n")
+        stream.write("\(timestamp()) \(level) \(label) :\(prettyMetadata.map { " \($0)" } ?? "") \(message)\n")
     }
 
     private func prettify(_ metadata: Logger.Metadata) -> String? {

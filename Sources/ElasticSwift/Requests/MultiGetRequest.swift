@@ -5,20 +5,19 @@
 //  Created by Prafull Kumar Soni on 8/23/19.
 //
 
+import ElasticSwiftCore
 import Foundation
 import NIOHTTP1
-import ElasticSwiftCore
 
-// MARK:- Multi-Get Request Builder
+// MARK: - Multi-Get Request Builder
 
 public class MultiGetRequestBuilder: RequestBuilder {
-    
     public typealias RequestType = MultiGetRequest
-    
+
     private var _index: String?
     private var _type: String?
     private var _items: [MultiGetRequest.Item] = []
-    
+
     private var _source: String?
     private var _sourceExcludes: [String]?
     private var _sourceIncludes: [String]?
@@ -27,135 +26,140 @@ public class MultiGetRequestBuilder: RequestBuilder {
     private var _routing: String?
     private var _preference: String?
     private var _storedFields: [String]?
-    
+
     public init() {}
-    
+
     @discardableResult
     @available(*, deprecated, message: "Elasticsearch has deprecated use of custom types and will be remove in 7.0")
     public func set(type: String) -> MultiGetRequestBuilder {
-        self._type = type
+        _type = type
         return self
     }
-    
+
     @discardableResult
     public func set(index: String) -> MultiGetRequestBuilder {
-        self._index = index
+        _index = index
         return self
     }
-    
+
     @discardableResult
     public func set(items: [MultiGetRequest.Item]) -> MultiGetRequestBuilder {
-        self._items = items
+        _items = items
         return self
     }
-    
+
     @discardableResult
     public func add(item: MultiGetRequest.Item) -> MultiGetRequestBuilder {
-        self._items.append(item)
+        _items.append(item)
         return self
     }
-    
+
     @discardableResult
     public func set(source: String) -> MultiGetRequestBuilder {
-        self._source = source
+        _source = source
         return self
     }
-    
+
     @discardableResult
     public func set(sourceExcludes: [String]) -> MultiGetRequestBuilder {
-        self._sourceExcludes = sourceExcludes
+        _sourceExcludes = sourceExcludes
         return self
     }
-    
+
     @discardableResult
     public func set(sourceIncludes: [String]) -> MultiGetRequestBuilder {
-        self._sourceIncludes = sourceIncludes
+        _sourceIncludes = sourceIncludes
         return self
     }
-    
+
     @discardableResult
     public func set(realTime: Bool) -> MultiGetRequestBuilder {
-        self._realTime = realTime
+        _realTime = realTime
         return self
     }
-    
+
     @discardableResult
     public func set(refresh: Bool) -> MultiGetRequestBuilder {
-        self._refresh = refresh
+        _refresh = refresh
         return self
     }
-    
+
     @discardableResult
     public func set(routing: String) -> MultiGetRequestBuilder {
-        self._routing = routing
+        _routing = routing
         return self
     }
-    
+
     @discardableResult
     public func set(preference: String) -> MultiGetRequestBuilder {
-        self._preference = preference
+        _preference = preference
         return self
     }
-    
+
     @discardableResult
     public func set(storedFields: [String]) -> MultiGetRequestBuilder {
-        self._storedFields = storedFields
+        _storedFields = storedFields
         return self
     }
-    
+
     public var index: String? {
-        return self._index
+        return _index
     }
-    
+
     public var type: String? {
-        return self._type
+        return _type
     }
-    
+
     public var source: String? {
-        return self._source
+        return _source
     }
-    
+
     public var items: [MultiGetRequest.Item] {
-        return self._items
+        return _items
     }
-    
+
     public var sourceExcludes: [String]? {
-        return self._sourceExcludes
+        return _sourceExcludes
     }
+
     public var sourceIncludes: [String]? {
-        return self._sourceIncludes
+        return _sourceIncludes
     }
+
     public var realTime: Bool? {
-        return self._realTime
+        return _realTime
     }
+
     public var refresh: Bool? {
-        return self._refresh
+        return _refresh
     }
+
     public var routing: String? {
-        return self._routing
+        return _routing
     }
+
     public var preference: String? {
-        return self._preference
+        return _preference
     }
+
     public var storedFields: [String]? {
-        return self._storedFields
+        return _storedFields
     }
-    
+
     public func build() throws -> MultiGetRequest {
         return try MultiGetRequest(withBuilder: self)
     }
 }
 
-// MARK:- Multi-Get Request
+// MARK: - Multi-Get Request
 
 public struct MultiGetRequest: Request {
-    
     public var headers: HTTPHeaders = HTTPHeaders()
-    
+
     public let index: String?
     public let type: String?
     public let items: [Item]
-    
+
     public var source: String?
     public var sourceExcludes: [String]?
     public var sourceIncludes: [String]?
@@ -164,7 +168,7 @@ public struct MultiGetRequest: Request {
     public var routing: String?
     public var preference: String?
     public var storedFields: [String]?
-    
+
     public init(index: String? = nil, type: String? = nil, items: [MultiGetRequest.Item], source: String? = nil, sourceExcludes: [String]? = nil, sourceIncludes: [String]? = nil, realTime: Bool? = nil, refresh: Bool? = nil, routing: String? = nil, preference: String? = nil, storedFields: [String]? = nil) {
         self.index = index
         self.type = type
@@ -178,27 +182,26 @@ public struct MultiGetRequest: Request {
         self.preference = preference
         self.storedFields = storedFields
     }
-    
+
     internal init(withBuilder builder: MultiGetRequestBuilder) throws {
-        
         guard !builder.items.isEmpty else {
             throw RequestBuilderError.atlestOneElementRequired("item")
         }
-        
-        self.items = builder.items
-        self.index = builder.index
-        self.type = builder.type
-        self.source = builder.source
-        self.preference = builder.preference
-        self.sourceIncludes = builder.sourceIncludes
-        self.sourceExcludes = builder.sourceExcludes
-        self.source = builder.source
-        self.routing = builder.routing
-        self.storedFields = builder.storedFields
-        self.realTime = builder.realTime
-        self.refresh = builder.refresh
+
+        items = builder.items
+        index = builder.index
+        type = builder.type
+        source = builder.source
+        preference = builder.preference
+        sourceIncludes = builder.sourceIncludes
+        sourceExcludes = builder.sourceExcludes
+        source = builder.source
+        routing = builder.routing
+        storedFields = builder.storedFields
+        realTime = builder.realTime
+        refresh = builder.refresh
     }
-    
+
     public var queryParams: [URLQueryItem] {
         var params = [URLQueryItem]()
         if let source = self.source {
@@ -227,11 +230,11 @@ public struct MultiGetRequest: Request {
         }
         return params
     }
-    
+
     public var method: HTTPMethod {
         return .POST
     }
-    
+
     public var endPoint: String {
         var _endPoint = "/_mget"
         if let type = self.type {
@@ -242,20 +245,19 @@ public struct MultiGetRequest: Request {
         }
         return _endPoint
     }
-    
+
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-        let body = Body(docs: self.items)
+        let body = Body(docs: items)
         return serializer.encode(body).mapError { error -> MakeBodyError in
-            return .wrapped(error)
+            .wrapped(error)
         }
     }
-    
+
     struct Body: Encodable {
         public let docs: [Item]
     }
-    
+
     public struct Item: Codable, Equatable {
-        
         public let index: String
         public let type: String?
         public let id: String
@@ -265,7 +267,7 @@ public struct MultiGetRequest: Request {
         public let sourceIncludes: [String]?
         public let sourceExcludes: [String]?
         public let storedFields: [String]?
-        
+
         public init(index: String, type: String? = nil, id: String, routing: String? = nil, parent: String? = nil, fetchSource: Bool? = nil, sourceIncludes: [String]? = nil, sourceExcludes: [String]? = nil, storedFields: [String]? = nil) {
             self.index = index
             self.type = type
@@ -277,7 +279,7 @@ public struct MultiGetRequest: Request {
             self.sourceExcludes = sourceExcludes
             self.storedFields = storedFields
         }
-        
+
         enum CodingKeys: String, CodingKey {
             case index = "_index"
             case type = "_type"
@@ -287,57 +289,55 @@ public struct MultiGetRequest: Request {
             case source = "_source"
             case storedFields = "stored_fields"
         }
-        
+
         enum SourceCodingKeys: String, CodingKey {
             case include
             case exclude
         }
-        
+
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(self.index, forKey: .index)
-            try container.encode(self.id, forKey: .id)
-            try container.encodeIfPresent(self.type, forKey: .type)
-            try container.encodeIfPresent(self.routing, forKey: .routing)
-            try container.encodeIfPresent(self.parent, forKey: .parent)
-            try container.encodeIfPresent(self.storedFields, forKey: .storedFields)
+            try container.encode(index, forKey: .index)
+            try container.encode(id, forKey: .id)
+            try container.encodeIfPresent(type, forKey: .type)
+            try container.encodeIfPresent(routing, forKey: .routing)
+            try container.encodeIfPresent(parent, forKey: .parent)
+            try container.encodeIfPresent(storedFields, forKey: .storedFields)
             if let fetchSource = self.fetchSource, self.sourceIncludes == nil && self.sourceExcludes == nil {
-                try  container.encodeIfPresent(fetchSource, forKey: .source)
-            } else if self.sourceIncludes != nil || self.sourceExcludes != nil {
+                try container.encodeIfPresent(fetchSource, forKey: .source)
+            } else if sourceIncludes != nil || sourceExcludes != nil {
                 var nested = container.nestedContainer(keyedBy: SourceCodingKeys.self, forKey: .source)
-                try nested.encodeIfPresent(self.sourceIncludes, forKey: .include)
-                try nested.encodeIfPresent(self.sourceExcludes, forKey: .exclude)
+                try nested.encodeIfPresent(sourceIncludes, forKey: .include)
+                try nested.encodeIfPresent(sourceExcludes, forKey: .exclude)
             }
         }
-        
+
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.index = try container.decode(String.self, forKey: .index)
-            self.id = try container.decode(String.self, forKey: .id)
-            self.type = try container.decodeIfPresent(String.self, forKey: .type)
-            self.routing = try container.decodeIfPresent(String.self, forKey: .routing)
-            self.parent = try container.decodeIfPresent(String.self, forKey: .parent)
-            self.storedFields = try container.decodeIfPresent([String].self, forKey: .storedFields)
+            index = try container.decode(String.self, forKey: .index)
+            id = try container.decode(String.self, forKey: .id)
+            type = try container.decodeIfPresent(String.self, forKey: .type)
+            routing = try container.decodeIfPresent(String.self, forKey: .routing)
+            parent = try container.decodeIfPresent(String.self, forKey: .parent)
+            storedFields = try container.decodeIfPresent([String].self, forKey: .storedFields)
             do {
-                self.fetchSource = try container.decodeIfPresent(Bool.self, forKey: .source)
-                self.sourceIncludes = nil
-                self.sourceExcludes = nil
+                fetchSource = try container.decodeIfPresent(Bool.self, forKey: .source)
+                sourceIncludes = nil
+                sourceExcludes = nil
             } catch {
                 do {
-                    self.sourceIncludes = try container.decode([String].self, forKey: .source)
-                    self.fetchSource = nil
-                    self.sourceExcludes = nil
+                    sourceIncludes = try container.decode([String].self, forKey: .source)
+                    fetchSource = nil
+                    sourceExcludes = nil
                 } catch {
                     let sourceContainer = try container.nestedContainer(keyedBy: SourceCodingKeys.self, forKey: .source)
-                    self.fetchSource = nil
-                    self.sourceIncludes = try sourceContainer.decodeIfPresent([String].self, forKey: .include)
-                    self.sourceExcludes = try sourceContainer.decodeIfPresent([String].self, forKey: .exclude)
+                    fetchSource = nil
+                    sourceIncludes = try sourceContainer.decodeIfPresent([String].self, forKey: .include)
+                    sourceExcludes = try sourceContainer.decodeIfPresent([String].self, forKey: .exclude)
                 }
             }
         }
     }
-    
-    
 }
 
 extension MultiGetRequest: Equatable {
@@ -350,4 +350,3 @@ extension MultiGetRequest: Equatable {
             && lhs.queryParams == rhs.queryParams
     }
 }
-

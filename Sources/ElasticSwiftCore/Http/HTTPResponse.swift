@@ -6,131 +6,129 @@
 //
 
 import Foundation
-import NIOHTTP1
 import Logging
+import NIOHTTP1
 
-//MARK:- HTTPResponse
+// MARK: - HTTPResponse
 
 /// Represents a HTTPResponse returned from Elasticsearch
 public struct HTTPResponse {
-    
     public let request: HTTPRequest
-    
+
     public let status: HTTPResponseStatus
     public let headers: HTTPHeaders
     public var body: Data?
-    
+
     public init(request: HTTPRequest, status: HTTPResponseStatus, headers: HTTPHeaders, body: Data?) {
         self.status = status
         self.headers = headers
         self.body = body
         self.request = request
     }
-    
+
     internal init(withBuilder builder: HTTPResponseBuilder) throws {
-        
         guard builder.request != nil else {
             throw HTTPResponseBuilderError("request can't be nil")
         }
-        
+
         guard builder.headers != nil else {
             throw HTTPResponseBuilderError("headers can't be nil")
         }
-        
+
         guard builder.status != nil else {
             throw HTTPResponseBuilderError("status can't be nil")
         }
-        
-        self.request = builder.request!
-        self.status =  builder.status!
-        self.headers = builder.headers!
-        self.body = builder.body
+
+        request = builder.request!
+        status = builder.status!
+        headers = builder.headers!
+        body = builder.body
     }
 }
 
 extension HTTPResponse: Equatable {}
 
-//MARK:- HTTPResponseBuilder
+// MARK: - HTTPResponseBuilder
 
 /// Builder for `HTTPResponse`
 public class HTTPResponseBuilder {
-    
     private var _request: HTTPRequest?
     private var _status: HTTPResponseStatus?
     private var _headers: HTTPHeaders?
     private var _body: Data?
-    
+
     public init() {}
-    
+
     @discardableResult
     public func set(headers: HTTPHeaders) -> HTTPResponseBuilder {
-        self._headers = headers
+        _headers = headers
         return self
     }
-    
+
     @discardableResult
     public func set(request: HTTPRequest) -> HTTPResponseBuilder {
-        self._request = request
+        _request = request
         return self
     }
-    
+
     @discardableResult
     public func set(status: HTTPResponseStatus) -> HTTPResponseBuilder {
-        self._status = status
+        _status = status
         return self
     }
-    
+
     @discardableResult
     public func set(body: Data) -> HTTPResponseBuilder {
-        self._body = body
+        _body = body
         return self
     }
-    
+
     public var request: HTTPRequest? {
-        return self._request
+        return _request
     }
+
     public var status: HTTPResponseStatus? {
-        return self._status
+        return _status
     }
+
     public var headers: HTTPHeaders? {
-        return self._headers
+        return _headers
     }
+
     public var body: Data? {
-        return self._body
+        return _body
     }
-    
+
     public func build() throws -> HTTPResponse {
         return try HTTPResponse(withBuilder: self)
     }
 }
 
-//MARK:- HTTPResponseStatus
+// MARK: - HTTPResponseStatus
 
 /// Helper extention for HTTPResponseStatus
 extension HTTPResponseStatus {
-    
     public func is1xxInformational() -> Bool {
-        return self.code >= 100 && self.code < 200
+        return code >= 100 && code < 200
     }
-    
+
     public func is2xxSuccessful() -> Bool {
-        return self.code >= 200 && self.code < 300
+        return code >= 200 && code < 300
     }
-    
+
     public func is3xxRedirection() -> Bool {
-        return self.code >= 300 && self.code < 400
+        return code >= 300 && code < 400
     }
-    
+
     public func is4xxClientError() -> Bool {
-        return self.code >= 400 && self.code < 500
+        return code >= 400 && code < 500
     }
-    
+
     public func is5xxServerError() -> Bool {
-        return self.code >= 500 && self.code < 600
+        return code >= 500 && code < 600
     }
-    
+
     public func isError() -> Bool {
-        return self.is4xxClientError() || self.is5xxServerError()
+        return is4xxClientError() || is5xxServerError()
     }
-    
 }
