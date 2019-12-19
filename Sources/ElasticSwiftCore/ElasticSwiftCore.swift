@@ -88,6 +88,7 @@ public enum QueryParams: String {
     case payloads
     case scroll
     case restTotalHitsAsInt = "rest_total_hits_as_int"
+    case searchType = "search_type"
 }
 
 enum EndPointCategory: String {

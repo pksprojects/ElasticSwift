@@ -22,10 +22,11 @@ public class SearchRequestBuilder: RequestBuilder {
     private var _size: Int16?
     private var _query: Query?
     private var _sort: Sort?
-    private var _fetchSource: Bool?
+    private var _sourceFilter: SourceFilter?
     private var _explain: Bool?
     private var _minScore: Decimal?
     private var _scroll: Scroll?
+    private var _searchType: SearchType?
 
     public init() {}
 
@@ -67,8 +68,8 @@ public class SearchRequestBuilder: RequestBuilder {
     }
 
     @discardableResult
-    public func fetchSource(_ fetchSource: Bool) -> Self {
-        _fetchSource = fetchSource
+    public func set(sourceFilter: SourceFilter) -> Self {
+        _sourceFilter = sourceFilter
         return self
     }
 
@@ -87,6 +88,12 @@ public class SearchRequestBuilder: RequestBuilder {
     @discardableResult
     public func set(scroll: Scroll) -> Self {
         _scroll = scroll
+        return self
+    }
+
+    @discardableResult
+    public func set(searchType: SearchType) -> Self {
+        _searchType = searchType
         return self
     }
 
@@ -114,8 +121,8 @@ public class SearchRequestBuilder: RequestBuilder {
         return _sort
     }
 
-    public var fetchSource: Bool? {
-        return _fetchSource
+    public var sourceFilter: SourceFilter? {
+        return _sourceFilter
     }
 
     public var explain: Bool? {
@@ -128,6 +135,10 @@ public class SearchRequestBuilder: RequestBuilder {
 
     public var scroll: Scroll? {
         return _scroll
+    }
+
+    public var searchType: SearchType? {
+        return _searchType
     }
 
     public func build() throws -> SearchRequest {
@@ -146,20 +157,21 @@ public struct SearchRequest: Request {
     public let size: Int16?
     public let query: Query?
     public let sort: Sort?
-    public let fetchSource: Bool?
+    public let sourceFilter: SourceFilter?
     public let explain: Bool?
     public let minScore: Decimal?
 
     public var scroll: Scroll?
+    public var searchType: SearchType?
 
-    public init(index: String, type: String?, from: Int16?, size: Int16?, query: Query?, sort: Sort?, fetchSource: Bool?, explain: Bool?, minScore: Decimal?, scroll: Scroll?) {
+    public init(index: String, type: String?, from: Int16?, size: Int16?, query: Query?, sort: Sort?, sourceFilter: SourceFilter?, explain: Bool?, minScore: Decimal?, scroll: Scroll?) {
         self.index = index
         self.type = type
         self.from = from
         self.size = size
         self.query = query
         self.sort = sort
-        self.fetchSource = fetchSource
+        self.sourceFilter = sourceFilter
         self.explain = explain
         self.minScore = minScore
         self.scroll = scroll
@@ -172,10 +184,11 @@ public struct SearchRequest: Request {
         from = builder.from
         size = builder.size
         sort = builder.sort
-        fetchSource = builder.fetchSource
+        sourceFilter = builder.sourceFilter
         explain = builder.explain
         minScore = builder.minScore
         scroll = builder.scroll
+        searchType = builder.searchType
     }
 
     public var method: HTTPMethod {
@@ -195,11 +208,14 @@ public struct SearchRequest: Request {
         if let scroll = self.scroll {
             queryItems.append(URLQueryItem(name: QueryParams.scroll, value: scroll.keepAlive))
         }
+        if let searchType = self.searchType {
+            queryItems.append(URLQueryItem(name: QueryParams.searchType, value: searchType.rawValue))
+        }
         return queryItems
     }
 
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-        let body = Body(query: query, sort: sort, size: size, from: from, source: fetchSource, explain: explain, minScore: minScore)
+        let body = Body(query: query, sort: sort, size: size, from: from, source: sourceFilter, explain: explain, minScore: minScore)
         return serializer.encode(body).mapError { error -> MakeBodyError in
             MakeBodyError.wrapped(error)
         }
@@ -210,7 +226,7 @@ public struct SearchRequest: Request {
         public let sort: Sort?
         public let size: Int16?
         public let from: Int16?
-        public let source: Bool?
+        public let source: SourceFilter?
         public let explain: Bool?
         public let minScore: Decimal?
 
@@ -241,7 +257,7 @@ extension SearchRequest: Equatable {
     public static func == (lhs: SearchRequest, rhs: SearchRequest) -> Bool {
         return lhs.index == rhs.index
             && lhs.explain == rhs.explain
-            && lhs.fetchSource == rhs.fetchSource
+            && lhs.sourceFilter == rhs.sourceFilter
             && lhs.from == rhs.from
             && lhs.endPoint == rhs.endPoint
             && lhs.headers == rhs.headers
@@ -514,3 +530,80 @@ public struct ClearScrollRequest: Request {
 }
 
 extension ClearScrollRequest: Equatable {}
+
+// MARK: - Search Type
+
+/// Search type represent the manner at which the search operation is executed.
+public enum SearchType: String, Codable {
+    /// Same as [query_then_fetch](x-source-tag://query_then_fetch), except for an initial scatter phase which goes and computes the distributed
+    /// term frequencies for more accurate scoring.
+    case dfs_query_then_fetch
+    /// The query is executed against all shards, but only enough information is returned (not the document content).
+    /// The results are then sorted and ranked, and based on it, only the relevant shards are asked for the actual
+    /// document content. The return number of hits is exactly as specified in size, since they are the only ones that
+    /// are fetched. This is very handy when the index has a lot of shards (not replicas, shard id groups).
+    /// - Tag: `query_then_fetch`
+    case query_then_fetch
+
+    /// Only used for pre 5.3 request where this type is still needed
+    @available(*, deprecated, message: "Only used for pre 5.3 request where this type is still needed")
+    case query_and_fetch
+
+    /// The default search type [query_then_fetch](x-source-tag://query_then_fetch)
+    public static let DEFAULT = SearchType.query_then_fetch
+}
+
+// MARK: - Source Filtering
+
+public enum SourceFilter {
+    case fetchSource(Bool)
+    case filter(String)
+    case filters([String])
+    case source(includes: [String], excludes: [String])
+}
+
+extension SourceFilter: Codable {
+    enum CodingKeys: String, CodingKey {
+        case includes
+        case excludes
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        switch self {
+        case let .fetchSource(value):
+            var contianer = encoder.singleValueContainer()
+            try contianer.encode(value)
+        case let .filter(value):
+            var contianer = encoder.singleValueContainer()
+            try contianer.encode(value)
+        case let .filters(values):
+            var contianer = encoder.unkeyedContainer()
+            try contianer.encode(contentsOf: values)
+        case let .source(includes, excludes):
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(includes, forKey: .includes)
+            try container.encode(excludes, forKey: .excludes)
+        }
+    }
+
+    public init(from decoder: Decoder) throws {
+        if let container = try? decoder.container(keyedBy: CodingKeys.self) {
+            let includes: [String] = try container.decodeArray(forKey: .includes)
+            let excludes: [String] = try container.decodeArray(forKey: .excludes)
+            self = .source(includes: includes, excludes: excludes)
+        } else if var contianer = try? decoder.unkeyedContainer() {
+            let values: [String] = try contianer.decodeArray()
+            self = .filters(values)
+        } else {
+            let container = try decoder.singleValueContainer()
+            if let value = try? container.decodeString() {
+                self = .filter(value)
+            } else {
+                let value = try container.decodeBool()
+                self = .fetchSource(value)
+            }
+        }
+    }
+}
+
+extension SourceFilter: Equatable {}
