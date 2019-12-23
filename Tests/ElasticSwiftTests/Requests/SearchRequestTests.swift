@@ -803,4 +803,102 @@ class SearchRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
+    
+    func test_14_Search_post_filter() throws {
+        let e = expectation(description: "execution complete")
+
+        func handler(_ result: Result<SearchResponse<Shirt>, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+                XCTAssert(false)
+            case let .success(response):
+                XCTAssertNotNil(response.hits)
+                XCTAssertTrue(response.hits.hits.count == 1, "Count \(response.hits.hits.count)")
+                for hit in response.hits.hits {
+                    XCTAssertNotNil(hit.id, "id is nil \(hit)")
+                    XCTAssertNotNil(hit.type, "type is nil \(hit)")
+                    XCTAssertNotNil(hit.source, "source is nil \(hit)")
+                }
+            }
+
+            e.fulfill()
+        }
+        
+        let postFilter = try QueryBuilders.termQuery()
+            .set(field: "color")
+            .set(value: "red")
+            .build()
+        
+        let request = try SearchRequestBuilder()
+            .set(indices: indexName)
+            .set(query: MatchAllQuery())
+            .set(postFilter: postFilter)
+            .build()
+
+        /// make sure doc exists
+        func handler1(_ result: Result<IndexResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+            case let .success(response):
+                logger.info("Found \(response.result)")
+            }
+            client.search(request, completionHandler: handler)
+        }
+        var shirt = Shirt()
+        shirt.brand = "gucci"
+        shirt.color = "red"
+        shirt.model = "slim"
+        var request1 = try IndexRequestBuilder<Shirt>()
+            .set(index: indexName)
+            .set(source: shirt)
+            .set(id: "1")
+            .build()
+        request1.refresh = .true
+        
+        shirt.color = "blue"
+        var request2 = try IndexRequestBuilder<Shirt>()
+            .set(index: indexName)
+            .set(source: shirt)
+            .set(id: "2")
+            .build()
+        request1.refresh = .true
+        
+        
+        func createIndexHandler(_ result: Result<CreateIndexResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+            case let .success(response):
+                logger.info("Found \(response.acknowledged)")
+            }
+            client.index(request1) { result in
+                self.client.index(request2, completionHandler: handler1)
+            }
+        }
+        
+        let createIndexRequest = try CreateIndexRequestBuilder()
+        .set(name: indexName)
+        .set(mappings: [
+            "_doc": MappingMetaData(type: nil, fields: nil, analyzer: nil, store: nil, termVector: nil, properties: [
+                "brand": MappingMetaData(type: "keyword", fields: nil, analyzer: nil, store: true, termVector: nil, properties: nil),
+                "color": MappingMetaData(type: "keyword", fields: nil, analyzer: nil, store: true, termVector: nil, properties: nil),
+                "model": MappingMetaData(type: "keyword", fields: nil, analyzer: nil, store: true, termVector: nil, properties: nil),
+            ]),
+        ])
+        .build()
+
+        client.indices.create(createIndexRequest, completionHandler: createIndexHandler)
+        
+        waitForExpectations(timeout: 10)
+    }
+}
+
+struct Shirt: Codable, Equatable {
+    var brand: String?
+    var color: String?
+    var model: String?
+    
+    init() {}
 }
