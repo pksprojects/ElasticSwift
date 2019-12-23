@@ -105,8 +105,8 @@ public struct Hits<T: Codable>: Codable, Equatable where T: Equatable {
 
 public struct SearchHit<T: Codable>: Codable, Equatable where T: Equatable {
     public let index: String
-    public let type: String
-    public let id: String
+    public let type: String?
+    public let id: String?
     public let score: Decimal?
     public let source: T?
     public let sort: [CodableValue]?

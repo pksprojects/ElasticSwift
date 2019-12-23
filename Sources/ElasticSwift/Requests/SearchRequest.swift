@@ -33,6 +33,7 @@ public class SearchRequestBuilder: RequestBuilder {
     private var _version: Bool?
     private var _preference: String?
     private var _scriptFields: [ScriptField]?
+    private var _storedFields: [String]?
 
     public init() {}
 
@@ -169,6 +170,18 @@ public class SearchRequestBuilder: RequestBuilder {
         return self
     }
     
+    @discardableResult
+    public func set(storedFields: String...) -> Self {
+        _storedFields = storedFields
+        return self
+    }
+    
+    @discardableResult
+    public func set(storedFields: [String]) -> Self {
+        _storedFields = storedFields
+        return self
+    }
+    
     public var index: String? {
         return _index
     }
@@ -236,6 +249,10 @@ public class SearchRequestBuilder: RequestBuilder {
     public var scriptFields: [ScriptField]? {
         return _scriptFields
     }
+    
+    public var storedFields: [String]? {
+        return _storedFields
+    }
 
     public func build() throws -> SearchRequest {
         return try SearchRequest(withBuilder: self)
@@ -261,12 +278,13 @@ public struct SearchRequest: Request {
     public let seqNoPrimaryTerm: Bool?
     public let version: Bool?
     public let scriptFields: [ScriptField]?
+    public let storedFields: [String]?
 
     public var scroll: Scroll?
     public var searchType: SearchType?
     public var preference: String?
 
-    public init(index: String, type: String?, from: Int16?, size: Int16?, query: Query?, sorts: [Sort]?, sourceFilter: SourceFilter?, explain: Bool?, minScore: Decimal?, scroll: Scroll?, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool?, preference: String? = nil, scriptFields: [ScriptField]? = nil) {
+    public init(index: String, type: String?, from: Int16?, size: Int16?, query: Query?, sorts: [Sort]?, sourceFilter: SourceFilter?, explain: Bool?, minScore: Decimal?, scroll: Scroll?, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool?, preference: String? = nil, scriptFields: [ScriptField]? = nil, storedFields: [String]? = nil) {
         self.index = index
         self.type = type
         self.from = from
@@ -283,6 +301,7 @@ public struct SearchRequest: Request {
         self.version = version
         self.preference = preference
         self.scriptFields = scriptFields
+        self.storedFields = storedFields
     }
 
     internal init(withBuilder builder: SearchRequestBuilder) throws {
@@ -303,6 +322,7 @@ public struct SearchRequest: Request {
         version = builder.version
         preference = builder.preference
         scriptFields = builder.scriptFields
+        storedFields = builder.storedFields
     }
 
     public var method: HTTPMethod {
@@ -332,7 +352,7 @@ public struct SearchRequest: Request {
     }
 
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-        let body = Body(query: query, sort: sorts, size: size, from: from, source: sourceFilter, explain: explain, minScore: minScore, trackScores: trackScores, indicesBoost: indicesBoost, seqNoPrimaryTerm: seqNoPrimaryTerm, version: version, scriptFields: scriptFields)
+        let body = Body(query: query, sort: sorts, size: size, from: from, source: sourceFilter, explain: explain, minScore: minScore, trackScores: trackScores, indicesBoost: indicesBoost, seqNoPrimaryTerm: seqNoPrimaryTerm, version: version, scriptFields: scriptFields, storedFields: storedFields)
         return serializer.encode(body).mapError { error -> MakeBodyError in
             MakeBodyError.wrapped(error)
         }
@@ -351,6 +371,7 @@ public struct SearchRequest: Request {
         public let seqNoPrimaryTerm: Bool?
         public let version: Bool?
         public let scriptFields: [ScriptField]?
+        public let storedFields: [String]?
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
@@ -365,6 +386,7 @@ public struct SearchRequest: Request {
             try container.encodeIfPresent(indicesBoost, forKey: .indicesBoost)
             try container.encodeIfPresent(seqNoPrimaryTerm, forKey: .seqNoPrimaryTerm)
             try container.encodeIfPresent(version, forKey: .version)
+            try container.encodeIfPresent(storedFields, forKey: .storedFields)
             if let scriptFields = self.scriptFields, !scriptFields.isEmpty {
                 if scriptFields.count == 1 {
                     try container.encode(scriptFields[0], forKey: .scriptFields)
@@ -391,6 +413,7 @@ public struct SearchRequest: Request {
             case seqNoPrimaryTerm = "seq_no_primary_term"
             case version
             case scriptFields = "script_fields"
+            case storedFields = "stored_fields"
         }
     }
 }
@@ -416,6 +439,7 @@ extension SearchRequest: Equatable {
             && lhs.seqNoPrimaryTerm == rhs.seqNoPrimaryTerm
             && lhs.version == rhs.version
             && lhs.preference == rhs.preference
+            && lhs.storedFields == rhs.storedFields
             && SearchRequest.matchQueries(lhs.query, rhs.query)
     }
 
