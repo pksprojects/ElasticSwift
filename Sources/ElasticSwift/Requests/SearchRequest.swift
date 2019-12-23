@@ -27,6 +27,7 @@ public class SearchRequestBuilder: RequestBuilder {
     private var _minScore: Decimal?
     private var _scroll: Scroll?
     private var _searchType: SearchType?
+    private var _trackScores: Bool?
 
     public init() {}
 
@@ -97,6 +98,12 @@ public class SearchRequestBuilder: RequestBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(trackScores: Bool) -> Self {
+        _trackScores = trackScores
+        return self
+    }
+    
     public var index: String? {
         return _index
     }
@@ -140,6 +147,10 @@ public class SearchRequestBuilder: RequestBuilder {
     public var searchType: SearchType? {
         return _searchType
     }
+    
+    public var trackScores: Bool? {
+        return _trackScores
+    }
 
     public func build() throws -> SearchRequest {
         return try SearchRequest(withBuilder: self)
@@ -160,11 +171,12 @@ public struct SearchRequest: Request {
     public let sourceFilter: SourceFilter?
     public let explain: Bool?
     public let minScore: Decimal?
+    public let trackScores: Bool?
 
     public var scroll: Scroll?
     public var searchType: SearchType?
 
-    public init(index: String, type: String?, from: Int16?, size: Int16?, query: Query?, sort: Sort?, sourceFilter: SourceFilter?, explain: Bool?, minScore: Decimal?, scroll: Scroll?) {
+    public init(index: String, type: String?, from: Int16?, size: Int16?, query: Query?, sort: Sort?, sourceFilter: SourceFilter?, explain: Bool?, minScore: Decimal?, scroll: Scroll?, trackScores: Bool? = nil) {
         self.index = index
         self.type = type
         self.from = from
@@ -175,6 +187,7 @@ public struct SearchRequest: Request {
         self.explain = explain
         self.minScore = minScore
         self.scroll = scroll
+        self.trackScores = trackScores
     }
 
     internal init(withBuilder builder: SearchRequestBuilder) throws {
@@ -189,6 +202,7 @@ public struct SearchRequest: Request {
         minScore = builder.minScore
         scroll = builder.scroll
         searchType = builder.searchType
+        trackScores = builder.trackScores
     }
 
     public var method: HTTPMethod {
@@ -215,7 +229,7 @@ public struct SearchRequest: Request {
     }
 
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-        let body = Body(query: query, sort: sort, size: size, from: from, source: sourceFilter, explain: explain, minScore: minScore)
+        let body = Body(query: query, sort: sort, size: size, from: from, source: sourceFilter, explain: explain, minScore: minScore, trackScores: trackScores)
         return serializer.encode(body).mapError { error -> MakeBodyError in
             MakeBodyError.wrapped(error)
         }
@@ -229,6 +243,7 @@ public struct SearchRequest: Request {
         public let source: SourceFilter?
         public let explain: Bool?
         public let minScore: Decimal?
+        public let trackScores: Bool?
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
@@ -239,6 +254,7 @@ public struct SearchRequest: Request {
             try container.encodeIfPresent(source, forKey: .source)
             try container.encodeIfPresent(explain, forKey: .explain)
             try container.encodeIfPresent(minScore, forKey: .minScore)
+            try container.encodeIfPresent(trackScores, forKey: .trackScores)
         }
 
         enum CodingKeys: String, CodingKey {
@@ -249,6 +265,7 @@ public struct SearchRequest: Request {
             case source = "_source"
             case explain
             case minScore = "min_score"
+            case trackScores = "track_scores"
         }
     }
 }
