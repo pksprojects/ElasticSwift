@@ -21,7 +21,7 @@ public class SearchRequestBuilder: RequestBuilder {
     private var _from: Int16?
     private var _size: Int16?
     private var _query: Query?
-    private var _sort: Sort?
+    private var _sorts: [Sort]?
     private var _sourceFilter: SourceFilter?
     private var _explain: Bool?
     private var _minScore: Decimal?
@@ -63,8 +63,8 @@ public class SearchRequestBuilder: RequestBuilder {
     }
 
     @discardableResult
-    public func set(sort: Sort) -> Self {
-        _sort = sort
+    public func set(sorts: [Sort]) -> Self {
+        _sorts = sorts
         return self
     }
 
@@ -104,6 +104,16 @@ public class SearchRequestBuilder: RequestBuilder {
         return self
     }
     
+    @discardableResult
+    public func add(sort: Sort) -> Self {
+        if self._sorts != nil {
+            _sorts?.append(sort)
+        } else {
+            _sorts = [sort]
+        }
+        return self
+    }
+    
     public var index: String? {
         return _index
     }
@@ -124,8 +134,8 @@ public class SearchRequestBuilder: RequestBuilder {
         return _query
     }
 
-    public var sort: Sort? {
-        return _sort
+    public var sorts: [Sort]? {
+        return _sorts
     }
 
     public var sourceFilter: SourceFilter? {
@@ -167,7 +177,7 @@ public struct SearchRequest: Request {
     public let from: Int16?
     public let size: Int16?
     public let query: Query?
-    public let sort: Sort?
+    public let sorts: [Sort]?
     public let sourceFilter: SourceFilter?
     public let explain: Bool?
     public let minScore: Decimal?
@@ -176,13 +186,13 @@ public struct SearchRequest: Request {
     public var scroll: Scroll?
     public var searchType: SearchType?
 
-    public init(index: String, type: String?, from: Int16?, size: Int16?, query: Query?, sort: Sort?, sourceFilter: SourceFilter?, explain: Bool?, minScore: Decimal?, scroll: Scroll?, trackScores: Bool? = nil) {
+    public init(index: String, type: String?, from: Int16?, size: Int16?, query: Query?, sorts: [Sort]?, sourceFilter: SourceFilter?, explain: Bool?, minScore: Decimal?, scroll: Scroll?, trackScores: Bool? = nil) {
         self.index = index
         self.type = type
         self.from = from
         self.size = size
         self.query = query
-        self.sort = sort
+        self.sorts = sorts
         self.sourceFilter = sourceFilter
         self.explain = explain
         self.minScore = minScore
@@ -196,7 +206,7 @@ public struct SearchRequest: Request {
         query = builder.query
         from = builder.from
         size = builder.size
-        sort = builder.sort
+        sorts = builder.sorts
         sourceFilter = builder.sourceFilter
         explain = builder.explain
         minScore = builder.minScore
@@ -229,7 +239,7 @@ public struct SearchRequest: Request {
     }
 
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-        let body = Body(query: query, sort: sort, size: size, from: from, source: sourceFilter, explain: explain, minScore: minScore, trackScores: trackScores)
+        let body = Body(query: query, sort: sorts, size: size, from: from, source: sourceFilter, explain: explain, minScore: minScore, trackScores: trackScores)
         return serializer.encode(body).mapError { error -> MakeBodyError in
             MakeBodyError.wrapped(error)
         }
@@ -237,7 +247,7 @@ public struct SearchRequest: Request {
 
     struct Body: Encodable {
         public let query: Query?
-        public let sort: Sort?
+        public let sort: [Sort]?
         public let size: Int16?
         public let from: Int16?
         public let source: SourceFilter?
@@ -282,7 +292,7 @@ extension SearchRequest: Equatable {
             && lhs.minScore == rhs.minScore
             && lhs.queryParams == rhs.queryParams
             && lhs.size == rhs.size
-            && lhs.sort == rhs.sort
+            && lhs.sorts == rhs.sorts
             && lhs.type == rhs.type
             && SearchRequest.matchQueries(lhs.query, rhs.query)
     }

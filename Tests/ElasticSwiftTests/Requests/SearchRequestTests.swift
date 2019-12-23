@@ -95,7 +95,7 @@ class SearchRequestTests: XCTestCase {
             .set(indices: indexName)
             .set(types: "_doc")
             .set(query: try! queryBuilder.build())
-            .set(sort: sort)
+            .add(sort: sort)
             .build()
 
         /// make sure doc exists
@@ -140,7 +140,7 @@ class SearchRequestTests: XCTestCase {
             .set(indices: indexName)
             .set(types: "_doc")
             .set(query: try! queryBuilder.build())
-            .set(sort: sort)
+            .add(sort: sort)
             .set(scroll: scroll)
             .set(size: 1)
             .build()
@@ -259,7 +259,7 @@ class SearchRequestTests: XCTestCase {
             .set(query: try! queryBuilder.build())
             .set(sourceFilter: .fetchSource(false))
             .set(searchType: .dfs_query_then_fetch)
-            .set(sort: sort)
+            .add(sort: sort)
             .build()
 
         /// make sure doc exists
@@ -313,7 +313,7 @@ class SearchRequestTests: XCTestCase {
             .set(types: "_doc")
             .set(query: try! queryBuilder.build())
             .set(trackScores: true)
-            .set(sort: sort)
+            .add(sort: sort)
             .build()
 
         /// make sure doc exists
@@ -334,6 +334,61 @@ class SearchRequestTests: XCTestCase {
             .build()
         request1.refresh = .true
         client.execute(request: request1, completionHandler: handler1)
+
+        waitForExpectations(timeout: 10)
+    }
+    
+    func test_05_Search_multiple_sorts() throws {
+        let e = expectation(description: "execution complete")
+
+        func handler(_ result: Result<SearchResponse<Message>, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+                XCTAssert(false)
+            case let .success(response):
+                XCTAssertNotNil(response.hits)
+                XCTAssertTrue(response.hits.hits.count > 0, "Count \(response.hits.hits.count)")
+                for hit in response.hits.hits {
+                    XCTAssertNotNil(hit.score, "Score is nil \(hit)")
+                }
+            }
+
+            e.fulfill()
+        }
+        let queryBuilder = QueryBuilders.boolQuery()
+        let match = try QueryBuilders.matchQuery().set(field: "msg").set(value: "Message").build()
+        queryBuilder.must(query: match)
+        let sort = SortBuilders.fieldSort("msg.keyword")
+            .set(order: .asc)
+            .build()
+        let scoreSort = SortBuilders.scoreSort().build()
+        let request = try SearchRequestBuilder()
+            .set(indices: indexName)
+            .set(types: "_doc")
+            .set(query: try! queryBuilder.build())
+            .set(trackScores: true)
+            .set(sorts: [sort, scoreSort])
+            .build()
+
+        /// make sure doc exists
+        func handler1(_ result: Result<IndexResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+            case let .success(response):
+                logger.info("Found \(response.result)")
+            }
+            client.search(request, completionHandler: handler)
+        }
+        var msg = Message()
+        msg.msg = "Message"
+        var request1 = try IndexRequestBuilder<Message>()
+            .set(index: indexName)
+            .set(source: msg)
+            .build()
+        request1.refresh = .true
+        client.index(request1, completionHandler: handler1)
 
         waitForExpectations(timeout: 10)
     }
