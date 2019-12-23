@@ -109,6 +109,9 @@ public struct SearchHit<T: Codable>: Codable, Equatable where T: Equatable {
     public let score: Decimal?
     public let source: T?
     public let sort: [CodableValue]?
+    public let version: Int?
+    public let seqNo: Int?
+    public let primaryTerm: Int?
 
     enum CodingKeys: String, CodingKey {
         case index = "_index"
@@ -117,6 +120,9 @@ public struct SearchHit<T: Codable>: Codable, Equatable where T: Equatable {
         case score = "_score"
         case source = "_source"
         case sort
+        case version = "_version"
+        case seqNo = "_seq_no"
+        case primaryTerm = "_primary_term"
     }
 }
 

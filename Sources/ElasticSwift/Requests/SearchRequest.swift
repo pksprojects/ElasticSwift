@@ -29,6 +29,9 @@ public class SearchRequestBuilder: RequestBuilder {
     private var _searchType: SearchType?
     private var _trackScores: Bool?
     private var _indicesBoost: [IndexBoost]?
+    private var _seqNoPrimaryTerm: Bool?
+    private var _version: Bool?
+    private var _preference: String?
 
     public init() {}
 
@@ -112,6 +115,24 @@ public class SearchRequestBuilder: RequestBuilder {
     }
     
     @discardableResult
+    public func set(preference: String) -> Self {
+        _preference = preference
+        return self
+    }
+    
+    @discardableResult
+    public func set(version: Bool) -> Self {
+        _version = version
+        return self
+    }
+    
+    @discardableResult
+    public func set(seqNoPrimaryTerm: Bool) -> Self {
+        _seqNoPrimaryTerm = seqNoPrimaryTerm
+        return self
+    }
+    
+    @discardableResult
     public func add(sort: Sort) -> Self {
         if self._sorts != nil {
             _sorts?.append(sort)
@@ -182,6 +203,18 @@ public class SearchRequestBuilder: RequestBuilder {
     public var indicesBoost: [IndexBoost]? {
         return _indicesBoost
     }
+    
+    public var seqNoPrimaryTerm: Bool? {
+        return _seqNoPrimaryTerm
+    }
+    
+    public var version: Bool? {
+        return _version
+    }
+    
+    public var preference: String? {
+        return _preference
+    }
 
     public func build() throws -> SearchRequest {
         return try SearchRequest(withBuilder: self)
@@ -204,11 +237,14 @@ public struct SearchRequest: Request {
     public let minScore: Decimal?
     public let trackScores: Bool?
     public let indicesBoost: [IndexBoost]?
+    public let seqNoPrimaryTerm: Bool?
+    public let version: Bool?
 
     public var scroll: Scroll?
     public var searchType: SearchType?
+    public var preference: String?
 
-    public init(index: String, type: String?, from: Int16?, size: Int16?, query: Query?, sorts: [Sort]?, sourceFilter: SourceFilter?, explain: Bool?, minScore: Decimal?, scroll: Scroll?, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil) {
+    public init(index: String, type: String?, from: Int16?, size: Int16?, query: Query?, sorts: [Sort]?, sourceFilter: SourceFilter?, explain: Bool?, minScore: Decimal?, scroll: Scroll?, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool?, preference: String? = nil) {
         self.index = index
         self.type = type
         self.from = from
@@ -221,6 +257,9 @@ public struct SearchRequest: Request {
         self.scroll = scroll
         self.trackScores = trackScores
         self.indicesBoost = indicesBoost
+        self.seqNoPrimaryTerm = seqNoPrimaryTerm
+        self.version = version
+        self.preference = preference
     }
 
     internal init(withBuilder builder: SearchRequestBuilder) throws {
@@ -237,6 +276,9 @@ public struct SearchRequest: Request {
         searchType = builder.searchType
         trackScores = builder.trackScores
         indicesBoost = builder.indicesBoost
+        seqNoPrimaryTerm = builder.seqNoPrimaryTerm
+        version = builder.version
+        preference = builder.preference
     }
 
     public var method: HTTPMethod {
@@ -259,11 +301,14 @@ public struct SearchRequest: Request {
         if let searchType = self.searchType {
             queryItems.append(URLQueryItem(name: QueryParams.searchType, value: searchType.rawValue))
         }
+        if let preference = self.preference {
+            queryItems.append(URLQueryItem(name: QueryParams.preference, value: preference))
+        }
         return queryItems
     }
 
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-        let body = Body(query: query, sort: sorts, size: size, from: from, source: sourceFilter, explain: explain, minScore: minScore, trackScores: trackScores, indicesBoost: indicesBoost)
+        let body = Body(query: query, sort: sorts, size: size, from: from, source: sourceFilter, explain: explain, minScore: minScore, trackScores: trackScores, indicesBoost: indicesBoost, seqNoPrimaryTerm: seqNoPrimaryTerm, version: version)
         return serializer.encode(body).mapError { error -> MakeBodyError in
             MakeBodyError.wrapped(error)
         }
@@ -279,6 +324,8 @@ public struct SearchRequest: Request {
         public let minScore: Decimal?
         public let trackScores: Bool?
         public let indicesBoost: [IndexBoost]?
+        public let seqNoPrimaryTerm: Bool?
+        public let version: Bool?
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
@@ -291,6 +338,8 @@ public struct SearchRequest: Request {
             try container.encodeIfPresent(minScore, forKey: .minScore)
             try container.encodeIfPresent(trackScores, forKey: .trackScores)
             try container.encodeIfPresent(indicesBoost, forKey: .indicesBoost)
+            try container.encodeIfPresent(seqNoPrimaryTerm, forKey: .seqNoPrimaryTerm)
+            try container.encodeIfPresent(version, forKey: .version)
         }
 
         enum CodingKeys: String, CodingKey {
@@ -303,6 +352,8 @@ public struct SearchRequest: Request {
             case minScore = "min_score"
             case trackScores = "track_scores"
             case indicesBoost = "indices_boost"
+            case seqNoPrimaryTerm = "seq_no_primary_term"
+            case version
         }
     }
 }
@@ -325,6 +376,9 @@ extension SearchRequest: Equatable {
             && lhs.trackScores == rhs.trackScores
             && lhs.scroll == rhs.scroll
             && lhs.searchType == rhs.searchType
+            && lhs.seqNoPrimaryTerm == rhs.seqNoPrimaryTerm
+            && lhs.version == rhs.version
+            && lhs.preference == rhs.preference
             && SearchRequest.matchQueries(lhs.query, rhs.query)
     }
 

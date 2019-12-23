@@ -451,4 +451,58 @@ class SearchRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
+    
+    func test_07_Search_preference_version_seqNoPrimaryTerm() throws {
+        let e = expectation(description: "execution complete")
+
+        func handler(_ result: Result<SearchResponse<Message>, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+                XCTAssert(false)
+            case let .success(response):
+                XCTAssertNotNil(response.hits)
+                XCTAssertTrue(response.hits.hits.count > 0, "Count \(response.hits.hits.count)")
+                for hit in response.hits.hits {
+                    XCTAssertNotNil(hit.seqNo, "seqNo is nil \(hit)")
+                    XCTAssertNotNil(hit.version, "version is nil \(hit)")
+                    XCTAssertNotNil(hit.primaryTerm, "primaryTerm is nil \(hit)")
+                }
+            }
+
+            e.fulfill()
+        }
+        let queryBuilder = QueryBuilders.boolQuery()
+        let match = try QueryBuilders.matchQuery().set(field: "msg").set(value: "Message").build()
+        queryBuilder.must(query: match)
+        let request = try SearchRequestBuilder()
+            .set(indices: indexName)
+            .set(types: "_doc")
+            .set(query: try! queryBuilder.build())
+            .set(seqNoPrimaryTerm: true)
+            .set(version: true)
+            .set(preference: "_local")
+            .build()
+
+        /// make sure doc exists
+        func handler1(_ result: Result<IndexResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+            case let .success(response):
+                logger.info("Found \(response.result)")
+            }
+            client.search(request, completionHandler: handler)
+        }
+        var msg = Message()
+        msg.msg = "Message"
+        var request1 = try IndexRequestBuilder<Message>()
+            .set(index: indexName)
+            .set(source: msg)
+            .build()
+        request1.refresh = .true
+        client.index(request1, completionHandler: handler1)
+
+        waitForExpectations(timeout: 10)
+    }
 }
