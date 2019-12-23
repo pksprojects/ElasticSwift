@@ -481,20 +481,19 @@ public struct ClearScrollRequest: Request {
         if scrollIds.contains("_all") {
             return "_search/scroll/_all"
         } else {
-            return "_search/scroll/\(scrollIds.joined(separator: ","))"
+            return "_search/scroll"
         }
     }
 
-    public func makeBody(_: Serializer) -> Result<Data, MakeBodyError> {
-        return .failure(.noBodyForRequest)
-//        if self.scrollIds.contains("_all") {
-//            return .failure(.noBodyForRequest)
-//        } else {
-//            let body = Body(scrollId: self.scrollIds)
-//            return serializer.encode(body).mapError { error -> MakeBodyError in
-//                return MakeBodyError.wrapped(error)
-//            }
-//        }
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        if self.scrollIds.contains("_all") {
+            return .failure(.noBodyForRequest)
+        } else {
+            let body = Body(scrollId: self.scrollIds)
+            return serializer.encode(body).mapError { error -> MakeBodyError in
+                return MakeBodyError.wrapped(error)
+            }
+        }
     }
 
     private struct Body: Codable, Equatable {

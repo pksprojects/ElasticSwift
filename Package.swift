@@ -35,8 +35,8 @@ let package = Package(
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
-        .package(url: "https://github.com/apple/swift-nio.git", .upToNextMajor(from: "2.11.1")),
-        .package(url: "https://github.com/apple/swift-nio-ssl.git", .upToNextMajor(from: "2.4.5")),
+        .package(url: "https://github.com/apple/swift-nio.git", .upToNextMajor(from: "2.12.0")),
+        .package(url: "https://github.com/apple/swift-nio-ssl.git", .upToNextMajor(from: "2.5.0")),
         .package(url: "https://github.com/apple/swift-nio-transport-services.git", .upToNextMajor(from: "1.3.0")),
         .package(url: "https://github.com/apple/swift-log.git", .upToNextMajor(from: "1.2.0")),
         .package(url: "https://github.com/swift-server/async-http-client.git", .upToNextMajor(from: "1.0.1")),
