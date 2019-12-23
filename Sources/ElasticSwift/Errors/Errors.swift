@@ -8,6 +8,7 @@
 
 import ElasticSwiftCore
 import Foundation
+import ElasticSwiftCodableUtils
 
 // MARK: - ERRORS
 
@@ -33,6 +34,40 @@ public struct ElasticError: Codable, Equatable {
         case index
         case reason
         case type
+    }
+}
+
+public struct ShardSearchFailure: Error, Codable, Equatable {
+    public let index: String?
+    public let type: String?
+    public let shard: Int?
+    public let node: String?
+    public let reason: ShardSearchFailureReason?
+}
+
+public struct ShardSearchFailureReason: Codable, Equatable {
+    
+    public let type: String?
+    public let reason: String?
+    public let scriptStack: [String]?
+    public let script: String?
+    public let lang: String?
+    public let params: [String: CodableValue]?
+    public let causedBy: CausedBy?
+    
+    enum CodingKeys: String, CodingKey {
+        case type
+        case reason
+        case scriptStack = "script_stack"
+        case script
+        case lang
+        case params
+        case causedBy = "caused_by"
+    }
+    
+    public struct CausedBy: Codable, Equatable {
+        public let type: String?
+        public let reason: String?
     }
 }
 

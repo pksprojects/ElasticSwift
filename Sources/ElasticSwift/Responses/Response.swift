@@ -82,6 +82,7 @@ public struct Shards: Codable, Equatable {
     public let successful: Int
     public let skipped: Int?
     public let failed: Int
+    public let failures: [ShardSearchFailure]?
 }
 
 public struct Hits<T: Codable>: Codable, Equatable where T: Equatable {
@@ -112,6 +113,7 @@ public struct SearchHit<T: Codable>: Codable, Equatable where T: Equatable {
     public let version: Int?
     public let seqNo: Int?
     public let primaryTerm: Int?
+    public let fields: [String: CodableValue]?
 
     enum CodingKeys: String, CodingKey {
         case index = "_index"
@@ -123,6 +125,7 @@ public struct SearchHit<T: Codable>: Codable, Equatable where T: Equatable {
         case version = "_version"
         case seqNo = "_seq_no"
         case primaryTerm = "_primary_term"
+        case fields
     }
 }
 

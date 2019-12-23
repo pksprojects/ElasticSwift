@@ -32,6 +32,7 @@ public class SearchRequestBuilder: RequestBuilder {
     private var _seqNoPrimaryTerm: Bool?
     private var _version: Bool?
     private var _preference: String?
+    private var _scriptFields: [ScriptField]?
 
     public init() {}
 
@@ -133,6 +134,12 @@ public class SearchRequestBuilder: RequestBuilder {
     }
     
     @discardableResult
+    public func set(scriptFields: [ScriptField]) -> Self {
+        _scriptFields = scriptFields
+        return self
+    }
+    
+    @discardableResult
     public func add(sort: Sort) -> Self {
         if self._sorts != nil {
             _sorts?.append(sort)
@@ -148,6 +155,16 @@ public class SearchRequestBuilder: RequestBuilder {
             _indicesBoost?.append(indexBoost)
         } else {
             _indicesBoost = [indexBoost]
+        }
+        return self
+    }
+    
+    @discardableResult
+    public func add(scriptField: ScriptField) -> Self {
+        if self._scriptFields != nil {
+            _scriptFields?.append(scriptField)
+        } else {
+            _scriptFields = [scriptField]
         }
         return self
     }
@@ -215,6 +232,10 @@ public class SearchRequestBuilder: RequestBuilder {
     public var preference: String? {
         return _preference
     }
+    
+    public var scriptFields: [ScriptField]? {
+        return _scriptFields
+    }
 
     public func build() throws -> SearchRequest {
         return try SearchRequest(withBuilder: self)
@@ -239,12 +260,13 @@ public struct SearchRequest: Request {
     public let indicesBoost: [IndexBoost]?
     public let seqNoPrimaryTerm: Bool?
     public let version: Bool?
+    public let scriptFields: [ScriptField]?
 
     public var scroll: Scroll?
     public var searchType: SearchType?
     public var preference: String?
 
-    public init(index: String, type: String?, from: Int16?, size: Int16?, query: Query?, sorts: [Sort]?, sourceFilter: SourceFilter?, explain: Bool?, minScore: Decimal?, scroll: Scroll?, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool?, preference: String? = nil) {
+    public init(index: String, type: String?, from: Int16?, size: Int16?, query: Query?, sorts: [Sort]?, sourceFilter: SourceFilter?, explain: Bool?, minScore: Decimal?, scroll: Scroll?, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool?, preference: String? = nil, scriptFields: [ScriptField]? = nil) {
         self.index = index
         self.type = type
         self.from = from
@@ -260,6 +282,7 @@ public struct SearchRequest: Request {
         self.seqNoPrimaryTerm = seqNoPrimaryTerm
         self.version = version
         self.preference = preference
+        self.scriptFields = scriptFields
     }
 
     internal init(withBuilder builder: SearchRequestBuilder) throws {
@@ -279,6 +302,7 @@ public struct SearchRequest: Request {
         seqNoPrimaryTerm = builder.seqNoPrimaryTerm
         version = builder.version
         preference = builder.preference
+        scriptFields = builder.scriptFields
     }
 
     public var method: HTTPMethod {
@@ -308,7 +332,7 @@ public struct SearchRequest: Request {
     }
 
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-        let body = Body(query: query, sort: sorts, size: size, from: from, source: sourceFilter, explain: explain, minScore: minScore, trackScores: trackScores, indicesBoost: indicesBoost, seqNoPrimaryTerm: seqNoPrimaryTerm, version: version)
+        let body = Body(query: query, sort: sorts, size: size, from: from, source: sourceFilter, explain: explain, minScore: minScore, trackScores: trackScores, indicesBoost: indicesBoost, seqNoPrimaryTerm: seqNoPrimaryTerm, version: version, scriptFields: scriptFields)
         return serializer.encode(body).mapError { error -> MakeBodyError in
             MakeBodyError.wrapped(error)
         }
@@ -326,6 +350,7 @@ public struct SearchRequest: Request {
         public let indicesBoost: [IndexBoost]?
         public let seqNoPrimaryTerm: Bool?
         public let version: Bool?
+        public let scriptFields: [ScriptField]?
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
@@ -340,6 +365,17 @@ public struct SearchRequest: Request {
             try container.encodeIfPresent(indicesBoost, forKey: .indicesBoost)
             try container.encodeIfPresent(seqNoPrimaryTerm, forKey: .seqNoPrimaryTerm)
             try container.encodeIfPresent(version, forKey: .version)
+            if let scriptFields = self.scriptFields, !scriptFields.isEmpty {
+                if scriptFields.count == 1 {
+                    try container.encode(scriptFields[0], forKey: .scriptFields)
+                } else {
+                    var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .scriptFields)
+                    for scriptField in scriptFields {
+                        var scriptContainer = nested.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: scriptField.field))
+                        try scriptContainer.encode(scriptField.script, forKey: .key(named: "script"))
+                    }
+                }
+            }
         }
 
         enum CodingKeys: String, CodingKey {
@@ -354,6 +390,7 @@ public struct SearchRequest: Request {
             case indicesBoost = "indices_boost"
             case seqNoPrimaryTerm = "seq_no_primary_term"
             case version
+            case scriptFields = "script_fields"
         }
     }
 }
@@ -392,6 +429,37 @@ extension SearchRequest: Equatable {
         return false
     }
 }
+
+public struct ScriptField {
+    public let field: String
+    public let script: Script
+}
+
+extension ScriptField: Codable {
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: DynamicCodingKeys.self)
+        var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.field))
+        try nested.encode(self.script, forKey: .script)
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
+        guard container.allKeys.count == 1 else {
+            throw Swift.DecodingError.typeMismatch(ScriptField.self, .init(codingPath: container.codingPath, debugDescription: "Unable to find field name in key(s) expect: 1 key found: \(container.allKeys.count)."))
+        }
+
+        self.field = container.allKeys.first!.stringValue
+        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.field))
+        self.script = try nested.decode(Script.self, forKey: .script)
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case script
+    }
+}
+
+extension ScriptField: Equatable {}
 
 /// Struct representing Index boost
 public struct IndexBoost {

@@ -505,4 +505,103 @@ class SearchRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
+    
+    func test_08_Search_script_fields() throws {
+        let e = expectation(description: "execution complete")
+
+        func handler(_ result: Result<SearchResponse<Message>, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+                XCTAssert(false)
+            case let .success(response):
+                XCTAssertNotNil(response.hits)
+                XCTAssertTrue(response.hits.hits.count > 0, "Count \(response.hits.hits.count)")
+                for hit in response.hits.hits {
+                    XCTAssertNotNil(hit.fields, "seqNo is nil \(hit)")
+                }
+            }
+
+            e.fulfill()
+        }
+        
+        let test1Script = ScriptField(field: "test1", script: Script("2", lang: "painless", params: nil))
+        let test2Script = ScriptField(field: "test2", script: Script("params['_source']['msg'] + params.text", lang: "painless", params: ["text": "test Text"]))
+        
+        let request = try SearchRequestBuilder()
+            .set(indices: indexName)
+            .set(query: MatchAllQuery())
+            .set(scriptFields: [test1Script])
+            .add(scriptField: test2Script)
+            .build()
+
+        /// make sure doc exists
+        func handler1(_ result: Result<IndexResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+            case let .success(response):
+                logger.info("Found \(response.result)")
+            }
+            client.search(request, completionHandler: handler)
+        }
+        var msg = Message()
+        msg.msg = "Message"
+        var request1 = try IndexRequestBuilder<Message>()
+            .set(index: indexName)
+            .set(source: msg)
+            .build()
+        request1.refresh = .true
+        client.index(request1, completionHandler: handler1)
+
+        waitForExpectations(timeout: 10)
+    }
+    
+    func test_09_Search_script_fields_shard_failed() throws {
+        let e = expectation(description: "execution complete")
+
+        func handler(_ result: Result<SearchResponse<Message>, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+                XCTAssert(false)
+            case let .success(response):
+                XCTAssertNotNil(response.hits)
+                XCTAssertTrue(response.hits.hits.count == 0, "Count \(response.hits.hits.count)")
+                XCTAssert(response.shards.failed == 1, "Expected shard failure didn't happened \(response.shards.failed)")
+                XCTAssert(response.shards.failures?.count == 1, "Expected failure count didn't match count: \(response.shards.failures?.count ?? -1)")
+            }
+
+            e.fulfill()
+        }
+        
+        let test1Script = ScriptField(field: "test1", script: Script("doc['msg'] + params.text", lang: "painless", params: ["text": "test Text"]))
+        
+        let request = try SearchRequestBuilder()
+            .set(indices: indexName)
+            .set(query: MatchAllQuery())
+            .add(scriptField: test1Script)
+            .build()
+
+        /// make sure doc exists
+        func handler1(_ result: Result<IndexResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+            case let .success(response):
+                logger.info("Found \(response.result)")
+            }
+            client.search(request, completionHandler: handler)
+        }
+        var msg = Message()
+        msg.msg = "Message"
+        var request1 = try IndexRequestBuilder<Message>()
+            .set(index: indexName)
+            .set(source: msg)
+            .build()
+        request1.refresh = .true
+        client.index(request1, completionHandler: handler1)
+
+        waitForExpectations(timeout: 10)
+    }
 }
