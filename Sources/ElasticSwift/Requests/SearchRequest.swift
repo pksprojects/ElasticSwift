@@ -322,6 +322,9 @@ extension SearchRequest: Equatable {
             && lhs.sorts == rhs.sorts
             && lhs.type == rhs.type
             && lhs.indicesBoost == rhs.indicesBoost
+            && lhs.trackScores == rhs.trackScores
+            && lhs.scroll == rhs.scroll
+            && lhs.searchType == rhs.searchType
             && SearchRequest.matchQueries(lhs.query, rhs.query)
     }
 
