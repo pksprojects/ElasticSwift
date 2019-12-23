@@ -28,6 +28,7 @@ public class SearchRequestBuilder: RequestBuilder {
     private var _scroll: Scroll?
     private var _searchType: SearchType?
     private var _trackScores: Bool?
+    private var _indicesBoost: [IndexBoost]?
 
     public init() {}
 
@@ -105,11 +106,27 @@ public class SearchRequestBuilder: RequestBuilder {
     }
     
     @discardableResult
+    public func set(indicesBoost: [IndexBoost]) -> Self {
+        _indicesBoost = indicesBoost
+        return self
+    }
+    
+    @discardableResult
     public func add(sort: Sort) -> Self {
         if self._sorts != nil {
             _sorts?.append(sort)
         } else {
             _sorts = [sort]
+        }
+        return self
+    }
+    
+    @discardableResult
+    public func add(indexBoost: IndexBoost) -> Self {
+        if self._indicesBoost != nil {
+            _indicesBoost?.append(indexBoost)
+        } else {
+            _indicesBoost = [indexBoost]
         }
         return self
     }
@@ -161,6 +178,10 @@ public class SearchRequestBuilder: RequestBuilder {
     public var trackScores: Bool? {
         return _trackScores
     }
+    
+    public var indicesBoost: [IndexBoost]? {
+        return _indicesBoost
+    }
 
     public func build() throws -> SearchRequest {
         return try SearchRequest(withBuilder: self)
@@ -182,11 +203,12 @@ public struct SearchRequest: Request {
     public let explain: Bool?
     public let minScore: Decimal?
     public let trackScores: Bool?
+    public let indicesBoost: [IndexBoost]?
 
     public var scroll: Scroll?
     public var searchType: SearchType?
 
-    public init(index: String, type: String?, from: Int16?, size: Int16?, query: Query?, sorts: [Sort]?, sourceFilter: SourceFilter?, explain: Bool?, minScore: Decimal?, scroll: Scroll?, trackScores: Bool? = nil) {
+    public init(index: String, type: String?, from: Int16?, size: Int16?, query: Query?, sorts: [Sort]?, sourceFilter: SourceFilter?, explain: Bool?, minScore: Decimal?, scroll: Scroll?, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil) {
         self.index = index
         self.type = type
         self.from = from
@@ -198,6 +220,7 @@ public struct SearchRequest: Request {
         self.minScore = minScore
         self.scroll = scroll
         self.trackScores = trackScores
+        self.indicesBoost = indicesBoost
     }
 
     internal init(withBuilder builder: SearchRequestBuilder) throws {
@@ -213,6 +236,7 @@ public struct SearchRequest: Request {
         scroll = builder.scroll
         searchType = builder.searchType
         trackScores = builder.trackScores
+        indicesBoost = builder.indicesBoost
     }
 
     public var method: HTTPMethod {
@@ -239,7 +263,7 @@ public struct SearchRequest: Request {
     }
 
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-        let body = Body(query: query, sort: sorts, size: size, from: from, source: sourceFilter, explain: explain, minScore: minScore, trackScores: trackScores)
+        let body = Body(query: query, sort: sorts, size: size, from: from, source: sourceFilter, explain: explain, minScore: minScore, trackScores: trackScores, indicesBoost: indicesBoost)
         return serializer.encode(body).mapError { error -> MakeBodyError in
             MakeBodyError.wrapped(error)
         }
@@ -254,6 +278,7 @@ public struct SearchRequest: Request {
         public let explain: Bool?
         public let minScore: Decimal?
         public let trackScores: Bool?
+        public let indicesBoost: [IndexBoost]?
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
@@ -265,6 +290,7 @@ public struct SearchRequest: Request {
             try container.encodeIfPresent(explain, forKey: .explain)
             try container.encodeIfPresent(minScore, forKey: .minScore)
             try container.encodeIfPresent(trackScores, forKey: .trackScores)
+            try container.encodeIfPresent(indicesBoost, forKey: .indicesBoost)
         }
 
         enum CodingKeys: String, CodingKey {
@@ -276,6 +302,7 @@ public struct SearchRequest: Request {
             case explain
             case minScore = "min_score"
             case trackScores = "track_scores"
+            case indicesBoost = "indices_boost"
         }
     }
 }
@@ -294,6 +321,7 @@ extension SearchRequest: Equatable {
             && lhs.size == rhs.size
             && lhs.sorts == rhs.sorts
             && lhs.type == rhs.type
+            && lhs.indicesBoost == rhs.indicesBoost
             && SearchRequest.matchQueries(lhs.query, rhs.query)
     }
 
@@ -307,6 +335,32 @@ extension SearchRequest: Equatable {
         return false
     }
 }
+
+/// Struct representing Index boost
+public struct IndexBoost {
+    public let index: String
+    public let boost: Decimal
+}
+
+extension IndexBoost: Codable {
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: DynamicCodingKeys.self)
+        try container.encode(self.boost, forKey: .key(named: self.index))
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let dic = try container.decode([String: Decimal].self)
+        if dic.isEmpty || dic.count > 1 {
+            throw Swift.DecodingError.dataCorruptedError(in: container, debugDescription: "Unexpected data found \(dic)")
+        }
+        self.index = dic.first!.key
+        self.boost = dic.first!.value
+    }
+}
+
+extension IndexBoost: Equatable {}
 
 // MARK: - Scroll
 

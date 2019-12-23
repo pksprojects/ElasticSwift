@@ -392,4 +392,63 @@ class SearchRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
+    
+    func test_06_Search_index_boost() throws {
+        let e = expectation(description: "execution complete")
+
+        func handler(_ result: Result<SearchResponse<Message>, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+                XCTAssert(false)
+            case let .success(response):
+                XCTAssertNotNil(response.hits)
+                XCTAssertTrue(response.hits.hits.count > 0, "Count \(response.hits.hits.count)")
+                for hit in response.hits.hits {
+                    XCTAssertNotNil(hit.score, "Score is nil \(hit)")
+                }
+            }
+
+            e.fulfill()
+        }
+        let queryBuilder = QueryBuilders.boolQuery()
+        let match = try QueryBuilders.matchQuery().set(field: "msg").set(value: "Message").build()
+        queryBuilder.must(query: match)
+        let sort = SortBuilders.fieldSort("msg.keyword")
+            .set(order: .asc)
+            .build()
+        let scoreSort = SortBuilders.scoreSort().build()
+        let request = try SearchRequestBuilder()
+            .set(indices: indexName)
+            .set(types: "_doc")
+            .set(query: try! queryBuilder.build())
+            .set(trackScores: true)
+            .add(sort: sort)
+            .add(sort: scoreSort)
+            .add(indexBoost: IndexBoost(index: "random will be replaced", boost: 1.3))
+            .set(indicesBoost: [IndexBoost(index: "\(TEST_INDEX_PREFIX)*", boost: 1.4)])
+            .add(indexBoost: IndexBoost(index: indexName, boost: 1.3))
+            .build()
+
+        /// make sure doc exists
+        func handler1(_ result: Result<IndexResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+            case let .success(response):
+                logger.info("Found \(response.result)")
+            }
+            client.search(request, completionHandler: handler)
+        }
+        var msg = Message()
+        msg.msg = "Message"
+        var request1 = try IndexRequestBuilder<Message>()
+            .set(index: indexName)
+            .set(source: msg)
+            .build()
+        request1.refresh = .true
+        client.index(request1, completionHandler: handler1)
+
+        waitForExpectations(timeout: 10)
+    }
 }
