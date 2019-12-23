@@ -439,6 +439,7 @@ extension SearchRequest: Equatable {
             && lhs.seqNoPrimaryTerm == rhs.seqNoPrimaryTerm
             && lhs.version == rhs.version
             && lhs.preference == rhs.preference
+            && lhs.scriptFields == rhs.scriptFields
             && lhs.storedFields == rhs.storedFields
             && SearchRequest.matchQueries(lhs.query, rhs.query)
     }
