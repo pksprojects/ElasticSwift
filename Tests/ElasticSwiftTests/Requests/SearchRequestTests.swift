@@ -283,7 +283,7 @@ class SearchRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_04_Search_track_scores() throws {
         let e = expectation(description: "execution complete")
 
@@ -337,7 +337,7 @@ class SearchRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_05_Search_multiple_sorts() throws {
         let e = expectation(description: "execution complete")
 
@@ -392,7 +392,7 @@ class SearchRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_06_Search_index_boost() throws {
         let e = expectation(description: "execution complete")
 
@@ -451,7 +451,7 @@ class SearchRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_07_Search_preference_version_seqNoPrimaryTerm() throws {
         let e = expectation(description: "execution complete")
 
@@ -505,7 +505,7 @@ class SearchRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_08_Search_script_fields() throws {
         let e = expectation(description: "execution complete")
 
@@ -524,10 +524,10 @@ class SearchRequestTests: XCTestCase {
 
             e.fulfill()
         }
-        
+
         let test1Script = ScriptField(field: "test1", script: Script("2", lang: "painless", params: nil))
         let test2Script = ScriptField(field: "test2", script: Script("params['_source']['msg'] + params.text", lang: "painless", params: ["text": "test Text"]))
-        
+
         let request = try SearchRequestBuilder()
             .set(indices: indexName)
             .set(query: MatchAllQuery())
@@ -556,7 +556,7 @@ class SearchRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_09_Search_script_fields_shard_failed() throws {
         let e = expectation(description: "execution complete")
 
@@ -574,9 +574,9 @@ class SearchRequestTests: XCTestCase {
 
             e.fulfill()
         }
-        
+
         let test1Script = ScriptField(field: "test1", script: Script("doc['msg'] + params.text", lang: "painless", params: ["text": "test Text"]))
-        
+
         let request = try SearchRequestBuilder()
             .set(indices: indexName)
             .set(query: MatchAllQuery())
@@ -604,7 +604,7 @@ class SearchRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_10_Search_stored_fields() throws {
         let e = expectation(description: "execution complete")
 
@@ -625,7 +625,7 @@ class SearchRequestTests: XCTestCase {
 
             e.fulfill()
         }
-        
+
         let request = try SearchRequestBuilder()
             .set(indices: indexName)
             .set(query: MatchAllQuery())
@@ -653,7 +653,7 @@ class SearchRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_11_Search_stored_fields_empty_array() throws {
         let e = expectation(description: "execution complete")
 
@@ -674,7 +674,7 @@ class SearchRequestTests: XCTestCase {
 
             e.fulfill()
         }
-        
+
         let request = try SearchRequestBuilder()
             .set(indices: indexName)
             .set(query: MatchAllQuery())
@@ -702,7 +702,7 @@ class SearchRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_12_Search_stored_fields_star() throws {
         let e = expectation(description: "execution complete")
 
@@ -723,7 +723,7 @@ class SearchRequestTests: XCTestCase {
 
             e.fulfill()
         }
-        
+
         let request = try SearchRequestBuilder()
             .set(indices: indexName)
             .set(query: MatchAllQuery())
@@ -751,7 +751,7 @@ class SearchRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_13_Search_docvalue_fields() throws {
         let e = expectation(description: "execution complete")
 
@@ -773,7 +773,7 @@ class SearchRequestTests: XCTestCase {
 
             e.fulfill()
         }
-        
+
         let request = try SearchRequestBuilder()
             .set(indices: indexName)
             .set(query: MatchAllQuery())
@@ -803,7 +803,7 @@ class SearchRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_14_Search_post_filter() throws {
         let e = expectation(description: "execution complete")
 
@@ -824,12 +824,12 @@ class SearchRequestTests: XCTestCase {
 
             e.fulfill()
         }
-        
+
         let postFilter = try QueryBuilders.termQuery()
             .set(field: "color")
             .set(value: "red")
             .build()
-        
+
         let request = try SearchRequestBuilder()
             .set(indices: indexName)
             .set(query: MatchAllQuery())
@@ -856,7 +856,7 @@ class SearchRequestTests: XCTestCase {
             .set(id: "1")
             .build()
         request1.refresh = .true
-        
+
         shirt.color = "blue"
         var request2 = try IndexRequestBuilder<Shirt>()
             .set(index: indexName)
@@ -864,8 +864,7 @@ class SearchRequestTests: XCTestCase {
             .set(id: "2")
             .build()
         request1.refresh = .true
-        
-        
+
         func createIndexHandler(_ result: Result<CreateIndexResponse, Error>) {
             switch result {
             case let .failure(error):
@@ -873,24 +872,24 @@ class SearchRequestTests: XCTestCase {
             case let .success(response):
                 logger.info("Found \(response.acknowledged)")
             }
-            client.index(request1) { result in
+            client.index(request1) { _ in
                 self.client.index(request2, completionHandler: handler1)
             }
         }
-        
+
         let createIndexRequest = try CreateIndexRequestBuilder()
-        .set(name: indexName)
-        .set(mappings: [
-            "_doc": MappingMetaData(type: nil, fields: nil, analyzer: nil, store: nil, termVector: nil, properties: [
-                "brand": MappingMetaData(type: "keyword", fields: nil, analyzer: nil, store: true, termVector: nil, properties: nil),
-                "color": MappingMetaData(type: "keyword", fields: nil, analyzer: nil, store: true, termVector: nil, properties: nil),
-                "model": MappingMetaData(type: "keyword", fields: nil, analyzer: nil, store: true, termVector: nil, properties: nil),
-            ]),
-        ])
-        .build()
+            .set(name: indexName)
+            .set(mappings: [
+                "_doc": MappingMetaData(type: nil, fields: nil, analyzer: nil, store: nil, termVector: nil, properties: [
+                    "brand": MappingMetaData(type: "keyword", fields: nil, analyzer: nil, store: true, termVector: nil, properties: nil),
+                    "color": MappingMetaData(type: "keyword", fields: nil, analyzer: nil, store: true, termVector: nil, properties: nil),
+                    "model": MappingMetaData(type: "keyword", fields: nil, analyzer: nil, store: true, termVector: nil, properties: nil),
+                ]),
+            ])
+            .build()
 
         client.indices.create(createIndexRequest, completionHandler: createIndexHandler)
-        
+
         waitForExpectations(timeout: 10)
     }
 }
@@ -899,6 +898,6 @@ struct Shirt: Codable, Equatable {
     var brand: String?
     var color: String?
     var model: String?
-    
+
     init() {}
 }

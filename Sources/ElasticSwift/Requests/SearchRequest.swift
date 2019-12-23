@@ -69,7 +69,7 @@ public class SearchRequestBuilder: RequestBuilder {
         _query = query
         return self
     }
-    
+
     @discardableResult
     public func set(postFilter: Query) -> Self {
         _postFilter = postFilter
@@ -117,95 +117,95 @@ public class SearchRequestBuilder: RequestBuilder {
         _trackScores = trackScores
         return self
     }
-    
+
     @discardableResult
     public func set(indicesBoost: [IndexBoost]) -> Self {
         _indicesBoost = indicesBoost
         return self
     }
-    
+
     @discardableResult
     public func set(preference: String) -> Self {
         _preference = preference
         return self
     }
-    
+
     @discardableResult
     public func set(version: Bool) -> Self {
         _version = version
         return self
     }
-    
+
     @discardableResult
     public func set(seqNoPrimaryTerm: Bool) -> Self {
         _seqNoPrimaryTerm = seqNoPrimaryTerm
         return self
     }
-    
+
     @discardableResult
     public func set(scriptFields: [ScriptField]) -> Self {
         _scriptFields = scriptFields
         return self
     }
-    
+
     @discardableResult
     public func set(docvalueFields: [DocValueField]) -> Self {
         _docvalueFields = docvalueFields
         return self
     }
-    
+
     @discardableResult
     public func add(sort: Sort) -> Self {
-        if self._sorts != nil {
+        if _sorts != nil {
             _sorts?.append(sort)
         } else {
             _sorts = [sort]
         }
         return self
     }
-    
+
     @discardableResult
     public func add(indexBoost: IndexBoost) -> Self {
-        if self._indicesBoost != nil {
+        if _indicesBoost != nil {
             _indicesBoost?.append(indexBoost)
         } else {
             _indicesBoost = [indexBoost]
         }
         return self
     }
-    
+
     @discardableResult
     public func add(scriptField: ScriptField) -> Self {
-        if self._scriptFields != nil {
+        if _scriptFields != nil {
             _scriptFields?.append(scriptField)
         } else {
             _scriptFields = [scriptField]
         }
         return self
     }
-    
+
     @discardableResult
     public func add(docvalueField: DocValueField) -> Self {
-        if self._docvalueFields != nil {
+        if _docvalueFields != nil {
             _docvalueFields?.append(docvalueField)
         } else {
             _docvalueFields = [docvalueField]
         }
         return self
     }
-    
+
     @discardableResult
     public func set(storedFields: String...) -> Self {
         _storedFields = storedFields
         return self
     }
-    
+
     @discardableResult
     public func set(storedFields: [String]) -> Self {
         _storedFields = storedFields
         return self
     }
-    
+
     public var index: String? {
         return _index
     }
@@ -249,39 +249,39 @@ public class SearchRequestBuilder: RequestBuilder {
     public var searchType: SearchType? {
         return _searchType
     }
-    
+
     public var trackScores: Bool? {
         return _trackScores
     }
-    
+
     public var indicesBoost: [IndexBoost]? {
         return _indicesBoost
     }
-    
+
     public var seqNoPrimaryTerm: Bool? {
         return _seqNoPrimaryTerm
     }
-    
+
     public var version: Bool? {
         return _version
     }
-    
+
     public var preference: String? {
         return _preference
     }
-    
+
     public var scriptFields: [ScriptField]? {
         return _scriptFields
     }
-    
+
     public var storedFields: [String]? {
         return _storedFields
     }
-    
+
     public var docvalueFields: [DocValueField]? {
         return _docvalueFields
     }
-    
+
     public var postFilter: Query? {
         return _postFilter
     }
@@ -507,24 +507,23 @@ public struct ScriptField {
 }
 
 extension ScriptField: Codable {
-    
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
-        var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.field))
-        try nested.encode(self.script, forKey: .script)
+        var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
+        try nested.encode(script, forKey: .script)
     }
-    
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         guard container.allKeys.count == 1 else {
             throw Swift.DecodingError.typeMismatch(ScriptField.self, .init(codingPath: container.codingPath, debugDescription: "Unable to find field name in key(s) expect: 1 key found: \(container.allKeys.count)."))
         }
 
-        self.field = container.allKeys.first!.stringValue
-        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.field))
-        self.script = try nested.decode(Script.self, forKey: .script)
+        field = container.allKeys.first!.stringValue
+        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
+        script = try nested.decode(Script.self, forKey: .script)
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case script
     }
@@ -546,20 +545,19 @@ public struct IndexBoost {
 }
 
 extension IndexBoost: Codable {
-    
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
-        try container.encode(self.boost, forKey: .key(named: self.index))
+        try container.encode(boost, forKey: .key(named: index))
     }
-    
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         let dic = try container.decode([String: Decimal].self)
         if dic.isEmpty || dic.count > 1 {
             throw Swift.DecodingError.dataCorruptedError(in: container, debugDescription: "Unexpected data found \(dic)")
         }
-        self.index = dic.first!.key
-        self.boost = dic.first!.value
+        index = dic.first!.key
+        boost = dic.first!.value
     }
 }
 
@@ -770,12 +768,12 @@ public struct ClearScrollRequest: Request {
     }
 
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-        if self.scrollIds.contains("_all") {
+        if scrollIds.contains("_all") {
             return .failure(.noBodyForRequest)
         } else {
-            let body = Body(scrollId: self.scrollIds)
+            let body = Body(scrollId: scrollIds)
             return serializer.encode(body).mapError { error -> MakeBodyError in
-                return MakeBodyError.wrapped(error)
+                MakeBodyError.wrapped(error)
             }
         }
     }
