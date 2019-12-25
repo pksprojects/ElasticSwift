@@ -121,7 +121,7 @@ public struct SearchHit<T: Codable> where T: Equatable {
     public let shard: String?
     public let highlightFields: [String: HighlightField]?
     public let nested: NestedIdentity?
-    
+
     public var searchSearchTarget: SearchSearchTarget? {
         if let node = self.node, let shard = self.shard {
             return .init(nodeId: node, shardId: shard)
@@ -131,24 +131,23 @@ public struct SearchHit<T: Codable> where T: Equatable {
 }
 
 extension SearchHit: Codable {
-    
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.index = try container.decodeString(forKey: .index)
-        self.type = try container.decodeStringIfPresent(forKey: .type)
-        self.id = try container.decodeStringIfPresent(forKey: .id)
-        self.score = try container.decodeDecimalIfPresent(forKey: .score)
-        self.version = try container.decodeIntIfPresent(forKey: .version)
-        self.seqNo = try container.decodeIntIfPresent(forKey: .seqNo)
-        self.primaryTerm = try container.decodeIntIfPresent(forKey: .primaryTerm)
-        self.node = try container.decodeStringIfPresent(forKey: .node)
-        self.shard = try container.decodeStringIfPresent(forKey: .shard)
-        self.nested = try container.decodeIfPresent(NestedIdentity.self, forKey: .nested)
-        self.matchedQueries = try container.decodeArrayIfPresent(forKey: .matchedQueries)
-        self.sort = try container.decodeArrayIfPresent(forKey: .sort)
-        self.source = try container.decodeIfPresent(T.self, forKey: .source)
-        self.explanation = try container.decodeIfPresent(Explanation.self, forKey: .explanation)
-        //self.innerHits = try container.decodeDicIfPresent(forKey: .innerHits)
+        index = try container.decodeString(forKey: .index)
+        type = try container.decodeStringIfPresent(forKey: .type)
+        id = try container.decodeStringIfPresent(forKey: .id)
+        score = try container.decodeDecimalIfPresent(forKey: .score)
+        version = try container.decodeIntIfPresent(forKey: .version)
+        seqNo = try container.decodeIntIfPresent(forKey: .seqNo)
+        primaryTerm = try container.decodeIntIfPresent(forKey: .primaryTerm)
+        node = try container.decodeStringIfPresent(forKey: .node)
+        shard = try container.decodeStringIfPresent(forKey: .shard)
+        nested = try container.decodeIfPresent(NestedIdentity.self, forKey: .nested)
+        matchedQueries = try container.decodeArrayIfPresent(forKey: .matchedQueries)
+        sort = try container.decodeArrayIfPresent(forKey: .sort)
+        source = try container.decodeIfPresent(T.self, forKey: .source)
+        explanation = try container.decodeIfPresent(Explanation.self, forKey: .explanation)
+        // self.innerHits = try container.decodeDicIfPresent(forKey: .innerHits)
 //        let fieldsDic = try container.decodeIfPresent([String: [CodableValue]].self, forKey: .fields)
 //        if let fieldsDic = fieldsDic {
 //            var dic = [String: SearchHitField]()
@@ -157,31 +156,31 @@ extension SearchHit: Codable {
 //        } else {
 //            self.fields = nil
 //        }
-        
-        self.fields = try SearchHit.decodeDicOf([String: [CodableValue]].self, in: container, forKey: .fields, flattern: { SearchHitField(name: $0.key, values: $0.value) }, reduce: { $1[$0.name] = $0 })
-        
-        self.highlightFields = try SearchHit.decodeDicOf([String: [String]].self, in: container, forKey: .highlightFields, flattern: { HighlightField(name: $0.key, fragments: $0.value) }, reduce: { $1[$0.name] = $0 })
-        
-        self.innerHits = try SearchHit.decodeDicOf([String: InnerHitWrapper].self, in: container, forKey: .innerHits, flattern: { ($0.key, $0.value.hits) }, reduce: {$1[$0.0] = $0.1 })
+
+        fields = try SearchHit.decodeDicOf([String: [CodableValue]].self, in: container, forKey: .fields, flattern: { SearchHitField(name: $0.key, values: $0.value) }, reduce: { $1[$0.name] = $0 })
+
+        highlightFields = try SearchHit.decodeDicOf([String: [String]].self, in: container, forKey: .highlightFields, flattern: { HighlightField(name: $0.key, fragments: $0.value) }, reduce: { $1[$0.name] = $0 })
+
+        innerHits = try SearchHit.decodeDicOf([String: InnerHitWrapper].self, in: container, forKey: .innerHits, flattern: { ($0.key, $0.value.hits) }, reduce: { $1[$0.0] = $0.1 })
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(self.index, forKey: .index)
-        try container.encodeIfPresent(self.type, forKey: .type)
-        try container.encodeIfPresent(self.id, forKey: .id)
-        try container.encodeIfPresent(self.score, forKey: .score)
-        try container.encodeIfPresent(self.source, forKey: .source)
-        try container.encodeIfPresent(self.sort, forKey: .sort)
-        try container.encodeIfPresent(self.version, forKey: .version)
-        try container.encodeIfPresent(self.seqNo, forKey: .seqNo)
-        try container.encodeIfPresent(self.primaryTerm, forKey: .primaryTerm)
-        try container.encodeIfPresent(self.explanation, forKey: .explanation)
-        try container.encodeIfPresent(self.matchedQueries, forKey: .matchedQueries)
-        try container.encodeIfPresent(self.innerHits?.mapValues { InnerHitWrapper(hits: $0) }, forKey: .innerHits)
-        try container.encodeIfPresent(self.shard, forKey: .shard)
-        try container.encodeIfPresent(self.node, forKey: .node)
-        try container.encodeIfPresent(self.nested, forKey: .nested)
+        try container.encode(index, forKey: .index)
+        try container.encodeIfPresent(type, forKey: .type)
+        try container.encodeIfPresent(id, forKey: .id)
+        try container.encodeIfPresent(score, forKey: .score)
+        try container.encodeIfPresent(source, forKey: .source)
+        try container.encodeIfPresent(sort, forKey: .sort)
+        try container.encodeIfPresent(version, forKey: .version)
+        try container.encodeIfPresent(seqNo, forKey: .seqNo)
+        try container.encodeIfPresent(primaryTerm, forKey: .primaryTerm)
+        try container.encodeIfPresent(explanation, forKey: .explanation)
+        try container.encodeIfPresent(matchedQueries, forKey: .matchedQueries)
+        try container.encodeIfPresent(innerHits?.mapValues { InnerHitWrapper(hits: $0) }, forKey: .innerHits)
+        try container.encodeIfPresent(shard, forKey: .shard)
+        try container.encodeIfPresent(node, forKey: .node)
+        try container.encodeIfPresent(nested, forKey: .nested)
         if let fields = self.fields {
             try container.encode(fields.mapValues { $0.values }, forKey: .fields)
         }
@@ -189,7 +188,7 @@ extension SearchHit: Codable {
             try container.encode(highlight.mapValues { $0.fragments }, forKey: .highlightFields)
         }
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case index = "_index"
         case type = "_type"
@@ -209,8 +208,8 @@ extension SearchHit: Codable {
         case highlightFields = "highlight"
         case nested = "_nested"
     }
-    
-    private static func decodeDicOf<K, V, R, X, Y>(_ decodeDic: Dictionary<K, V>.Type, in container: KeyedDecodingContainer<CodingKeys>, forKey key: CodingKeys, flattern mapper: ((key: K, value: V)) throws -> R, reduce reducer: (R, SharedDic<X, Y>) -> Void) throws -> Dictionary<X, Y>? where K: Codable, V: Codable {
+
+    private static func decodeDicOf<K, V, R, X, Y>(_ decodeDic: [K: V].Type, in container: KeyedDecodingContainer<CodingKeys>, forKey key: CodingKeys, flattern mapper: ((key: K, value: V)) throws -> R, reduce reducer: (R, SharedDic<X, Y>) -> Void) throws -> [X: Y]? where K: Codable, V: Codable {
         let decodedDic: [K: V]? = try container.decodeDicIfPresent(forKey: key)
         if let decodeDic = decodedDic {
             let dic = SharedDic<X, Y>()
@@ -219,7 +218,7 @@ extension SearchHit: Codable {
         }
         return nil
     }
-    
+
     private struct InnerHitWrapper: Codable, Equatable {
         public let hits: SearchHits<CodableValue>
     }
@@ -242,7 +241,7 @@ public struct Explanation: Codable, Equatable {
 public struct SearchSearchTarget: Codable, Equatable {
     public let nodeId: String
     public let shardId: String
-    
+
     enum CodingKeys: String, CodingKey {
         case nodeId = "_node"
         case shardId = "_shard"
@@ -255,21 +254,20 @@ public struct HighlightField: Codable, Equatable {
 }
 
 public struct NestedIdentity {
-    
     public let field: String
     public let offset: Int
     private let _nested: [NestedIdentity]?
-    
+
     public init(field: String, offset: Int, nested: NestedIdentity?) {
         self.field = field
         self.offset = offset
         if let nested = nested {
-            self._nested = [nested]
+            _nested = [nested]
         } else {
-            self._nested = nil
+            _nested = nil
         }
     }
-    
+
     public var child: NestedIdentity? {
         if let nested = self._nested, !nested.isEmpty {
             return nested[0]
@@ -279,28 +277,27 @@ public struct NestedIdentity {
 }
 
 extension NestedIdentity: Codable {
-    
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(self.field, forKey: .field)
-        try container.encode(self.offset, forKey: .offset)
+        try container.encode(field, forKey: .field)
+        try container.encode(offset, forKey: .offset)
         if let nested = self._nested, !nested.isEmpty {
             try container.encode(nested[0], forKey: .nested)
         }
     }
-    
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.field = try container.decodeString(forKey: .field)
-        self.offset =  try container.decodeInt(forKey: .offset)
+        field = try container.decodeString(forKey: .field)
+        offset = try container.decodeInt(forKey: .offset)
         let nested = try container.decodeIfPresent(NestedIdentity.self, forKey: .nested)
         if let nested = nested {
-            self._nested = [nested]
+            _nested = [nested]
         } else {
-            self._nested = nil
+            _nested = nil
         }
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case field
         case offset

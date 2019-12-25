@@ -10,11 +10,10 @@ import UnitTestSettings
 import XCTest
 
 @testable import ElasticSwift
-@testable import ElasticSwiftCore
 @testable import ElasticSwiftCodableUtils
+@testable import ElasticSwiftCore
 
 class ResponseTests: XCTestCase {
-    
     let logger = Logger(label: "org.pksprojects.ElasticSwiftTests.Response.ResponseTests", factory: logFactory)
 
     override func setUp() {
@@ -29,68 +28,67 @@ class ResponseTests: XCTestCase {
         super.tearDown()
         logger.info("====================TEST=END===============================")
     }
-    
+
     func test_01_search_response_decode() throws {
-        
         let serializer = DefaultSerializer()
-        
+
         let data =
-        """
-        {
-          "took" : 4,
-          "timed_out" : false,
-          "_shards" : {
-            "total" : 63,
-            "successful" : 63,
-            "skipped" : 0,
-            "failed" : 0
-          },
-          "hits" : {
-            "total" : 1,
-            "max_score" : 0.2876821,
-            "hits" : [
-              {
-                "_index" : "test",
-                "_type" : "_doc",
-                "_id" : "1",
-                "_score" : 0.2876821,
-                "_source" : {
-                  "title" : "Test title",
-                  "content" : "Some test content kimchy",
-                  "comments" : [
-                    {
-                      "author" : "kimchy",
-                      "text" : "comment text",
-                      "votes" : [ ]
-                    },
-                    {
-                      "author" : "nik9000",
-                      "text" : "words words words",
-                      "votes" : [
+            """
+            {
+              "took" : 4,
+              "timed_out" : false,
+              "_shards" : {
+                "total" : 63,
+                "successful" : 63,
+                "skipped" : 0,
+                "failed" : 0
+              },
+              "hits" : {
+                "total" : 1,
+                "max_score" : 0.2876821,
+                "hits" : [
+                  {
+                    "_index" : "test",
+                    "_type" : "_doc",
+                    "_id" : "1",
+                    "_score" : 0.2876821,
+                    "_source" : {
+                      "title" : "Test title",
+                      "content" : "Some test content kimchy",
+                      "comments" : [
                         {
-                          "value" : 1,
-                          "voter" : "kimchy"
+                          "author" : "kimchy",
+                          "text" : "comment text",
+                          "votes" : [ ]
                         },
                         {
-                          "value" : -1,
-                          "voter" : "other"
+                          "author" : "nik9000",
+                          "text" : "words words words",
+                          "votes" : [
+                            {
+                              "value" : 1,
+                              "voter" : "kimchy"
+                            },
+                            {
+                              "value" : -1,
+                              "voter" : "other"
+                            }
+                          ]
                         }
                       ]
+                    },
+                    "highlight" : {
+                      "content" : [
+                        "Some test content <em>kimchy</em>"
+                      ]
                     }
-                  ]
-                },
-                "highlight" : {
-                  "content" : [
-                    "Some test content <em>kimchy</em>"
-                  ]
-                }
+                  }
+                ]
               }
-            ]
-          }
-        }
-        """.data(using: .utf8)
+            }
+            """.data(using: .utf8)
 
-        let result : Result<SearchResponse<CodableValue>, DecodingError> = serializer.decode(data: data!)
+        let result: Result<SearchResponse<CodableValue>, DecodingError> = serializer.decode(data: data!)
 
         switch result {
         case let .success(resposne):
@@ -100,17 +98,16 @@ class ResponseTests: XCTestCase {
             logger.info("Unexpected Error: \(error.localizedDescription)")
             XCTAssert(false, "Encoding Failed!")
         }
-        
     }
-    
+
     func test_02_search_response_encode() throws {
         let serializer = DefaultSerializer()
-        
-        let hit = SearchHit.init(index: "test", type: "_doc", id: "1", score: 0.2876821, source: ["test": "test"], sort: nil, version: nil, seqNo: nil, primaryTerm: nil, fields: nil, explanation: nil, matchedQueries: nil, innerHits: nil, node: nil, shard: nil, highlightFields: ["content": .init(name: "content", fragments: ["test"])], nested: nil)
+
+        let hit = SearchHit(index: "test", type: "_doc", id: "1", score: 0.2876821, source: ["test": "test"], sort: nil, version: nil, seqNo: nil, primaryTerm: nil, fields: nil, explanation: nil, matchedQueries: nil, innerHits: nil, node: nil, shard: nil, highlightFields: ["content": .init(name: "content", fragments: ["test"])], nested: nil)
         let searchResponse = SearchResponse(took: 1, timedOut: false, shards: .init(total: 1, successful: 1, skipped: 0, failed: 0, failures: nil), hits: .init(total: 1, maxScore: 1.0, hits: [hit]), scrollId: nil)
-        
+
         let result: Result<Data, EncodingError> = serializer.encode(searchResponse)
-        
+
         switch result {
         case let .success(resposne):
             let encodeStr = String(data: resposne, encoding: .utf8)
@@ -122,11 +119,10 @@ class ResponseTests: XCTestCase {
             XCTAssert(false, "Encoding Failed!")
         }
     }
-    
-    func test_03_search_response_decode_inner_hits() throws {
 
+    func test_03_search_response_decode_inner_hits() throws {
         let serializer = DefaultSerializer()
-        
+
         let data =
             """
             {
@@ -282,7 +278,7 @@ class ResponseTests: XCTestCase {
             """.data(using: .utf8)
 
         let result: Result<SearchResponse<CodableValue>, DecodingError> = serializer.decode(data: data!)
-        
+
         switch result {
         case let .success(response):
             logger.info("Decoded: \(response)")
@@ -295,17 +291,16 @@ class ResponseTests: XCTestCase {
             logger.info("Unexpected Error: \(error)")
             XCTAssert(false, "Encoding Failed!")
         }
-        
     }
-    
+
     func test_04_search_response_encode_inner_hits() throws {
         let serializer = DefaultSerializer()
-        
-        let hit = SearchHit.init(index: "test", type: "_doc", id: "1", score: 0.2876821, source: ["test": "test"], sort: nil, version: nil, seqNo: nil, primaryTerm: nil, fields: ["test1": .init(name: "test1", values: ["value"])], explanation: nil, matchedQueries: nil, innerHits: ["comments.votes": .init(total: 0, maxScore: 0, hits: [])], node: nil, shard: nil, highlightFields: nil, nested: .init(field: "comments", offset: 1, nested: .init(field: "votes", offset: 0, nested: nil)))
+
+        let hit = SearchHit(index: "test", type: "_doc", id: "1", score: 0.2876821, source: ["test": "test"], sort: nil, version: nil, seqNo: nil, primaryTerm: nil, fields: ["test1": .init(name: "test1", values: ["value"])], explanation: nil, matchedQueries: nil, innerHits: ["comments.votes": .init(total: 0, maxScore: 0, hits: [])], node: nil, shard: nil, highlightFields: nil, nested: .init(field: "comments", offset: 1, nested: .init(field: "votes", offset: 0, nested: nil)))
         let searchResponse = SearchResponse(took: 1, timedOut: false, shards: .init(total: 1, successful: 1, skipped: 0, failed: 0, failures: nil), hits: .init(total: 1, maxScore: 1.0, hits: [hit]), scrollId: nil)
-        
+
         let result: Result<Data, EncodingError> = serializer.encode(searchResponse)
-        
+
         switch result {
         case let .success(resposne):
             let encodeStr = String(data: resposne, encoding: .utf8)
@@ -316,8 +311,5 @@ class ResponseTests: XCTestCase {
             logger.info("Unexpected Error: \(error)")
             XCTAssert(false, "Encoding Failed!")
         }
-        
-        
     }
-    
 }

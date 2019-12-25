@@ -93,8 +93,8 @@ extension URLQueryItem {
 
 /// Dictionary Wrapper to pass dictionary as referance
 internal class SharedDic<K: Hashable, V> {
-    var dict : Dictionary<K, V> = Dictionary()
-    subscript(key : K) -> V? {
+    var dict: [K: V] = Dictionary()
+    subscript(key: K) -> V? {
         get {
             return dict[key]
         }
