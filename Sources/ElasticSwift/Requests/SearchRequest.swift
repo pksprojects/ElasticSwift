@@ -89,7 +89,7 @@ public class SearchRequestBuilder: RequestBuilder {
     }
 
     @discardableResult
-    public func explain(_ explain: Bool) -> Self {
+    public func set(explain: Bool) -> Self {
         _explain = explain
         return self
     }

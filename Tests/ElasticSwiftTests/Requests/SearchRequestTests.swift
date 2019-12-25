@@ -531,7 +531,7 @@ class SearchRequestTests: XCTestCase {
         let request = try SearchRequestBuilder()
             .set(indices: indexName)
             .set(query: MatchAllQuery())
-            .explain(true)
+            .set(explain: true)
             .set(scriptFields: [test1Script])
             .add(scriptField: test2Script)
             .build()
