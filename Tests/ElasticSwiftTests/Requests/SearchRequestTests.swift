@@ -506,7 +506,7 @@ class SearchRequestTests: XCTestCase {
         waitForExpectations(timeout: 10)
     }
 
-    func test_08_Search_script_fields() throws {
+    func test_08_Search_script_fields_explain_true() throws {
         let e = expectation(description: "execution complete")
 
         func handler(_ result: Result<SearchResponse<Message>, Error>) {
@@ -531,6 +531,7 @@ class SearchRequestTests: XCTestCase {
         let request = try SearchRequestBuilder()
             .set(indices: indexName)
             .set(query: MatchAllQuery())
+            .explain(true)
             .set(scriptFields: [test1Script])
             .add(scriptField: test2Script)
             .build()
