@@ -893,6 +893,66 @@ class SearchRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
+    
+    func test_15_Search_highlight() throws {
+        let e = expectation(description: "execution complete")
+
+        func handler(_ result: Result<SearchResponse<Message>, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+                XCTAssert(false)
+            case let .success(response):
+                XCTAssertNotNil(response.hits)
+                XCTAssertTrue(response.hits.hits.count > 0, "Count \(response.hits.hits.count)")
+                for hit in response.hits.hits {
+                    XCTAssertNotNil(hit.id, "id is nil \(hit)")
+                    XCTAssertNotNil(hit.type, "type is nil \(hit)")
+                    XCTAssertNotNil(hit.highlightFields, "highlightFields is \(hit)")
+                    XCTAssertNotNil(hit.source, "source is nil \(hit)")
+                }
+            }
+
+            e.fulfill()
+        }
+        
+        let fieldOptions =  FieldOptionsBuilder()
+            .set(highlighterType: .plain)
+            .set(scoreOrdered: true)
+            .build()
+        
+        let globalOptions = FieldOptionsBuilder()
+            .set(encoder: .html)
+            .set(tagScheme: "styled")
+            .build()
+
+        let request = try SearchRequestBuilder()
+            .set(indices: indexName)
+            .set(query: MatchQuery(field: "msg", value: "to test"))
+            .set(highlight: .init(fields: [.init("msg", options: fieldOptions)], globalOptions: globalOptions))
+            .build()
+
+        /// make sure doc exists
+        func handler1(_ result: Result<IndexResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+            case let .success(response):
+                logger.info("Found \(response.result)")
+            }
+            client.search(request, completionHandler: handler)
+        }
+        var msg = Message()
+        msg.msg = "Message to test"
+        var request1 = try IndexRequestBuilder<Message>()
+            .set(index: indexName)
+            .set(source: msg)
+            .build()
+        request1.refresh = .true
+        client.index(request1, completionHandler: handler1)
+
+        waitForExpectations(timeout: 10)
+    }
 }
 
 struct Shirt: Codable, Equatable {

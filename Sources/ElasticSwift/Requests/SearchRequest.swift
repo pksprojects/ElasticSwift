@@ -8,6 +8,7 @@
 
 import ElasticSwiftCore
 import ElasticSwiftQueryDSL
+import ElasticSwiftCodableUtils
 import Foundation
 import NIOHTTP1
 
@@ -36,6 +37,7 @@ public class SearchRequestBuilder: RequestBuilder {
     private var _storedFields: [String]?
     private var _docvalueFields: [DocValueField]?
     private var _postFilter: Query?
+    private var _highlight: Highlight?
 
     public init() {}
 
@@ -205,6 +207,12 @@ public class SearchRequestBuilder: RequestBuilder {
         _storedFields = storedFields
         return self
     }
+    
+    @discardableResult
+    public func set(highlight: Highlight) -> Self {
+        _highlight = highlight
+        return self
+    }
 
     public var index: String? {
         return _index
@@ -285,6 +293,10 @@ public class SearchRequestBuilder: RequestBuilder {
     public var postFilter: Query? {
         return _postFilter
     }
+    
+    public var highlight: Highlight? {
+        return _highlight
+    }
 
     public func build() throws -> SearchRequest {
         return try SearchRequest(withBuilder: self)
@@ -313,12 +325,13 @@ public struct SearchRequest: Request {
     public let storedFields: [String]?
     public let docvalueFields: [DocValueField]?
     public let postFilter: Query?
+    public let highlight: Highlight?
 
     public var scroll: Scroll?
     public var searchType: SearchType?
     public var preference: String?
 
-    public init(index: String, type: String?, from: Int16?, size: Int16?, query: Query?, sorts: [Sort]?, sourceFilter: SourceFilter?, explain: Bool?, minScore: Decimal?, scroll: Scroll?, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool?, preference: String? = nil, scriptFields: [ScriptField]? = nil, storedFields: [String]? = nil, docvalueFields: [DocValueField]?, postFilter: Query? = nil) {
+    public init(index: String, type: String?, from: Int16?, size: Int16?, query: Query?, sorts: [Sort]?, sourceFilter: SourceFilter?, explain: Bool?, minScore: Decimal?, scroll: Scroll?, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool?, preference: String? = nil, scriptFields: [ScriptField]? = nil, storedFields: [String]? = nil, docvalueFields: [DocValueField]?, postFilter: Query? = nil, highlight: Highlight? = nil) {
         self.index = index
         self.type = type
         self.from = from
@@ -338,6 +351,7 @@ public struct SearchRequest: Request {
         self.storedFields = storedFields
         self.docvalueFields = docvalueFields
         self.postFilter = postFilter
+        self.highlight = highlight
     }
 
     internal init(withBuilder builder: SearchRequestBuilder) throws {
@@ -361,6 +375,7 @@ public struct SearchRequest: Request {
         storedFields = builder.storedFields
         docvalueFields = builder.docvalueFields
         postFilter = builder.postFilter
+        highlight = builder.highlight
     }
 
     public var method: HTTPMethod {
@@ -390,7 +405,7 @@ public struct SearchRequest: Request {
     }
 
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-        let body = Body(query: query, sort: sorts, size: size, from: from, source: sourceFilter, explain: explain, minScore: minScore, trackScores: trackScores, indicesBoost: indicesBoost, seqNoPrimaryTerm: seqNoPrimaryTerm, version: version, scriptFields: scriptFields, storedFields: storedFields, docvalueFields: docvalueFields, postFilter: postFilter)
+        let body = Body(query: query, sort: sorts, size: size, from: from, source: sourceFilter, explain: explain, minScore: minScore, trackScores: trackScores, indicesBoost: indicesBoost, seqNoPrimaryTerm: seqNoPrimaryTerm, version: version, scriptFields: scriptFields, storedFields: storedFields, docvalueFields: docvalueFields, postFilter: postFilter, highlight: highlight)
         return serializer.encode(body).mapError { error -> MakeBodyError in
             MakeBodyError.wrapped(error)
         }
@@ -412,6 +427,7 @@ public struct SearchRequest: Request {
         public let storedFields: [String]?
         public let docvalueFields: [DocValueField]?
         public let postFilter: Query?
+        public let highlight: Highlight?
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
@@ -429,6 +445,7 @@ public struct SearchRequest: Request {
             try container.encodeIfPresent(storedFields, forKey: .storedFields)
             try container.encodeIfPresent(docvalueFields, forKey: .docvalueFields)
             try container.encodeIfPresent(postFilter, forKey: .postFilter)
+            try container.encodeIfPresent(highlight, forKey: .highlight)
             if let scriptFields = self.scriptFields, !scriptFields.isEmpty {
                 if scriptFields.count == 1 {
                     try container.encode(scriptFields[0], forKey: .scriptFields)
@@ -458,6 +475,7 @@ public struct SearchRequest: Request {
             case storedFields = "stored_fields"
             case docvalueFields = "docvalue_fields"
             case postFilter = "post_filter"
+            case highlight
         }
     }
 }
@@ -490,7 +508,7 @@ extension SearchRequest: Equatable {
             && SearchRequest.matchQueries(lhs.postFilter, rhs.postFilter)
     }
 
-    private static func matchQueries(_ lhs: Query?, _ rhs: Query?) -> Bool {
+    fileprivate static func matchQueries(_ lhs: Query?, _ rhs: Query?) -> Bool {
         if lhs == nil, rhs == nil {
             return true
         }
@@ -888,3 +906,613 @@ extension SourceFilter: Codable {
 }
 
 extension SourceFilter: Equatable {}
+
+// MARK:- Highlighting
+
+public class HighlightBuilder {
+    
+    private var _fields: [Highlight.Field]?
+    private var _globalOptions: Highlight.FieldOptions?
+    
+    @discardableResult
+    public func set(fields: [Highlight.Field]) -> Self {
+        self._fields = fields
+        return self
+    }
+    
+    @discardableResult
+    public func set(globalOptions: Highlight.FieldOptions) -> Self {
+        self._globalOptions = globalOptions
+        return self
+    }
+    
+    @discardableResult
+    public func add(field: Highlight.Field) -> Self {
+        if self._fields != nil {
+            self._fields?.append(field)
+        } else {
+            self._fields = [field]
+        }
+        return self
+    }
+    
+    
+    public var fields: [Highlight.Field]? {
+        return self._fields
+    }
+    
+    public var globalOptions: Highlight.FieldOptions? {
+        return self._globalOptions
+    }
+    
+    public func build() throws -> Highlight {
+        return try Highlight(withBuilder: self)
+    }
+}
+
+public class FieldOptionsBuilder {
+    
+    private var _fragmentSize: Int?
+    private var _numberOfFragments: Int?
+    private var _fragmentOffset: Int?
+    private var _encoder: Highlight.EncoderType?
+    private var _preTags: [String]?
+    private var _postTags: [String]?
+    private var _scoreOrdered: Bool?
+    private var _requireFieldMatch: Bool?
+    private var _highlighterType: Highlight.HighlighterType?
+    private var _forceSource: Bool?
+    private var _fragmenter: String?
+    private var _boundaryScannerType: Highlight.BoundaryScannerType?
+    private var _boundaryMaxScan: Int?
+    private var _boundaryChars: [Character]?
+    private var _boundaryScannerLocale: String?
+    private var _highlightQuery: Query?
+    private var _noMatchSize: Int?
+    private var _matchedFields: [String]?
+    private var _phraseLimit: Int?
+    private var _tagScheme: String?
+    private var _termVector: String?
+    private var _indexOptions: String?
+    
+    public init() {}
+    
+    @discardableResult
+    public func set(fragmentSize: Int) -> Self {
+        self._fragmentSize = fragmentSize
+        return self
+    }
+    @discardableResult
+    public func set(numberOfFragments: Int) -> Self {
+        self._numberOfFragments = numberOfFragments
+        return self
+    }
+    @discardableResult
+    public func set(fragmentOffset: Int) -> Self {
+        self._fragmentOffset = fragmentOffset
+        return self
+    }
+    @discardableResult
+    public func set(encoder: Highlight.EncoderType) -> Self {
+        self._encoder = encoder
+        return self
+    }
+    @discardableResult
+    public func set(preTags: [String]) -> Self {
+        self._preTags = preTags
+        return self
+    }
+    @discardableResult
+    public func set(postTags: [String]) -> Self {
+        self._postTags = postTags
+        return self
+    }
+    @discardableResult
+    public func set(scoreOrdered: Bool) -> Self {
+        self._scoreOrdered = scoreOrdered
+        return self
+    }
+    @discardableResult
+    public func set(requireFieldMatch: Bool) -> Self {
+        self._requireFieldMatch = requireFieldMatch
+        return self
+    }
+    @discardableResult
+    public func set(highlighterType: Highlight.HighlighterType) -> Self {
+        self._highlighterType = highlighterType
+        return self
+    }
+    @discardableResult
+    public func set(forceSource: Bool) -> Self {
+        self._forceSource = forceSource
+        return self
+    }
+    @discardableResult
+    public func set(fragmenter: String) -> Self {
+        self._fragmenter = fragmenter
+        return self
+    }
+    @discardableResult
+    public func set(boundaryScannerType: Highlight.BoundaryScannerType) -> Self {
+        self._boundaryScannerType = boundaryScannerType
+        return self
+    }
+    @discardableResult
+    public func set(boundaryMaxScan: Int) -> Self {
+        self._boundaryMaxScan = boundaryMaxScan
+        return self
+    }
+    @discardableResult
+    public func set(boundaryChars: [Character]) -> Self {
+        self._boundaryChars = boundaryChars
+        return self
+    }
+    @discardableResult
+    public func set(boundaryScannerLocale: String) -> Self {
+        self._boundaryScannerLocale = boundaryScannerLocale
+        return self
+    }
+    @discardableResult
+    public func set(highlightQuery: Query) -> Self {
+        self._highlightQuery = highlightQuery
+        return self
+    }
+    @discardableResult
+    public func set(noMatchSize: Int) -> Self {
+        self._noMatchSize = noMatchSize
+        return self
+    }
+    @discardableResult
+    public func set(matchedFields: [String]) -> Self {
+        self._matchedFields = matchedFields
+        return self
+    }
+    @discardableResult
+    public func set(phraseLimit: Int) -> Self {
+        self._phraseLimit = phraseLimit
+        return self
+    }
+    @discardableResult
+    public func set(tagScheme: String) -> Self {
+        self._tagScheme = tagScheme
+        return self
+    }
+    @discardableResult
+    public func set(termVector: String) -> Self {
+        self._termVector = termVector
+        return self
+    }
+    @discardableResult
+    public func set(indexOptions: String) -> Self {
+        self._indexOptions = indexOptions
+        return self
+    }
+    
+    
+    public var fragmentSize: Int? {
+        return self._fragmentSize
+    }
+    public var numberOfFragments: Int? {
+        return self._numberOfFragments
+    }
+    public var fragmentOffset: Int? {
+        return self._fragmentOffset
+    }
+    public var encoder: Highlight.EncoderType? {
+        return self._encoder
+    }
+    public var preTags: [String]? {
+        return self._preTags
+    }
+    public var postTags: [String]? {
+        return self._postTags
+    }
+    public var scoreOrdered: Bool? {
+        return self._scoreOrdered
+    }
+    public var requireFieldMatch: Bool? {
+        return self._requireFieldMatch
+    }
+    public var highlighterType: Highlight.HighlighterType? {
+        return self._highlighterType
+    }
+    public var forceSource: Bool? {
+        return self._forceSource
+    }
+    public var fragmenter: String? {
+        return self._fragmenter
+    }
+    public var boundaryScannerType: Highlight.BoundaryScannerType? {
+        return self._boundaryScannerType
+    }
+    public var boundaryMaxScan: Int? {
+        return self._boundaryMaxScan
+    }
+    public var boundaryChars: [Character]? {
+        return self._boundaryChars
+    }
+    public var boundaryScannerLocale: String? {
+        return self._boundaryScannerLocale
+    }
+    public var highlightQuery: Query? {
+        return self._highlightQuery
+    }
+    public var noMatchSize: Int? {
+        return self._noMatchSize
+    }
+    public var matchedFields: [String]? {
+        return self._matchedFields
+    }
+    public var phraseLimit: Int? {
+        return self._phraseLimit
+    }
+    public var tagScheme: String? {
+        return self._tagScheme
+    }
+    public var termVector: String? {
+        return self._termVector
+    }
+    public var indexOptions: String? {
+        return self._indexOptions
+    }
+    
+    public func build() -> Highlight.FieldOptions {
+        return Highlight.FieldOptions(withBuilder: self)
+    }
+}
+
+public struct Highlight {
+    
+    public let fields: [Field]
+    public let globalOptions: FieldOptions
+    
+    public init(fields: [Field], globalOptions: FieldOptions = FieldOptions()) {
+        self.fields = fields
+        self.globalOptions = globalOptions
+    }
+    
+    internal init(withBuilder builder: HighlightBuilder) throws {
+        
+        guard builder.fields != nil && !builder.fields!.isEmpty else {
+            throw RequestBuilderError.atlestOneElementRequired("fields")
+        }
+        
+        self.init(fields: builder.fields!, globalOptions: builder.globalOptions ?? FieldOptions())
+    }
+}
+
+extension Highlight: Codable {
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.fields, forKey: .fields)
+        try container.encodeIfPresent(self.globalOptions.boundaryChars?.map { String($0) }, forKey: .boundaryChars)
+        try container.encodeIfPresent(self.globalOptions.boundaryMaxScan, forKey: .boundaryMaxScan)
+        try container.encodeIfPresent(self.globalOptions.boundaryScannerType, forKey: .boundaryScannerType)
+        try container.encodeIfPresent(self.globalOptions.boundaryScannerLocale, forKey: .boundaryScannerLocale)
+        try container.encodeIfPresent(self.globalOptions.encoder, forKey: .encoder)
+        try container.encodeIfPresent(self.globalOptions.forceSource, forKey: .forceSource)
+        try container.encodeIfPresent(self.globalOptions.fragmenter, forKey: .fragmenter)
+        try container.encodeIfPresent(self.globalOptions.fragmentOffset, forKey: .fragmentOffset)
+        try container.encodeIfPresent(self.globalOptions.fragmentSize, forKey: .fragmentSize)
+        try container.encodeIfPresent(self.globalOptions.highlightQuery, forKey: .highlightQuery)
+        try container.encodeIfPresent(self.globalOptions.matchedFields, forKey: .matchedFields)
+        try container.encodeIfPresent(self.globalOptions.numberOfFragments, forKey: .numberOfFragments)
+        try container.encodeIfPresent((self.globalOptions.scoreOrdered ?? false) ? Highlight.FieldOptions.SCORE_ORDERER_VALUE: nil, forKey: .order)
+        try container.encodeIfPresent(self.globalOptions.phraseLimit, forKey: .phraseLimit)
+        try container.encodeIfPresent(self.globalOptions.preTags, forKey: .preTags)
+        try container.encodeIfPresent(self.globalOptions.postTags, forKey: .postTags)
+        try container.encodeIfPresent(self.globalOptions.requireFieldMatch, forKey: .requireFieldMatch)
+        try container.encodeIfPresent(self.globalOptions.tagScheme, forKey: .tagsSchema)
+        try container.encodeIfPresent(self.globalOptions.highlighterType, forKey: .type)
+        try container.encodeIfPresent(self.globalOptions.termVector, forKey: .termVector)
+        try container.encodeIfPresent(self.globalOptions.indexOptions, forKey: .indexOptions)
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.fields = try container.decodeArray(forKey: .fields)
+        var options = FieldOptions()
+        let chars: [String]? = try container.decodeArrayIfPresent(forKey: .boundaryChars)
+        if let chars = chars {
+            var charArr = [Character]()
+            for char in chars {
+                charArr.append(contentsOf: [Character](char))
+            }
+            options.boundaryChars = charArr
+        } else {
+            options.boundaryChars = nil
+        }
+        options.boundaryMaxScan = try container.decodeIntIfPresent(forKey: .boundaryMaxScan)
+        options.boundaryScannerType = try container.decodeIfPresent(Highlight.BoundaryScannerType.self, forKey: .boundaryScannerType)
+        options.boundaryScannerLocale = try container.decodeStringIfPresent(forKey: .boundaryScannerLocale)
+        options.encoder = try container.decodeIfPresent(Highlight.EncoderType.self, forKey: .encoder)
+        options.forceSource = try container.decodeBoolIfPresent(forKey: .forceSource)
+        options.fragmenter = try container.decodeStringIfPresent(forKey: .fragmenter)
+        options.fragmentOffset = try container.decodeIntIfPresent(forKey: .fragmentOffset)
+        options.fragmentSize = try container.decodeIntIfPresent(forKey: .fragmentSize)
+        options.highlightQuery = try container.decodeQueryIfPresent(forKey: .highlightQuery)
+        options.matchedFields = try container.decodeArray(forKey: .matchedFields)
+        options.noMatchSize = try container.decodeIntIfPresent(forKey: .noMatchSize)
+        options.numberOfFragments = try container.decodeIntIfPresent(forKey: .numberOfFragments)
+        let order = try container.decodeStringIfPresent(forKey: .order)
+        if let order = order {
+            switch order {
+            case Highlight.FieldOptions.SCORE_ORDERER_VALUE:
+                options.scoreOrdered = true
+            default:
+                options.scoreOrdered = false
+            }
+        } else {
+            options.scoreOrdered = nil
+        }
+        options.phraseLimit = try container.decodeIntIfPresent(forKey: .phraseLimit)
+        options.preTags = try container.decodeArray(forKey: .preTags)
+        options.postTags = try container.decodeArray(forKey: .postTags)
+        options.requireFieldMatch = try container.decodeBoolIfPresent(forKey: .requireFieldMatch)
+        options.tagScheme = try container.decodeStringIfPresent(forKey: .tagsSchema)
+        options.highlighterType = try container.decodeIfPresent(Highlight.HighlighterType.self, forKey: .type)
+        options.termVector = try container.decodeStringIfPresent(forKey: .termVector)
+        options.indexOptions = try container.decodeStringIfPresent(forKey: .indexOptions)
+        self.globalOptions = options
+    }
+    
+    
+    enum CodingKeys: String, CodingKey {
+        case fields
+        case boundaryChars = "boundary_chars"
+        case boundaryMaxScan = "boundary_max_scan"
+        case boundaryScannerType = "boundary_scanner"
+        case boundaryScannerLocale = "boundary_scanner_locale"
+        case encoder
+        case forceSource = "force_source"
+        case fragmenter
+        case fragmentOffset = "fragment_offset"
+        case fragmentSize = "fragment_size"
+        case highlightQuery = "highlight_query"
+        case matchedFields = "matched_fields"
+        case noMatchSize = "no_match_size"
+        case numberOfFragments = "number_of_fragments"
+        case order
+        case phraseLimit = "phrase_limit"
+        case preTags = "pre_tags"
+        case postTags = "post_tags"
+        case requireFieldMatch = "require_field_match"
+        case tagsSchema = "tags_schema"
+        case type
+        case termVector = "term_vector"
+        case indexOptions = "index_options"
+    }
+}
+
+extension Highlight: Equatable {}
+
+extension Highlight {
+    public struct Field {
+        public let name: String
+        public let options: FieldOptions
+        
+        public init(_ name: String, options: FieldOptions = FieldOptions()) {
+            self.name = name
+            self.options = options
+        }
+    }
+    
+    public struct FieldOptions {
+        
+        fileprivate static let SCORE_ORDERER_VALUE = "score"
+        
+        public var fragmentSize: Int?
+        public var numberOfFragments: Int?
+        public var fragmentOffset: Int?
+        public var encoder: EncoderType?
+        public var preTags: [String]?
+        public var postTags: [String]?
+        public var scoreOrdered: Bool?
+        public var requireFieldMatch: Bool?
+        public var highlighterType: HighlighterType?
+        public var forceSource: Bool?
+        public var fragmenter: String?
+        public var boundaryScannerType: BoundaryScannerType?
+        public var boundaryMaxScan: Int?
+        public var boundaryChars: [Character]?
+        public var boundaryScannerLocale: String?
+        public var highlightQuery: Query?
+        public var noMatchSize: Int?
+        public var matchedFields: [String]?
+        public var phraseLimit: Int?
+        public var tagScheme: String?
+        public var termVector: String?
+        public var indexOptions: String?
+        
+        public init() {}
+        
+        internal init(withBuilder builder: FieldOptionsBuilder) {
+            self.fragmentSize = builder.fragmentSize
+            self.numberOfFragments = builder.numberOfFragments
+            self.fragmentOffset = builder.fragmentOffset
+            self.encoder = builder.encoder
+            self.preTags = builder.preTags
+            self.postTags = builder.postTags
+            self.scoreOrdered = builder.scoreOrdered
+            self.requireFieldMatch = builder.requireFieldMatch
+            self.highlighterType = builder.highlighterType
+            self.forceSource = builder.forceSource
+            self.fragmenter = builder.fragmenter
+            self.boundaryScannerType = builder.boundaryScannerType
+            self.boundaryMaxScan = builder.boundaryMaxScan
+            self.boundaryChars = builder.boundaryChars
+            self.boundaryScannerLocale = builder.boundaryScannerLocale
+            self.highlightQuery = builder.highlightQuery
+            self.noMatchSize = builder.noMatchSize
+            self.matchedFields = builder.matchedFields
+            self.phraseLimit = builder.phraseLimit
+            self.tagScheme = builder.tagScheme
+            self.termVector = builder.termVector
+            self.indexOptions = builder.indexOptions
+        }
+    }
+    
+    public enum BoundaryScannerType: String, Codable {
+        case chars
+        case word
+        case sentence
+    }
+    
+    public enum EncoderType: String, Codable {
+        case `default`
+        case html
+    }
+    
+    public enum HighlighterType: String, Codable {
+        case unified
+        case plain
+        case fvh
+    }
+}
+
+extension Highlight.Field: Codable {
+    public func encode(to encoder: Swift.Encoder) throws {
+        var container = encoder.container(keyedBy: DynamicCodingKeys.self)
+        try container.encodeIfPresent(self.options, forKey: .key(named: self.name))
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
+        guard container.allKeys.count == 1 else {
+            throw Swift.DecodingError.typeMismatch(Highlight.Field.self, .init(codingPath: container.codingPath, debugDescription: "Unable to find field name in key(s) expect: 1 key found: \(container.allKeys.count)."))
+        }
+
+        let field = container.allKeys.first!.stringValue
+        
+        self.options = try container.decode(Highlight.FieldOptions.self, forKey: .key(named: field))
+        self.name = field
+        
+    }
+}
+
+extension Highlight.Field: Equatable{}
+
+extension Highlight.FieldOptions: Codable {
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(self.boundaryChars?.map { String($0) }, forKey: .boundaryChars)
+        try container.encodeIfPresent(self.boundaryMaxScan, forKey: .boundaryMaxScan)
+        try container.encodeIfPresent(self.boundaryScannerType, forKey: .boundaryScannerType)
+        try container.encodeIfPresent(self.boundaryScannerLocale, forKey: .boundaryScannerLocale)
+        try container.encodeIfPresent(self.encoder, forKey: .encoder)
+        try container.encodeIfPresent(self.forceSource, forKey: .forceSource)
+        try container.encodeIfPresent(self.fragmenter, forKey: .fragmenter)
+        try container.encodeIfPresent(self.fragmentOffset, forKey: .fragmentOffset)
+        try container.encodeIfPresent(self.fragmentSize, forKey: .fragmentSize)
+        try container.encodeIfPresent(self.highlightQuery, forKey: .highlightQuery)
+        try container.encodeIfPresent(self.matchedFields, forKey: .matchedFields)
+        try container.encodeIfPresent(self.numberOfFragments, forKey: .numberOfFragments)
+        try container.encodeIfPresent((self.scoreOrdered ?? false) ? Highlight.FieldOptions.SCORE_ORDERER_VALUE: nil, forKey: .order)
+        try container.encodeIfPresent(self.phraseLimit, forKey: .phraseLimit)
+        try container.encodeIfPresent(self.preTags, forKey: .preTags)
+        try container.encodeIfPresent(self.postTags, forKey: .postTags)
+        try container.encodeIfPresent(self.requireFieldMatch, forKey: .requireFieldMatch)
+        try container.encodeIfPresent(self.tagScheme, forKey: .tagsSchema)
+        try container.encodeIfPresent(self.highlighterType, forKey: .type)
+        try container.encodeIfPresent(self.termVector, forKey: .termVector)
+        try container.encodeIfPresent(self.indexOptions, forKey: .indexOptions)
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let chars: [String]? = try container.decodeArrayIfPresent(forKey: .boundaryChars)
+        if let chars = chars {
+            var charArr = [Character]()
+            for char in chars {
+                charArr.append(contentsOf: [Character](char))
+            }
+            self.boundaryChars = charArr
+        } else {
+            self.boundaryChars = nil
+        }
+        self.boundaryMaxScan = try container.decodeIntIfPresent(forKey: .boundaryMaxScan)
+        self.boundaryScannerType = try container.decodeIfPresent(Highlight.BoundaryScannerType.self, forKey: .boundaryScannerType)
+        self.boundaryScannerLocale = try container.decodeStringIfPresent(forKey: .boundaryScannerLocale)
+        self.encoder = try container.decodeIfPresent(Highlight.EncoderType.self, forKey: .encoder)
+        self.forceSource = try container.decodeBoolIfPresent(forKey: .forceSource)
+        self.fragmenter = try container.decodeStringIfPresent(forKey: .fragmenter)
+        self.fragmentOffset = try container.decodeIntIfPresent(forKey: .fragmentOffset)
+        self.fragmentSize = try container.decodeIntIfPresent(forKey: .fragmentSize)
+        self.highlightQuery = try container.decodeQueryIfPresent(forKey: .highlightQuery)
+        self.matchedFields = try container.decodeArray(forKey: .matchedFields)
+        self.noMatchSize = try container.decodeIntIfPresent(forKey: .noMatchSize)
+        self.numberOfFragments = try container.decodeIntIfPresent(forKey: .numberOfFragments)
+        let order = try container.decodeStringIfPresent(forKey: .order)
+        if let order = order {
+            switch order {
+            case Highlight.FieldOptions.SCORE_ORDERER_VALUE:
+                self.scoreOrdered = true
+            default:
+                self.scoreOrdered = false
+            }
+        } else {
+            self.scoreOrdered = nil
+        }
+        self.phraseLimit = try container.decodeIntIfPresent(forKey: .phraseLimit)
+        self.preTags = try container.decodeArray(forKey: .preTags)
+        self.postTags = try container.decodeArray(forKey: .postTags)
+        self.requireFieldMatch = try container.decodeBoolIfPresent(forKey: .requireFieldMatch)
+        self.tagScheme = try container.decodeStringIfPresent(forKey: .tagsSchema)
+        self.highlighterType = try container.decodeIfPresent(Highlight.HighlighterType.self, forKey: .type)
+        self.termVector = try container.decodeStringIfPresent(forKey: .termVector)
+        self.indexOptions = try container.decodeStringIfPresent(forKey: .indexOptions)
+    }
+    
+    
+    enum CodingKeys: String, CodingKey {
+        case boundaryChars = "boundary_chars"
+        case boundaryMaxScan = "boundary_max_scan"
+        case boundaryScannerType = "boundary_scanner"
+        case boundaryScannerLocale = "boundary_scanner_locale"
+        case encoder
+        case forceSource = "force_source"
+        case fragmenter
+        case fragmentOffset = "fragment_offset"
+        case fragmentSize = "fragment_size"
+        case highlightQuery = "highlight_query"
+        case matchedFields = "matched_fields"
+        case noMatchSize = "no_match_size"
+        case numberOfFragments = "number_of_fragments"
+        case order
+        case phraseLimit = "phrase_limit"
+        case preTags = "pre_tags"
+        case postTags = "post_tags"
+        case requireFieldMatch = "require_field_match"
+        case tagsSchema = "tags_schema"
+        case type
+        case termVector = "term_vector"
+        case indexOptions = "index_options"
+    }
+}
+
+extension Highlight.FieldOptions: Equatable {
+    public static func == (lhs: Highlight.FieldOptions, rhs: Highlight.FieldOptions) -> Bool {
+        return lhs.boundaryChars == rhs.boundaryChars
+            && lhs.boundaryMaxScan == rhs.boundaryMaxScan
+            && lhs.boundaryScannerType == rhs.boundaryScannerType
+            && lhs.boundaryScannerLocale == rhs.boundaryScannerLocale
+            && lhs.encoder == rhs.encoder
+            && lhs.forceSource == rhs.forceSource
+            && lhs.fragmenter == rhs.fragmenter
+            && lhs.fragmentOffset == rhs.fragmentOffset
+            && lhs.fragmentSize == rhs.fragmentSize
+            && lhs.matchedFields == rhs.matchedFields
+            && lhs.noMatchSize == rhs.noMatchSize
+            && lhs.numberOfFragments == rhs.numberOfFragments
+            && lhs.scoreOrdered == rhs.scoreOrdered
+            && lhs.phraseLimit == rhs.phraseLimit
+            && lhs.preTags == rhs.preTags
+            && lhs.requireFieldMatch == rhs.requireFieldMatch
+            && lhs.tagScheme == rhs.tagScheme
+            && lhs.highlighterType == rhs.highlighterType
+            && SearchRequest.matchQueries(lhs.highlightQuery, rhs.highlightQuery)
+    }
+    
+    
+}
