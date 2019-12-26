@@ -38,6 +38,7 @@ public class SearchRequestBuilder: RequestBuilder {
     private var _docvalueFields: [DocValueField]?
     private var _postFilter: Query?
     private var _highlight: Highlight?
+    private var _rescore: [QueryRescorer]?
 
     public init() {}
 
@@ -155,6 +156,12 @@ public class SearchRequestBuilder: RequestBuilder {
         _docvalueFields = docvalueFields
         return self
     }
+    
+    @discardableResult
+    public func set(rescore: [QueryRescorer]) -> Self {
+        _rescore = rescore
+        return self
+    }
 
     @discardableResult
     public func add(sort: Sort) -> Self {
@@ -192,6 +199,16 @@ public class SearchRequestBuilder: RequestBuilder {
             _docvalueFields?.append(docvalueField)
         } else {
             _docvalueFields = [docvalueField]
+        }
+        return self
+    }
+    
+    @discardableResult
+    public func add(rescore: QueryRescorer) -> Self {
+        if _rescore != nil {
+            _rescore?.append(rescore)
+        } else {
+            _rescore = [rescore]
         }
         return self
     }
@@ -297,6 +314,10 @@ public class SearchRequestBuilder: RequestBuilder {
     public var highlight: Highlight? {
         return _highlight
     }
+    
+    public var rescore: [QueryRescorer]? {
+        return _rescore
+    }
 
     public func build() throws -> SearchRequest {
         return try SearchRequest(withBuilder: self)
@@ -326,12 +347,13 @@ public struct SearchRequest: Request {
     public let docvalueFields: [DocValueField]?
     public let postFilter: Query?
     public let highlight: Highlight?
+    public let rescore: [QueryRescorer]?
 
     public var scroll: Scroll?
     public var searchType: SearchType?
     public var preference: String?
 
-    public init(index: String, type: String?, from: Int16?, size: Int16?, query: Query?, sorts: [Sort]?, sourceFilter: SourceFilter?, explain: Bool?, minScore: Decimal?, scroll: Scroll?, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool?, preference: String? = nil, scriptFields: [ScriptField]? = nil, storedFields: [String]? = nil, docvalueFields: [DocValueField]?, postFilter: Query? = nil, highlight: Highlight? = nil) {
+    public init(index: String, type: String?, from: Int16?, size: Int16?, query: Query?, sorts: [Sort]?, sourceFilter: SourceFilter?, explain: Bool?, minScore: Decimal?, scroll: Scroll?, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool?, preference: String? = nil, scriptFields: [ScriptField]? = nil, storedFields: [String]? = nil, docvalueFields: [DocValueField]?, postFilter: Query? = nil, highlight: Highlight? = nil, rescore: [QueryRescorer]? = nil) {
         self.index = index
         self.type = type
         self.from = from
@@ -352,6 +374,7 @@ public struct SearchRequest: Request {
         self.docvalueFields = docvalueFields
         self.postFilter = postFilter
         self.highlight = highlight
+        self.rescore = rescore
     }
 
     internal init(withBuilder builder: SearchRequestBuilder) throws {
@@ -376,6 +399,7 @@ public struct SearchRequest: Request {
         docvalueFields = builder.docvalueFields
         postFilter = builder.postFilter
         highlight = builder.highlight
+        rescore = builder.rescore
     }
 
     public var method: HTTPMethod {
@@ -405,7 +429,7 @@ public struct SearchRequest: Request {
     }
 
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-        let body = Body(query: query, sort: sorts, size: size, from: from, source: sourceFilter, explain: explain, minScore: minScore, trackScores: trackScores, indicesBoost: indicesBoost, seqNoPrimaryTerm: seqNoPrimaryTerm, version: version, scriptFields: scriptFields, storedFields: storedFields, docvalueFields: docvalueFields, postFilter: postFilter, highlight: highlight)
+        let body = Body(query: query, sort: sorts, size: size, from: from, source: sourceFilter, explain: explain, minScore: minScore, trackScores: trackScores, indicesBoost: indicesBoost, seqNoPrimaryTerm: seqNoPrimaryTerm, version: version, scriptFields: scriptFields, storedFields: storedFields, docvalueFields: docvalueFields, postFilter: postFilter, highlight: highlight, rescore: rescore)
         return serializer.encode(body).mapError { error -> MakeBodyError in
             MakeBodyError.wrapped(error)
         }
@@ -428,6 +452,7 @@ public struct SearchRequest: Request {
         public let docvalueFields: [DocValueField]?
         public let postFilter: Query?
         public let highlight: Highlight?
+        public let rescore: [QueryRescorer]?
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
@@ -457,6 +482,13 @@ public struct SearchRequest: Request {
                     }
                 }
             }
+            if let rescore = self.rescore, !rescore.isEmpty {
+                if rescore.count == 1 {
+                    try container.encode(rescore[0], forKey: .rescore)
+                } else {
+                    try container.encode(rescore, forKey: .rescore)
+                }
+            }
         }
 
         enum CodingKeys: String, CodingKey {
@@ -476,6 +508,7 @@ public struct SearchRequest: Request {
             case docvalueFields = "docvalue_fields"
             case postFilter = "post_filter"
             case highlight
+            case rescore
         }
     }
 }
@@ -1516,3 +1549,41 @@ extension Highlight.FieldOptions: Equatable {
     
     
 }
+
+// MARK:- Rescoring
+
+/// `SearchRequest` rescorer based on a query.
+public struct QueryRescorer {
+    
+    public let windowSize: Int?
+    public let query: RescoreQuery
+    
+    public init(query: RescoreQuery, windowSize: Int? = nil) {
+        self.query = query
+        self.windowSize = windowSize
+    }
+    
+}
+
+extension QueryRescorer: Codable {
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(self.windowSize, forKey: .windowSize)
+        try container.encode(self.query, forKey: .query)
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.windowSize = try container.decodeIntIfPresent(forKey: .windowSize)
+        self.query = try container.decode(RescoreQuery.self, forKey: .query)
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case windowSize = "window_size"
+        case query
+    }
+    
+}
+
+extension QueryRescorer: Equatable {}

@@ -31,6 +31,7 @@ enum QueryType: String, Codable {
     case fuzzy
     case type
     case ids
+    case rescoreQuery
 
     var metaType: Query.Type {
         switch self {
@@ -82,6 +83,8 @@ enum QueryType: String, Codable {
             return TypeQuery.self
         case .ids:
             return IdsQuery.self
+        case .rescoreQuery:
+            return RescoreQuery.self
         }
     }
 }
@@ -204,6 +207,7 @@ public enum ScoreMode: String, Codable {
     case SUM = "sum"
     case MIN = "min"
     case MULTIPLY = "multiply"
+    case TOTAL = "total"
 }
 
 public enum BoostMode: String, Codable {
@@ -214,6 +218,90 @@ public enum BoostMode: String, Codable {
     case MIN = "min"
     case MAX = "max"
 }
+
+// MARK:- Rescore Query
+
+/// Wrapper for Query for use in `QueryRescorer` to facilitate rescoring in `SearchRequest`
+public struct RescoreQuery: Query {
+    
+    public let name: String = "rescore_query"
+    
+    public let query: Query
+    public let queryWeight: Decimal?
+    public let rescoreQueryWeight: Decimal?
+    public let scoreMode: ScoreMode?
+    
+    public init(_ query: Query, scoreMode: ScoreMode? = nil, queryWeight: Decimal? = nil, rescoreQueryWeight: Decimal? = nil) {
+        self.query = query
+        self.scoreMode = scoreMode
+        self.queryWeight = queryWeight
+        self.rescoreQueryWeight = rescoreQueryWeight
+    }
+    
+}
+
+extension RescoreQuery {
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.query = try container.decodeQuery(forKey: .query)
+        self.scoreMode = try container.decodeIfPresent(ScoreMode.self, forKey: .scoreMode)
+        self.queryWeight = try container.decodeDecimalIfPresent(forKey: .queryWeight)
+        self.rescoreQueryWeight = try container.decodeDecimalIfPresent(forKey: .rescoreQueryWeight)
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.query, forKey: .query)
+        try container.encodeIfPresent(self.scoreMode, forKey: .scoreMode)
+        try container.encodeIfPresent(self.queryWeight, forKey: .queryWeight)
+        try container.encodeIfPresent(self.rescoreQueryWeight, forKey: .rescoreQueryWeight)
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case query = "rescore_query"
+        case rescoreQueryWeight = "rescore_query_weight"
+        case queryWeight = "query_weight"
+        case scoreMode = "score_mode"
+    }
+    
+    public func toDic() -> [String : Any] {
+        var dic = [String: Any]()
+        
+        dic[CodingKeys.query.rawValue] = self.query.toDic()
+        
+        if let rescoreQueryWeight = self.rescoreQueryWeight {
+            dic[CodingKeys.rescoreQueryWeight.rawValue] = rescoreQueryWeight
+        }
+        if let queryWeight = self.queryWeight {
+            dic[CodingKeys.queryWeight.rawValue] = queryWeight
+        }
+        if let scoreMode = self.scoreMode {
+            dic[CodingKeys.scoreMode.rawValue] = scoreMode
+        }
+        return dic
+    }
+}
+
+extension RescoreQuery: Equatable {
+    public static func == (lhs: RescoreQuery, rhs: RescoreQuery) -> Bool {
+        return lhs.queryWeight == rhs.queryWeight
+            && lhs.rescoreQueryWeight == rhs.rescoreQueryWeight
+            && lhs.scoreMode == rhs.scoreMode
+            && matchQueries(lhs.query, rhs.query)
+    }
+}
+
+internal func matchQueries(_ lhs: Query?, _ rhs: Query?) -> Bool {
+    if lhs == nil, rhs == nil {
+        return true
+    }
+    if let lhs = lhs, let rhs = rhs {
+        return lhs.isEqualTo(rhs)
+    }
+    return false
+}
+
 
 // MARK: - Codable Extenstions
 
