@@ -1062,6 +1062,107 @@ class SearchRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
+    
+    func test_17_Search_field_collapse() throws {
+        let e = expectation(description: "execution complete")
+
+        func handler(_ result: Result<SearchResponse<CodableValue>, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+                XCTAssert(false)
+            case let .success(response):
+                XCTAssertNotNil(response.hits)
+                XCTAssertTrue(response.hits.hits.count == 1, "Count \(response.hits.hits.count)")
+            }
+
+            e.fulfill()
+        }
+        
+        let sort = FieldSortBuilder("date").set(order: .asc).build()
+        
+        var innerHit = InnerHit()
+        innerHit.name = "last_tweets"
+        innerHit.size = 5
+        innerHit.sort = [sort]
+        
+        let collapse = Collapse(field: "user.keyword", innerHits: [innerHit], maxConcurrentGroupRequests: 4)
+        
+        let request = try SearchRequestBuilder()
+            .set(indices: indexName)
+            .set(query: MatchQuery(field: "message", value: "elasticsearch"))
+            .build()
+
+        /// make sure doc exists
+        func handler1(_ result: Result<IndexResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+            case let .success(response):
+                logger.info("Found \(response.result)")
+            }
+            client.search(request, completionHandler: handler)
+        }
+        var request1 = try IndexRequestBuilder<CodableValue>()
+            .set(index: indexName)
+            .set(source: ["message": "This is elasticsearch", "user": "random_user", "date": CodableValue(Date().timeIntervalSinceReferenceDate), "likes": 10])
+            .build()
+        request1.refresh = .true
+        client.index(request1, completionHandler: handler1)
+
+        waitForExpectations(timeout: 10)
+    }
+    
+    func test_17_Search_field_collapse_2() throws {
+        let e = expectation(description: "execution complete")
+
+        func handler(_ result: Result<SearchResponse<CodableValue>, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+                XCTAssert(false)
+            case let .success(response):
+                XCTAssertNotNil(response.hits)
+                XCTAssertTrue(response.hits.hits.count == 1, "Count \(response.hits.hits.count)")
+            }
+
+            e.fulfill()
+        }
+        
+        let sort = FieldSortBuilder("date").set(order: .asc).build()
+        
+        var innerHit = InnerHit()
+        innerHit.name = "last_tweets"
+        innerHit.size = 5
+        innerHit.sort = [sort]
+        innerHit.collapse = Collapse.init(field: "user.keyword", innerHits: nil, maxConcurrentGroupRequests: nil)
+        
+        let collapse = Collapse(field: "country.keyword", innerHits: [innerHit], maxConcurrentGroupRequests: 4)
+        
+        let request = try SearchRequestBuilder()
+            .set(indices: indexName)
+            .set(query: MatchQuery(field: "message", value: "elasticsearch"))
+            .build()
+
+        /// make sure doc exists
+        func handler1(_ result: Result<IndexResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+            case let .success(response):
+                logger.info("Found \(response.result)")
+            }
+            client.search(request, completionHandler: handler)
+        }
+        var request1 = try IndexRequestBuilder<CodableValue>()
+            .set(index: indexName)
+            .set(source: ["message": "This is elasticsearch", "user": "random_user", "date": CodableValue(Date().timeIntervalSinceReferenceDate), "likes": 10, "country": "US"])
+            .build()
+        request1.refresh = .true
+        client.index(request1, completionHandler: handler1)
+
+        waitForExpectations(timeout: 10)
+    }
 }
 
 struct Shirt: Codable, Equatable {

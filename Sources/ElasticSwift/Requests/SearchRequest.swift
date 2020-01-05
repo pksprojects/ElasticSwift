@@ -1587,3 +1587,148 @@ extension QueryRescorer: Codable {
 }
 
 extension QueryRescorer: Equatable {}
+
+// MARK:- Collapsing
+
+public struct Collapse {
+    
+    public let field: String
+    public let innerHits: [InnerHit]?
+    public let maxConcurrentGroupRequests: Int?
+}
+
+extension Collapse: Codable {
+    
+    enum CodingKeys: String, CodingKey {
+        case field
+        case innerHits = "inner_hits"
+        case maxConcurrentGroupRequests = "max_concurrent_group_searches"
+    }
+}
+
+extension Collapse: Equatable {}
+
+// MARK:- Inner Hits
+
+public struct InnerHit {
+    
+    public var name: String?
+    public var ignoreUnmapped: Bool?
+    public var from: Int?
+    public var size: Int?
+    public var explain: Bool?
+    public var version: Bool?
+    public var trackScores: Bool?
+    public var sort: [Sort]?
+    public var query: Query?
+    public var sourceFilter: SourceFilter?
+    public var scriptFields: [ScriptField]?
+    public var storedFields: [String]?
+    public var docvalueFields: [DocValueField]?
+    public var highlight: Highlight?
+    public var collapse: Collapse?
+    
+    public init() {}
+    
+}
+
+extension InnerHit: Codable {
+    
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.name = try container.decodeStringIfPresent(forKey: .name)
+        self.ignoreUnmapped = try container.decodeBoolIfPresent(forKey: .ignoreUnmapped)
+        self.from = try container.decodeIntIfPresent(forKey: .from)
+        self.size = try container.decodeIntIfPresent(forKey: .size)
+        self.explain = try container.decodeBoolIfPresent(forKey: .explain)
+        self.version = try container.decodeBoolIfPresent(forKey: .version)
+        self.trackScores = try container.decodeBoolIfPresent(forKey: .trackScores)
+        self.sort = try container.decodeIfPresent([Sort].self, forKey: .sort)
+        self.query = try container.decodeQueryIfPresent(forKey: .query)
+        self.sourceFilter = try container.decodeIfPresent(SourceFilter.self, forKey: .sourceFilter)
+        self.docvalueFields = try container.decodeIfPresent([DocValueField].self, forKey: .docvalueFields)
+        self.highlight = try container.decodeIfPresent(Highlight.self, forKey: .highlight)
+        self.collapse = try container.decodeIfPresent(Collapse.self, forKey: .collapse)
+        if container.contains(.scriptFields) {
+            do {
+                let scriptedField = try container.decode(ScriptField.self, forKey: .scriptFields)
+                self.scriptFields = [scriptedField]
+            } catch {
+                let nested = try container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .scriptFields)
+                var fields = [ScriptField]()
+                for key in nested.allKeys {
+                    let scriptContainer = try nested.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: key)
+                    let script = try scriptContainer.decode(Script.self, forKey: .key(named: ScriptField.CodingKeys.script.stringValue))
+                    fields.append(ScriptField.init(field: key.stringValue, script: script))
+                }
+                self.scriptFields = fields
+            }
+        }
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(self.name, forKey: .name)
+        try container.encodeIfPresent(self.ignoreUnmapped, forKey: .ignoreUnmapped)
+        try container.encodeIfPresent(self.from, forKey: .from)
+        try container.encodeIfPresent(self.size, forKey: .size)
+        try container.encodeIfPresent(self.explain, forKey: .explain)
+        try container.encodeIfPresent(self.version, forKey: .version)
+        try container.encodeIfPresent(self.trackScores, forKey: .trackScores)
+        try container.encodeIfPresent(self.sort, forKey: .sort)
+        try container.encodeIfPresent(self.query, forKey: .query)
+        try container.encodeIfPresent(self.sourceFilter, forKey: .sourceFilter)
+        try container.encodeIfPresent(self.storedFields, forKey: .storedFields)
+        try container.encodeIfPresent(self.docvalueFields, forKey: .docvalueFields)
+        try container.encodeIfPresent(self.highlight, forKey: .highlight)
+        try container.encodeIfPresent(self.collapse, forKey: .collapse)
+        
+        if let scriptFields = self.scriptFields, !scriptFields.isEmpty {
+            if scriptFields.count == 1 {
+                try container.encode(scriptFields[0], forKey: .scriptFields)
+            } else {
+                var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .scriptFields)
+                for scriptField in scriptFields {
+                    var scriptContainer = nested.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: scriptField.field))
+                    try scriptContainer.encode(scriptField.script, forKey: .key(named: ScriptField.CodingKeys.script.stringValue))
+                }
+            }
+        }
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case name
+        case ignoreUnmapped = "ignore_unmapped"
+        case from
+        case size
+        case explain
+        case version
+        case trackScores = "track_scores"
+        case sort
+        case query
+        case sourceFilter = "_source"
+        case scriptFields = "script_fields"
+        case storedFields = "stored_fields"
+        case docvalueFields = "docvalue_fields"
+        case highlight
+        case collapse
+    }
+}
+
+extension InnerHit: Equatable {
+    public static func == (lhs: InnerHit, rhs: InnerHit) -> Bool {
+        return lhs.name == rhs.name
+            && lhs.ignoreUnmapped == rhs.ignoreUnmapped
+            && lhs.from == rhs.from
+            && lhs.size == rhs.size
+            && lhs.explain == rhs.explain
+            && lhs.version == rhs.version
+            && lhs.trackScores == rhs.trackScores
+            && lhs.sort == rhs.sort
+            && lhs.sourceFilter == rhs.sourceFilter
+            && lhs.scriptFields == rhs.scriptFields
+            && lhs.docvalueFields == rhs.docvalueFields
+            && lhs.highlight == rhs.highlight
+    }
+}
