@@ -1161,7 +1161,7 @@ class SearchRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_18_Search_searchAfter() throws {
         let e = expectation(description: "execution complete")
 
@@ -1183,7 +1183,7 @@ class SearchRequestTests: XCTestCase {
             .set(query: MatchQuery(field: "message", value: "elasticsearch"))
             .add(sort: FieldSortBuilder("date").set(order: .asc).build())
             .add(sort: FieldSortBuilder("tie_breaker_id.keyword").set(order: .asc).build())
-            .set(searchAfter: [1463538857, "654323"])
+            .set(searchAfter: [1_463_538_857, "654323"])
             .build()
 
         /// make sure doc exists

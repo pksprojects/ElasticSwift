@@ -163,7 +163,7 @@ public class SearchRequestBuilder: RequestBuilder {
         _rescore = rescore
         return self
     }
-    
+
     @discardableResult
     public func set(searchAfter: CodableValue) -> Self {
         _searchAfter = searchAfter
@@ -325,7 +325,7 @@ public class SearchRequestBuilder: RequestBuilder {
     public var rescore: [QueryRescorer]? {
         return _rescore
     }
-    
+
     public var searchAfter: CodableValue? {
         return _searchAfter
     }
@@ -365,7 +365,7 @@ public struct SearchRequest: Request {
     public var searchType: SearchType?
     public var preference: String?
 
-    public init(index: String, type: String?, query: Query?, from: Int16?, size: Int16?, sorts: [Sort]?, sourceFilter: SourceFilter?, explain: Bool?, minScore: Decimal?, scroll: Scroll?, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, searchType: SearchType? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool?, preference: String? = nil, scriptFields: [ScriptField]? = nil, storedFields: [String]? = nil, docvalueFields: [DocValueField]?, postFilter: Query? = nil, highlight: Highlight? = nil, rescore: [QueryRescorer]? = nil, searchAfter: CodableValue? = nil) {
+    public init(index: String, type: String?, query: Query?, from: Int16?, size: Int16?, sorts: [Sort]?, sourceFilter: SourceFilter?, explain: Bool?, minScore: Decimal?, scroll: Scroll?, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, searchType _: SearchType? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool?, preference: String? = nil, scriptFields: [ScriptField]? = nil, storedFields: [String]? = nil, docvalueFields: [DocValueField]?, postFilter: Query? = nil, highlight: Highlight? = nil, rescore: [QueryRescorer]? = nil, searchAfter: CodableValue? = nil) {
         self.index = index
         self.type = type
         self.from = from
@@ -391,7 +391,6 @@ public struct SearchRequest: Request {
     }
 
     internal init(withBuilder builder: SearchRequestBuilder) throws {
-        
         self.init(index: builder.index ?? "_all", type: builder.type, query: builder.query, from: builder.from, size: builder.size, sorts: builder.sorts, sourceFilter: builder.sourceFilter, explain: builder.explain, minScore: builder.minScore, scroll: builder.scroll, trackScores: builder.trackScores, indicesBoost: builder.indicesBoost, searchType: builder.searchType, seqNoPrimaryTerm: builder.seqNoPrimaryTerm, version: builder.version, preference: builder.preference, scriptFields: builder.scriptFields, storedFields: builder.storedFields, docvalueFields: builder.docvalueFields, postFilter: builder.postFilter, highlight: builder.highlight, rescore: builder.rescore, searchAfter: builder.searchAfter)
     }
 
@@ -483,7 +482,7 @@ public struct SearchRequest: Request {
                     try container.encode(rescore, forKey: .rescore)
                 }
             }
-            try container.encodeIfPresent(self.searchAfter, forKey: .searchAfter)
+            try container.encodeIfPresent(searchAfter, forKey: .searchAfter)
         }
 
         enum CodingKeys: String, CodingKey {
