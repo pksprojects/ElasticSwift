@@ -135,7 +135,7 @@ public class HasChildQueryBuilder: QueryBuilder {
     }
 
     public var query: Query? {
-        _query
+        return _query
     }
 
     public var scoreMode: ScoreMode? {
