@@ -893,7 +893,7 @@ class SearchRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_15_Search_highlight() throws {
         let e = expectation(description: "execution complete")
 
@@ -915,12 +915,12 @@ class SearchRequestTests: XCTestCase {
 
             e.fulfill()
         }
-        
-        let fieldOptions =  FieldOptionsBuilder()
+
+        let fieldOptions = FieldOptionsBuilder()
             .set(highlighterType: .plain)
             .set(scoreOrdered: true)
             .build()
-        
+
         let globalOptions = FieldOptionsBuilder()
             .set(encoder: .html)
             .set(tagScheme: "styled")
@@ -953,7 +953,7 @@ class SearchRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_16_Search_rescoring() throws {
         let e = expectation(description: "execution complete")
 
@@ -974,8 +974,7 @@ class SearchRequestTests: XCTestCase {
 
             e.fulfill()
         }
-        
-       
+
         let request = try SearchRequestBuilder()
             .set(indices: indexName)
             .set(query: MatchQuery(field: "msg", value: "the quick brown", operator: .or))
@@ -1003,7 +1002,7 @@ class SearchRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_16_Search_rescoring_2() throws {
         let e = expectation(description: "execution complete")
 
@@ -1019,21 +1018,20 @@ class SearchRequestTests: XCTestCase {
 
             e.fulfill()
         }
-        
+
         let rescorer = QueryRescorer(query: RescoreQuery(MatchPhraseQuery(field: "msg", value: "the quick brown"), scoreMode: .TOTAL, queryWeight: 0.7, rescoreQueryWeight: 1.2), windowSize: 100)
-        
-        
+
         let scoreFunction = try ScoreFunctionBuilders.scriptFunction()
             .set(script: Script("Math.log10(doc.likes.value + 2)"))
             .build()
-        
+
         let functionScore = try FunctionScoreQueryBuilder()
             .add(function: scoreFunction)
             .set(query: MatchAllQuery())
             .build()
-        
+
         let rescorer1 = QueryRescorer(query: RescoreQuery(functionScore, scoreMode: .MULTIPLY), windowSize: 10)
-        
+
         let request = try SearchRequestBuilder()
             .set(indices: indexName)
             .set(query: MatchQuery(field: "msg", value: "the quick brown", operator: .or))
@@ -1062,7 +1060,7 @@ class SearchRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_17_Search_field_collapse() throws {
         let e = expectation(description: "execution complete")
 
@@ -1078,16 +1076,16 @@ class SearchRequestTests: XCTestCase {
 
             e.fulfill()
         }
-        
+
         let sort = FieldSortBuilder("date").set(order: .asc).build()
-        
+
         var innerHit = InnerHit()
         innerHit.name = "last_tweets"
         innerHit.size = 5
         innerHit.sort = [sort]
-        
+
         let collapse = Collapse(field: "user.keyword", innerHits: [innerHit], maxConcurrentGroupRequests: 4)
-        
+
         let request = try SearchRequestBuilder()
             .set(indices: indexName)
             .set(query: MatchQuery(field: "message", value: "elasticsearch"))
@@ -1112,7 +1110,7 @@ class SearchRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_17_Search_field_collapse_2() throws {
         let e = expectation(description: "execution complete")
 
@@ -1128,17 +1126,17 @@ class SearchRequestTests: XCTestCase {
 
             e.fulfill()
         }
-        
+
         let sort = FieldSortBuilder("date").set(order: .asc).build()
-        
+
         var innerHit = InnerHit()
         innerHit.name = "last_tweets"
         innerHit.size = 5
         innerHit.sort = [sort]
-        innerHit.collapse = Collapse.init(field: "user.keyword", innerHits: nil, maxConcurrentGroupRequests: nil)
-        
+        innerHit.collapse = Collapse(field: "user.keyword", innerHits: nil, maxConcurrentGroupRequests: nil)
+
         let collapse = Collapse(field: "country.keyword", innerHits: [innerHit], maxConcurrentGroupRequests: 4)
-        
+
         let request = try SearchRequestBuilder()
             .set(indices: indexName)
             .set(query: MatchQuery(field: "message", value: "elasticsearch"))

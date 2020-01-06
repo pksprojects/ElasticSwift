@@ -105,4 +105,20 @@ public final class QueryBuilders {
     public static func boostingQuery() -> BoostingQueryBuilder {
         return BoostingQueryBuilder()
     }
+
+    public static func nestedQuery() -> NestedQueryBuilder {
+        return NestedQueryBuilder()
+    }
+
+    public static func hasChildQuery() -> HasChildQueryBuilder {
+        return HasChildQueryBuilder()
+    }
+
+    public static func hasParentQuery() -> HasParentQueryBuilder {
+        return HasParentQueryBuilder()
+    }
+
+    public static func parentIdQuery() -> ParentIdQueryBuilder {
+        return ParentIdQueryBuilder()
+    }
 }

@@ -75,13 +75,21 @@ extension MatchQuery {
         }
 
         field = nested.allKeys.first!.stringValue
-        let fieldContainer = try nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
-        value = try fieldContainer.decodeString(forKey: .query)
-        `operator` = try fieldContainer.decodeIfPresent(MatchQueryOperator.self, forKey: .operator)
-        zeroTermQuery = try fieldContainer.decodeIfPresent(ZeroTermQuery.self, forKey: .zeroTermsQuery)
-        cutoffFrequency = try fieldContainer.decodeDecimalIfPresent(forKey: .cutoffFrequency)
-        fuzziness = try fieldContainer.decodeStringIfPresent(forKey: .fuzziness)
-        autoGenSynonymnsPhraseQuery = try fieldContainer.decodeBoolIfPresent(forKey: .autoGenerateSynonymsPhraseQuery)
+        if let fieldContainer = try? nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field)) {
+            value = try fieldContainer.decodeString(forKey: .query)
+            `operator` = try fieldContainer.decodeIfPresent(MatchQueryOperator.self, forKey: .operator)
+            zeroTermQuery = try fieldContainer.decodeIfPresent(ZeroTermQuery.self, forKey: .zeroTermsQuery)
+            cutoffFrequency = try fieldContainer.decodeDecimalIfPresent(forKey: .cutoffFrequency)
+            fuzziness = try fieldContainer.decodeStringIfPresent(forKey: .fuzziness)
+            autoGenSynonymnsPhraseQuery = try fieldContainer.decodeBoolIfPresent(forKey: .autoGenerateSynonymsPhraseQuery)
+        } else {
+            value = try nested.decodeString(forKey: .key(named: field))
+            `operator` = nil
+            zeroTermQuery = nil
+            cutoffFrequency = nil
+            fuzziness = nil
+            autoGenSynonymnsPhraseQuery = nil
+        }
     }
 
     public func encode(to encoder: Encoder) throws {

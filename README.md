@@ -295,4 +295,8 @@ Below Table lists all the available search queries with their corresponding Quer
 | FuzzyQuery | FuzzyQueryBuilder | QueryBuilders.fuzzyQuery() |
 | TypeQuery | TypeQueryBuilder | QueryBuilders.typeQuery() |
 | IdsQuery | IdsQueryBuilder | QueryBuilders.idsQuery() |
+| NestedQuery | NestedQueryBuilder | QueryBuilders.nestedQuery() |
+| HasChildQuery | HasChildQueryBuilder | QueryBuilders.hasChildQuery() |
+| HasParentQuery | HasParentQueryBuilder | QueryBuilders.hasParentQuery() |
+| ParentIdQuery | ParentIdQueryBuilder | QueryBuilders.parentIdQuery() |
 

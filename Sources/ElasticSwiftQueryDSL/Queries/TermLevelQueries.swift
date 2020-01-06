@@ -60,8 +60,7 @@ extension TermQuery {
             value = try fieldContainer.decodeString(forKey: .value)
             boost = try fieldContainer.decodeDecimalIfPresent(forKey: .boost)
         } else {
-            var fieldContainer = try nested.nestedUnkeyedContainer(forKey: .key(named: field))
-            value = try fieldContainer.decode(String.self)
+            value = try nested.decodeString(forKey: .key(named: field))
             boost = nil
         }
     }
