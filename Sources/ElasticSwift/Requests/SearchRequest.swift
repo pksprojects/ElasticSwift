@@ -39,6 +39,7 @@ public class SearchRequestBuilder: RequestBuilder {
     private var _postFilter: Query?
     private var _highlight: Highlight?
     private var _rescore: [QueryRescorer]?
+    private var _searchAfter: CodableValue?
 
     public init() {}
 
@@ -160,6 +161,12 @@ public class SearchRequestBuilder: RequestBuilder {
     @discardableResult
     public func set(rescore: [QueryRescorer]) -> Self {
         _rescore = rescore
+        return self
+    }
+    
+    @discardableResult
+    public func set(searchAfter: CodableValue) -> Self {
+        _searchAfter = searchAfter
         return self
     }
 
@@ -318,6 +325,10 @@ public class SearchRequestBuilder: RequestBuilder {
     public var rescore: [QueryRescorer]? {
         return _rescore
     }
+    
+    public var searchAfter: CodableValue? {
+        return _searchAfter
+    }
 
     public func build() throws -> SearchRequest {
         return try SearchRequest(withBuilder: self)
@@ -348,12 +359,13 @@ public struct SearchRequest: Request {
     public let postFilter: Query?
     public let highlight: Highlight?
     public let rescore: [QueryRescorer]?
+    public let searchAfter: CodableValue?
 
     public var scroll: Scroll?
     public var searchType: SearchType?
     public var preference: String?
 
-    public init(index: String, type: String?, from: Int16?, size: Int16?, query: Query?, sorts: [Sort]?, sourceFilter: SourceFilter?, explain: Bool?, minScore: Decimal?, scroll: Scroll?, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool?, preference: String? = nil, scriptFields: [ScriptField]? = nil, storedFields: [String]? = nil, docvalueFields: [DocValueField]?, postFilter: Query? = nil, highlight: Highlight? = nil, rescore: [QueryRescorer]? = nil) {
+    public init(index: String, type: String?, query: Query?, from: Int16?, size: Int16?, sorts: [Sort]?, sourceFilter: SourceFilter?, explain: Bool?, minScore: Decimal?, scroll: Scroll?, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, searchType: SearchType? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool?, preference: String? = nil, scriptFields: [ScriptField]? = nil, storedFields: [String]? = nil, docvalueFields: [DocValueField]?, postFilter: Query? = nil, highlight: Highlight? = nil, rescore: [QueryRescorer]? = nil, searchAfter: CodableValue? = nil) {
         self.index = index
         self.type = type
         self.from = from
@@ -375,31 +387,12 @@ public struct SearchRequest: Request {
         self.postFilter = postFilter
         self.highlight = highlight
         self.rescore = rescore
+        self.searchAfter = searchAfter
     }
 
     internal init(withBuilder builder: SearchRequestBuilder) throws {
-        index = builder.index ?? "_all"
-        type = builder.type
-        query = builder.query
-        from = builder.from
-        size = builder.size
-        sorts = builder.sorts
-        sourceFilter = builder.sourceFilter
-        explain = builder.explain
-        minScore = builder.minScore
-        scroll = builder.scroll
-        searchType = builder.searchType
-        trackScores = builder.trackScores
-        indicesBoost = builder.indicesBoost
-        seqNoPrimaryTerm = builder.seqNoPrimaryTerm
-        version = builder.version
-        preference = builder.preference
-        scriptFields = builder.scriptFields
-        storedFields = builder.storedFields
-        docvalueFields = builder.docvalueFields
-        postFilter = builder.postFilter
-        highlight = builder.highlight
-        rescore = builder.rescore
+        
+        self.init(index: builder.index ?? "_all", type: builder.type, query: builder.query, from: builder.from, size: builder.size, sorts: builder.sorts, sourceFilter: builder.sourceFilter, explain: builder.explain, minScore: builder.minScore, scroll: builder.scroll, trackScores: builder.trackScores, indicesBoost: builder.indicesBoost, searchType: builder.searchType, seqNoPrimaryTerm: builder.seqNoPrimaryTerm, version: builder.version, preference: builder.preference, scriptFields: builder.scriptFields, storedFields: builder.storedFields, docvalueFields: builder.docvalueFields, postFilter: builder.postFilter, highlight: builder.highlight, rescore: builder.rescore, searchAfter: builder.searchAfter)
     }
 
     public var method: HTTPMethod {
@@ -429,7 +422,7 @@ public struct SearchRequest: Request {
     }
 
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-        let body = Body(query: query, sort: sorts, size: size, from: from, source: sourceFilter, explain: explain, minScore: minScore, trackScores: trackScores, indicesBoost: indicesBoost, seqNoPrimaryTerm: seqNoPrimaryTerm, version: version, scriptFields: scriptFields, storedFields: storedFields, docvalueFields: docvalueFields, postFilter: postFilter, highlight: highlight, rescore: rescore)
+        let body = Body(query: query, sort: sorts, size: size, from: from, source: sourceFilter, explain: explain, minScore: minScore, trackScores: trackScores, indicesBoost: indicesBoost, seqNoPrimaryTerm: seqNoPrimaryTerm, version: version, scriptFields: scriptFields, storedFields: storedFields, docvalueFields: docvalueFields, postFilter: postFilter, highlight: highlight, rescore: rescore, searchAfter: searchAfter)
         return serializer.encode(body).mapError { error -> MakeBodyError in
             MakeBodyError.wrapped(error)
         }
@@ -453,6 +446,7 @@ public struct SearchRequest: Request {
         public let postFilter: Query?
         public let highlight: Highlight?
         public let rescore: [QueryRescorer]?
+        public let searchAfter: CodableValue?
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
@@ -489,6 +483,7 @@ public struct SearchRequest: Request {
                     try container.encode(rescore, forKey: .rescore)
                 }
             }
+            try container.encodeIfPresent(self.searchAfter, forKey: .searchAfter)
         }
 
         enum CodingKeys: String, CodingKey {
@@ -509,6 +504,7 @@ public struct SearchRequest: Request {
             case postFilter = "post_filter"
             case highlight
             case rescore
+            case searchAfter = "search_after"
         }
     }
 }
