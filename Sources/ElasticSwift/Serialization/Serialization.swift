@@ -6,20 +6,19 @@
 //
 //
 
-import Foundation
 import ElasticSwiftCore
+import Foundation
 
-//MARK:- DefaultSerializer
+// MARK: - DefaultSerializer
 
 /// `JSONEncoder/JSONDecoder` based default implementation of `Serializer`
 public class DefaultSerializer: Serializer {
-    
     /// The encoder of the serializer
     public let encoder: JSONEncoder
-    
+
     /// The decoder of the serializer
     public let decoder: JSONDecoder
-    
+
     /// Initializes new serializer.
     /// - Parameters:
     ///   - encoder: json encoder for encoding
@@ -28,7 +27,7 @@ public class DefaultSerializer: Serializer {
         self.encoder = encoder
         self.decoder = decoder
     }
-    
+
     /// Decodes data into object of type `T` conforming to `Decodable`
     /// - Parameter data: data to decode
     /// - Returns: result of either success `T` or failure `DecodingError`
@@ -40,7 +39,7 @@ public class DefaultSerializer: Serializer {
             return .failure(DecodingError(T.self, data: data, error: error))
         }
     }
-    
+
     /// Decodes data into object of type `T` conforming to `Encodable`
     /// - Parameter value: value to encode
     /// - Returns: result of either success `Data` or failure `DecodingError`

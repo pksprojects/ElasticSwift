@@ -8,34 +8,28 @@
 
 import Foundation
 
-//MARK:- Serializer Protocol
+// MARK: - Serializer Protocol
 
 public protocol Serializer {
-    
     func decode<T>(data: Data) -> Result<T, DecodingError> where T: Decodable
-    
+
     func encode<T>(_ value: T) -> Result<Data, EncodingError> where T: Encodable
-    
 }
 
-//MARK:- HTTPSettings
+// MARK: - HTTPSettings
 
 public enum HTTPSettings {
-    
     case managed(adaptorConfig: HTTPAdaptorConfiguration)
     case independent(adaptor: HTTPClientAdaptor)
-    
 }
 
-//MARK:- ClientCredential
+// MARK: - ClientCredential
 
 public protocol ClientCredential {
-    
     var token: String { get }
-    
 }
 
-//MARK:- QueryParams enums
+// MARK: - QueryParams enums
 
 /// Enum QueryParams represent all the query params supported by ElasticSearch.
 public enum QueryParams: String {
@@ -92,6 +86,9 @@ public enum QueryParams: String {
     case offsets
     case positions
     case payloads
+    case scroll
+    case restTotalHitsAsInt = "rest_total_hits_as_int"
+    case searchType = "search_type"
 }
 
 enum EndPointCategory: String {
@@ -104,32 +101,32 @@ enum EndPointCategory: String {
 }
 
 enum EndPointPath: String {
-    case aliases = "aliases"
-    case allocation = "allocation"
-    case count = "count"
-    case health = "health"
-    case indices = "indices"
-    case master = "master"
-    case nodes = "nodes"
-    case recovery = "recovery"
-    case shards = "shards"
-    case segments = "segments"
+    case aliases
+    case allocation
+    case count
+    case health
+    case indices
+    case master
+    case nodes
+    case recovery
+    case shards
+    case segments
     case pendingTasks = "pending_tasks"
     case threadPool = "thread_pool"
     case fieldData = "fielddata"
-    case plugins = "plugins"
+    case plugins
     case nodeAttributes = "nodeattrs"
-    case repositories = "repositories"
-    case snapshots = "snapshots"
-    case tasks = "tasks"
-    case templates = "templates"
-    case state = "state"
-    case stats = "stats"
-    case reroute = "reroute"
-    case settings = "settings"
+    case repositories
+    case snapshots
+    case tasks
+    case templates
+    case state
+    case stats
+    case reroute
+    case settings
     case allocationExplain = "allocation/explain"
-    case pipeline = "pipeline"
-    case simulate = "simulate"
+    case pipeline
+    case simulate
     case hotThreads = "hotthreads"
     case restore = "_recovery"
     case status = "_status"

@@ -6,8 +6,8 @@
 //
 //
 
-import Foundation
 import ElasticSwiftCore
+import Foundation
 
 /// Elasticsearch version type
 public enum VersionType: String, Codable {
@@ -34,7 +34,6 @@ public enum OpType: String, Codable {
 
 /// URLQueryItem extension with convenience initializers with `QueryParams`
 extension URLQueryItem {
-    
     /// Convenience initializer
     /// - Parameters:
     ///   - name: query parameter
@@ -42,7 +41,7 @@ extension URLQueryItem {
     init(name: QueryParams, value: String?) {
         self.init(name: name.rawValue, value: value)
     }
-    
+
     /// Convenience initializer
     /// - Parameters:
     ///   - name: query parameter
@@ -50,7 +49,7 @@ extension URLQueryItem {
     init(name: QueryParams, value: Bool?) {
         self.init(name: name.rawValue, value: value?.description)
     }
-    
+
     /// Convenience initializer
     /// - Parameters:
     ///   - name: query parameter
@@ -58,7 +57,7 @@ extension URLQueryItem {
     init(name: QueryParams, value: Int?) {
         self.init(name: name.rawValue, value: value?.description)
     }
-    
+
     /// Convenience initializer
     /// - Parameters:
     ///   - name: query parameter
@@ -66,7 +65,7 @@ extension URLQueryItem {
     init(name: QueryParams, value: Float?) {
         self.init(name: name.rawValue, value: value?.description)
     }
-    
+
     /// Convenience initializer
     /// - Parameters:
     ///   - name: query parameter
@@ -74,7 +73,7 @@ extension URLQueryItem {
     init(name: QueryParams, value: Double?) {
         self.init(name: name.rawValue, value: value?.description)
     }
-    
+
     /// Convenience initializer
     /// - Parameters:
     ///   - name: query parameter
@@ -82,7 +81,7 @@ extension URLQueryItem {
     init(name: QueryParams, value: Decimal?) {
         self.init(name: name.rawValue, value: value?.description)
     }
-    
+
     /// Convenience initializer
     /// - Parameters:
     ///   - name: query parameter
@@ -90,5 +89,17 @@ extension URLQueryItem {
     init(name: QueryParams, value: [String]?) {
         self.init(name: name.rawValue, value: value?.joined(separator: ","))
     }
-    
+}
+
+/// Dictionary Wrapper to pass dictionary as referance
+internal class SharedDic<K: Hashable, V> {
+    var dict: [K: V] = Dictionary()
+    subscript(key: K) -> V? {
+        get {
+            return dict[key]
+        }
+        set(newValue) {
+            dict[key] = newValue
+        }
+    }
 }

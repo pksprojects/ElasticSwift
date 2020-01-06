@@ -5,39 +5,36 @@
 //  Created by Prafull Kumar Soni on 9/27/19.
 //
 
+import AsyncHTTPClient
+import ElasticSwiftCore
 import Foundation
 import Logging
 import NIO
-import ElasticSwiftCore
-import AsyncHTTPClient
 
-//MARK:- Timeouts
+// MARK: - Timeouts
 
 public struct Timeouts {
-    
-    public static let DEFAULT_TIMEOUTS: Timeouts = Timeouts(read: TimeAmount.milliseconds(1000), connect: TimeAmount.milliseconds(3000))
-    
+    public static let DEFAULT_TIMEOUTS: Timeouts = Timeouts(read: TimeAmount.milliseconds(5000), connect: TimeAmount.milliseconds(5000))
+
     public let read: TimeAmount?
     public let connect: TimeAmount?
-    
+
     public init(read: TimeAmount? = nil, connect: TimeAmount? = nil) {
         self.read = read
         self.connect = connect
     }
-    
 }
 
 extension Timeouts: Equatable {}
 
-//MARK:- HTTPAdaptorConfiguration
+// MARK: - HTTPAdaptorConfiguration
 
 /// Class holding HTTPAdaptor Config
 public class AsyncHTTPClientAdaptorConfiguration: HTTPAdaptorConfiguration {
-    
     public let adaptor: ManagedHTTPClientAdaptor.Type
-    
+
     public let clientConfig: HTTPClient.Configuration
-    
+
     public let eventLoopProvider: HTTPClient.EventLoopGroupProvider
 
     public init(adaptor: ManagedHTTPClientAdaptor.Type = AsyncHTTPClientAdaptor.self, eventLoopProvider: HTTPClient.EventLoopGroupProvider = .createNew, timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS) {
@@ -45,19 +42,16 @@ public class AsyncHTTPClientAdaptorConfiguration: HTTPAdaptorConfiguration {
         self.adaptor = adaptor
         var config = HTTPClient.Configuration()
         config.timeout = .init(connect: timeouts?.connect, read: timeouts?.read)
-        self.clientConfig = config
+        clientConfig = config
     }
-    
+
     public init(adaptor: ManagedHTTPClientAdaptor.Type = AsyncHTTPClientAdaptor.self, eventLoopProvider: HTTPClient.EventLoopGroupProvider = .createNew, asyncClientConfig: HTTPClient.Configuration) {
         self.eventLoopProvider = eventLoopProvider
         self.adaptor = adaptor
-        self.clientConfig = asyncClientConfig
+        clientConfig = asyncClientConfig
     }
-    
+
     public static var `default`: HTTPAdaptorConfiguration {
-        get {
-            return AsyncHTTPClientAdaptorConfiguration()
-        }
+        return AsyncHTTPClientAdaptorConfiguration()
     }
-    
 }

@@ -5,13 +5,12 @@
 //  Created by Prafull Kumar Soni on 4/7/18.
 //
 
-import Foundation
 import ElasticSwiftCore
+import Foundation
 
-// MARK:- Builder for Match query.
+// MARK: - Builder for Match query.
 
 public class MatchQueryBuilder: QueryBuilder {
-    
     private var _field: String?
     private var _value: String?
     private var _isFuzzy: Bool?
@@ -21,250 +20,257 @@ public class MatchQueryBuilder: QueryBuilder {
     private var _cutoffFrequency: Decimal?
     private var _fuzziness: String?
     private var _autoGenSynonymnsPhraseQuery: Bool?
-    
+
     public init() {}
-    
+
     @discardableResult
     public func set(field: String) -> MatchQueryBuilder {
-        self._field = field
+        _field = field
         return self
     }
-    
+
     @discardableResult
     public func set(value: String) -> MatchQueryBuilder {
-        self._value = value
+        _value = value
         return self
     }
-    
+
     @discardableResult
     public func set(cutoffFrequency: Decimal) -> MatchQueryBuilder {
-        self._cutoffFrequency = cutoffFrequency
+        _cutoffFrequency = cutoffFrequency
         return self
     }
-    
+
     @discardableResult
-    public func set(`operator`: MatchQueryOperator) -> MatchQueryBuilder {
-        self._operator = `operator`
+    public func set(operator: MatchQueryOperator) -> MatchQueryBuilder {
+        _operator = `operator`
         return self
     }
-    
+
     @discardableResult
     public func set(zeroTermQuery: ZeroTermQuery) -> MatchQueryBuilder {
-        self._zeroTermQuery = zeroTermQuery
+        _zeroTermQuery = zeroTermQuery
         return self
     }
-    
+
     @discardableResult
     public func set(isFuzzy: Bool) -> MatchQueryBuilder {
-        self._isFuzzy = isFuzzy
+        _isFuzzy = isFuzzy
         return self
     }
-    
+
     @discardableResult
     public func set(boost: Decimal) -> MatchQueryBuilder {
-        self._boost = boost
+        _boost = boost
         return self
     }
-    
+
     @discardableResult
     public func set(fuzziness: String) -> MatchQueryBuilder {
-        self._fuzziness = fuzziness
+        _fuzziness = fuzziness
         return self
     }
-    
+
     @discardableResult
     public func set(autoGenSynonymnsPhraseQuery: Bool) -> Self {
-        self._autoGenSynonymnsPhraseQuery = autoGenSynonymnsPhraseQuery
+        _autoGenSynonymnsPhraseQuery = autoGenSynonymnsPhraseQuery
         return self
     }
-    
+
     public var field: String? {
-        return self._field
+        return _field
     }
+
     public var value: String? {
-        return self._value
+        return _value
     }
+
     public var isFuzzy: Bool? {
-        return self._isFuzzy
+        return _isFuzzy
     }
+
     public var boost: Decimal? {
-        return self._boost
+        return _boost
     }
+
     public var `operator`: MatchQueryOperator? {
-        return self._operator
+        return _operator
     }
+
     public var zeroTermQuery: ZeroTermQuery? {
-        return self._zeroTermQuery
+        return _zeroTermQuery
     }
+
     public var cutoffFrequency: Decimal? {
-        return self._cutoffFrequency
+        return _cutoffFrequency
     }
+
     public var fuzziness: String? {
-        return self._fuzziness
+        return _fuzziness
     }
+
     public var autoGenSynonymnsPhraseQuery: Bool? {
-        return self._autoGenSynonymnsPhraseQuery
+        return _autoGenSynonymnsPhraseQuery
     }
-    
+
     public func build() throws -> MatchQuery {
         return try MatchQuery(withBuilder: self)
     }
 }
 
-// MARK:- Builder for Match Phrase query.
+// MARK: - Builder for Match Phrase query.
 
 public class MatchPhraseQueryBuilder: QueryBuilder {
-    
     private var _field: String?
     private var _value: String?
     private var _analyzer: String?
-    
+
     public init() {}
-    
+
     @discardableResult
     public func set(field: String) -> MatchPhraseQueryBuilder {
-        self._field = field
+        _field = field
         return self
     }
-    
+
     @discardableResult
     public func set(value: String) -> MatchPhraseQueryBuilder {
-        self._value = value
+        _value = value
         return self
     }
-    
+
     @discardableResult
     public func set(analyzer: String) -> MatchPhraseQueryBuilder {
-        self._analyzer = analyzer
+        _analyzer = analyzer
         return self
     }
-    
+
     public var field: String? {
-        return self._field
+        return _field
     }
+
     public var value: String? {
-        return self._value
+        return _value
     }
+
     public var analyzer: String? {
-        return self._analyzer
+        return _analyzer
     }
-    
+
     public func build() throws -> MatchPhraseQuery {
         return try MatchPhraseQuery(withBuilder: self)
     }
-    
-    
 }
 
-// MARK:- Builder for Match Phrase query.
+// MARK: - Builder for Match Phrase query.
 
 public class MatchPhrasePrefixQueryBuilder: QueryBuilder {
-    
     private var _field: String?
     private var _value: String?
     private var _maxExpansions: Int?
-    
+
     public init() {}
-    
+
     @discardableResult
     public func set(field: String) -> Self {
-        self._field = field
+        _field = field
         return self
     }
-    
+
     @discardableResult
     public func set(value: String) -> Self {
-        self._value = value
+        _value = value
         return self
     }
-    
+
     @discardableResult
     public func set(maxExpansions: Int) -> Self {
-        self._maxExpansions = maxExpansions
+        _maxExpansions = maxExpansions
         return self
     }
-    
+
     public var field: String? {
-        return self._field
+        return _field
     }
+
     public var value: String? {
-        return self._value
+        return _value
     }
+
     public var maxExpansions: Int? {
-        return self._maxExpansions
+        return _maxExpansions
     }
-    
+
     public func build() throws -> MatchPhrasePrefixQuery {
         return try MatchPhrasePrefixQuery(withBuilder: self)
     }
-    
 }
 
-// MARK:- Builder for MultiMatch query.
+// MARK: - Builder for MultiMatch query.
 
 public class MultiMatchQueryBuilder: QueryBuilder {
-    
     private var _query: String?
     private var _fields: [String] = []
     private var _type: MultiMatchQueryType?
     private var _tieBreaker: Decimal?
-    
+
     init() {}
-    
+
     @discardableResult
     public func set(query: String) -> MultiMatchQueryBuilder {
-        self._query = query
+        _query = query
         return self
     }
-    
+
     @discardableResult
     public func set(fields: String...) -> MultiMatchQueryBuilder {
-        self._fields = fields
+        _fields = fields
         return self
     }
-    
+
     @discardableResult
     public func add(field: String) -> MultiMatchQueryBuilder {
-        self._fields.append(field)
+        _fields.append(field)
         return self
     }
-    
+
     @discardableResult
     public func set(type: MultiMatchQueryType) -> MultiMatchQueryBuilder {
-        self._type = type
+        _type = type
         return self
     }
-    
+
     @discardableResult
     public func set(tieBreaker: Decimal) -> MultiMatchQueryBuilder {
-        self._tieBreaker = tieBreaker
+        _tieBreaker = tieBreaker
         return self
     }
-    
+
     public var query: String? {
-        return self._query
+        return _query
     }
+
     public var fields: [String] {
-        return self._fields
+        return _fields
     }
+
     public var type: MultiMatchQueryType? {
-        return self._type
+        return _type
     }
+
     public var tieBreaker: Decimal? {
-        return self._tieBreaker
+        return _tieBreaker
     }
-    
+
     @discardableResult
     public func build() throws -> MultiMatchQuery {
         return try MultiMatchQuery(withBuilder: self)
     }
-    
 }
 
-// MARK:- Builder for Common Terms query.
+// MARK: - Builder for Common Terms query.
 
 public class CommonTermsQueryBuilder: QueryBuilder {
-    
     private var _query: String?
     private var _cutoffFrequency: Decimal?
     private var _lowFrequencyOperator: String?
@@ -272,83 +278,87 @@ public class CommonTermsQueryBuilder: QueryBuilder {
     private var _minimumShouldMatch: Int?
     private var _minimumShouldMatchLowFreq: Int?
     private var _minimumShouldMatchHighFreq: Int?
-    
+
     init() {}
-    
+
     @discardableResult
     public func set(query: String) -> CommonTermsQueryBuilder {
-        self._query = query
+        _query = query
         return self
     }
-    
+
     @discardableResult
     public func set(cutoffFrequency: Decimal) -> CommonTermsQueryBuilder {
-        self._cutoffFrequency = cutoffFrequency
+        _cutoffFrequency = cutoffFrequency
         return self
     }
-    
+
     @discardableResult
     public func set(lowFrequencyOperator: String) -> CommonTermsQueryBuilder {
-        self._lowFrequencyOperator = lowFrequencyOperator
+        _lowFrequencyOperator = lowFrequencyOperator
         return self
     }
-    
+
     @discardableResult
     public func set(highFrequencyOperator: String) -> CommonTermsQueryBuilder {
-        self._highFrequencyOperator = highFrequencyOperator
+        _highFrequencyOperator = highFrequencyOperator
         return self
     }
-    
+
     @discardableResult
     public func set(minimumShouldMatch: Int) -> CommonTermsQueryBuilder {
-        self._minimumShouldMatch = minimumShouldMatch
+        _minimumShouldMatch = minimumShouldMatch
         return self
     }
-    
+
     @discardableResult
     public func set(minimumShouldMatchLowFreq: Int) -> CommonTermsQueryBuilder {
-        self._minimumShouldMatchLowFreq = minimumShouldMatchLowFreq
+        _minimumShouldMatchLowFreq = minimumShouldMatchLowFreq
         return self
     }
-    
+
     @discardableResult
     public func set(minimumShouldMatchHighFreq: Int) -> CommonTermsQueryBuilder {
-        self._minimumShouldMatchHighFreq = minimumShouldMatchHighFreq
+        _minimumShouldMatchHighFreq = minimumShouldMatchHighFreq
         return self
     }
-    
+
     public var query: String? {
-        return self._query
+        return _query
     }
+
     public var cutoffFrequency: Decimal? {
-        return self._cutoffFrequency
+        return _cutoffFrequency
     }
+
     public var lowFrequencyOperator: String? {
-        return self._lowFrequencyOperator
+        return _lowFrequencyOperator
     }
+
     public var highFrequencyOperator: String? {
-        return self._highFrequencyOperator
+        return _highFrequencyOperator
     }
+
     public var minimumShouldMatch: Int? {
-        return self._minimumShouldMatch
+        return _minimumShouldMatch
     }
+
     public var minimumShouldMatchLowFreq: Int? {
-        return self._minimumShouldMatchLowFreq
+        return _minimumShouldMatchLowFreq
     }
+
     public var minimumShouldMatchHighFreq: Int? {
-        return self._minimumShouldMatchHighFreq
+        return _minimumShouldMatchHighFreq
     }
-    
+
     public func build() throws -> CommonTermsQuery {
         return try CommonTermsQuery(withBuilder: self)
     }
-    
 }
 
-// MARK:- Builder for QueryString query.
+// MARK: - Builder for QueryString query.
 
 public class QueryStringQueryBuilder: QueryBuilder {
-    
     private var _defaultField: String?
     private var _value: String?
     private var _defaultOperator: String?
@@ -370,209 +380,227 @@ public class QueryStringQueryBuilder: QueryBuilder {
     private var _timeZone: String?
     private var _quoteFieldSuffix: String?
     private var _autoGenerateSynonymsPhraseQuery: Bool?
-    
+
     public init() {}
-    
+
     @discardableResult
     public func set(allowLeadingWildcard: Bool) -> Self {
-        self._allowLeadingWildcard = allowLeadingWildcard
+        _allowLeadingWildcard = allowLeadingWildcard
         return self
     }
-    
+
     @discardableResult
     public func set(value: String) -> Self {
-        self._value = value
+        _value = value
         return self
     }
-    
+
     @discardableResult
     public func set(fuzziness: String) -> Self {
-        self._fuzziness = fuzziness
+        _fuzziness = fuzziness
         return self
     }
-    
+
     @discardableResult
     public func set(phraseSlop: Int) -> Self {
-        self._phraseSlop = phraseSlop
+        _phraseSlop = phraseSlop
         return self
     }
-    
+
     @discardableResult
     public func set(enablePositionIncrements: Bool) -> Self {
-        self._enablePositionIncrements = enablePositionIncrements
+        _enablePositionIncrements = enablePositionIncrements
         return self
     }
-    
+
     @discardableResult
     public func set(quoteAnalyzer: String) -> Self {
-        self._quoteAnalyzer = quoteAnalyzer
+        _quoteAnalyzer = quoteAnalyzer
         return self
     }
-    
+
     @discardableResult
     public func set(autoGenerateSynonymsPhraseQuery: Bool) -> Self {
-        self._autoGenerateSynonymsPhraseQuery = autoGenerateSynonymsPhraseQuery
+        _autoGenerateSynonymsPhraseQuery = autoGenerateSynonymsPhraseQuery
         return self
     }
-    
+
     @discardableResult
     public func set(quoteFieldSuffix: String) -> Self {
-        self._quoteFieldSuffix = quoteFieldSuffix
+        _quoteFieldSuffix = quoteFieldSuffix
         return self
     }
-    
+
     @discardableResult
     public func set(fuzzyTranspositions: Bool) -> Self {
-        self._fuzzyTranspositions = fuzzyTranspositions
+        _fuzzyTranspositions = fuzzyTranspositions
         return self
     }
-    
+
     @discardableResult
     public func set(fuzzyPrefixLength: Int) -> Self {
-        self._fuzzyPrefixLength = fuzzyPrefixLength
+        _fuzzyPrefixLength = fuzzyPrefixLength
         return self
     }
-    
+
     @discardableResult
     public func set(fuzzyMaxExpansions: Int) -> Self {
-        self._fuzzyMaxExpansions = fuzzyMaxExpansions
+        _fuzzyMaxExpansions = fuzzyMaxExpansions
         return self
     }
-    
+
     @discardableResult
     public func set(maxDeterminizedStates: Int) -> Self {
-        self._maxDeterminizedStates = maxDeterminizedStates
+        _maxDeterminizedStates = maxDeterminizedStates
         return self
     }
-    
+
     @discardableResult
     public func set(minimumShouldMatch: Int) -> Self {
-        self._minimumShouldMatch = minimumShouldMatch
+        _minimumShouldMatch = minimumShouldMatch
         return self
     }
-    
+
     @discardableResult
     public func set(lenient: Bool) -> Self {
-        self._lenient = lenient
+        _lenient = lenient
         return self
     }
-    
+
     @discardableResult
     public func set(analyzeWildcard: Bool) -> Self {
-        self._analyzeWildcard = analyzeWildcard
+        _analyzeWildcard = analyzeWildcard
         return self
     }
-    
+
     @discardableResult
     public func set(autoGeneratePhraseQueries: Bool) -> Self {
-        self._autoGeneratePhraseQueries = autoGeneratePhraseQueries
+        _autoGeneratePhraseQueries = autoGeneratePhraseQueries
         return self
     }
-    
+
     @discardableResult
     public func set(timeZone: String) -> Self {
-        self._timeZone = timeZone
+        _timeZone = timeZone
         return self
     }
-    
+
     @discardableResult
     public func set(analyzer: String) -> Self {
-        self._analyzer = analyzer
+        _analyzer = analyzer
         return self
     }
-    
+
     @discardableResult
     public func set(defaultField: String) -> Self {
-        self._defaultField = defaultField
+        _defaultField = defaultField
         return self
     }
-    
+
     @discardableResult
     public func set(defaultOperator: String) -> Self {
-        self._defaultOperator = defaultOperator
+        _defaultOperator = defaultOperator
         return self
     }
-    
+
     @discardableResult
     public func set(boost: Decimal) -> Self {
-        self._boost = boost
+        _boost = boost
         return self
     }
-    
+
     public var defaultField: String? {
-        return self._defaultField
+        return _defaultField
     }
+
     public var value: String? {
-        return self._value
+        return _value
     }
+
     public var defaultOperator: String? {
-        return self._defaultOperator
+        return _defaultOperator
     }
+
     public var analyzer: String? {
-        return self._analyzer
+        return _analyzer
     }
+
     public var quoteAnalyzer: String? {
-        return self._quoteAnalyzer
+        return _quoteAnalyzer
     }
+
     public var allowLeadingWildcard: Bool? {
-        return self._allowLeadingWildcard
+        return _allowLeadingWildcard
     }
+
     public var enablePositionIncrements: Bool? {
-        return self._enablePositionIncrements
+        return _enablePositionIncrements
     }
+
     public var fuzzyMaxExpansions: Int? {
-        return self._fuzzyMaxExpansions
+        return _fuzzyMaxExpansions
     }
+
     public var fuzziness: String? {
-        return self._fuzziness
+        return _fuzziness
     }
+
     public var fuzzyPrefixLength: Int? {
-        return self._fuzzyPrefixLength
+        return _fuzzyPrefixLength
     }
+
     public var fuzzyTranspositions: Bool? {
-        return self._fuzzyTranspositions
+        return _fuzzyTranspositions
     }
+
     public var phraseSlop: Int? {
-        return self._phraseSlop
+        return _phraseSlop
     }
+
     public var boost: Decimal? {
-        return self._boost
+        return _boost
     }
+
     public var autoGeneratePhraseQueries: Bool? {
-        return self._autoGeneratePhraseQueries
+        return _autoGeneratePhraseQueries
     }
+
     public var analyzeWildcard: Bool? {
-        return self._analyzeWildcard
+        return _analyzeWildcard
     }
+
     public var maxDeterminizedStates: Int? {
-        return self._maxDeterminizedStates
+        return _maxDeterminizedStates
     }
+
     public var minimumShouldMatch: Int? {
-        return self._minimumShouldMatch
+        return _minimumShouldMatch
     }
+
     public var lenient: Bool? {
-        return self._lenient
+        return _lenient
     }
+
     public var timeZone: String? {
-        return self._timeZone
+        return _timeZone
     }
+
     public var quoteFieldSuffix: String? {
-        return self._quoteFieldSuffix
+        return _quoteFieldSuffix
     }
+
     public var autoGenerateSynonymsPhraseQuery: Bool? {
-        return self._autoGenerateSynonymsPhraseQuery
+        return _autoGenerateSynonymsPhraseQuery
     }
-    
+
     public func build() throws -> QueryStringQuery {
         return try QueryStringQuery(withBuilder: self)
     }
-    
 }
 
-// MARK:- Builder for SimpleQueryString query.
+// MARK: - Builder for SimpleQueryString query.
 
 public class SimpleQueryStringQueryBuilder: QueryBuilder {
-    
     private var _query: String?
     private var _fields: [String]?
     private var _defaultOperator: String?
@@ -585,121 +613,130 @@ public class SimpleQueryStringQueryBuilder: QueryBuilder {
     private var _fuzzyTranspositions: Bool?
     private var _quoteFieldSuffix: String?
     private var _autoGenerateSynonymsPhraseQuery: Bool?
-    
+
     public init() {}
-    
+
     @discardableResult
     public func set(query: String) -> Self {
-        self._query = query
+        _query = query
         return self
     }
-    
+
     @discardableResult
     public func set(autoGenerateSynonymsPhraseQuery: Bool) -> Self {
-        self._autoGenerateSynonymsPhraseQuery = autoGenerateSynonymsPhraseQuery
+        _autoGenerateSynonymsPhraseQuery = autoGenerateSynonymsPhraseQuery
         return self
     }
-    
+
     @discardableResult
     public func set(quoteFieldSuffix: String) -> Self {
-        self._quoteFieldSuffix = quoteFieldSuffix
+        _quoteFieldSuffix = quoteFieldSuffix
         return self
     }
-    
+
     @discardableResult
     public func set(fuzzyTranspositions: Bool) -> Self {
-        self._fuzzyTranspositions = fuzzyTranspositions
+        _fuzzyTranspositions = fuzzyTranspositions
         return self
     }
-    
+
     @discardableResult
     public func set(fuzzyPrefixLength: Int) -> Self {
-        self._fuzzyPrefixLength = fuzzyPrefixLength
+        _fuzzyPrefixLength = fuzzyPrefixLength
         return self
     }
-    
+
     @discardableResult
     public func set(fuzzyMaxExpansions: Int) -> Self {
-        self._fuzzyMaxExpansions = fuzzyMaxExpansions
+        _fuzzyMaxExpansions = fuzzyMaxExpansions
         return self
     }
-    
+
     @discardableResult
     public func set(minimumShouldMatch: Int) -> Self {
-        self._minimumShouldMatch = minimumShouldMatch
+        _minimumShouldMatch = minimumShouldMatch
         return self
     }
-    
+
     @discardableResult
     public func set(lenient: Bool) -> Self {
-        self._lenient = lenient
+        _lenient = lenient
         return self
     }
-    
+
     @discardableResult
     public func set(flags: String) -> Self {
-        self._flags = flags
+        _flags = flags
         return self
     }
-    
+
     @discardableResult
     public func set(analyzer: String) -> Self {
-        self._analyzer = analyzer
+        _analyzer = analyzer
         return self
     }
-    
+
     @discardableResult
     public func set(fields: String...) -> Self {
-        self._fields = fields
+        _fields = fields
         return self
     }
-    
+
     @discardableResult
     public func set(defaultOperator: String) -> Self {
-        self._defaultOperator = defaultOperator
+        _defaultOperator = defaultOperator
         return self
     }
-    
+
     public var query: String? {
-        return self._query
+        return _query
     }
+
     public var fields: [String]? {
-        return self._fields
+        return _fields
     }
+
     public var defaultOperator: String? {
-        return self._defaultOperator
+        return _defaultOperator
     }
+
     public var analyzer: String? {
-        return self._analyzer
+        return _analyzer
     }
+
     public var flags: String? {
-        return self._flags
+        return _flags
     }
+
     public var lenient: Bool? {
-        return self._lenient
+        return _lenient
     }
+
     public var minimumShouldMatch: Int? {
-        return self._minimumShouldMatch
+        return _minimumShouldMatch
     }
+
     public var fuzzyMaxExpansions: Int? {
-        return self._fuzzyMaxExpansions
+        return _fuzzyMaxExpansions
     }
+
     public var fuzzyPrefixLength: Int? {
-        return self._fuzzyPrefixLength
+        return _fuzzyPrefixLength
     }
+
     public var fuzzyTranspositions: Bool? {
-        return self._fuzzyTranspositions
+        return _fuzzyTranspositions
     }
+
     public var quoteFieldSuffix: String? {
-        return self._quoteFieldSuffix
+        return _quoteFieldSuffix
     }
+
     public var autoGenerateSynonymsPhraseQuery: Bool? {
-        return self._autoGenerateSynonymsPhraseQuery
+        return _autoGenerateSynonymsPhraseQuery
     }
-    
+
     public func build() throws -> SimpleQueryStringQuery {
         return try SimpleQueryStringQuery(withBuilder: self)
     }
-    
 }
-

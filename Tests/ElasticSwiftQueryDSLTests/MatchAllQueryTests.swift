@@ -1,20 +1,19 @@
 //
 //  MatchAllQueryTests.swift
-//  ElasticSwiftTests
+//  ElasticSwiftQueryDSLTests
 //
 //  Created by Prafull Kumar Soni on 6/8/19.
 //
 
-import XCTest
 import Logging
+import UnitTestSettings
+import XCTest
 
-@testable import ElasticSwift
 @testable import ElasticSwiftQueryDSL
 
 class MatchAllQueryTests: XCTestCase {
+    let logger = Logger(label: "org.pksprojects.ElasticSwiftQueryDSLTests.ScriptTests", factory: logFactory)
 
-    let logger = Logger(label: "org.pksprojects.ElasticSwiftTests.QueryDSL.ScriptTests", factory: logFactory)
-    
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
         super.setUp()
@@ -59,7 +58,7 @@ class MatchAllQueryTests: XCTestCase {
             XCTAssert(false)
         }
     }
-    
+
     func testMatchNonQuery() {
         let query = try! MatchNoneQueryBuilder().build()
         let expectedJson = "{\"match_none\":{}}"
@@ -76,6 +75,6 @@ class MatchAllQueryTests: XCTestCase {
     static var allTests = [
         ("testMatchAllQuery", testMatchAllQuery),
         ("testMatchAllBoost", testMatchAllBoost),
-        ("testMatchNonQuery", testMatchNonQuery)
+        ("testMatchNonQuery", testMatchNonQuery),
     ]
 }
