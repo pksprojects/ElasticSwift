@@ -89,6 +89,17 @@ public enum QueryParams: String {
     case scroll
     case restTotalHitsAsInt = "rest_total_hits_as_int"
     case searchType = "search_type"
+    case ignoreThrottled = "ignore_throttled"
+    case allowNoIndices = "allow_no_indices"
+    case expandWildcards = "expand_wildcards"
+    case minScore = "min_score"
+    case q
+    case analyzer
+    case analyzeWildcard = "analyze_wildcard"
+    case defaultOperator = "default_operator"
+    case df
+    case lenient
+    case terminateAfter = "terminate_after"
 }
 
 enum EndPointCategory: String {

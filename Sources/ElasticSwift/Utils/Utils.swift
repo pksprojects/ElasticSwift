@@ -32,6 +32,20 @@ public enum OpType: String, Codable {
     case delete
 }
 
+/// Mode in which to expand wildcard expresion to concrete indices
+public enum ExpandWildcards: String, Codable {
+    case open
+    case closed
+    case none
+    case all
+}
+
+/// Operator for query string query
+public enum QueryStringQueryOperator: String, Codable {
+    case and = "AND"
+    case or = "OR"
+}
+
 /// URLQueryItem extension with convenience initializers with `QueryParams`
 extension URLQueryItem {
     /// Convenience initializer
