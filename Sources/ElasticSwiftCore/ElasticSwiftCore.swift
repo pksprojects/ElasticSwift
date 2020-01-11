@@ -97,7 +97,7 @@ public enum QueryParams: String {
     case analyzer
     case analyzeWildcard = "analyze_wildcard"
     case defaultOperator = "default_operator"
-    case  df = "df"
+    case df
     case lenient
     case terminateAfter = "terminate_after"
 }

@@ -1,7 +1,7 @@
 //
 //  CountRequestTests.swift
 //  ElasticSwiftTests
-//  
+//
 //
 //  Created by Prafull Kumar Soni on 1/11/20.
 //
@@ -66,9 +66,8 @@ class CountRequestTests: XCTestCase {
         waitForExpectations(timeout: 10)
         logger.info("====================TEST=END===============================")
     }
-    
+
     func test_01_Count_on_empty_index() throws {
-        
         let e = expectation(description: "execution complete")
 
         func handler(_ result: Result<CountResponse, Error>) {
@@ -82,16 +81,15 @@ class CountRequestTests: XCTestCase {
 
             e.fulfill()
         }
-        
+
         let request = CountRequest(indices: indexName)
-        
-        self.client.count(request, completionHandler: handler)
-        
+
+        client.count(request, completionHandler: handler)
+
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_02_Count_type_query() throws {
-        
         let e = expectation(description: "execution complete")
 
         func handler(_ result: Result<CountResponse, Error>) {
@@ -105,9 +103,9 @@ class CountRequestTests: XCTestCase {
 
             e.fulfill()
         }
-        
+
         let request = CountRequest(indices: indexName, types: ["_doc"], query: MatchQuery(field: "name", value: "elasticsearch"))
-        
+
         /// make sure doc exists
         func handler1(_ result: Result<IndexResponse, Error>) {
             switch result {
@@ -116,23 +114,21 @@ class CountRequestTests: XCTestCase {
             case let .success(response):
                 logger.info("Found \(response.result)")
             }
-            self.client.count(request, completionHandler: handler)
+            client.count(request, completionHandler: handler)
         }
-        
+
         var request1 = try IndexRequestBuilder<CodableValue>()
             .set(index: indexName)
             .set(type: "_doc")
-            .set(source: [ "name": "elasticsearch" ])
+            .set(source: ["name": "elasticsearch"])
             .build()
         request1.refresh = .true
         client.index(request1, completionHandler: handler1)
 
-        
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_03_Count_q() throws {
-        
         let e = expectation(description: "execution complete")
 
         func handler(_ result: Result<CountResponse, Error>) {
@@ -146,13 +142,13 @@ class CountRequestTests: XCTestCase {
 
             e.fulfill()
         }
-        
+
         let request = try CountRequestBuilder()
             .set(indices: indexName)
             .set(types: "_doc")
             .set(q: "name:elasticsearch")
             .build()
-        
+
         /// make sure doc exists
         func handler1(_ result: Result<IndexResponse, Error>) {
             switch result {
@@ -161,21 +157,20 @@ class CountRequestTests: XCTestCase {
             case let .success(response):
                 logger.info("Found \(response.result)")
             }
-            self.client.count(request, completionHandler: handler)
+            client.count(request, completionHandler: handler)
         }
-        
+
         var request1 = try IndexRequestBuilder<CodableValue>()
             .set(index: indexName)
             .set(type: "_doc")
-            .set(source: [ "name": "elasticsearch" ])
+            .set(source: ["name": "elasticsearch"])
             .build()
         request1.refresh = .true
         client.index(request1, completionHandler: handler1)
 
-        
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_04_equatable() throws {
         let request = try CountRequestBuilder()
             .add(index: indexName)
@@ -220,4 +215,3 @@ class CountRequestTests: XCTestCase {
         XCTAssert(request.headers.count == 0)
     }
 }
-

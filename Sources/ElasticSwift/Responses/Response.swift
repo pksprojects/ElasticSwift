@@ -761,14 +761,14 @@ public struct ClearScrollResponse: Codable {
 
 extension ClearScrollResponse: Equatable {}
 
-// MARK:- Count Response
+// MARK: - Count Response
 
 /// A response to _count API request.
 public struct CountResponse: Codable {
     public let count: Int
     public let shards: Shards
     public let terminatedEarly: Bool?
-    
+
     enum CodingKeys: String, CodingKey {
         case count
         case shards = "_shards"

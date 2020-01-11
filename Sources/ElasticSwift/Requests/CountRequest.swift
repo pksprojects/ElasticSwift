@@ -1,25 +1,25 @@
 //
 //  CountRequest.swift
 //  ElasticSwift
-//  
+//
 //
 //  Created by Prafull Kumar Soni on 1/11/20.
 //
 
-import NIOHTTP1
-import Foundation
 import ElasticSwiftCore
 import ElasticSwiftQueryDSL
+import Foundation
+import NIOHTTP1
 
-// MARK:- Count Request Builder
+// MARK: - Count Request Builder
 
 public class CountRequestBuilder: RequestBuilder {
     public typealias RequestType = CountRequest
-    
+
     private var _indices: [String]?
     private var _types: [String]?
     private var _query: Query?
-    
+
     private var _ignoreUnavailable: Bool?
     private var _ignoreThrottled: Bool?
     private var _allowNoIndices: Bool?
@@ -34,202 +34,217 @@ public class CountRequestBuilder: RequestBuilder {
     private var _df: String?
     private var _lenient: String?
     private var _terminateAfter: Int?
-    
+
     public init() {}
-    
+
     @discardableResult
     public func set(indices: String...) -> Self {
-        self._indices = indices
+        _indices = indices
         return self
     }
 
     @available(*, deprecated, message: "Elasticsearch has deprecated use of custom types and will be remove in 7.0")
     @discardableResult
     public func set(types: String...) -> Self {
-        self._types = types
+        _types = types
         return self
     }
-    
+
     @discardableResult
     public func add(index: String) -> Self {
-        if self._indices != nil {
-            self._indices?.append(index)
+        if _indices != nil {
+            _indices?.append(index)
         } else {
-            self._indices = [index]
+            _indices = [index]
         }
         return self
     }
-    
+
     @available(*, deprecated, message: "Elasticsearch has deprecated use of custom types and will be remove in 7.0")
     @discardableResult
     public func add(type: String) -> Self {
-        if self._types != nil {
-            self._types?.append(type)
+        if _types != nil {
+            _types?.append(type)
         } else {
-            self._types = [type]
+            _types = [type]
         }
         return self
     }
-    
+
     @discardableResult
     public func set(query: Query) -> Self {
-        self._query = query
+        _query = query
         return self
     }
-    
+
     @discardableResult
     public func set(ignoreUnavailable: Bool) -> Self {
-        self._ignoreUnavailable = ignoreUnavailable
+        _ignoreUnavailable = ignoreUnavailable
         return self
     }
-    
+
     @discardableResult
     public func set(ignoreThrottled: Bool) -> Self {
-        self._ignoreThrottled = ignoreThrottled
+        _ignoreThrottled = ignoreThrottled
         return self
     }
-    
+
     @discardableResult
     public func set(allowNoIndices: Bool) -> Self {
-        self._allowNoIndices = allowNoIndices
+        _allowNoIndices = allowNoIndices
         return self
     }
-    
+
     @discardableResult
     public func set(expandWildcards: ExpandWildcards) -> Self {
-        self._expandWildcards = expandWildcards
+        _expandWildcards = expandWildcards
         return self
     }
-    
+
     @discardableResult
     public func set(minScore: Decimal) -> Self {
-        self._minScore = minScore
+        _minScore = minScore
         return self
     }
-    
+
     @discardableResult
     public func set(preference: String) -> Self {
-        self._preference = preference
+        _preference = preference
         return self
     }
-    
+
     @discardableResult
     public func set(routing: String) -> Self {
-        self._routing = routing
+        _routing = routing
         return self
     }
-    
+
     @discardableResult
     public func set(q: String) -> Self {
-        self._q = q
+        _q = q
         return self
     }
-    
+
     @discardableResult
     public func set(analyzer: String) -> Self {
-        self._analyzer = analyzer
+        _analyzer = analyzer
         return self
     }
-    
+
     @discardableResult
     public func set(analyzeWildcard: Bool) -> Self {
-        self._analyzeWildcard = analyzeWildcard
+        _analyzeWildcard = analyzeWildcard
         return self
     }
-    
+
     @discardableResult
     public func set(defaultOperator: QueryStringQueryOperator) -> Self {
-        self._defaultOperator = defaultOperator
+        _defaultOperator = defaultOperator
         return self
     }
-    
+
     @discardableResult
     public func set(df: String) -> Self {
-        self._df = df
+        _df = df
         return self
     }
-    
+
     @discardableResult
     public func set(lenient: String) -> Self {
-        self._lenient = lenient
+        _lenient = lenient
         return self
     }
-    
+
     @discardableResult
     public func set(terminateAfter: Int) -> Self {
-        self._terminateAfter = terminateAfter
+        _terminateAfter = terminateAfter
         return self
     }
-    
+
     public var indices: [String]? {
-        return self._indices
+        return _indices
     }
+
     public var types: [String]? {
-        return self._types
+        return _types
     }
+
     public var query: Query? {
-        return self._query
+        return _query
     }
+
     public var ignoreUnavailable: Bool? {
-        return self._ignoreUnavailable
+        return _ignoreUnavailable
     }
+
     public var ignoreThrottled: Bool? {
-        return self._ignoreThrottled
+        return _ignoreThrottled
     }
+
     public var allowNoIndices: Bool? {
-        return self._allowNoIndices
+        return _allowNoIndices
     }
+
     public var expandWildcards: ExpandWildcards? {
-        return self._expandWildcards
+        return _expandWildcards
     }
+
     public var minScore: Decimal? {
-        return self._minScore
+        return _minScore
     }
+
     public var preference: String? {
-        return self._preference
+        return _preference
     }
+
     public var routing: String? {
-        return self._routing
+        return _routing
     }
+
     public var q: String? {
-        return self._q
+        return _q
     }
+
     public var analyzer: String? {
-        return self._analyzer
+        return _analyzer
     }
+
     public var analyzeWildcard: Bool? {
-        return self._analyzeWildcard
+        return _analyzeWildcard
     }
+
     public var defaultOperator: QueryStringQueryOperator? {
-        return self._defaultOperator
+        return _defaultOperator
     }
+
     public var df: String? {
-        return self._df
+        return _df
     }
+
     public var lenient: String? {
-        return self._lenient
+        return _lenient
     }
+
     public var terminateAfter: Int? {
-        return self._terminateAfter
+        return _terminateAfter
     }
-    
+
     public func build() throws -> CountRequest {
         return try CountRequest(withBuilder: self)
     }
 }
 
-// MARK:- Count Request
+// MARK: - Count Request
 
 /// Encapsulates a request to _count API against one, several or all indices.
 public struct CountRequest: Request {
-    
     /// A comma-separated list of indices to restrict the results
     public let indices: [String]?
     /// A comma-separated list of types to restrict the results
     public let types: [String]?
     /// A query to restrict the results specified with the Query DSL (optional)
     public let query: Query?
-    
+
     /// Whether specified concrete indices should be ignored when unavailable (missing or closed)
     public var ignoreUnavailable: Bool?
     /// Whether specified concrete, expanded or aliased indices should be ignored when throttled
@@ -258,40 +273,40 @@ public struct CountRequest: Request {
     public var lenient: String?
     /// The maximum count for each shard, upon reaching which the query execution will terminate early
     public var terminateAfter: Int?
-    
+
     public init(indices: [String]? = nil, types: [String]? = nil, query: Query? = nil) {
         self.indices = indices
         self.types = types
         self.query = query
     }
-    
+
     public init(indices: String..., types: [String]? = nil, query: Query? = nil) {
         self.init(indices: indices, types: types, query: query)
     }
-    
+
     internal init(withBuilder builder: CountRequestBuilder) throws {
         self.init(indices: builder.indices, types: builder.types, query: builder.query)
-        
-        self.ignoreUnavailable = builder.ignoreUnavailable
-        self.ignoreThrottled = builder.ignoreThrottled
-        self.allowNoIndices = builder.allowNoIndices
-        self.expandWildcards = builder.expandWildcards
-        self.minScore = builder.minScore
-        self.preference = builder.preference
-        self.routing = builder.routing
-        self.q = builder.q
-        self.analyzer = builder.analyzer
-        self.analyzeWildcard = builder.analyzeWildcard
-        self.defaultOperator = builder.defaultOperator
-        self.df = builder.df
-        self.lenient = builder.lenient
-        self.terminateAfter = builder.terminateAfter
+
+        ignoreUnavailable = builder.ignoreUnavailable
+        ignoreThrottled = builder.ignoreThrottled
+        allowNoIndices = builder.allowNoIndices
+        expandWildcards = builder.expandWildcards
+        minScore = builder.minScore
+        preference = builder.preference
+        routing = builder.routing
+        q = builder.q
+        analyzer = builder.analyzer
+        analyzeWildcard = builder.analyzeWildcard
+        defaultOperator = builder.defaultOperator
+        df = builder.df
+        lenient = builder.lenient
+        terminateAfter = builder.terminateAfter
     }
-    
+
     public var headers: HTTPHeaders {
         return HTTPHeaders()
     }
-    
+
     public var queryParams: [URLQueryItem] {
         var params = [URLQueryItem]()
         if let ignoreUnavailable = self.ignoreUnavailable {
@@ -338,11 +353,11 @@ public struct CountRequest: Request {
         }
         return params
     }
-    
+
     public var method: HTTPMethod {
         return .POST
     }
-    
+
     public var endPoint: String {
         var _endPoint = "_count"
         if let types = self.types, !types.isEmpty {
@@ -353,30 +368,29 @@ public struct CountRequest: Request {
         }
         return _endPoint
     }
-    
+
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
         if let query = self.query {
             let body = Body(query: query)
             return serializer.encode(body).mapError { error -> MakeBodyError in
-                return .wrapped(error)
+                .wrapped(error)
             }
         }
         return .failure(.noBodyForRequest)
     }
-    
+
     struct Body: Encodable {
         let query: Query
-        
+
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(self.query, forKey: .query)
+            try container.encode(query, forKey: .query)
         }
-        
+
         enum CodingKeys: String, CodingKey {
             case query
         }
     }
-    
 }
 
 extension CountRequest: Equatable {
@@ -400,5 +414,3 @@ extension CountRequest: Equatable {
             && lhs.terminateAfter == rhs.terminateAfter
     }
 }
-
-

@@ -185,7 +185,7 @@ extension ElasticClient {
     public func bulk(_ bulkRequest: BulkRequest, completionHandler: @escaping (_ result: Result<BulkResponse, Error>) -> Void) {
         return execute(request: bulkRequest, options: .default, completionHandler: completionHandler)
     }
-    
+
     /// Asynchronously executes a count request using the Count API.
     ///
     /// [Count API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-count.html)
@@ -351,7 +351,7 @@ extension ElasticClient {
     public func bulk(_ bulkRequest: BulkRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<BulkResponse, Error>) -> Void) {
         return execute(request: bulkRequest, options: options, completionHandler: completionHandler)
     }
-    
+
     /// Asynchronously executes a count request using the Count API.
     ///
     /// [Count API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-count.html)
