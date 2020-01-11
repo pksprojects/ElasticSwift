@@ -185,6 +185,16 @@ extension ElasticClient {
     public func bulk(_ bulkRequest: BulkRequest, completionHandler: @escaping (_ result: Result<BulkResponse, Error>) -> Void) {
         return execute(request: bulkRequest, options: .default, completionHandler: completionHandler)
     }
+    
+    /// Asynchronously executes a count request using the Count API.
+    ///
+    /// [Count API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-count.html)
+    /// - Parameters:
+    ///   - bulkRequest: the request.
+    ///   - completionHandler: callback to be invoked upon request completion.
+    public func count(_ countRequest: CountRequest, completionHandler: @escaping (_ result: Result<CountResponse, Error>) -> Void) {
+        return execute(request: countRequest, options: .default, completionHandler: completionHandler)
+    }
 }
 
 extension ElasticClient {
@@ -340,6 +350,17 @@ extension ElasticClient {
     ///   - completionHandler: callback to be invoked upon request completion.
     public func bulk(_ bulkRequest: BulkRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<BulkResponse, Error>) -> Void) {
         return execute(request: bulkRequest, options: options, completionHandler: completionHandler)
+    }
+    
+    /// Asynchronously executes a count request using the Count API.
+    ///
+    /// [Count API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-count.html)
+    /// - Parameters:
+    ///   - bulkRequest: the request.
+    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - completionHandler: callback to be invoked upon request completion.
+    public func count(_ countRequest: CountRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<CountResponse, Error>) -> Void) {
+        return execute(request: countRequest, options: options, completionHandler: completionHandler)
     }
 }
 
