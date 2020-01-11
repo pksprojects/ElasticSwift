@@ -390,7 +390,7 @@ extension CountRequest: Equatable {
             && lhs.expandWildcards == rhs.expandWildcards
             && lhs.minScore == rhs.minScore
             && lhs.preference == rhs.preference
-            && lhs.routing == rhs.preference
+            && lhs.routing == rhs.routing
             && lhs.q == rhs.q
             && lhs.analyzer == rhs.analyzer
             && lhs.analyzeWildcard == rhs.analyzeWildcard

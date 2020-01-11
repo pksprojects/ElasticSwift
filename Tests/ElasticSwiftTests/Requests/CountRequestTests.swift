@@ -175,5 +175,49 @@ class CountRequestTests: XCTestCase {
         
         waitForExpectations(timeout: 10)
     }
+    
+    func test_04_equatable() throws {
+        let request = try CountRequestBuilder()
+            .add(index: indexName)
+            .set(indices: indexName)
+            .add(index: "index2")
+            .add(type: "_doc")
+            .set(types: "_doc")
+            .add(type: "_doc2")
+            .set(query: MatchAllQuery())
+            .set(ignoreUnavailable: true)
+            .set(ignoreThrottled: true)
+            .set(allowNoIndices: false)
+            .set(expandWildcards: .all)
+            .set(minScore: 1.0)
+            .set(preference: "local")
+            .set(routing: "routing")
+            .set(analyzer: "analyzer")
+            .set(analyzeWildcard: false)
+            .set(defaultOperator: .and)
+            .set(df: "df")
+            .set(lenient: "lenient")
+            .set(terminateAfter: 10)
+            .build()
+        var request1 = CountRequest(indices: indexName, "index2", types: ["_doc", "_doc2"], query: MatchAllQuery())
+        request1.ignoreUnavailable = true
+        request1.ignoreThrottled = true
+        request1.allowNoIndices = false
+        request1.expandWildcards = .all
+        request1.minScore = 1.0
+        request1.preference = "local"
+        request1.routing = "routing"
+        request1.analyzer = "analyzer"
+        request1.analyzeWildcard = false
+        request1.defaultOperator = .and
+        request1.df = "df"
+        request1.lenient = "lenient"
+        request1.terminateAfter = 10
+        XCTAssert(request == request1)
+        XCTAssert(request.endPoint == "\(indexName),index2/_doc,_doc2/_count")
+        XCTAssert(request.method == .POST)
+        XCTAssert(request.queryParams.count == 13)
+        XCTAssert(request.headers.count == 0)
+    }
 }
 
