@@ -190,7 +190,7 @@ extension ElasticClient {
     ///
     /// [Count API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-count.html)
     /// - Parameters:
-    ///   - bulkRequest: the request.
+    ///   - countRequest: the request.
     ///   - completionHandler: callback to be invoked upon request completion.
     public func count(_ countRequest: CountRequest, completionHandler: @escaping (_ result: Result<CountResponse, Error>) -> Void) {
         return execute(request: countRequest, options: .default, completionHandler: completionHandler)
@@ -366,7 +366,7 @@ extension ElasticClient {
     ///
     /// [Count API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-count.html)
     /// - Parameters:
-    ///   - bulkRequest: the request.
+    ///   - countRequest: the request.
     ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
     public func count(_ countRequest: CountRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<CountResponse, Error>) -> Void) {
