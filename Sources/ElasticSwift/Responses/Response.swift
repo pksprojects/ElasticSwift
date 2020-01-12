@@ -776,6 +776,8 @@ public struct CountResponse: Codable {
     }
 }
 
+extension CountResponse: Equatable {}
+
 // MARK: - Explain Response
 
 public struct ExplainResponse: Codable {
