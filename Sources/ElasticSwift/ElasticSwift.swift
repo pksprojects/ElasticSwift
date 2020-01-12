@@ -205,6 +205,16 @@ extension ElasticClient {
     public func explain(_ explainRequest: ExplainRequest, completionHandler: @escaping (_ result: Result<ExplainResponse, Error>) -> Void) {
         return execute(request: explainRequest, options: .default, completionHandler: completionHandler)
     }
+
+    /// Asynchronously executes a request using the Field Capabilities API.
+    ///
+    /// [Field Capabilities API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-field-caps.html)
+    /// - Parameters:
+    ///   - fieldCapabilitiesRequest: the request.
+    ///   - completionHandler: callback to be invoked upon request completion.
+    public func fieldCaps(_ fieldCapabilitiesRequest: FieldCapabilitiesRequest, completionHandler: @escaping (_ result: Result<FieldCapabilitiesResponse, Error>) -> Void) {
+        return execute(request: fieldCapabilitiesRequest, options: .default, completionHandler: completionHandler)
+    }
 }
 
 extension ElasticClient {
@@ -382,6 +392,17 @@ extension ElasticClient {
     ///   - completionHandler: callback to be invoked upon request completion.
     public func explain(_ explainRequest: ExplainRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<ExplainResponse, Error>) -> Void) {
         return execute(request: explainRequest, options: options, completionHandler: completionHandler)
+    }
+
+    /// Asynchronously executes a request using the Field Capabilities API.
+    ///
+    /// [Field Capabilities API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-field-caps.html)
+    /// - Parameters:
+    ///   - fieldCapabilitiesRequest: the request.
+    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - completionHandler: callback to be invoked upon request completion.
+    public func fieldCaps(_ fieldCapabilitiesRequest: FieldCapabilitiesRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<FieldCapabilitiesResponse, Error>) -> Void) {
+        return execute(request: fieldCapabilitiesRequest, options: options, completionHandler: completionHandler)
     }
 }
 

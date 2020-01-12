@@ -797,3 +797,92 @@ public struct ExplainResponse: Codable {
 }
 
 extension ExplainResponse: Equatable {}
+
+// MARK: - Field Capabilities Response
+
+/// Response for FieldCapabilitiesIndexRequest requests.
+public struct FieldCapabilitiesResponse {
+    public let fields: [String: [String: FieldCapabilities]]
+}
+
+extension FieldCapabilitiesResponse: Codable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let fieldsResponse = try container.decode([String: [String: FieldCaps]].self, forKey: .fields)
+        var fields = [String: [String: FieldCapabilities]]()
+        for field in fieldsResponse.keys {
+            for type in fieldsResponse[field]!.keys {
+                let fieldCaps = fieldsResponse[field]![type]!
+                if fields.keys.contains(field) {
+                    fields[field]![type] = fieldCaps.toFieldCapabilities(field, type: type)
+                } else {
+                    fields[field] = [String: FieldCapabilities]()
+                    fields[field]![type] = fieldCaps.toFieldCapabilities(field, type: type)
+                }
+            }
+        }
+        self.fields = fields
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var fields = [String: [String: FieldCaps]]()
+        for field in self.fields.keys {
+            for type in self.fields[field]!.keys {
+                let fieldCaps = self.fields[field]![type]!
+                if fields.keys.contains(field) {
+                    fields[field]![type] = FieldCaps.fromFieldCapabilities(fieldCaps)
+                } else {
+                    fields[field] = [String: FieldCaps]()
+                    fields[field]![type] = FieldCaps.fromFieldCapabilities(fieldCaps)
+                }
+            }
+        }
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(fields, forKey: .fields)
+    }
+
+    internal struct FieldCaps: Codable, Equatable {
+        public let type: String?
+        public let searchable: Bool
+        public let aggregatable: Bool
+        public let indices: [String]?
+        public let nonSearchableIndices: [String]?
+        public let nonAggregatableIndicies: [String]?
+
+        func toFieldCapabilities(_ name: String, type: String) -> FieldCapabilities {
+            return FieldCapabilities(name: name, type: type, isSearchable: searchable, isAggregatable: aggregatable, indices: indices, nonSearchableIndices: nonSearchableIndices, nonAggregatableIndicies: nonAggregatableIndicies)
+        }
+
+        static func fromFieldCapabilities(_ caps: FieldCapabilities) -> FieldCaps {
+            return FieldCaps(type: caps.type, searchable: caps.isSearchable, aggregatable: caps.isAggregatable, indices: caps.indices, nonSearchableIndices: caps.nonSearchableIndices, nonAggregatableIndicies: caps.nonAggregatableIndicies)
+        }
+
+        enum CodingKeys: String, CodingKey {
+            case type
+            case searchable
+            case aggregatable
+            case indices
+            case nonSearchableIndices = "non_searchable_indices"
+            case nonAggregatableIndicies = "non_aggregatable_indices"
+        }
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case fields
+    }
+}
+
+extension FieldCapabilitiesResponse: Equatable {}
+
+/// Describes the capabilities of a field optionally merged across multiple indices.
+public struct FieldCapabilities: Codable {
+    public let name: String
+    public let type: String
+    public let isSearchable: Bool
+    public let isAggregatable: Bool
+    public let indices: [String]?
+    public let nonSearchableIndices: [String]?
+    public let nonAggregatableIndicies: [String]?
+}
+
+extension FieldCapabilities: Equatable {}
