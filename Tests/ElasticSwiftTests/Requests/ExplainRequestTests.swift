@@ -316,4 +316,73 @@ class ExplainRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
+    
+    func test_09_sourceFilter_test_bool() throws {
+        var request = try ExplainRequestBuilder()
+            .set(index: indexName)
+            .set(type: "_doc")
+            .set(id: "0")
+            .set(q: "user:test")
+            .build()
+        request.sourceFilter = .fetchSource(true)
+        XCTAssert(request.queryParams.first { $0.name == "_source" }!.value == "true")
+    }
+    
+    func test_10_sourceFilter_test_single_val() throws {
+        var request = try ExplainRequestBuilder()
+            .set(index: indexName)
+            .set(type: "_doc")
+            .set(id: "0")
+            .set(q: "user:test")
+            .build()
+        request.sourceFilter = .filter("field.pattern.*")
+        XCTAssert(request.queryParams.first { $0.name == "_source" }!.value == "field.pattern.*")
+    }
+    
+    func test_11_sourceFilter_test_source_fields() throws {
+        var request = try ExplainRequestBuilder()
+            .set(index: indexName)
+            .set(type: "_doc")
+            .set(id: "0")
+            .set(q: "user:test")
+            .build()
+        request.sourceFilter = .filters(["field1", "field2"])
+        XCTAssert(request.queryParams.first { $0.name == "_source" }!.value == "field1,field2")
+    }
+    
+    func test_12_sourceFilter_test_source_include_exclude() throws {
+        var request = try ExplainRequestBuilder()
+            .set(index: indexName)
+            .set(type: "_doc")
+            .set(id: "0")
+            .set(q: "user:test")
+            .build()
+        request.sourceFilter = .source(includes: ["include"], excludes: ["exclude"])
+        XCTAssert(request.queryParams.first { $0.name == "_source_includes" }!.value == "include")
+        XCTAssert(request.queryParams.first { $0.name == "_source_excludes" }!.value == "exclude")
+    }
+    
+    func test_13_sourceFilter_test_source_include_only() throws {
+        var request = try ExplainRequestBuilder()
+            .set(index: indexName)
+            .set(type: "_doc")
+            .set(id: "0")
+            .set(q: "user:test")
+            .build()
+        request.sourceFilter = .source(includes: ["include"], excludes: [])
+        XCTAssert(request.queryParams.first { $0.name == "_source_includes" }!.value == "include")
+        XCTAssert(request.queryParams.first { $0.name == "_source_excludes" } == nil)
+    }
+    
+    func test_14_sourceFilter_test_source_exlude_only() throws {
+        var request = try ExplainRequestBuilder()
+            .set(index: indexName)
+            .set(type: "_doc")
+            .set(id: "0")
+            .set(q: "user:test")
+            .build()
+        request.sourceFilter = .source(includes: [], excludes: ["exclude"])
+        XCTAssert(request.queryParams.first { $0.name == "_source_includes" } == nil)
+        XCTAssert(request.queryParams.first { $0.name == "_source_excludes" }!.value == "exclude")
+    }
 }
