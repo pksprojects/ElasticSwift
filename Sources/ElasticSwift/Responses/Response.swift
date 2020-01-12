@@ -775,3 +775,25 @@ public struct CountResponse: Codable {
         case terminatedEarly = "terminated_early"
     }
 }
+
+extension CountResponse: Equatable {}
+
+// MARK: - Explain Response
+
+public struct ExplainResponse: Codable {
+    public let index: String
+    public let type: String
+    public let id: String
+    public let matched: Bool
+    public let explanation: Explanation
+
+    enum CodingKeys: String, CodingKey {
+        case index = "_index"
+        case type = "_type"
+        case id = "_id"
+        case matched
+        case explanation
+    }
+}
+
+extension ExplainResponse: Equatable {}
