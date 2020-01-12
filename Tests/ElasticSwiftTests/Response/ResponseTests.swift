@@ -326,4 +326,127 @@ class ResponseTests: XCTestCase {
             XCTAssert(false, "Encoding Failed!")
         }
     }
+
+    func test_05_field_capabilities_response_decode() throws {
+        let serializer = DefaultSerializer()
+        let data = """
+        {
+            "fields": {
+                "rating": {
+                    "long": {
+                        "searchable": true,
+                        "aggregatable": false,
+                        "indices": ["index1", "index2"],
+                        "non_aggregatable_indices": ["index1"]
+                    },
+                    "keyword": {
+                        "searchable": false,
+                        "aggregatable": true,
+                        "indices": ["index3", "index4"],
+                        "non_searchable_indices": ["index4"]
+                    }
+                },
+                "title": {
+                    "text": {
+                        "searchable": true,
+                        "aggregatable": false
+
+                    }
+                }
+            }
+        }
+        """.data(using: .utf8)
+
+        let result: Result<FieldCapabilitiesResponse, DecodingError> = serializer.decode(data: data!)
+
+        switch result {
+        case let .success(response):
+            logger.info("Decoded: \(response)")
+            XCTAssertNotNil(response.fields)
+            XCTAssertNotNil(response.fields["rating"])
+            XCTAssertNotNil(response.fields["title"])
+            XCTAssertNotNil(response.fields["rating"]!["long"])
+            XCTAssertTrue(response.fields["rating"]!["long"] == FieldCapabilities(name: "rating", type: "long", isSearchable: true, isAggregatable: false, indices: ["index1", "index2"], nonSearchableIndices: nil, nonAggregatableIndicies: ["index1"]))
+            XCTAssertNotNil(response.fields["rating"]!["keyword"])
+            XCTAssertTrue(response.fields["rating"]!["keyword"] == FieldCapabilities(name: "rating", type: "keyword", isSearchable: false, isAggregatable: true, indices: ["index3", "index4"], nonSearchableIndices: ["index4"], nonAggregatableIndicies: nil))
+            XCTAssertNotNil(response.fields["title"]!["text"])
+            XCTAssertTrue(response.fields["title"]!["text"] == FieldCapabilities(name: "title", type: "text", isSearchable: true, isAggregatable: false, indices: nil, nonSearchableIndices: nil, nonAggregatableIndicies: nil))
+        case let .failure(error):
+            logger.info("Unexpected Error: \(error)")
+            XCTAssert(false, "Encoding Failed!")
+        }
+    }
+
+    func test_06_field_capabilities_response_encode() throws {
+        let serializer = DefaultSerializer()
+
+        let fieldCapsResponse = FieldCapabilitiesResponse(fields: [
+            "rating": [
+                "long": FieldCapabilities(name: "rating", type: "long", isSearchable: true, isAggregatable: false, indices: ["index1", "index2"], nonSearchableIndices: nil, nonAggregatableIndicies: ["index1"]),
+                "keyword": FieldCapabilities(name: "rating", type: "keyword", isSearchable: false, isAggregatable: true, indices: ["index3", "index4"], nonSearchableIndices: ["index4"], nonAggregatableIndicies: nil),
+            ],
+            "title": [
+                "text": FieldCapabilities(name: "title", type: "text", isSearchable: true, isAggregatable: false, indices: nil, nonSearchableIndices: nil, nonAggregatableIndicies: nil),
+            ],
+        ])
+
+        let data = """
+        {
+            "fields": {
+                "rating": {
+                    "long": {
+                        "type": "long",
+                        "searchable": true,
+                        "aggregatable": false,
+                        "indices": ["index1", "index2"],
+                        "non_aggregatable_indices": ["index1"]
+                    },
+                    "keyword": {
+                        "type": "keyword",
+                        "searchable": false,
+                        "aggregatable": true,
+                        "indices": ["index3", "index4"],
+                        "non_searchable_indices": ["index4"]
+                    }
+                },
+                "title": {
+                    "text": {
+                        "type": "text",
+                        "searchable": true,
+                        "aggregatable": false
+
+                    }
+                }
+            }
+        }
+        """.data(using: .utf8)
+
+        let result = serializer.encode(fieldCapsResponse)
+
+        let expectedResult: Result<CodableValue, DecodingError> = serializer.decode(data: data!)
+
+        switch result {
+        case let .success(response):
+            let encodeStr = String(data: response, encoding: .utf8)
+            XCTAssertNotNil(encodeStr)
+            logger.info("Encoded: \(encodeStr!)")
+            let decodeResult: Result<CodableValue, DecodingError> = serializer.decode(data: response)
+            switch decodeResult {
+            case let .success(decoded):
+                switch expectedResult {
+                case let .success(expected):
+                    XCTAssertTrue(expected == decoded)
+                case let .failure(error):
+                    logger.info("Unexpected Error: \(error)")
+                    XCTAssert(false, "Expected result Decoding Failed!")
+                }
+            case let .failure(error):
+                logger.info("Unexpected Error: \(error)")
+                XCTAssert(false, "Decoding Failed!")
+            }
+        case let .failure(error):
+            logger.info("Unexpected Error: \(error)")
+            XCTAssert(false, "Encoding Failed!")
+        }
+    }
 }
