@@ -112,8 +112,15 @@ class ResponseTests: XCTestCase {
         case let .success(resposne):
             let encodeStr = String(data: resposne, encoding: .utf8)
             XCTAssertNotNil(encodeStr)
-            XCTAssertEqual(encodeStr, "{\"hits\":{\"total\":1,\"max_score\":1,\"hits\":[{\"_type\":\"_doc\",\"_index\":\"test\",\"_id\":\"1\",\"_source\":{\"test\":\"test\"},\"highlight\":{\"content\":[\"test\"]},\"_score\":0.2876821}]},\"_shards\":{\"skipped\":0,\"failed\":0,\"total\":1,\"successful\":1},\"timed_out\":false,\"took\":1}")
             logger.info("Encoded: \(encodeStr!)")
+            let decodeResult: Result<SearchResponse<[String: String]>, DecodingError> = serializer.decode(data: resposne)
+            switch decodeResult {
+            case let .success(decoded):
+                XCTAssertTrue(searchResponse == decoded)
+            case let .failure(error):
+                logger.info("Unexpected Error: \(error)")
+                XCTAssert(false, "Decoding Failed!")
+            }
         case let .failure(error):
             logger.info("Unexpected Error: \(error)")
             XCTAssert(false, "Encoding Failed!")
@@ -305,8 +312,15 @@ class ResponseTests: XCTestCase {
         case let .success(resposne):
             let encodeStr = String(data: resposne, encoding: .utf8)
             XCTAssertNotNil(encodeStr)
-            XCTAssertEqual(encodeStr, "{\"hits\":{\"total\":1,\"max_score\":1,\"hits\":[{\"_index\":\"test\",\"_id\":\"1\",\"_score\":0.2876821,\"inner_hits\":{\"comments.votes\":{\"hits\":{\"total\":0,\"max_score\":0,\"hits\":[]}}},\"_type\":\"_doc\",\"fields\":{\"test1\":[\"value\"]},\"_nested\":{\"field\":\"comments\",\"_nested\":{\"field\":\"votes\",\"offset\":0},\"offset\":1},\"_source\":{\"test\":\"test\"}}]},\"_shards\":{\"skipped\":0,\"failed\":0,\"total\":1,\"successful\":1},\"timed_out\":false,\"took\":1}")
             logger.info("Encoded: \(encodeStr!)")
+            let decodeResult: Result<SearchResponse<[String: String]>, DecodingError> = serializer.decode(data: resposne)
+            switch decodeResult {
+            case let .success(decoded):
+                XCTAssertTrue(searchResponse == decoded)
+            case let .failure(error):
+                logger.info("Unexpected Error: \(error)")
+                XCTAssert(false, "Decoding Failed!")
+            }
         case let .failure(error):
             logger.info("Unexpected Error: \(error)")
             XCTAssert(false, "Encoding Failed!")
