@@ -64,6 +64,12 @@
             ("test_06_explainRequestBuilder_fail_id", test_06_explainRequestBuilder_fail_id),
             ("test_07_explainRequestBuilder_fail_query_q", test_07_explainRequestBuilder_fail_query_q),
             ("test_08_explain_query_matched_false", test_08_explain_query_matched_false),
+            ("test_09_sourceFilter_test_bool", test_09_sourceFilter_test_bool),
+            ("test_10_sourceFilter_test_single_val", test_10_sourceFilter_test_single_val),
+            ("test_11_sourceFilter_test_source_fields", test_11_sourceFilter_test_source_fields),
+            ("test_12_sourceFilter_test_source_include_exclude", test_12_sourceFilter_test_source_include_exclude),
+            ("test_13_sourceFilter_test_source_include_only", test_13_sourceFilter_test_source_include_only),
+            ("test_14_sourceFilter_test_source_exlude_only", test_14_sourceFilter_test_source_exlude_only),
         ]
     }
 
