@@ -24,77 +24,6 @@ public class IndicesClient {
     init(withClient: ElasticClient) {
         client = withClient
     }
-
-    /// Asynchronously creates an index using the Create Index API.
-    ///
-    /// [Create Index API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html)
-    /// - Parameters:
-    ///   - createRequest: the request
-    ///   - completionHandler: callback to be invoked upon request completion.
-    public func create(_ createRequest: CreateIndexRequest, completionHandler: @escaping (_ result: Result<CreateIndexResponse, Error>) -> Void) {
-        client.execute(request: createRequest, options: .default, completionHandler: completionHandler)
-    }
-
-    /// Retrieve information about one or more indexes
-    ///
-    /// [Indices Get Index API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-get-index.html)
-    /// - Parameters:
-    ///   - getReqeust: the request
-    ///   - completionHandler: callback to be invoked upon request completion.
-    public func get(_ getReqeust: GetIndexRequest, completionHandler: @escaping (_ result: Result<GetIndexResponse, Error>) -> Void) {
-        client.execute(request: getReqeust, options: .default, completionHandler: completionHandler)
-    }
-
-    /// Asynchronously checks if the index (indices) exists or not.
-    ///
-    /// [Indices Exists API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-exists.html)
-    /// - Parameters:
-    ///   - getReqeust: the request
-    ///   - completionHandler: callback to be invoked upon request completion.
-    public func exists(_ getReqeust: GetIndexRequest, completionHandler: @escaping (_ result: Result<IndexExistsResponse, Error>) -> Void) {
-        client.execute(request: getReqeust, options: .default, converter: ResponseConverters.indexExistsResponseConverter, completionHandler: completionHandler)
-    }
-
-    /// Asynchronously checks if the index (indices) exists or not.
-    ///
-    /// [Indices Exists API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-exists.html)
-    /// - Parameters:
-    ///   - existsReqeust: the request
-    ///   - completionHandler: callback to be invoked upon request completion.
-    public func exists(_ existsReqeust: IndexExistsRequest, completionHandler: @escaping (_ result: Result<IndexExistsResponse, Error>) -> Void) {
-        client.execute(request: existsReqeust, options: .default, converter: ResponseConverters.indexExistsResponseConverter, completionHandler: completionHandler)
-    }
-
-    /// Asynchronously deletes an index using the Delete Index API.
-    ///
-    /// [Delete Index API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-delete-index.html)
-    /// - Parameters:
-    ///   - deleteReqeust: the request
-    ///   - completionHandler: callback to be invoked upon request completion.
-    public func delete(_ deleteReqeust: DeleteIndexRequest, completionHandler: @escaping (_ result: Result<AcknowledgedResponse, Error>) -> Void) {
-        client.execute(request: deleteReqeust, options: .default, completionHandler: completionHandler)
-    }
-
-    /// Asynchronously opens an index using the Open Index API.
-    ///
-    /// [Open Index API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-open-close.html)
-    /// - Parameters:
-    ///   - openReqeust: the request
-    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
-    ///   - completionHandler: callback to be invoked upon request completion.
-    public func open(_ openReqeust: OpenIndexRequest, completionHandler: @escaping (_ rresult: Result<AcknowledgedResponse, Error>) -> Void) {
-        client.execute(request: openReqeust, options: .default, completionHandler: completionHandler)
-    }
-
-    /// Asynchronously closes an index using the Close Index API.
-    ///
-    /// [Close Index API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-open-close.html)
-    /// - Parameters:
-    ///   - closeReqeust: the request
-    ///   - completionHandler: callback to be invoked upon request completion.
-    public func close(_ closeReqeust: CloseIndexRequest, completionHandler: @escaping (_ result: Result<AcknowledgedResponse, Error>) -> Void) {
-        client.execute(request: closeReqeust, options: .default, completionHandler: completionHandler)
-    }
 }
 
 extension IndicesClient {
@@ -103,9 +32,9 @@ extension IndicesClient {
     /// [Create Index API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html)
     /// - Parameters:
     ///   - createRequest: the request
-    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func create(_ createRequest: CreateIndexRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<CreateIndexResponse, Error>) -> Void) {
+    public func create(_ createRequest: CreateIndexRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<CreateIndexResponse, Error>) -> Void) {
         client.execute(request: createRequest, options: options, completionHandler: completionHandler)
     }
 
@@ -114,9 +43,9 @@ extension IndicesClient {
     /// [Indices Get Index API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-get-index.html)
     /// - Parameters:
     ///   - getReqeust: the request
-    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func get(_ getReqeust: GetIndexRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<GetIndexResponse, Error>) -> Void) {
+    public func get(_ getReqeust: GetIndexRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<GetIndexResponse, Error>) -> Void) {
         client.execute(request: getReqeust, options: options, completionHandler: completionHandler)
     }
 
@@ -125,9 +54,9 @@ extension IndicesClient {
     /// [Indices Exists API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-exists.html)
     /// - Parameters:
     ///   - getReqeust: the request
-    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func exists(_ getReqeust: GetIndexRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<IndexExistsResponse, Error>) -> Void) {
+    public func exists(_ getReqeust: GetIndexRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<IndexExistsResponse, Error>) -> Void) {
         client.execute(request: getReqeust, options: options, converter: ResponseConverters.indexExistsResponseConverter, completionHandler: completionHandler)
     }
 
@@ -136,9 +65,9 @@ extension IndicesClient {
     /// [Indices Exists API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-exists.html)
     /// - Parameters:
     ///   - existsReqeust: the request
-    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func exists(_ existsReqeust: IndexExistsRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<IndexExistsResponse, Error>) -> Void) {
+    public func exists(_ existsReqeust: IndexExistsRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<IndexExistsResponse, Error>) -> Void) {
         client.execute(request: existsReqeust, options: options, converter: ResponseConverters.indexExistsResponseConverter, completionHandler: completionHandler)
     }
 
@@ -147,9 +76,9 @@ extension IndicesClient {
     /// [Delete Index API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-delete-index.html)
     /// - Parameters:
     ///   - deleteReqeust: the request
-    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func delete(_ deleteReqeust: DeleteIndexRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<AcknowledgedResponse, Error>) -> Void) {
+    public func delete(_ deleteReqeust: DeleteIndexRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<AcknowledgedResponse, Error>) -> Void) {
         client.execute(request: deleteReqeust, options: options, completionHandler: completionHandler)
     }
 
@@ -158,9 +87,9 @@ extension IndicesClient {
     /// [Open Index API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-open-close.html)
     /// - Parameters:
     ///   - openReqeust: the request
-    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func open(_ openReqeust: OpenIndexRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<AcknowledgedResponse, Error>) -> Void) {
+    public func open(_ openReqeust: OpenIndexRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<AcknowledgedResponse, Error>) -> Void) {
         client.execute(request: openReqeust, options: options, completionHandler: completionHandler)
     }
 
@@ -169,9 +98,9 @@ extension IndicesClient {
     /// [Close Index API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-open-close.html)
     /// - Parameters:
     ///   - closeReqeust: the request
-    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func close(_ closeReqeust: CloseIndexRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<AcknowledgedResponse, Error>) -> Void) {
+    public func close(_ closeReqeust: CloseIndexRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<AcknowledgedResponse, Error>) -> Void) {
         client.execute(request: closeReqeust, options: options, completionHandler: completionHandler)
     }
 }

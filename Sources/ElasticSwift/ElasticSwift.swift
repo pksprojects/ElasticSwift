@@ -51,181 +51,9 @@ extension ElasticClient {
     /// [Get API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-get.html)
     /// - Parameters:
     ///   - getRequest: the request
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func get<T: Codable>(_ getRequest: GetRequest, completionHandler: @escaping (_ result: Result<GetResponse<T>, Error>) -> Void) -> Void {
-        return execute(request: getRequest, options: .default, completionHandler: completionHandler)
-    }
-
-    /// Asynchronously index a document using the Index API.
-    ///
-    /// [Index API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html)
-    /// - Parameters:
-    ///   - indexRequest: the request
-    ///   - completionHandler: callback to be invoked upon request completion.
-    public func index<T: Codable>(_ indexRequest: IndexRequest<T>, completionHandler: @escaping (_ result: Result<IndexResponse, Error>) -> Void) -> Void {
-        return execute(request: indexRequest, options: .default, completionHandler: completionHandler)
-    }
-
-    /// Asynchronously deletes a document by id using the Delete API.
-    ///
-    /// [Delete API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete.html)
-    /// - Parameters:
-    ///   - deleteRequest: the request
-    ///   - completionHandler: callback to be invoked upon request completion.
-    public func delete(_ deleteRequest: DeleteRequest, completionHandler: @escaping (_ result: Result<DeleteResponse, Error>) -> Void) {
-        return execute(request: deleteRequest, options: .default, completionHandler: completionHandler)
-    }
-
-    /// Asynchronously updates a document using the Update API.
-    ///
-    /// [Update API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-update.html)
-    /// - Parameters:
-    ///   - updateRequest: the request
-    ///   - completionHandler: callback to be invoked upon request completion.
-    public func update(_ updateRequest: UpdateRequest, completionHandler: @escaping (_ result: Result<UpdateResponse, Error>) -> Void) {
-        return execute(request: updateRequest, options: .default, completionHandler: completionHandler)
-    }
-
-    /// Asynchronously executes a search using the Search API.
-    ///
-    /// [Search API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-search.html)
-    /// - Parameters:
-    ///   - serachRequest: the request
-    ///   - completionHandler: callback to be invoked upon request completion.
-    public func search<T: Codable>(_ serachRequest: SearchRequest, completionHandler: @escaping (_ result: Result<SearchResponse<T>, Error>) -> Void) -> Void {
-        return execute(request: serachRequest, options: .default, completionHandler: completionHandler)
-    }
-
-    /// Asynchronously executes a search using the Search Scroll API.
-    ///
-    /// [Search Scroll API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html)
-    /// - Parameters:
-    ///   - serachRequest: the request
-    ///   - completionHandler: callback to be invoked upon request completion.
-    public func scroll<T: Codable>(_ scrollRequest: SearchScrollRequest, completionHandler: @escaping (_ result: Result<SearchResponse<T>, Error>) -> Void) -> Void {
-        return execute(request: scrollRequest, options: .default, completionHandler: completionHandler)
-    }
-
-    /// Asynchronously clears one or more scroll ids using the Clear Scroll API.
-    ///
-    /// [Clear Scroll API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html#_clear_scroll_api)
-    /// - Parameters:
-    ///   - serachRequest: the request
-    ///   - completionHandler: callback to be invoked upon request completion.
-    public func clearScroll(_ clearScrollRequest: ClearScrollRequest, completionHandler: @escaping (_ result: Result<ClearScrollResponse, Error>) -> Void) {
-        return execute(request: clearScrollRequest, options: .default, completionHandler: completionHandler)
-    }
-
-    /// Asynchronously executes a delete by query request.
-    ///
-    /// [Delete By Query API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete-by-query.html)
-    /// - Parameters:
-    ///   - deleteByQueryRequest: the request
-    ///   - completionHandler: callback to be invoked upon request completion.
-    public func deleteByQuery(_ deleteByQueryRequest: DeleteByQueryRequest, completionHandler: @escaping (_ result: Result<DeleteByQueryResponse, Error>) -> Void) {
-        return execute(request: deleteByQueryRequest, options: .default, completionHandler: completionHandler)
-    }
-
-    /// Asynchronously executes an update by query request.
-    ///
-    /// [Update By Query API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-update-by-query.html)
-    /// - Parameters:
-    ///   - updateByQueryRequest: the request
-    ///   - completionHandler: callback to be invoked upon request completion.
-    public func updateByQuery(_ updateByQueryRequest: UpdateByQueryRequest, completionHandler: @escaping (_ result: Result<UpdateByQueryResponse, Error>) -> Void) {
-        return execute(request: updateByQueryRequest, options: .default, completionHandler: completionHandler)
-    }
-
-    /// Asynchronously retrieves multiple documents by id using the Multi Get API.
-    ///
-    ///  [Multi Get API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-multi-get.html)
-    /// - Parameters:
-    ///   - multiGetRequest: the request
-    ///   - completionHandler: callback to be invoked upon request completion.
-    public func mget(_ multiGetRequest: MultiGetRequest, completionHandler: @escaping (_ result: Result<MultiGetResponse, Error>) -> Void) {
-        return execute(request: multiGetRequest, options: .default, completionHandler: completionHandler)
-    }
-
-    /// Asynchronously executes a reindex request.
-    ///
-    ///  [Reindex API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-reindex.html)
-    /// - Parameters:
-    ///   - reIndexRequest: the request
-    ///   - completionHandler: callback to be invoked upon request completion.
-    public func reIndex(_ reIndexRequest: ReIndexRequest, completionHandler: @escaping (_ result: Result<ReIndexResponse, Error>) -> Void) {
-        return execute(request: reIndexRequest, options: .default, completionHandler: completionHandler)
-    }
-
-    /// Asynchronously calls the Term Vectors API
-    ///
-    ///  [Term Vectors API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-termvectors.html)
-    /// - Parameters:
-    ///   - termVectorsRequest: the request
-    ///   - completionHandler: callback to be invoked upon request completion.
-    public func termVectors(_ termVectorsRequest: TermVectorsRequest, completionHandler: @escaping (_ result: Result<TermVectorsResponse, Error>) -> Void) {
-        return execute(request: termVectorsRequest, options: .default, completionHandler: completionHandler)
-    }
-
-    /// Asynchronously calls the Multi Term Vectors API
-    ///
-    /// [Multi Term Vectors API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-multi-termvectors.html)
-    /// - Parameters:
-    ///   - mtermVectorsRequest: the request.
-    ///   - completionHandler: callback to be invoked upon request completion.
-    public func mtermVectors(_ mtermVectorsRequest: MultiTermVectorsRequest, completionHandler: @escaping (_ result: Result<MultiTermVectorsResponse, Error>) -> Void) {
-        return execute(request: mtermVectorsRequest, options: .default, completionHandler: completionHandler)
-    }
-
-    /// Asynchronously executes a bulk request using the Bulk API.
-    ///
-    /// [Bulk API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html)
-    /// - Parameters:
-    ///   - bulkRequest: the request.
-    ///   - completionHandler: callback to be invoked upon request completion.
-    public func bulk(_ bulkRequest: BulkRequest, completionHandler: @escaping (_ result: Result<BulkResponse, Error>) -> Void) {
-        return execute(request: bulkRequest, options: .default, completionHandler: completionHandler)
-    }
-
-    /// Asynchronously executes a count request using the Count API.
-    ///
-    /// [Count API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-count.html)
-    /// - Parameters:
-    ///   - countRequest: the request.
-    ///   - completionHandler: callback to be invoked upon request completion.
-    public func count(_ countRequest: CountRequest, completionHandler: @escaping (_ result: Result<CountResponse, Error>) -> Void) {
-        return execute(request: countRequest, options: .default, completionHandler: completionHandler)
-    }
-
-    /// Asynchronously executes a request using the Explain API.
-    ///
-    /// [Explain API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-explain.html)
-    /// - Parameters:
-    ///   - explainRequest: the request.
-    ///   - completionHandler: callback to be invoked upon request completion.
-    public func explain(_ explainRequest: ExplainRequest, completionHandler: @escaping (_ result: Result<ExplainResponse, Error>) -> Void) {
-        return execute(request: explainRequest, options: .default, completionHandler: completionHandler)
-    }
-
-    /// Asynchronously executes a request using the Field Capabilities API.
-    ///
-    /// [Field Capabilities API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-field-caps.html)
-    /// - Parameters:
-    ///   - fieldCapabilitiesRequest: the request.
-    ///   - completionHandler: callback to be invoked upon request completion.
-    public func fieldCaps(_ fieldCapabilitiesRequest: FieldCapabilitiesRequest, completionHandler: @escaping (_ result: Result<FieldCapabilitiesResponse, Error>) -> Void) {
-        return execute(request: fieldCapabilitiesRequest, options: .default, completionHandler: completionHandler)
-    }
-}
-
-extension ElasticClient {
-    /// Asynchronously retrieves a document by id using the Get API.
-    ///
-    /// [Get API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-get.html)
-    /// - Parameters:
-    ///   - getRequest: the request
-    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
-    ///   - completionHandler: callback to be invoked upon request completion.
-    public func get<T: Codable>(_ getRequest: GetRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<GetResponse<T>, Error>) -> Void) -> Void {
+    public func get<T: Codable>(_ getRequest: GetRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<GetResponse<T>, Error>) -> Void) -> Void {
         return execute(request: getRequest, options: options, completionHandler: completionHandler)
     }
 
@@ -234,9 +62,9 @@ extension ElasticClient {
     /// [Index API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html)
     /// - Parameters:
     ///   - indexRequest: the request
-    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func index<T: Codable>(_ indexRequest: IndexRequest<T>, with options: RequestOptions, completionHandler: @escaping (_ result: Result<IndexResponse, Error>) -> Void) -> Void {
+    public func index<T: Codable>(_ indexRequest: IndexRequest<T>, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<IndexResponse, Error>) -> Void) -> Void {
         return execute(request: indexRequest, options: options, completionHandler: completionHandler)
     }
 
@@ -245,9 +73,9 @@ extension ElasticClient {
     /// [Delete API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete.html)
     /// - Parameters:
     ///   - deleteRequest: the request
-    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func delete(_ deleteRequest: DeleteRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<DeleteResponse, Error>) -> Void) {
+    public func delete(_ deleteRequest: DeleteRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<DeleteResponse, Error>) -> Void) {
         return execute(request: deleteRequest, options: options, completionHandler: completionHandler)
     }
 
@@ -256,9 +84,9 @@ extension ElasticClient {
     /// [Update API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-update.html)
     /// - Parameters:
     ///   - updateRequest: the request
-    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func update(_ updateRequest: UpdateRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<UpdateResponse, Error>) -> Void) {
+    public func update(_ updateRequest: UpdateRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<UpdateResponse, Error>) -> Void) {
         return execute(request: updateRequest, options: options, completionHandler: completionHandler)
     }
 
@@ -267,9 +95,9 @@ extension ElasticClient {
     /// [Search API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-search.html)
     /// - Parameters:
     ///   - serachRequest: the request
-    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func search<T: Codable>(_ serachRequest: SearchRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<SearchResponse<T>, Error>) -> Void) -> Void {
+    public func search<T: Codable>(_ serachRequest: SearchRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<SearchResponse<T>, Error>) -> Void) -> Void {
         return execute(request: serachRequest, options: options, completionHandler: completionHandler)
     }
 
@@ -278,9 +106,9 @@ extension ElasticClient {
     /// [Search Scroll API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html)
     /// - Parameters:
     ///   - serachRequest: the request
-    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func scroll<T: Codable>(_ scrollRequest: SearchScrollRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<SearchResponse<T>, Error>) -> Void) -> Void {
+    public func scroll<T: Codable>(_ scrollRequest: SearchScrollRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<SearchResponse<T>, Error>) -> Void) -> Void {
         return execute(request: scrollRequest, options: options, completionHandler: completionHandler)
     }
 
@@ -289,9 +117,9 @@ extension ElasticClient {
     /// [Clear Scroll API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html#_clear_scroll_api)
     /// - Parameters:
     ///   - serachRequest: the request
-    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func clearScroll(_ clearScrollRequest: ClearScrollRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<ClearScrollResponse, Error>) -> Void) {
+    public func clearScroll(_ clearScrollRequest: ClearScrollRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<ClearScrollResponse, Error>) -> Void) {
         return execute(request: clearScrollRequest, options: options, completionHandler: completionHandler)
     }
 
@@ -300,9 +128,9 @@ extension ElasticClient {
     /// [Delete By Query API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete-by-query.html)
     /// - Parameters:
     ///   - deleteByQueryRequest: the request
-    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func deleteByQuery(_ deleteByQueryRequest: DeleteByQueryRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<DeleteByQueryResponse, Error>) -> Void) {
+    public func deleteByQuery(_ deleteByQueryRequest: DeleteByQueryRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<DeleteByQueryResponse, Error>) -> Void) {
         return execute(request: deleteByQueryRequest, options: options, completionHandler: completionHandler)
     }
 
@@ -311,9 +139,9 @@ extension ElasticClient {
     /// [Update By Query API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-update-by-query.html)
     /// - Parameters:
     ///   - updateByQueryRequest: the request
-    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func updateByQuery(_ updateByQueryRequest: UpdateByQueryRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<UpdateByQueryResponse, Error>) -> Void) {
+    public func updateByQuery(_ updateByQueryRequest: UpdateByQueryRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<UpdateByQueryResponse, Error>) -> Void) {
         return execute(request: updateByQueryRequest, options: options, completionHandler: completionHandler)
     }
 
@@ -322,9 +150,9 @@ extension ElasticClient {
     ///  [Multi Get API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-multi-get.html)
     /// - Parameters:
     ///   - multiGetRequest: the request
-    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func mget(_ multiGetRequest: MultiGetRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<MultiGetResponse, Error>) -> Void) {
+    public func mget(_ multiGetRequest: MultiGetRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<MultiGetResponse, Error>) -> Void) {
         return execute(request: multiGetRequest, options: options, completionHandler: completionHandler)
     }
 
@@ -333,9 +161,9 @@ extension ElasticClient {
     ///  [Reindex API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-reindex.html)
     /// - Parameters:
     ///   - reIndexRequest: the request
-    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func reIndex(_ reIndexRequest: ReIndexRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<ReIndexResponse, Error>) -> Void) {
+    public func reIndex(_ reIndexRequest: ReIndexRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<ReIndexResponse, Error>) -> Void) {
         return execute(request: reIndexRequest, options: options, completionHandler: completionHandler)
     }
 
@@ -344,9 +172,9 @@ extension ElasticClient {
     ///  [Term Vectors API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-termvectors.html)
     /// - Parameters:
     ///   - termVectorsRequest: the request
-    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func termVectors(_ termVectorsRequest: TermVectorsRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<TermVectorsResponse, Error>) -> Void) {
+    public func termVectors(_ termVectorsRequest: TermVectorsRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<TermVectorsResponse, Error>) -> Void) {
         return execute(request: termVectorsRequest, options: options, completionHandler: completionHandler)
     }
 
@@ -355,9 +183,9 @@ extension ElasticClient {
     /// [Multi Term Vectors API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-multi-termvectors.html)
     /// - Parameters:
     ///   - mtermVectorsRequest: the request.
-    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func mtermVectors(_ mtermVectorsRequest: MultiTermVectorsRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<MultiTermVectorsResponse, Error>) -> Void) {
+    public func mtermVectors(_ mtermVectorsRequest: MultiTermVectorsRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<MultiTermVectorsResponse, Error>) -> Void) {
         return execute(request: mtermVectorsRequest, options: options, completionHandler: completionHandler)
     }
 
@@ -366,9 +194,9 @@ extension ElasticClient {
     /// [Bulk API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html)
     /// - Parameters:
     ///   - bulkRequest: the request.
-    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func bulk(_ bulkRequest: BulkRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<BulkResponse, Error>) -> Void) {
+    public func bulk(_ bulkRequest: BulkRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<BulkResponse, Error>) -> Void) {
         return execute(request: bulkRequest, options: options, completionHandler: completionHandler)
     }
 
@@ -377,9 +205,9 @@ extension ElasticClient {
     /// [Count API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-count.html)
     /// - Parameters:
     ///   - countRequest: the request.
-    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func count(_ countRequest: CountRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<CountResponse, Error>) -> Void) {
+    public func count(_ countRequest: CountRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<CountResponse, Error>) -> Void) {
         return execute(request: countRequest, options: options, completionHandler: completionHandler)
     }
 
@@ -388,9 +216,9 @@ extension ElasticClient {
     /// [Explain API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-explain.html)
     /// - Parameters:
     ///   - explainRequest: the request.
-    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func explain(_ explainRequest: ExplainRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<ExplainResponse, Error>) -> Void) {
+    public func explain(_ explainRequest: ExplainRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<ExplainResponse, Error>) -> Void) {
         return execute(request: explainRequest, options: options, completionHandler: completionHandler)
     }
 
@@ -399,9 +227,9 @@ extension ElasticClient {
     /// [Field Capabilities API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-field-caps.html)
     /// - Parameters:
     ///   - fieldCapabilitiesRequest: the request.
-    ///   - options: the request options (e.g. headers), use `RequestOptions.default` if nothing to be customized.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func fieldCaps(_ fieldCapabilitiesRequest: FieldCapabilitiesRequest, with options: RequestOptions, completionHandler: @escaping (_ result: Result<FieldCapabilitiesResponse, Error>) -> Void) {
+    public func fieldCaps(_ fieldCapabilitiesRequest: FieldCapabilitiesRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<FieldCapabilitiesResponse, Error>) -> Void) {
         return execute(request: fieldCapabilitiesRequest, options: options, completionHandler: completionHandler)
     }
 }
