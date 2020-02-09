@@ -85,10 +85,13 @@ class RankEvalRequestTests: XCTestCase {
 
             e.fulfill()
         }
+        
+        var searchSource = SearchSource()
+        searchSource.query = MatchAllQuery()
 
         let request = try RankEvalRequestBuilder()
             .set(rankEvalSpec: .init(request: [
-                .init(id: "Test 01", summaryFields: [], ratedDocs: [], templateId: nil, params: [:], evaluationRequest: SearchSource(query: MatchAllQuery())),
+                .init(id: "Test 01", summaryFields: [], ratedDocs: [], templateId: nil, params: [:], evaluationRequest: searchSource),
             ], metric: PrecisionAtK(threshold: nil, ignoreUnlabeled: nil, k: nil), maxConcurrentSearches: nil, templates: []))
             .build()
 
@@ -112,10 +115,13 @@ class RankEvalRequestTests: XCTestCase {
 
             e.fulfill()
         }
+        
+        var searchSource = SearchSource()
+        searchSource.query = MatchAllQuery()
 
         let request = try RankEvalRequestBuilder()
             .set(rankEvalSpec: .init(request: [
-                .init(id: "Test 01", summaryFields: [], ratedDocs: [], templateId: nil, params: [:], evaluationRequest: SearchSource(query: MatchAllQuery())),
+                .init(id: "Test 01", summaryFields: [], ratedDocs: [], templateId: nil, params: [:], evaluationRequest: searchSource),
             ], metric: MeanReciprocalRank(k: nil, relevantRatingThreshhold: nil), maxConcurrentSearches: nil, templates: []))
             .build()
 
@@ -139,10 +145,13 @@ class RankEvalRequestTests: XCTestCase {
 
             e.fulfill()
         }
+        
+        var searchSource = SearchSource()
+        searchSource.query = MatchAllQuery()
 
         let request = try RankEvalRequestBuilder()
             .set(rankEvalSpec: .init(request: [
-                .init(id: "Test 01", summaryFields: [], ratedDocs: [], templateId: nil, params: [:], evaluationRequest: SearchSource(query: MatchAllQuery())),
+                .init(id: "Test 01", summaryFields: [], ratedDocs: [], templateId: nil, params: [:], evaluationRequest: searchSource),
             ], metric: DiscountedCumulativeGain(k: nil, normalize: true, unknownDocRating: nil), maxConcurrentSearches: nil, templates: []))
             .build()
 
@@ -166,10 +175,13 @@ class RankEvalRequestTests: XCTestCase {
 
             e.fulfill()
         }
+        
+        var searchSource = SearchSource()
+        searchSource.query = MatchAllQuery()
 
         let request = try RankEvalRequestBuilder()
             .set(rankEvalSpec: .init(request: [
-                .init(id: "Test 01", summaryFields: [], ratedDocs: [], templateId: nil, params: [:], evaluationRequest: SearchSource(query: MatchAllQuery())),
+                .init(id: "Test 01", summaryFields: [], ratedDocs: [], templateId: nil, params: [:], evaluationRequest: searchSource),
             ], metric: ExpectedReciprocalRank(k: nil, maxRelevance: 3), maxConcurrentSearches: nil, templates: []))
             .build()
 
