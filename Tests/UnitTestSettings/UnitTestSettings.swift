@@ -33,11 +33,7 @@ public let logFactory: ((String) -> LogHandler) = { label -> LogHandler in
 }
 
 public let isLoggingConfigured: Bool = {
-    LoggingSystem.bootstrap { label in
-        var handler = StreamLogHandler.standardOutput(label: label)
-        handler.logLevel = loggerLevel
-        return handler
-    }
+    LoggingSystem.bootstrap(logFactory)
     return true
 }()
 
