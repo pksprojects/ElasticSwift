@@ -96,7 +96,7 @@ class RankEvalRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_02_rankEvalRequest_mrr() throws {
         let e = expectation(description: "execution complete")
 
@@ -123,7 +123,7 @@ class RankEvalRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_03_rankEvalRequest_dcg() throws {
         let e = expectation(description: "execution complete")
 
@@ -150,7 +150,7 @@ class RankEvalRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_04_rankEvalRequest_err() throws {
         let e = expectation(description: "execution complete")
 
