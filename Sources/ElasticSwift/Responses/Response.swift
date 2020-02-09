@@ -886,3 +886,91 @@ public struct FieldCapabilities: Codable {
 }
 
 extension FieldCapabilities: Equatable {}
+
+// MARK: - RankEvalResponse
+
+public struct RankEvalResponse: Codable {
+    public let metricScore: Decimal
+    public let details: [String: EvalQueryQuality]
+    public let failures: [String: ElasticError]
+
+    enum CodingKeys: String, CodingKey {
+        case metricScore = "metric_score"
+        case details
+        case failures
+    }
+}
+
+extension RankEvalResponse: Equatable {}
+
+public struct EvalQueryQuality {
+    public let queryId: String?
+    public let metricScore: Decimal
+    public let metricDetails: MetricDetail?
+    public let ratedHits: [RatedSearchHit]
+    public let unratedDocs: [UnratedDocument]
+}
+
+extension EvalQueryQuality: Codable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        metricScore = try container.decodeDecimal(forKey: .metricScore)
+        metricDetails = try container.decodeMetricDetailIfPresent(forKey: .metricDetails)
+        ratedHits = try container.decodeArray(forKey: .ratedHits)
+        unratedDocs = try container.decode([UnratedDocument].self, forKey: .unratedDocs)
+        queryId = nil
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(metricScore, forKey: .metricScore)
+        try container.encodeIfPresent(metricDetails, forKey: .metricDetails)
+        try container.encode(ratedHits, forKey: .ratedHits)
+        try container.encode(unratedDocs, forKey: .unratedDocs)
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case metricScore = "metric_score"
+        case unratedDocs = "unrated_docs"
+        case metricDetails = "metric_details"
+        case ratedHits = "hits"
+    }
+}
+
+extension EvalQueryQuality: Equatable {
+    public static func == (lhs: EvalQueryQuality, rhs: EvalQueryQuality) -> Bool {
+        return lhs.queryId == rhs.queryId
+            && lhs.metricScore == rhs.metricScore
+            && lhs.ratedHits == rhs.ratedHits
+            && isEqualMetricDetails(lhs.metricDetails, rhs.metricDetails)
+            && lhs.unratedDocs == rhs.unratedDocs
+    }
+}
+
+public struct RatedSearchHit {
+    public let searchHit: SearchHit<CodableValue>
+    public let rating: Int?
+}
+
+extension RatedSearchHit: Codable {
+    enum CodingKeys: String, CodingKey {
+        case searchHit = "hit"
+        case rating
+    }
+}
+
+extension RatedSearchHit: Equatable {}
+
+public struct UnratedDocument {
+    public let index: String
+    public let id: String
+}
+
+extension UnratedDocument: Codable {
+    enum CodingKeys: String, CodingKey {
+        case index = "_index"
+        case id = "_id"
+    }
+}
+
+extension UnratedDocument: Equatable {}

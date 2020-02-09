@@ -232,6 +232,17 @@ extension ElasticClient {
     public func fieldCaps(_ fieldCapabilitiesRequest: FieldCapabilitiesRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<FieldCapabilitiesResponse, Error>) -> Void) {
         return execute(request: fieldCapabilitiesRequest, options: options, completionHandler: completionHandler)
     }
+
+    /// Asynchronously executes a request using the Ranking Evaluation API.
+    ///
+    /// [Ranking Evaluation API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-rank-eval.html)
+    /// - Parameters:
+    ///   - rankEvalRequest: the request.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
+    ///   - completionHandler: callback to be invoked upon request completion.
+    public func rankEval(_ rankEvalRequest: RankEvalRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<RankEvalResponse, Error>) -> Void) {
+        return execute(request: rankEvalRequest, options: options, completionHandler: completionHandler)
+    }
 }
 
 /// Extention declaring various flavors of elasticsearch client
