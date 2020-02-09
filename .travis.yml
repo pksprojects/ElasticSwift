@@ -58,7 +58,7 @@ before_install:
   - cd $HOME
   - wget -q -O elasticsearch.tar.gz https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.8.5.tar.gz
   - mkdir elasticsearch
-  - tar xzf elasticsearch.tar.gz -C elasticsearch --strip-components=1
+  - tar xzf elasticsearch.tar.gz --strip-components=2 -C elasticsearch
   - cd elasticsearch
   - bin/elasticsearch -d -p pid
 before_script:
