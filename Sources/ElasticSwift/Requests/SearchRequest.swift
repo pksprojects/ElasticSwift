@@ -305,7 +305,7 @@ public struct SearchRequest: Request {
     public var searchType: SearchType?
     public var preference: String?
 
-    public init(indices: [String]?, types: [String]?, searchSource: SearchSource?, scroll: Scroll?, searchType: SearchType?, preference: String?) {
+    public init(indices: [String]?, types: [String]?, searchSource: SearchSource?, scroll: Scroll? = nil, searchType: SearchType? = nil, preference: String? = nil) {
         self.indices = indices
         self.types = types
         self.searchSource = searchSource
@@ -314,7 +314,7 @@ public struct SearchRequest: Request {
         self.preference = preference
     }
 
-    public init(indices: [String]?, types: [String]?, query: Query?, from: Int16?, size: Int16?, sorts: [Sort]?, sourceFilter: SourceFilter?, explain: Bool?, minScore: Decimal?, scroll: Scroll?, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, searchType: SearchType? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool?, preference: String? = nil, scriptFields: [ScriptField]? = nil, storedFields: [String]? = nil, docvalueFields: [DocValueField]?, postFilter: Query? = nil, highlight: Highlight? = nil, rescore: [QueryRescorer]? = nil, searchAfter: CodableValue? = nil) {
+    public init(indices: [String]? = nil, types: [String]? = nil, query: Query? = nil, from: Int16? = nil, size: Int16? = nil, sorts: [Sort]? = nil, sourceFilter: SourceFilter? = nil, explain: Bool? = nil, minScore: Decimal? = nil, scroll: Scroll? = nil, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, searchType: SearchType? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool? = nil, preference: String? = nil, scriptFields: [ScriptField]? = nil, storedFields: [String]? = nil, docvalueFields: [DocValueField]? = nil, postFilter: Query? = nil, highlight: Highlight? = nil, rescore: [QueryRescorer]? = nil, searchAfter: CodableValue? = nil) {
         var searchSource = SearchSource()
         searchSource.query = query
         searchSource.postFilter = postFilter
@@ -337,7 +337,7 @@ public struct SearchRequest: Request {
         self.init(indices: indices, types: types, searchSource: searchSource, scroll: scroll, searchType: searchType, preference: preference)
     }
 
-    public init(indices: String..., types: [String]?, query: Query?, from: Int16?, size: Int16?, sorts: [Sort]?, sourceFilter: SourceFilter?, explain: Bool?, minScore: Decimal?, scroll: Scroll?, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, searchType: SearchType? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool?, preference: String? = nil, scriptFields: [ScriptField]? = nil, storedFields: [String]? = nil, docvalueFields: [DocValueField]?, postFilter: Query? = nil, highlight: Highlight? = nil, rescore: [QueryRescorer]? = nil, searchAfter: CodableValue? = nil) {
+    public init(indices: String..., types: [String]? = nil, query: Query? = nil, from: Int16? = nil, size: Int16? = nil, sorts: [Sort]? = nil, sourceFilter: SourceFilter? = nil, explain: Bool? = nil, minScore: Decimal? = nil, scroll: Scroll? = nil, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, searchType: SearchType? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool? = nil, preference: String? = nil, scriptFields: [ScriptField]? = nil, storedFields: [String]? = nil, docvalueFields: [DocValueField]? = nil, postFilter: Query? = nil, highlight: Highlight? = nil, rescore: [QueryRescorer]? = nil, searchAfter: CodableValue? = nil) {
         self.init(indices: indices, types: types, query: query, from: from, size: size, sorts: sorts, sourceFilter: sourceFilter, explain: explain, minScore: minScore, scroll: scroll, trackScores: trackScores, indicesBoost: indicesBoost, searchType: searchType, seqNoPrimaryTerm: seqNoPrimaryTerm, version: version, preference: preference, scriptFields: scriptFields, storedFields: storedFields, docvalueFields: docvalueFields, postFilter: postFilter, highlight: highlight, rescore: rescore, searchAfter: searchAfter)
     }
 
