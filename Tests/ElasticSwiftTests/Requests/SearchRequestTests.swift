@@ -1205,6 +1205,46 @@ class SearchRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
+
+    func test_19_Search_search() throws {
+        let e = expectation(description: "execution complete")
+
+        func handler(_ result: Result<SearchResponse<CodableValue>, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+                XCTAssert(false)
+            case let .success(response):
+                XCTAssertNotNil(response.hits)
+                XCTAssertTrue(response.hits.hits.count == 0, "Count \(response.hits.hits.count)")
+            }
+
+            e.fulfill()
+        }
+
+        let request = SearchRequest(indices: indexName)
+
+        client.search(request, completionHandler: handler)
+
+        waitForExpectations(timeout: 10)
+    }
+
+    func test_20_searchSource() throws {
+        var s1 = SearchSource()
+        s1.query = MatchAllQuery()
+        s1.rescore = [.init(query: .init(MatchAllQuery(), scoreMode: .AVG, queryWeight: 1.0, rescoreQueryWeight: 1.3))]
+        s1.sorts = [FieldSortBuilder("test_field").build()]
+
+        let encoded = try JSONEncoder().encode(s1)
+
+        logger.info("Encoded: \(String(data: encoded, encoding: .utf8) ?? "nil")")
+
+        let decoded = try JSONDecoder().decode(SearchSource.self, from: encoded)
+
+        logger.info("Decoded: \(decoded)")
+
+        assert(s1 == decoded)
+    }
 }
 
 struct Shirt: Codable, Equatable {

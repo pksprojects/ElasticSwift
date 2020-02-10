@@ -85,7 +85,7 @@ class RankEvalRequestTests: XCTestCase {
 
             e.fulfill()
         }
-        
+
         var searchSource = SearchSource()
         searchSource.query = MatchAllQuery()
 
@@ -115,7 +115,7 @@ class RankEvalRequestTests: XCTestCase {
 
             e.fulfill()
         }
-        
+
         var searchSource = SearchSource()
         searchSource.query = MatchAllQuery()
 
@@ -145,7 +145,7 @@ class RankEvalRequestTests: XCTestCase {
 
             e.fulfill()
         }
-        
+
         var searchSource = SearchSource()
         searchSource.query = MatchAllQuery()
 
@@ -175,7 +175,7 @@ class RankEvalRequestTests: XCTestCase {
 
             e.fulfill()
         }
-        
+
         var searchSource = SearchSource()
         searchSource.query = MatchAllQuery()
 
