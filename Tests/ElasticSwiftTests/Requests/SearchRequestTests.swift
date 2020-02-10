@@ -1243,7 +1243,7 @@ class SearchRequestTests: XCTestCase {
 
         logger.info("Decoded: \(decoded)")
 
-        assert(s1 == decoded)
+        XCTAssert(s1 == decoded)
     }
 }
 
