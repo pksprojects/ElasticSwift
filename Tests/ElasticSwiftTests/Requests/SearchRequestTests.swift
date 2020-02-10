@@ -1234,6 +1234,7 @@ class SearchRequestTests: XCTestCase {
         s1.query = MatchAllQuery()
         s1.rescore = [.init(query: .init(MatchAllQuery(), scoreMode: .AVG, queryWeight: 1.0, rescoreQueryWeight: 1.3))]
         s1.sorts = [FieldSortBuilder("test_field").build()]
+        s1.scriptFields = [.init(field: "test", script: Script("test script"))]
 
         let encoded = try JSONEncoder().encode(s1)
 
