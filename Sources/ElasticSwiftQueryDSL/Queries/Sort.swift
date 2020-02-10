@@ -104,8 +104,12 @@ extension Sort: Codable {
         let dic = try container.decode([String: CodableValue].self)
         let item = dic.first!
         field = item.key
-        if let order = item.value.value as? SortOrder {
-            sortOrder = order
+        if let order = item.value.value as? String {
+            if let sortOrder = SortOrder(rawValue: order) {
+                self.sortOrder = sortOrder
+            } else {
+                throw Swift.DecodingError.typeMismatch(SortOrder.self, .init(codingPath: container.codingPath, debugDescription: "Unable to serialize value \(order) as SortOrder"))
+            }
             mode = nil
         } else if let subDic = item.value.value as? [String: String] {
             if let order = subDic[Sort.ORDER] {

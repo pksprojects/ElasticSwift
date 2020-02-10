@@ -17,90 +17,91 @@ import NIOHTTP1
 public class SearchRequestBuilder: RequestBuilder {
     public typealias RequestType = SearchRequest
 
-    private var _index: String?
-    private var _type: String?
-    private var _from: Int16?
-    private var _size: Int16?
-    private var _query: Query?
-    private var _sorts: [Sort]?
+    private var _indices: [String]?
+    private var _types: [String]?
+    private var _searchSource = SearchSource()
     private var _sourceFilter: SourceFilter?
-    private var _explain: Bool?
-    private var _minScore: Decimal?
     private var _scroll: Scroll?
     private var _searchType: SearchType?
-    private var _trackScores: Bool?
-    private var _indicesBoost: [IndexBoost]?
-    private var _seqNoPrimaryTerm: Bool?
-    private var _version: Bool?
     private var _preference: String?
-    private var _scriptFields: [ScriptField]?
-    private var _storedFields: [String]?
-    private var _docvalueFields: [DocValueField]?
-    private var _postFilter: Query?
-    private var _highlight: Highlight?
-    private var _rescore: [QueryRescorer]?
-    private var _searchAfter: CodableValue?
 
     public init() {}
 
     @discardableResult
     public func set(indices: String...) -> Self {
-        _index = indices.compactMap { $0 }.joined(separator: ",")
+        _indices = indices
         return self
     }
 
-    @available(*, deprecated, message: "Elasticsearch has deprecated use of custom types and will be remove in 7.0")
+    @discardableResult
+    public func set(indices: [String]) -> Self {
+        _indices = indices
+        return self
+    }
+
     @discardableResult
     public func set(types: String...) -> Self {
-        _type = types.compactMap { $0 }.joined(separator: ",")
+        _types = types
+        return self
+    }
+
+    @discardableResult
+    public func set(types: [String]) -> Self {
+        _types = types
+        return self
+    }
+
+    @discardableResult
+    public func set(searchSource: SearchSource) -> Self {
+        _searchSource = searchSource
         return self
     }
 
     @discardableResult
     public func set(from: Int16) -> Self {
-        _from = from
+        _searchSource.from = from
         return self
     }
 
     @discardableResult
     public func set(size: Int16) -> Self {
-        _size = size
+        _searchSource.size = size
         return self
     }
 
     @discardableResult
     public func set(query: Query) -> Self {
-        _query = query
+        _searchSource.query = query
         return self
     }
 
     @discardableResult
     public func set(postFilter: Query) -> Self {
-        _postFilter = postFilter
+        _searchSource.postFilter = postFilter
         return self
     }
 
     @discardableResult
     public func set(sorts: [Sort]) -> Self {
-        _sorts = sorts
+        _searchSource.sorts = sorts
         return self
     }
 
     @discardableResult
     public func set(sourceFilter: SourceFilter) -> Self {
-        _sourceFilter = sourceFilter
+        _searchSource.sourceFilter = sourceFilter
         return self
     }
 
     @discardableResult
     public func set(explain: Bool) -> Self {
-        _explain = explain
+        _searchSource.explain = explain
         return self
     }
 
     @discardableResult
     public func set(minScore: Decimal) -> Self {
-        _minScore = minScore
+        _searchSource.minScore = minScore
         return self
     }
 
@@ -118,13 +119,13 @@ public class SearchRequestBuilder: RequestBuilder {
 
     @discardableResult
     public func set(trackScores: Bool) -> Self {
-        _trackScores = trackScores
+        _searchSource.trackScores = trackScores
         return self
     }
 
     @discardableResult
     public func set(indicesBoost: [IndexBoost]) -> Self {
-        _indicesBoost = indicesBoost
+        _searchSource.indicesBoost = indicesBoost
         return self
     }
 
@@ -136,142 +137,142 @@ public class SearchRequestBuilder: RequestBuilder {
 
     @discardableResult
     public func set(version: Bool) -> Self {
-        _version = version
+        _searchSource.version = version
         return self
     }
 
     @discardableResult
     public func set(seqNoPrimaryTerm: Bool) -> Self {
-        _seqNoPrimaryTerm = seqNoPrimaryTerm
+        _searchSource.seqNoPrimaryTerm = seqNoPrimaryTerm
         return self
     }
 
     @discardableResult
     public func set(scriptFields: [ScriptField]) -> Self {
-        _scriptFields = scriptFields
+        _searchSource.scriptFields = scriptFields
         return self
     }
 
     @discardableResult
     public func set(docvalueFields: [DocValueField]) -> Self {
-        _docvalueFields = docvalueFields
+        _searchSource.docvalueFields = docvalueFields
         return self
     }
 
     @discardableResult
     public func set(rescore: [QueryRescorer]) -> Self {
-        _rescore = rescore
+        _searchSource.rescore = rescore
         return self
     }
 
     @discardableResult
     public func set(searchAfter: CodableValue) -> Self {
-        _searchAfter = searchAfter
+        _searchSource.searchAfter = searchAfter
         return self
     }
 
     @discardableResult
     public func add(sort: Sort) -> Self {
-        if _sorts != nil {
-            _sorts?.append(sort)
+        if _searchSource.sorts != nil {
+            _searchSource.sorts?.append(sort)
         } else {
-            _sorts = [sort]
+            _searchSource.sorts = [sort]
         }
         return self
     }
 
     @discardableResult
     public func add(indexBoost: IndexBoost) -> Self {
-        if _indicesBoost != nil {
-            _indicesBoost?.append(indexBoost)
+        if _searchSource.indicesBoost != nil {
+            _searchSource.indicesBoost?.append(indexBoost)
         } else {
-            _indicesBoost = [indexBoost]
+            _searchSource.indicesBoost = [indexBoost]
         }
         return self
     }
 
     @discardableResult
     public func add(scriptField: ScriptField) -> Self {
-        if _scriptFields != nil {
-            _scriptFields?.append(scriptField)
+        if _searchSource.scriptFields != nil {
+            _searchSource.scriptFields?.append(scriptField)
         } else {
-            _scriptFields = [scriptField]
+            _searchSource.scriptFields = [scriptField]
         }
         return self
     }
 
     @discardableResult
     public func add(docvalueField: DocValueField) -> Self {
-        if _docvalueFields != nil {
-            _docvalueFields?.append(docvalueField)
+        if _searchSource.docvalueFields != nil {
+            _searchSource.docvalueFields?.append(docvalueField)
         } else {
-            _docvalueFields = [docvalueField]
+            _searchSource.docvalueFields = [docvalueField]
         }
         return self
     }
 
     @discardableResult
     public func add(rescore: QueryRescorer) -> Self {
-        if _rescore != nil {
-            _rescore?.append(rescore)
+        if _searchSource.rescore != nil {
+            _searchSource.rescore?.append(rescore)
         } else {
-            _rescore = [rescore]
+            _searchSource.rescore = [rescore]
         }
         return self
     }
 
     @discardableResult
     public func set(storedFields: String...) -> Self {
-        _storedFields = storedFields
+        _searchSource.storedFields = storedFields
         return self
     }
 
     @discardableResult
     public func set(storedFields: [String]) -> Self {
-        _storedFields = storedFields
+        _searchSource.storedFields = storedFields
         return self
     }
 
     @discardableResult
     public func set(highlight: Highlight) -> Self {
-        _highlight = highlight
+        _searchSource.highlight = highlight
         return self
     }
 
-    public var index: String? {
-        return _index
+    @discardableResult
+    public func add(index: String) -> Self {
+        if _indices != nil {
+            _indices?.append(index)
+        } else {
+            _indices = [index]
+        }
+        return self
     }
 
-    public var type: String? {
-        return _type
+    @discardableResult
+    public func add(type: String) -> Self {
+        if _types != nil {
+            _types?.append(type)
+        } else {
+            _types = [type]
+        }
+        return self
     }
 
-    public var from: Int16? {
-        return _from
+    public var indices: [String]? {
+        return _indices
     }
 
-    public var size: Int16? {
-        return _size
+    public var types: [String]? {
+        return _types
     }
 
-    public var query: Query? {
-        return _query
-    }
-
-    public var sorts: [Sort]? {
-        return _sorts
+    public var searchSource: SearchSource {
+        return _searchSource
     }
 
     public var sourceFilter: SourceFilter? {
         return _sourceFilter
-    }
-
-    public var explain: Bool? {
-        return _explain
-    }
-
-    public var minScore: Decimal? {
-        return _minScore
     }
 
     public var scroll: Scroll? {
@@ -282,52 +283,8 @@ public class SearchRequestBuilder: RequestBuilder {
         return _searchType
     }
 
-    public var trackScores: Bool? {
-        return _trackScores
-    }
-
-    public var indicesBoost: [IndexBoost]? {
-        return _indicesBoost
-    }
-
-    public var seqNoPrimaryTerm: Bool? {
-        return _seqNoPrimaryTerm
-    }
-
-    public var version: Bool? {
-        return _version
-    }
-
     public var preference: String? {
         return _preference
-    }
-
-    public var scriptFields: [ScriptField]? {
-        return _scriptFields
-    }
-
-    public var storedFields: [String]? {
-        return _storedFields
-    }
-
-    public var docvalueFields: [DocValueField]? {
-        return _docvalueFields
-    }
-
-    public var postFilter: Query? {
-        return _postFilter
-    }
-
-    public var highlight: Highlight? {
-        return _highlight
-    }
-
-    public var rescore: [QueryRescorer]? {
-        return _rescore
-    }
-
-    public var searchAfter: CodableValue? {
-        return _searchAfter
     }
 
     public func build() throws -> SearchRequest {
@@ -340,58 +297,52 @@ public class SearchRequestBuilder: RequestBuilder {
 public struct SearchRequest: Request {
     public var headers: HTTPHeaders = HTTPHeaders()
 
-    public let index: String
-    public let type: String?
-    public let from: Int16?
-    public let size: Int16?
-    public let query: Query?
-    public let sorts: [Sort]?
-    public let sourceFilter: SourceFilter?
-    public let explain: Bool?
-    public let minScore: Decimal?
-    public let trackScores: Bool?
-    public let indicesBoost: [IndexBoost]?
-    public let seqNoPrimaryTerm: Bool?
-    public let version: Bool?
-    public let scriptFields: [ScriptField]?
-    public let storedFields: [String]?
-    public let docvalueFields: [DocValueField]?
-    public let postFilter: Query?
-    public let highlight: Highlight?
-    public let rescore: [QueryRescorer]?
-    public let searchAfter: CodableValue?
+    public let indices: [String]?
+    public let types: [String]?
+    public let searchSource: SearchSource?
 
     public var scroll: Scroll?
     public var searchType: SearchType?
     public var preference: String?
 
-    public init(index: String, type: String?, query: Query?, from: Int16?, size: Int16?, sorts: [Sort]?, sourceFilter: SourceFilter?, explain: Bool?, minScore: Decimal?, scroll: Scroll?, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, searchType _: SearchType? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool?, preference: String? = nil, scriptFields: [ScriptField]? = nil, storedFields: [String]? = nil, docvalueFields: [DocValueField]?, postFilter: Query? = nil, highlight: Highlight? = nil, rescore: [QueryRescorer]? = nil, searchAfter: CodableValue? = nil) {
-        self.index = index
-        self.type = type
-        self.from = from
-        self.size = size
-        self.query = query
-        self.sorts = sorts
-        self.sourceFilter = sourceFilter
-        self.explain = explain
-        self.minScore = minScore
+    public init(indices: [String]?, types: [String]?, searchSource: SearchSource?, scroll: Scroll? = nil, searchType: SearchType? = nil, preference: String? = nil) {
+        self.indices = indices
+        self.types = types
+        self.searchSource = searchSource
         self.scroll = scroll
-        self.trackScores = trackScores
-        self.indicesBoost = indicesBoost
-        self.seqNoPrimaryTerm = seqNoPrimaryTerm
-        self.version = version
+        self.searchType = searchType
         self.preference = preference
-        self.scriptFields = scriptFields
-        self.storedFields = storedFields
-        self.docvalueFields = docvalueFields
-        self.postFilter = postFilter
-        self.highlight = highlight
-        self.rescore = rescore
-        self.searchAfter = searchAfter
+    }
+
+    public init(indices: [String]? = nil, types: [String]? = nil, query: Query? = nil, from: Int16? = nil, size: Int16? = nil, sorts: [Sort]? = nil, sourceFilter: SourceFilter? = nil, explain: Bool? = nil, minScore: Decimal? = nil, scroll: Scroll? = nil, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, searchType: SearchType? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool? = nil, preference: String? = nil, scriptFields: [ScriptField]? = nil, storedFields: [String]? = nil, docvalueFields: [DocValueField]? = nil, postFilter: Query? = nil, highlight: Highlight? = nil, rescore: [QueryRescorer]? = nil, searchAfter: CodableValue? = nil) {
+        var searchSource = SearchSource()
+        searchSource.query = query
+        searchSource.postFilter = postFilter
+        searchSource.from = from
+        searchSource.size = size
+        searchSource.sorts = sorts
+        searchSource.sourceFilter = sourceFilter
+        searchSource.explain = explain
+        searchSource.minScore = minScore
+        searchSource.trackScores = trackScores
+        searchSource.indicesBoost = indicesBoost
+        searchSource.docvalueFields = docvalueFields
+        searchSource.highlight = highlight
+        searchSource.rescore = rescore
+        searchSource.searchAfter = searchAfter
+        searchSource.seqNoPrimaryTerm = seqNoPrimaryTerm
+        searchSource.scriptFields = scriptFields
+        searchSource.storedFields = storedFields
+        searchSource.version = version
+        self.init(indices: indices, types: types, searchSource: searchSource, scroll: scroll, searchType: searchType, preference: preference)
+    }
+
+    public init(indices: String..., types: [String]? = nil, query: Query? = nil, from: Int16? = nil, size: Int16? = nil, sorts: [Sort]? = nil, sourceFilter: SourceFilter? = nil, explain: Bool? = nil, minScore: Decimal? = nil, scroll: Scroll? = nil, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, searchType: SearchType? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool? = nil, preference: String? = nil, scriptFields: [ScriptField]? = nil, storedFields: [String]? = nil, docvalueFields: [DocValueField]? = nil, postFilter: Query? = nil, highlight: Highlight? = nil, rescore: [QueryRescorer]? = nil, searchAfter: CodableValue? = nil) {
+        self.init(indices: indices, types: types, query: query, from: from, size: size, sorts: sorts, sourceFilter: sourceFilter, explain: explain, minScore: minScore, scroll: scroll, trackScores: trackScores, indicesBoost: indicesBoost, searchType: searchType, seqNoPrimaryTerm: seqNoPrimaryTerm, version: version, preference: preference, scriptFields: scriptFields, storedFields: storedFields, docvalueFields: docvalueFields, postFilter: postFilter, highlight: highlight, rescore: rescore, searchAfter: searchAfter)
     }
 
     internal init(withBuilder builder: SearchRequestBuilder) throws {
-        self.init(index: builder.index ?? "_all", type: builder.type, query: builder.query, from: builder.from, size: builder.size, sorts: builder.sorts, sourceFilter: builder.sourceFilter, explain: builder.explain, minScore: builder.minScore, scroll: builder.scroll, trackScores: builder.trackScores, indicesBoost: builder.indicesBoost, searchType: builder.searchType, seqNoPrimaryTerm: builder.seqNoPrimaryTerm, version: builder.version, preference: builder.preference, scriptFields: builder.scriptFields, storedFields: builder.storedFields, docvalueFields: builder.docvalueFields, postFilter: builder.postFilter, highlight: builder.highlight, rescore: builder.rescore, searchAfter: builder.searchAfter)
+        self.init(indices: builder.indices, types: builder.types, searchSource: builder.searchSource, scroll: builder.scroll, searchType: builder.searchType, preference: builder.preference)
     }
 
     public var method: HTTPMethod {
@@ -399,11 +350,14 @@ public struct SearchRequest: Request {
     }
 
     public var endPoint: String {
-        var path = index
-        if let type = self.type {
-            path += "/" + type
+        var _endPoint = "_search"
+        if let types = self.types, !types.isEmpty {
+            _endPoint = types.joined(separator: ",") + "/" + _endPoint
         }
-        return path + "/_search"
+        if let indices = self.indices, !indices.isEmpty {
+            _endPoint = indices.joined(separator: ",") + "/" + _endPoint
+        }
+        return _endPoint
     }
 
     public var queryParams: [URLQueryItem] {
@@ -421,121 +375,16 @@ public struct SearchRequest: Request {
     }
 
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-        let body = Body(query: query, sort: sorts, size: size, from: from, source: sourceFilter, explain: explain, minScore: minScore, trackScores: trackScores, indicesBoost: indicesBoost, seqNoPrimaryTerm: seqNoPrimaryTerm, version: version, scriptFields: scriptFields, storedFields: storedFields, docvalueFields: docvalueFields, postFilter: postFilter, highlight: highlight, rescore: rescore, searchAfter: searchAfter)
-        return serializer.encode(body).mapError { error -> MakeBodyError in
-            MakeBodyError.wrapped(error)
-        }
-    }
-
-    struct Body: Encodable {
-        public let query: Query?
-        public let sort: [Sort]?
-        public let size: Int16?
-        public let from: Int16?
-        public let source: SourceFilter?
-        public let explain: Bool?
-        public let minScore: Decimal?
-        public let trackScores: Bool?
-        public let indicesBoost: [IndexBoost]?
-        public let seqNoPrimaryTerm: Bool?
-        public let version: Bool?
-        public let scriptFields: [ScriptField]?
-        public let storedFields: [String]?
-        public let docvalueFields: [DocValueField]?
-        public let postFilter: Query?
-        public let highlight: Highlight?
-        public let rescore: [QueryRescorer]?
-        public let searchAfter: CodableValue?
-
-        public func encode(to encoder: Encoder) throws {
-            var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encodeIfPresent(query, forKey: .query)
-            try container.encodeIfPresent(sort, forKey: .sort)
-            try container.encodeIfPresent(size, forKey: .size)
-            try container.encodeIfPresent(from, forKey: .from)
-            try container.encodeIfPresent(source, forKey: .source)
-            try container.encodeIfPresent(explain, forKey: .explain)
-            try container.encodeIfPresent(minScore, forKey: .minScore)
-            try container.encodeIfPresent(trackScores, forKey: .trackScores)
-            try container.encodeIfPresent(indicesBoost, forKey: .indicesBoost)
-            try container.encodeIfPresent(seqNoPrimaryTerm, forKey: .seqNoPrimaryTerm)
-            try container.encodeIfPresent(version, forKey: .version)
-            try container.encodeIfPresent(storedFields, forKey: .storedFields)
-            try container.encodeIfPresent(docvalueFields, forKey: .docvalueFields)
-            try container.encodeIfPresent(postFilter, forKey: .postFilter)
-            try container.encodeIfPresent(highlight, forKey: .highlight)
-            if let scriptFields = self.scriptFields, !scriptFields.isEmpty {
-                if scriptFields.count == 1 {
-                    try container.encode(scriptFields[0], forKey: .scriptFields)
-                } else {
-                    var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .scriptFields)
-                    for scriptField in scriptFields {
-                        var scriptContainer = nested.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: scriptField.field))
-                        try scriptContainer.encode(scriptField.script, forKey: .key(named: "script"))
-                    }
-                }
+        if let body = self.searchSource {
+            return serializer.encode(body).mapError { error -> MakeBodyError in
+                MakeBodyError.wrapped(error)
             }
-            if let rescore = self.rescore, !rescore.isEmpty {
-                if rescore.count == 1 {
-                    try container.encode(rescore[0], forKey: .rescore)
-                } else {
-                    try container.encode(rescore, forKey: .rescore)
-                }
-            }
-            try container.encodeIfPresent(searchAfter, forKey: .searchAfter)
         }
-
-        enum CodingKeys: String, CodingKey {
-            case query
-            case sort
-            case size
-            case from
-            case source = "_source"
-            case explain
-            case minScore = "min_score"
-            case trackScores = "track_scores"
-            case indicesBoost = "indices_boost"
-            case seqNoPrimaryTerm = "seq_no_primary_term"
-            case version
-            case scriptFields = "script_fields"
-            case storedFields = "stored_fields"
-            case docvalueFields = "docvalue_fields"
-            case postFilter = "post_filter"
-            case highlight
-            case rescore
-            case searchAfter = "search_after"
-        }
+        return .failure(.noBodyForRequest)
     }
 }
 
-extension SearchRequest: Equatable {
-    public static func == (lhs: SearchRequest, rhs: SearchRequest) -> Bool {
-        return lhs.index == rhs.index
-            && lhs.explain == rhs.explain
-            && lhs.sourceFilter == rhs.sourceFilter
-            && lhs.from == rhs.from
-            && lhs.endPoint == rhs.endPoint
-            && lhs.headers == rhs.headers
-            && lhs.method == rhs.method
-            && lhs.minScore == rhs.minScore
-            && lhs.queryParams == rhs.queryParams
-            && lhs.size == rhs.size
-            && lhs.sorts == rhs.sorts
-            && lhs.type == rhs.type
-            && lhs.indicesBoost == rhs.indicesBoost
-            && lhs.trackScores == rhs.trackScores
-            && lhs.scroll == rhs.scroll
-            && lhs.searchType == rhs.searchType
-            && lhs.seqNoPrimaryTerm == rhs.seqNoPrimaryTerm
-            && lhs.version == rhs.version
-            && lhs.preference == rhs.preference
-            && lhs.scriptFields == rhs.scriptFields
-            && lhs.storedFields == rhs.storedFields
-            && lhs.docvalueFields == rhs.docvalueFields
-            && isEqualQueries(lhs.query, rhs.query)
-            && isEqualQueries(lhs.postFilter, rhs.postFilter)
-    }
-}
+extension SearchRequest: Equatable {}
 
 public struct ScriptField {
     public let field: String
@@ -1734,5 +1583,146 @@ extension InnerHit: Equatable {
             && lhs.scriptFields == rhs.scriptFields
             && lhs.docvalueFields == rhs.docvalueFields
             && lhs.highlight == rhs.highlight
+    }
+}
+
+// MARK: - Search Source
+
+public struct SearchSource {
+    public var query: Query?
+    public var sorts: [Sort]?
+    public var size: Int16?
+    public var from: Int16?
+    public var sourceFilter: SourceFilter?
+    public var explain: Bool?
+    public var minScore: Decimal?
+    public var trackScores: Bool?
+    public var indicesBoost: [IndexBoost]?
+    public var seqNoPrimaryTerm: Bool?
+    public var version: Bool?
+    public var scriptFields: [ScriptField]?
+    public var storedFields: [String]?
+    public var docvalueFields: [DocValueField]?
+    public var postFilter: Query?
+    public var highlight: Highlight?
+    public var rescore: [QueryRescorer]?
+    public var searchAfter: CodableValue?
+}
+
+extension SearchSource: Codable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        query = try container.decodeQueryIfPresent(forKey: .query)
+        sorts = try container.decodeArrayIfPresent(forKey: .sorts)
+        size = try container.decodeInt16IfPresent(forKey: .size)
+        from = try container.decodeInt16IfPresent(forKey: .from)
+        sourceFilter = try container.decodeIfPresent(SourceFilter.self, forKey: .sourceFilter)
+        explain = try container.decodeBoolIfPresent(forKey: .explain)
+        minScore = try container.decodeDecimalIfPresent(forKey: .minScore)
+        trackScores = try container.decodeBoolIfPresent(forKey: .trackScores)
+        indicesBoost = try container.decodeArrayIfPresent(forKey: .indicesBoost)
+        seqNoPrimaryTerm = try container.decodeBoolIfPresent(forKey: .seqNoPrimaryTerm)
+        version = try container.decodeBoolIfPresent(forKey: .version)
+        storedFields = try container.decodeArrayIfPresent(forKey: .storedFields)
+        docvalueFields = try container.decodeArrayIfPresent(forKey: .docvalueFields)
+        postFilter = try container.decodeQueryIfPresent(forKey: .postFilter)
+        highlight = try container.decodeIfPresent(Highlight.self, forKey: .highlight)
+        searchAfter = try container.decodeIfPresent(CodableValue.self, forKey: .searchAfter)
+
+        do {
+            scriptFields = try container.decodeArrayIfPresent(forKey: .scriptFields)
+        } catch {
+            let scriptField = try container.decode(ScriptField.self, forKey: .scriptFields)
+            scriptFields = [scriptField]
+        }
+
+        do {
+            rescore = try container.decodeArrayIfPresent(forKey: .rescore)
+        } catch {
+            let rescorer = try container.decode(QueryRescorer.self, forKey: .rescore)
+            rescore = [rescorer]
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(query, forKey: .query)
+        try container.encodeIfPresent(sorts, forKey: .sorts)
+        try container.encodeIfPresent(size, forKey: .size)
+        try container.encodeIfPresent(from, forKey: .from)
+        try container.encodeIfPresent(sourceFilter, forKey: .sourceFilter)
+        try container.encodeIfPresent(explain, forKey: .explain)
+        try container.encodeIfPresent(minScore, forKey: .minScore)
+        try container.encodeIfPresent(trackScores, forKey: .trackScores)
+        try container.encodeIfPresent(indicesBoost, forKey: .indicesBoost)
+        try container.encodeIfPresent(seqNoPrimaryTerm, forKey: .seqNoPrimaryTerm)
+        try container.encodeIfPresent(version, forKey: .version)
+        try container.encodeIfPresent(storedFields, forKey: .storedFields)
+        try container.encodeIfPresent(docvalueFields, forKey: .docvalueFields)
+        try container.encodeIfPresent(postFilter, forKey: .postFilter)
+        try container.encodeIfPresent(highlight, forKey: .highlight)
+        if let scriptFields = self.scriptFields, !scriptFields.isEmpty {
+            if scriptFields.count == 1 {
+                try container.encode(scriptFields[0], forKey: .scriptFields)
+            } else {
+                var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .scriptFields)
+                for scriptField in scriptFields {
+                    var scriptContainer = nested.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: scriptField.field))
+                    try scriptContainer.encode(scriptField.script, forKey: .key(named: "script"))
+                }
+            }
+        }
+        if let rescore = self.rescore, !rescore.isEmpty {
+            if rescore.count == 1 {
+                try container.encode(rescore[0], forKey: .rescore)
+            } else {
+                try container.encode(rescore, forKey: .rescore)
+            }
+        }
+        try container.encodeIfPresent(searchAfter, forKey: .searchAfter)
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case query
+        case sorts = "sort"
+        case size
+        case from
+        case sourceFilter = "_source"
+        case explain
+        case minScore = "min_score"
+        case trackScores = "track_scores"
+        case indicesBoost = "indices_boost"
+        case seqNoPrimaryTerm = "seq_no_primary_term"
+        case version
+        case scriptFields = "script_fields"
+        case storedFields = "stored_fields"
+        case docvalueFields = "docvalue_fields"
+        case postFilter = "post_filter"
+        case highlight
+        case rescore
+        case searchAfter = "search_after"
+    }
+}
+
+extension SearchSource: Equatable {
+    public static func == (lhs: SearchSource, rhs: SearchSource) -> Bool {
+        return lhs.sorts == rhs.sorts
+            && lhs.size == rhs.size
+            && lhs.from == rhs.from
+            && lhs.sourceFilter == rhs.sourceFilter
+            && lhs.explain == rhs.explain
+            && lhs.minScore == rhs.minScore
+            && lhs.trackScores == rhs.trackScores
+            && lhs.indicesBoost == rhs.indicesBoost
+            && lhs.seqNoPrimaryTerm == rhs.seqNoPrimaryTerm
+            && lhs.version == rhs.version
+            && lhs.scriptFields == rhs.scriptFields
+            && lhs.storedFields == rhs.storedFields
+            && lhs.docvalueFields == rhs.docvalueFields
+            && lhs.highlight == rhs.highlight
+            && lhs.rescore == rhs.rescore
+            && lhs.searchAfter == rhs.searchAfter
+            && isEqualQueries(lhs.query, rhs.query)
+            && isEqualQueries(lhs.postFilter, rhs.postFilter)
     }
 }
