@@ -12,7 +12,7 @@ import Foundation
 // MARK: - Nested Query
 
 public struct NestedQuery: Query {
-    public let name: String = "nested"
+    public let queryType: QueryType = QueryTypes.nested
 
     public let path: String
     public let query: Query
@@ -53,7 +53,7 @@ public struct NestedQuery: Query {
         if let innerHits = self.innerHits {
             dic[CodingKeys.innerHits.stringValue] = innerHits
         }
-        return dic
+        return [queryType.name: dic]
     }
 }
 
@@ -65,7 +65,7 @@ extension NestedQuery {
             throw Swift.DecodingError.typeMismatch(NestedQuery.self, .init(codingPath: container.codingPath, debugDescription: "Unable to find field name in key(s) expect: 1 key found: \(container.allKeys.count)."))
         }
 
-        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: name))
+        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
 
         path = try nested.decodeString(forKey: .path)
         query = try nested.decodeQuery(forKey: .query)
@@ -76,7 +76,7 @@ extension NestedQuery {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
-        var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: name))
+        var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         try nested.encode(path, forKey: .path)
         try nested.encode(query, forKey: .query)
         try nested.encodeIfPresent(scoreMode, forKey: .scoreMode)
@@ -95,7 +95,7 @@ extension NestedQuery {
 
 extension NestedQuery: Equatable {
     public static func == (lhs: NestedQuery, rhs: NestedQuery) -> Bool {
-        return lhs.name == rhs.name
+        return lhs.queryType.isEqualTo(rhs.queryType)
             && lhs.path == rhs.path
             && lhs.query.isEqualTo(rhs.query)
             && lhs.scoreMode == rhs.scoreMode
@@ -107,7 +107,7 @@ extension NestedQuery: Equatable {
 // MARK: - HasChild Query
 
 public struct HasChildQuery: Query {
-    public let name: String = "has_child"
+    public let queryType: QueryType = QueryTypes.hasChild
 
     public let type: String
     public let query: Query
@@ -158,7 +158,7 @@ public struct HasChildQuery: Query {
         if let innerHits = self.innerHits {
             dic[CodingKeys.innerHits.stringValue] = innerHits
         }
-        return dic
+        return [queryType.name: dic]
     }
 }
 
@@ -170,7 +170,7 @@ extension HasChildQuery {
             throw Swift.DecodingError.typeMismatch(HasChildQuery.self, .init(codingPath: container.codingPath, debugDescription: "Unable to find field name in key(s) expect: 1 key found: \(container.allKeys.count)."))
         }
 
-        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: name))
+        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
 
         type = try nested.decodeString(forKey: .type)
         query = try nested.decodeQuery(forKey: .query)
@@ -183,7 +183,7 @@ extension HasChildQuery {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
-        var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: name))
+        var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         try nested.encode(type, forKey: .type)
         try nested.encode(query, forKey: .query)
         try nested.encodeIfPresent(scoreMode, forKey: .scoreMode)
@@ -206,7 +206,7 @@ extension HasChildQuery {
 
 extension HasChildQuery: Equatable {
     public static func == (lhs: HasChildQuery, rhs: HasChildQuery) -> Bool {
-        return lhs.name == rhs.name
+        return lhs.queryType.isEqualTo(rhs.queryType)
             && lhs.type == rhs.type
             && lhs.query.isEqualTo(rhs.query)
             && lhs.scoreMode == rhs.scoreMode
@@ -219,7 +219,7 @@ extension HasChildQuery: Equatable {
 // MARK: - HasParent Query
 
 public struct HasParentQuery: Query {
-    public let name: String = "has_parent"
+    public let queryType: QueryType = QueryTypes.hasParent
 
     public let parentType: String
     public let query: Query
@@ -260,7 +260,7 @@ public struct HasParentQuery: Query {
         if let innerHits = self.innerHits {
             dic[CodingKeys.innerHits.stringValue] = innerHits
         }
-        return dic
+        return [queryType.name: dic]
     }
 }
 
@@ -272,7 +272,7 @@ extension HasParentQuery {
             throw Swift.DecodingError.typeMismatch(HasParentQuery.self, .init(codingPath: container.codingPath, debugDescription: "Unable to find field name in key(s) expect: 1 key found: \(container.allKeys.count)."))
         }
 
-        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: name))
+        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
 
         parentType = try nested.decodeString(forKey: .parentType)
         query = try nested.decodeQuery(forKey: .query)
@@ -283,7 +283,7 @@ extension HasParentQuery {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
-        var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: name))
+        var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         try nested.encode(parentType, forKey: .parentType)
         try nested.encode(query, forKey: .query)
         try nested.encodeIfPresent(score, forKey: .score)
@@ -302,7 +302,7 @@ extension HasParentQuery {
 
 extension HasParentQuery: Equatable {
     public static func == (lhs: HasParentQuery, rhs: HasParentQuery) -> Bool {
-        return lhs.name == rhs.name
+        return lhs.queryType.isEqualTo(rhs.queryType)
             && lhs.parentType == rhs.parentType
             && lhs.query.isEqualTo(rhs.query)
             && lhs.score == rhs.score
@@ -314,7 +314,7 @@ extension HasParentQuery: Equatable {
 // MARK: - ParentId Query
 
 public struct ParentIdQuery: Query {
-    public let name: String = "parent_id"
+    public let queryType: QueryType = QueryTypes.parentId
 
     public let type: String
     public let id: String
@@ -344,7 +344,7 @@ public struct ParentIdQuery: Query {
         if let ignoreUnmapped = self.ignoreUnmapped {
             dic[CodingKeys.ignoreUnmapped.stringValue] = ignoreUnmapped
         }
-        return dic
+        return [queryType.name: dic]
     }
 }
 
@@ -356,7 +356,7 @@ extension ParentIdQuery {
             throw Swift.DecodingError.typeMismatch(ParentIdQuery.self, .init(codingPath: container.codingPath, debugDescription: "Unable to find field name in key(s) expect: 1 key found: \(container.allKeys.count)."))
         }
 
-        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: name))
+        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
 
         type = try nested.decodeString(forKey: .type)
         id = try nested.decodeString(forKey: .id)
@@ -365,7 +365,7 @@ extension ParentIdQuery {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
-        var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: name))
+        var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         try nested.encode(type, forKey: .type)
         try nested.encode(id, forKey: .id)
         try nested.encodeIfPresent(ignoreUnmapped, forKey: .ignoreUnmapped)
@@ -378,4 +378,11 @@ extension ParentIdQuery {
     }
 }
 
-extension ParentIdQuery: Equatable {}
+extension ParentIdQuery: Equatable {
+    public static func == (lhs: ParentIdQuery, rhs: ParentIdQuery) -> Bool {
+        return lhs.queryType.isEqualTo(rhs.queryType)
+            && lhs.id == rhs.id
+            && lhs.type == rhs.type
+            && lhs.ignoreUnmapped == rhs.ignoreUnmapped
+    }
+}
