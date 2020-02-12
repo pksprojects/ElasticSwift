@@ -49,8 +49,9 @@ extension QueryType where Self: RawRepresentable, Self.RawValue == String {
     public init?(_ name: String) {
         if let v = Self(rawValue: name) {
             self = v
+        } else {
+            return nil
         }
-        return nil
     }
 }
 
