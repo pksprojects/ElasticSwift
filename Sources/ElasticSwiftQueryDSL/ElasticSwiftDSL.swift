@@ -372,7 +372,7 @@ extension KeyedDecodingContainer {
     public func decodeQuery(forKey key: KeyedDecodingContainer<K>.Key) throws -> Query {
         let qContainer = try nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: key)
         for qKey in qContainer.allKeys {
-            if let qType = QueryTypes(rawValue: qKey.stringValue) {
+            if let qType = QueryTypes(qKey.stringValue) {
                 return try qType.metaType.init(from: superDecoder(forKey: key))
             }
         }
@@ -395,7 +395,7 @@ extension KeyedDecodingContainer {
                 var copy = arrayContainer
                 let elementContainer = try copy.nestedContainer(keyedBy: DynamicCodingKeys.self)
                 for qKey in elementContainer.allKeys {
-                    if let qType = QueryTypes(rawValue: qKey.stringValue) {
+                    if let qType = QueryTypes(qKey.stringValue) {
                         let q = try qType.metaType.init(from: arrayContainer.superDecoder())
                         result.append(q)
                     }
