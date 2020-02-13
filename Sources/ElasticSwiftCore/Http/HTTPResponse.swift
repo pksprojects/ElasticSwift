@@ -28,21 +28,18 @@ public struct HTTPResponse {
 
     internal init(withBuilder builder: HTTPResponseBuilder) throws {
         guard builder.request != nil else {
-            throw HTTPResponseBuilderError("request can't be nil")
+            throw HTTPResponseBuilderError.missingRequiredField("request")
         }
 
         guard builder.headers != nil else {
-            throw HTTPResponseBuilderError("headers can't be nil")
+            throw HTTPResponseBuilderError.missingRequiredField("headers")
         }
 
         guard builder.status != nil else {
-            throw HTTPResponseBuilderError("status can't be nil")
+            throw HTTPResponseBuilderError.missingRequiredField("status")
         }
 
-        request = builder.request!
-        status = builder.status!
-        headers = builder.headers!
-        body = builder.body
+        self.init(request: builder.request!, status: builder.status!, headers: builder.headers!, body: builder.body)
     }
 }
 

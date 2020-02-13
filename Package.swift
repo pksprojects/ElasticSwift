@@ -80,6 +80,10 @@ let package = Package(
             name: "ElasticSwiftQueryDSLTests",
             dependencies: ["ElasticSwiftQueryDSL", "Logging", "UnitTestSettings"]
         ),
+        .testTarget(
+            name: "ElasticSwiftCoreTests",
+            dependencies: ["ElasticSwiftCore", "Logging", "UnitTestSettings"]
+        ),
         .target(
             name: "UnitTestSettings",
             dependencies: ["Logging"],
