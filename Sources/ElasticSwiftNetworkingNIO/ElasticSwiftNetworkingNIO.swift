@@ -42,7 +42,7 @@ public class AsyncHTTPClientAdaptorConfiguration: HTTPAdaptorConfiguration {
         self.adaptor = adaptor
         clientConfig = asyncClientConfig
     }
-    
+
     public convenience init(adaptor: ManagedHTTPClientAdaptor.Type = AsyncHTTPClientAdaptor.self, eventLoopProvider: HTTPClient.EventLoopGroupProvider = .createNew, timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS) {
         var config = HTTPClient.Configuration()
         config.timeout = .init(connect: timeouts?.connect, read: timeouts?.read)
