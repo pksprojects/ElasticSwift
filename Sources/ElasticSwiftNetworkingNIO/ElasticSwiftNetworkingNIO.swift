@@ -37,18 +37,16 @@ public class AsyncHTTPClientAdaptorConfiguration: HTTPAdaptorConfiguration {
 
     public let eventLoopProvider: HTTPClient.EventLoopGroupProvider
 
-    public init(adaptor: ManagedHTTPClientAdaptor.Type = AsyncHTTPClientAdaptor.self, eventLoopProvider: HTTPClient.EventLoopGroupProvider = .createNew, timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS) {
-        self.eventLoopProvider = eventLoopProvider
-        self.adaptor = adaptor
-        var config = HTTPClient.Configuration()
-        config.timeout = .init(connect: timeouts?.connect, read: timeouts?.read)
-        clientConfig = config
-    }
-
     public init(adaptor: ManagedHTTPClientAdaptor.Type = AsyncHTTPClientAdaptor.self, eventLoopProvider: HTTPClient.EventLoopGroupProvider = .createNew, asyncClientConfig: HTTPClient.Configuration) {
         self.eventLoopProvider = eventLoopProvider
         self.adaptor = adaptor
         clientConfig = asyncClientConfig
+    }
+    
+    public convenience init(adaptor: ManagedHTTPClientAdaptor.Type = AsyncHTTPClientAdaptor.self, eventLoopProvider: HTTPClient.EventLoopGroupProvider = .createNew, timeouts: Timeouts? = Timeouts.DEFAULT_TIMEOUTS) {
+        var config = HTTPClient.Configuration()
+        config.timeout = .init(connect: timeouts?.connect, read: timeouts?.read)
+        self.init(adaptor: adaptor, eventLoopProvider: eventLoopProvider, asyncClientConfig: config)
     }
 
     public static var `default`: HTTPAdaptorConfiguration {
