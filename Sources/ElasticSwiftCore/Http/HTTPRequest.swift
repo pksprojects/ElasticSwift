@@ -66,7 +66,6 @@ public class HTTPRequestBuilder {
     private var _body: Data?
     private var _path: String?
     private var _queryParams: [URLQueryItem]?
-    private var _completionHandler: ((_ response: HTTPResponse) -> Void)?
 
     public init() {}
 
@@ -106,12 +105,6 @@ public class HTTPRequestBuilder {
         return self
     }
 
-    @discardableResult
-    public func set(completionHandler: @escaping ((_ response: HTTPResponse) -> Void)) -> HTTPRequestBuilder {
-        _completionHandler = completionHandler
-        return self
-    }
-
     public var version: HTTPVersion? {
         return _version
     }
@@ -134,10 +127,6 @@ public class HTTPRequestBuilder {
 
     public var queryParams: [URLQueryItem]? {
         return _queryParams
-    }
-
-    public var completionHandler: ((_ response: HTTPResponse) -> Void)? {
-        return self._completionHandler
     }
 
     public func build() throws -> HTTPRequest {
