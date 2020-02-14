@@ -17,6 +17,10 @@
             ("test_08_httpResponseBuilder_fail_3", test_08_httpResponseBuilder_fail_3),
             ("test_09_httpResponseBuilder", test_09_httpResponseBuilder),
             ("test_10_HTTPResponseStatus_extension_test", test_10_HTTPResponseStatus_extension_test),
+            ("test_11_dynamic_coding_keys", test_11_dynamic_coding_keys),
+            ("test_12_dynamic_coding_keys", test_12_dynamic_coding_keys),
+            ("test_13_query_type", test_13_query_type),
+            ("test_14_query", test_14_query),
         ]
     }
 

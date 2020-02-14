@@ -201,4 +201,123 @@ class ElasticSwiftCoreTests: XCTestCase {
         XCTAssertTrue(HTTPResponseStatus.badGateway.isError())
         XCTAssertTrue(HTTPResponseStatus.badRequest.isError())
     }
+
+    func test_11_dynamic_coding_keys() throws {
+        let data = "{ \"1\": \"Test\"}".data(using: .utf8)!
+        let test = try JSONDecoder().decode(Test.self, from: data)
+
+        XCTAssertTrue(test.str == "Test")
+    }
+
+    func test_12_dynamic_coding_keys() throws {
+        let key = DynamicCodingKeys(stringValue: "test")
+
+        XCTAssertNotNil(key)
+        XCTAssertNil(key?.intValue)
+        XCTAssertEqual("test", key?.stringValue)
+    }
+
+    func test_13_query_type() throws {
+        let queryType1 = MyQueryType.query1
+        let queryType2 = MyTestQueryType.random1
+
+        XCTAssertFalse(queryType1.isEqualTo(queryType2))
+        XCTAssertTrue(queryType2.isEqualTo(MyTestQueryType.random1))
+        XCTAssertNil(MyTestQueryType("NOT VALUE"))
+    }
+
+    func test_14_query() throws {
+        let query1 = MyTestQuery()
+        let query2 = MyTestQuery2()
+
+        XCTAssertFalse(query1.isEqualTo(query2))
+        XCTAssertTrue(query2.isEqualTo(query2))
+    }
+}
+
+struct Test {
+    let str: String
+}
+
+extension Test: Decodable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
+        str = try container.decode(String.self, forKey: .key(indexed: 1))
+    }
+}
+
+enum MyQueryType: String, QueryType {
+    case query1
+    case query2
+
+    var metaType: Query.Type {
+        return MyTestQuery.self
+    }
+}
+
+enum MyTestQueryType: String, QueryType {
+    case random1
+    case random2
+
+    var metaType: Query.Type {
+        return MyTestQuery.self
+    }
+}
+
+struct MyTestQuery: Query, Equatable {
+    static func == (lhs: MyTestQuery, rhs: MyTestQuery) -> Bool {
+        return lhs.queryType.isEqualTo(rhs.queryType)
+    }
+
+    var queryType: QueryType = MyTestQueryType.random1
+
+    func toDic() -> [String: Any] {
+        return [:]
+    }
+
+    init() {}
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(queryType.name, forKey: .queryType)
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let type = try container.decode(String.self, forKey: .queryType)
+        queryType = MyTestQueryType(type)!
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case queryType
+    }
+}
+
+struct MyTestQuery2: Query, Equatable {
+    static func == (lhs: MyTestQuery2, rhs: MyTestQuery2) -> Bool {
+        return lhs.queryType.isEqualTo(rhs.queryType)
+    }
+
+    var queryType: QueryType = MyQueryType.query2
+
+    init() {}
+
+    func toDic() -> [String: Any] {
+        return [:]
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(queryType.name, forKey: .queryType)
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let type = try container.decode(String.self, forKey: .queryType)
+        queryType = MyQueryType(type)!
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case queryType
+    }
 }
