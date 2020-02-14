@@ -78,7 +78,7 @@ let package = Package(
         ),
         .testTarget(
             name: "ElasticSwiftQueryDSLTests",
-            dependencies: ["ElasticSwiftQueryDSL", "Logging", "UnitTestSettings"]
+            dependencies: ["ElasticSwiftCore", "ElasticSwiftQueryDSL", "Logging", "UnitTestSettings"]
         ),
         .testTarget(
             name: "ElasticSwiftCoreTests",

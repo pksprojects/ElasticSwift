@@ -9,6 +9,7 @@ import Logging
 import UnitTestSettings
 import XCTest
 
+@testable import ElasticSwiftCore
 @testable import ElasticSwiftQueryDSL
 
 class MatchAllQueryTests: XCTestCase {
@@ -27,7 +28,7 @@ class MatchAllQueryTests: XCTestCase {
         logger.info("====================TEST=END===============================")
     }
 
-    func testMatchAllQuery() throws {
+    func test_01_match_all_query() throws {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
         let query = try! QueryBuilders.matchAllQuery().build()
@@ -42,7 +43,7 @@ class MatchAllQueryTests: XCTestCase {
         }
     }
 
-    func testMatchAllBoost() {
+    func test_02_match_all_boost() {
 //        // This is an example of a performance test case.
 //        self.measure {
 //            // Put the code you want to measure the time of here.
@@ -59,7 +60,7 @@ class MatchAllQueryTests: XCTestCase {
         }
     }
 
-    func testMatchNonQuery() {
+    func test_03_match_non_query() {
         let query = try! MatchNoneQueryBuilder().build()
         let expectedJson = "{\"match_none\":{}}"
         do {
@@ -72,9 +73,12 @@ class MatchAllQueryTests: XCTestCase {
         }
     }
 
-    static var allTests = [
-        ("testMatchAllQuery", testMatchAllQuery),
-        ("testMatchAllBoost", testMatchAllBoost),
-        ("testMatchNonQuery", testMatchNonQuery),
-    ]
+    func test_04_match_all_non_equality() throws {
+        let query1 = MatchAllQuery()
+        let query2 = MatchNoneQuery()
+
+        XCTAssertFalse(query1.isEqualTo(query2))
+        XCTAssertNotEqual(query1, MatchAllQuery(1.0))
+        XCTAssertEqual(query2, MatchNoneQuery())
+    }
 }
