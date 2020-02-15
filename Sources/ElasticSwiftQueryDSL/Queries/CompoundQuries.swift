@@ -315,7 +315,7 @@ public struct FunctionScoreQuery: Query {
         if !functions.isEmpty {
             if functions.count == 1 {
                 let scoreFunction = functions[0]
-                dic[scoreFunction.name] = scoreFunction.toDic()[scoreFunction.name]
+                dic[scoreFunction.scoreFunctionType.rawValue] = scoreFunction.toDic()[scoreFunction.scoreFunctionType.rawValue]
             } else {
                 dic[CodingKeys.functions.rawValue] = functions.map { $0.toDic() }
             }

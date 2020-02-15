@@ -105,7 +105,7 @@ extension QueryTypes: QueryType {
 
 // MARK: - Score Function Types
 
-enum ScoreFunctionType: String, Codable {
+public enum ScoreFunctionType: String, Codable {
     case weight
     case randomScore = "random_score"
     case scriptScore = "script_score"
@@ -318,6 +318,10 @@ public func isEqualQueries(_ lhs: Query?, _ rhs: Query?) -> Bool {
 extension DynamicCodingKeys {
     public static func key(named queryType: QueryType) -> DynamicCodingKeys {
         return .key(named: queryType.name)
+    }
+
+    public static func key(named scoreFunctionType: ScoreFunctionType) -> DynamicCodingKeys {
+        return .key(named: scoreFunctionType.rawValue)
     }
 }
 

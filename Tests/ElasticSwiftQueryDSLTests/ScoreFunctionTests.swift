@@ -185,7 +185,7 @@ class ScoreFunctionTests: XCTestCase {
 
         logger.debug("LinearDecayScoreFunction Decode test: \(decoded)")
 
-        XCTAssertEqual(decayFunc.name, decoded.name)
+        XCTAssertEqual(decayFunc.scoreFunctionType, decoded.scoreFunctionType)
         XCTAssertEqual(decayFunc.field, decoded.field)
         XCTAssertEqual(decayFunc.origin, decoded.origin)
         XCTAssertEqual(decayFunc.scale, decoded.scale)
@@ -223,7 +223,7 @@ class ScoreFunctionTests: XCTestCase {
 
         logger.debug("GaussScoreFunction Decode test: \(decoded)")
 
-        XCTAssertEqual(decayFunc.name, decoded.name)
+        XCTAssertEqual(decayFunc.scoreFunctionType, decoded.scoreFunctionType)
         XCTAssertEqual(decayFunc.field, decoded.field)
         XCTAssertEqual(decayFunc.origin, decoded.origin)
         XCTAssertEqual(decayFunc.scale, decoded.scale)
@@ -261,7 +261,7 @@ class ScoreFunctionTests: XCTestCase {
 
         logger.debug("ExponentialDecayScoreFunction Decode test: \(decoded)")
 
-        XCTAssertEqual(decayFunc.name, decoded.name)
+        XCTAssertEqual(decayFunc.scoreFunctionType, decoded.scoreFunctionType)
         XCTAssertEqual(decayFunc.field, decoded.field)
         XCTAssertEqual(decayFunc.origin, decoded.origin)
         XCTAssertEqual(decayFunc.scale, decoded.scale)
