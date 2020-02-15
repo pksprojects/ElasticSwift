@@ -20,8 +20,8 @@ public struct HTTPRequest {
     public let path: String
     public let queryParams: [URLQueryItem]
 
-    public init(path: String, method: HTTPMethod, queryParams: [URLQueryItem] = [], headers: HTTPHeaders = HTTPHeaders(), body: Data? = nil) {
-        version = HTTPVersion(major: 1, minor: 1)
+    public init(path: String, method: HTTPMethod, queryParams: [URLQueryItem] = [], headers: HTTPHeaders = .init(), body: Data? = nil, version: HTTPVersion = .init(major: 1, minor: 1)) {
+        self.version = version
         self.method = method
         self.body = body
         self.headers = headers
@@ -31,31 +31,14 @@ public struct HTTPRequest {
 
     internal init(withBuilder builder: HTTPRequestBuilder) throws {
         guard builder.method != nil else {
-            throw HTTPRequestBuilderError("method can't be nil")
+            throw HTTPRequestBuilderError.missingRequiredField("method")
         }
 
         guard builder.path != nil else {
-            throw HTTPRequestBuilderError("url can't be nil")
+            throw HTTPRequestBuilderError.missingRequiredField("path")
         }
 
-        if let version = builder.version {
-            self.version = version
-        } else {
-            version = HTTPVersion(major: 1, minor: 1)
-        }
-        if let queryParams = builder.queryParams {
-            self.queryParams = queryParams
-        } else {
-            queryParams = []
-        }
-        if let headers = builder.headers {
-            self.headers = headers
-        } else {
-            headers = HTTPHeaders()
-        }
-        body = builder.body
-        method = builder.method!
-        path = builder.path!
+        self.init(path: builder.path!, method: builder.method!, queryParams: builder.queryParams ?? [], headers: builder.headers ?? HTTPHeaders(), body: builder.body, version: builder.version ?? HTTPVersion(major: 1, minor: 1))
     }
 
     public var query: String {
@@ -83,7 +66,6 @@ public class HTTPRequestBuilder {
     private var _body: Data?
     private var _path: String?
     private var _queryParams: [URLQueryItem]?
-    private var _completionHandler: ((_ response: HTTPResponse) -> Void)?
 
     public init() {}
 
@@ -123,12 +105,6 @@ public class HTTPRequestBuilder {
         return self
     }
 
-    @discardableResult
-    public func set(completionHandler: @escaping ((_ response: HTTPResponse) -> Void)) -> HTTPRequestBuilder {
-        _completionHandler = completionHandler
-        return self
-    }
-
     public var version: HTTPVersion? {
         return _version
     }
@@ -151,10 +127,6 @@ public class HTTPRequestBuilder {
 
     public var queryParams: [URLQueryItem]? {
         return _queryParams
-    }
-
-    public var completionHandler: ((_ response: HTTPResponse) -> Void)? {
-        return self._completionHandler
     }
 
     public func build() throws -> HTTPRequest {

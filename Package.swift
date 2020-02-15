@@ -35,11 +35,11 @@ let package = Package(
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
-        .package(url: "https://github.com/apple/swift-nio.git", .upToNextMajor(from: "2.12.0")),
-        .package(url: "https://github.com/apple/swift-nio-ssl.git", .upToNextMajor(from: "2.5.0")),
+        .package(url: "https://github.com/apple/swift-nio.git", .upToNextMajor(from: "2.14.0")),
+        .package(url: "https://github.com/apple/swift-nio-ssl.git", .upToNextMajor(from: "2.6.1")),
         .package(url: "https://github.com/apple/swift-nio-transport-services.git", .upToNextMajor(from: "1.3.0")),
         .package(url: "https://github.com/apple/swift-log.git", .upToNextMajor(from: "1.2.0")),
-        .package(url: "https://github.com/swift-server/async-http-client.git", .upToNextMajor(from: "1.0.1")),
+        .package(url: "https://github.com/swift-server/async-http-client.git", .upToNextMajor(from: "1.1.0")),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -78,7 +78,11 @@ let package = Package(
         ),
         .testTarget(
             name: "ElasticSwiftQueryDSLTests",
-            dependencies: ["ElasticSwiftQueryDSL", "Logging", "UnitTestSettings"]
+            dependencies: ["ElasticSwiftCore", "ElasticSwiftQueryDSL", "Logging", "UnitTestSettings"]
+        ),
+        .testTarget(
+            name: "ElasticSwiftCoreTests",
+            dependencies: ["ElasticSwiftCore", "Logging", "UnitTestSettings"]
         ),
         .target(
             name: "UnitTestSettings",

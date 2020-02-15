@@ -61,29 +61,13 @@ public class DecodingError: Error, CustomStringConvertible, CustomDebugStringCon
 }
 
 /// Error thrown by  HTTPRequestBuilder's build function.
-public class HTTPRequestBuilderError: Error {
-    private let msg: String
-
-    public init(_ msg: String) {
-        self.msg = msg
-    }
-
-    public func message() -> String {
-        return msg
-    }
+public enum HTTPRequestBuilderError: Error {
+    case missingRequiredField(String)
 }
 
 /// Error thrown by HTTPRequestBuilder's build function.
-public class HTTPResponseBuilderError: Error {
-    private let msg: String
-
-    public init(_ msg: String) {
-        self.msg = msg
-    }
-
-    public func message() -> String {
-        return msg
-    }
+public enum HTTPResponseBuilderError: Error {
+    case missingRequiredField(String)
 }
 
 // MARK: - QueryBuilder Error

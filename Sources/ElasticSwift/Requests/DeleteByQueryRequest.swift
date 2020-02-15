@@ -93,9 +93,7 @@ public struct DeleteByQueryRequest: Request {
             throw RequestBuilderError.missingRequiredField("query")
         }
 
-        index = builder.index!
-        type = builder.type
-        query = builder.query!
+        self.init(index: builder.index!, type: builder.type, query: builder.query!)
     }
 
     public var queryParams: [URLQueryItem] {

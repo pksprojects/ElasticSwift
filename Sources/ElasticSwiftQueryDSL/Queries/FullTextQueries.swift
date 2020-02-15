@@ -11,7 +11,7 @@ import Foundation
 // MARK: - Match Query.
 
 public struct MatchQuery: Query {
-    public let name: String = "match"
+    public let queryType: QueryType = QueryTypes.match
 
     public let field: String
     public let value: String
@@ -61,14 +61,14 @@ public struct MatchQuery: Query {
         if let autoGenSynonymnsPhraseQuery = self.autoGenSynonymnsPhraseQuery {
             dic[CodingKeys.autoGenerateSynonymsPhraseQuery.rawValue] = autoGenSynonymnsPhraseQuery
         }
-        return [name: [field: dic]]
+        return [queryType.name: [field: dic]]
     }
 }
 
 extension MatchQuery {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
-        let nested = try container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: name))
+        let nested = try container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
 
         guard nested.allKeys.count == 1 else {
             throw Swift.DecodingError.typeMismatch(MatchQuery.self, .init(codingPath: nested.codingPath, debugDescription: "Unable to find field name in key(s) expect: 1 key found: \(nested.allKeys.count)."))
@@ -94,7 +94,7 @@ extension MatchQuery {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
-        var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: name))
+        var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
         var fieldContainer = nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
         try fieldContainer.encode(value, forKey: .query)
         try fieldContainer.encodeIfPresent(`operator`, forKey: .operator)
@@ -116,7 +116,7 @@ extension MatchQuery {
 
 extension MatchQuery: Equatable {
     public static func == (lhs: MatchQuery, rhs: MatchQuery) -> Bool {
-        return lhs.name == rhs.name
+        return lhs.queryType.isEqualTo(rhs.queryType)
             && lhs.field == rhs.field
             && lhs.value == rhs.value
             && lhs.cutoffFrequency == rhs.cutoffFrequency
@@ -130,7 +130,7 @@ extension MatchQuery: Equatable {
 // MARK: - MatchPhraseQuery
 
 public struct MatchPhraseQuery: Query {
-    public let name: String = "match_phrase"
+    public let queryType: QueryType = QueryTypes.matchPhrase
 
     public let field: String
     public let value: String
@@ -157,10 +157,10 @@ public struct MatchPhraseQuery: Query {
     public func toDic() -> [String: Any] {
         var dic: [String: Any] = [:]
         if let analyzer = analyzer {
-            dic[name] = [self.field: [CodingKeys.query.rawValue: self.value,
-                                      CodingKeys.analyzer.rawValue: analyzer]]
+            dic[queryType.name] = [self.field: [CodingKeys.query.rawValue: self.value,
+                                                CodingKeys.analyzer.rawValue: analyzer]]
         } else {
-            dic[name] = [self.field: self.value]
+            dic[queryType.name] = [self.field: self.value]
         }
         return dic
     }
@@ -169,7 +169,7 @@ public struct MatchPhraseQuery: Query {
 extension MatchPhraseQuery {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
-        let nested = try container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: name))
+        let nested = try container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
 
         guard nested.allKeys.count == 1 else {
             throw Swift.DecodingError.typeMismatch(MatchPhraseQuery.self, .init(codingPath: nested.codingPath, debugDescription: "Unable to find field name in key(s) expect: 1 key found: \(nested.allKeys.count)."))
@@ -188,7 +188,7 @@ extension MatchPhraseQuery {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
-        var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: name))
+        var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
         guard analyzer != nil else {
             try nested.encode(value, forKey: .key(named: field))
             return
@@ -207,7 +207,7 @@ extension MatchPhraseQuery {
 
 extension MatchPhraseQuery: Equatable {
     public static func == (lhs: MatchPhraseQuery, rhs: MatchPhraseQuery) -> Bool {
-        return lhs.name == rhs.name
+        return lhs.queryType.isEqualTo(rhs.queryType)
             && lhs.field == rhs.field
             && lhs.value == rhs.value
             && lhs.analyzer == rhs.analyzer
@@ -217,7 +217,7 @@ extension MatchPhraseQuery: Equatable {
 // MARK: - MatchPhrasePrefixQuery
 
 public struct MatchPhrasePrefixQuery: Query {
-    public let name: String = "match_phrase_prefix"
+    public let queryType: QueryType = QueryTypes.matchPhrasePrefix
 
     public let field: String
     public let value: String
@@ -244,10 +244,10 @@ public struct MatchPhrasePrefixQuery: Query {
     public func toDic() -> [String: Any] {
         var dic: [String: Any] = [:]
         if let maxExpansions = maxExpansions {
-            dic[name] = [self.field: [CodingKeys.query.rawValue: self.value,
-                                      CodingKeys.maxExpansions.rawValue: maxExpansions]]
+            dic[queryType.name] = [self.field: [CodingKeys.query.rawValue: self.value,
+                                                CodingKeys.maxExpansions.rawValue: maxExpansions]]
         } else {
-            dic[name] = [self.field: self.value]
+            dic[queryType.name] = [self.field: self.value]
         }
         return dic
     }
@@ -256,7 +256,7 @@ public struct MatchPhrasePrefixQuery: Query {
 extension MatchPhrasePrefixQuery {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
-        let nested = try container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: name))
+        let nested = try container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
 
         guard nested.allKeys.count == 1 else {
             throw Swift.DecodingError.typeMismatch(MatchPhraseQuery.self, .init(codingPath: nested.codingPath, debugDescription: "Unable to find field name in key(s) expect: 1 key found: \(nested.allKeys.count)."))
@@ -275,7 +275,7 @@ extension MatchPhrasePrefixQuery {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
-        var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: name))
+        var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
         guard maxExpansions != nil else {
             try nested.encode(value, forKey: .key(named: field))
             return
@@ -294,7 +294,7 @@ extension MatchPhrasePrefixQuery {
 
 extension MatchPhrasePrefixQuery: Equatable {
     public static func == (lhs: MatchPhrasePrefixQuery, rhs: MatchPhrasePrefixQuery) -> Bool {
-        return lhs.name == rhs.name
+        return lhs.queryType.isEqualTo(rhs.queryType)
             && lhs.field == rhs.field
             && lhs.value == rhs.value
             && lhs.maxExpansions == rhs.maxExpansions
@@ -304,14 +304,14 @@ extension MatchPhrasePrefixQuery: Equatable {
 // MARK: - MultiMatchQuery
 
 public struct MultiMatchQuery: Query {
-    public let name: String = "multi_match"
+    public let queryType: QueryType = QueryTypes.multiMatch
 
     public let tieBreaker: Decimal?
     public let type: MultiMatchQueryType?
     public let query: String
     public let fields: [String]
 
-    internal init(tieBreaker: Decimal?, type: MultiMatchQueryType?, query: String, fields: [String]) {
+    internal init(query: String, fields: [String], tieBreaker: Decimal?, type: MultiMatchQueryType?) {
         self.tieBreaker = tieBreaker
         self.type = type
         self.query = query
@@ -327,10 +327,7 @@ public struct MultiMatchQuery: Query {
             throw QueryBuilderError.missingRequiredField("query")
         }
 
-        query = builder.query!
-        fields = builder.fields
-        tieBreaker = builder.tieBreaker
-        type = builder.type
+        self.init(query: builder.query!, fields: builder.fields, tieBreaker: builder.tieBreaker, type: builder.type)
     }
 
     public func toDic() -> [String: Any] {
@@ -343,14 +340,14 @@ public struct MultiMatchQuery: Query {
         if let tieBreaker = self.tieBreaker {
             dic[CodingKeys.tieBreaker.rawValue] = tieBreaker
         }
-        return [name: dic]
+        return [queryType.name: dic]
     }
 }
 
 extension MultiMatchQuery {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
-        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: name))
+        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         query = try nested.decodeString(forKey: .query)
         fields = try nested.decodeArray(forKey: .fields)
         type = try nested.decodeIfPresent(MultiMatchQueryType.self, forKey: .type)
@@ -359,7 +356,7 @@ extension MultiMatchQuery {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
-        var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: name))
+        var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
 
         try nested.encode(query, forKey: .query)
         try nested.encode(fields, forKey: .fields)
@@ -377,7 +374,7 @@ extension MultiMatchQuery {
 
 extension MultiMatchQuery: Equatable {
     public static func == (lhs: MultiMatchQuery, rhs: MultiMatchQuery) -> Bool {
-        return lhs.name == rhs.name
+        return lhs.queryType.isEqualTo(rhs.queryType)
             && lhs.query == rhs.query
             && lhs.fields == rhs.fields
             && lhs.tieBreaker == rhs.tieBreaker
@@ -390,7 +387,7 @@ extension MultiMatchQuery: Equatable {
 public struct CommonTermsQuery: Query {
     private static let BODY = "body"
 
-    public let name: String = "common"
+    public let queryType: QueryType = QueryTypes.common
 
     public let query: String
     public let cutoffFrequency: Decimal
@@ -441,14 +438,14 @@ public struct CommonTermsQuery: Query {
                 CodingKeys.highFreq.rawValue: minLowFreq,
             ]
         }
-        return [name: [CommonTermsQuery.BODY: dic]]
+        return [queryType.name: [CommonTermsQuery.BODY: dic]]
     }
 }
 
 extension CommonTermsQuery {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
-        let nested = try container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: name))
+        let nested = try container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
         let bodyContainer = try nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: CommonTermsQuery.BODY))
 
         query = try bodyContainer.decodeString(forKey: .query)
@@ -469,7 +466,7 @@ extension CommonTermsQuery {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
-        var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: name))
+        var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
         var bodyContainer = nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: CommonTermsQuery.BODY))
 
         try bodyContainer.encode(query, forKey: .query)
@@ -497,7 +494,7 @@ extension CommonTermsQuery {
 
 extension CommonTermsQuery: Equatable {
     public static func == (lhs: CommonTermsQuery, rhs: CommonTermsQuery) -> Bool {
-        return lhs.name == rhs.name
+        return lhs.queryType.isEqualTo(rhs.queryType)
             && lhs.query == rhs.query
             && lhs.cutoffFrequency == rhs.cutoffFrequency
             && lhs.highFrequencyOperator == rhs.highFrequencyOperator
@@ -511,7 +508,7 @@ extension CommonTermsQuery: Equatable {
 // MARK: - QueryStringQuery
 
 public struct QueryStringQuery: Query {
-    public let name: String = "query_string"
+    public let queryType: QueryType = QueryTypes.queryString
 
     public let defaultField: String?
     public let value: String
@@ -560,27 +557,11 @@ public struct QueryStringQuery: Query {
     }
 
     internal init(withBuilder builder: QueryStringQueryBuilder) throws {
-        defaultField = builder.defaultField
-        value = builder.value!
-        defaultOperator = builder.defaultOperator
-        analyzer = builder.analyzer
-        quoteAnalyzer = builder.quoteAnalyzer
-        allowLeadingWildcard = builder.allowLeadingWildcard
-        enablePositionIncrements = builder.enablePositionIncrements
-        fuzzyMaxExpansions = builder.fuzzyMaxExpansions
-        fuzziness = builder.fuzziness
-        fuzzyPrefixLength = builder.fuzzyPrefixLength
-        fuzzyTranspositions = builder.fuzzyTranspositions
-        phraseSlop = builder.phraseSlop
-        boost = builder.boost
-        autoGeneratePhraseQueries = builder.autoGeneratePhraseQueries
-        analyzeWildcard = builder.analyzeWildcard
-        maxDeterminizedStates = builder.maxDeterminizedStates
-        minimumShouldMatch = builder.minimumShouldMatch
-        lenient = builder.lenient
-        timeZone = builder.timeZone
-        quoteFieldSuffix = builder.quoteFieldSuffix
-        autoGenerateSynonymsPhraseQuery = builder.autoGenerateSynonymsPhraseQuery
+        guard builder.value != nil else {
+            throw QueryBuilderError.missingRequiredField("value")
+        }
+
+        self.init(builder.value!, defaultField: builder.defaultField, defaultOperator: builder.defaultOperator, analyzer: builder.analyzer, quoteAnalyzer: builder.quoteAnalyzer, allowLeadingWildcard: builder.allowLeadingWildcard, enablePositionIncrements: builder.enablePositionIncrements, fuzzyMaxExpansions: builder.fuzzyMaxExpansions, fuzziness: builder.fuzziness, fuzzyPrefixLength: builder.fuzzyPrefixLength, fuzzyTranspositions: builder.fuzzyTranspositions, phraseSlop: builder.phraseSlop, boost: builder.boost, autoGeneratePhraseQueries: builder.autoGeneratePhraseQueries, analyzeWildcard: builder.analyzeWildcard, maxDeterminizedStates: builder.maxDeterminizedStates, minimumShouldMatch: builder.minimumShouldMatch, lenient: builder.lenient, timeZone: builder.timeZone, quoteFieldSuffix: builder.quoteFieldSuffix, autoGenerateSynonymsPhraseQuery: builder.autoGenerateSynonymsPhraseQuery)
     }
 
     public func toDic() -> [String: Any] {
@@ -646,14 +627,14 @@ public struct QueryStringQuery: Query {
         if let autoGenerateSynonymsPhraseQuery = self.autoGenerateSynonymsPhraseQuery {
             dic[CodingKeys.autoGenerateSynonymsPhraseQuery.rawValue] = autoGenerateSynonymsPhraseQuery
         }
-        return [name: dic]
+        return [queryType.name: dic]
     }
 }
 
 extension QueryStringQuery {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
-        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: name))
+        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         value = try nested.decodeString(forKey: .query)
         defaultField = try nested.decodeStringIfPresent(forKey: .defaultField)
         defaultOperator = try nested.decodeStringIfPresent(forKey: .defaultField)
@@ -679,7 +660,7 @@ extension QueryStringQuery {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
-        var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: name))
+        var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         try nested.encode(value, forKey: .query)
         try nested.encodeIfPresent(defaultField, forKey: .defaultField)
         try nested.encodeIfPresent(defaultOperator, forKey: .defaultOperator)
@@ -730,7 +711,7 @@ extension QueryStringQuery {
 
 extension QueryStringQuery: Equatable {
     public static func == (lhs: QueryStringQuery, rhs: QueryStringQuery) -> Bool {
-        return lhs.name == rhs.name
+        return lhs.queryType.isEqualTo(rhs.queryType)
             && lhs.value == rhs.value
             && lhs.analyzer == rhs.analyzer
             && lhs.allowLeadingWildcard == rhs.allowLeadingWildcard
@@ -757,7 +738,7 @@ extension QueryStringQuery: Equatable {
 // MARK: - SimpleQueryStringQuery
 
 public struct SimpleQueryStringQuery: Query {
-    public let name: String = "simple_query_string"
+    public let queryType: QueryType = QueryTypes.simpleQueryString
 
     public let query: String
     public let fields: [String]?
@@ -831,14 +812,14 @@ public struct SimpleQueryStringQuery: Query {
         if let autoGenerateSynonymsPhraseQuery = self.autoGenerateSynonymsPhraseQuery {
             dic[CodingKeys.autoGenerateSynonymsPhraseQuery.rawValue] = autoGenerateSynonymsPhraseQuery
         }
-        return [name: dic]
+        return [queryType.name: dic]
     }
 }
 
 extension SimpleQueryStringQuery {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
-        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: name))
+        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         query = try nested.decodeString(forKey: .query)
         fields = try nested.decodeArrayIfPresent(forKey: .fields)
         defaultOperator = try nested.decodeStringIfPresent(forKey: .defaultOperator)
@@ -855,7 +836,7 @@ extension SimpleQueryStringQuery {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
-        var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: name))
+        var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
 
         try nested.encode(query, forKey: .query)
         try nested.encodeIfPresent(fields, forKey: .fields)
@@ -889,7 +870,7 @@ extension SimpleQueryStringQuery {
 
 extension SimpleQueryStringQuery: Equatable {
     public static func == (lhs: SimpleQueryStringQuery, rhs: SimpleQueryStringQuery) -> Bool {
-        return lhs.name == rhs.name
+        return lhs.queryType.isEqualTo(rhs.queryType)
             && lhs.query == rhs.query
             && lhs.analyzer == rhs.analyzer
             && lhs.autoGenerateSynonymsPhraseQuery == rhs.autoGenerateSynonymsPhraseQuery

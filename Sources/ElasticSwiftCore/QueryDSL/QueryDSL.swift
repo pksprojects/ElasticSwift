@@ -12,7 +12,7 @@ import Foundation
 
 /// Protocol that all `Query` conforms to
 public protocol Query: Codable {
-    var name: String { get }
+    var queryType: QueryType { get }
 
     func isEqualTo(_ other: Query) -> Bool
 
@@ -21,6 +21,42 @@ public protocol Query: Codable {
 
 extension Query where Self: Equatable {
     public func isEqualTo(_ other: Query) -> Bool {
+        if let o = other as? Self {
+            return self == o
+        }
+        return false
+    }
+}
+
+// MARK: - QueryType Protocol
+
+/// Protocol to wrap query type information
+public protocol QueryType: Codable {
+    var metaType: Query.Type { get }
+
+    var name: String { get }
+
+    init?(_ name: String)
+
+    func isEqualTo(_ other: QueryType) -> Bool
+}
+
+extension QueryType where Self: RawRepresentable, Self.RawValue == String {
+    public var name: String {
+        return rawValue
+    }
+
+    public init?(_ name: String) {
+        if let v = Self(rawValue: name) {
+            self = v
+        } else {
+            return nil
+        }
+    }
+}
+
+extension QueryType where Self: Equatable {
+    public func isEqualTo(_ other: QueryType) -> Bool {
         if let o = other as? Self {
             return self == o
         }

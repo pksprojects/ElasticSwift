@@ -181,15 +181,7 @@ public struct UpdateRequest: Request, BulkableRequest {
             throw RequestBuilderError.atleastOneFieldRequired(["doc", "script"])
         }
 
-        index = builder.index!
-        type = builder.type ?? "_doc"
-        id = builder.id!
-        script = builder.script
-        upsert = builder.upsert
-        detectNoop = builder.detectNoop
-        docAsUpsert = builder.docAsUpsert
-        doc = builder.doc
-        scriptedUpsert = builder.scriptedUpsert
+        self.init(index: builder.index!, type: builder.type ?? "_doc", id: builder.id!, script: builder.script, upsert: builder.upsert, detectNoop: builder.detectNoop, docAsUpsert: builder.docAsUpsert, doc: builder.doc, scriptedUpsert: builder.scriptedUpsert)
     }
 
     public var method: HTTPMethod {

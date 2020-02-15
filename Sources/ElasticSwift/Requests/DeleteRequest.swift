@@ -117,9 +117,7 @@ public struct DeleteRequest: Request, BulkableRequest {
             throw RequestBuilderError.missingRequiredField("id")
         }
 
-        index = builder.index!
-        type = builder.type ?? "_doc"
-        id = builder.id!
+        self.init(index: builder.index!, type: builder.type ?? "_doc", id: builder.id!)
         version = builder.version
         versionType = builder.versionType
         refresh = builder.refresh

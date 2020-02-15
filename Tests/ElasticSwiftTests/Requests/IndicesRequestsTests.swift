@@ -181,6 +181,46 @@ class IndicesRequestsTests: XCTestCase {
         waitForExpectations(timeout: 10)
     }
 
+    func test_04_index_open_and_close() throws {
+        let e = expectation(description: "execution complete")
+
+        let openRequest = try OpenIndexRequestBuilder()
+            .set(indices: indexName)
+            .build()
+
+        let closeRequest = try CloseIndexRequestBuilder()
+            .set(indices: indexName)
+            .build()
+
+        func handlerOpen(_ result: Result<AcknowledgedResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+                XCTAssert(false)
+            case let .success(response):
+                logger.info("Open Response: \(response)")
+                XCTAssert(response.acknowledged == true, "Open Acknowledged: \(response.acknowledged)")
+            }
+            e.fulfill()
+        }
+
+        func handlerClose(_ result: Result<AcknowledgedResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+                XCTAssert(false)
+            case let .success(response):
+                logger.info("Close Response: \(response)")
+                XCTAssert(response.acknowledged == true, "Acknowledged: \(response.acknowledged)")
+                client.indices.open(openRequest, completionHandler: handlerOpen)
+            }
+        }
+
+        client.indices.close(closeRequest, completionHandler: handlerClose)
+
+        waitForExpectations(timeout: 10)
+    }
+
     func test_999_DeleteIndex() throws {
         let e = expectation(description: "execution complete")
         func handler(_ result: Result<AcknowledgedResponse, Error>) {

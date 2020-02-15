@@ -55,9 +55,10 @@
         //   `swift test --generate-linuxmain`
         // to regenerate.
         static let __allTests__MatchAllQueryTests = [
-            ("testMatchAllBoost", testMatchAllBoost),
-            ("testMatchAllQuery", testMatchAllQuery),
-            ("testMatchNonQuery", testMatchNonQuery),
+            ("test_01_match_all_query", test_01_match_all_query),
+            ("test_02_match_all_boost", test_02_match_all_boost),
+            ("test_03_match_non_query", test_03_match_non_query),
+            ("test_04_match_all_non_equality", test_04_match_all_non_equality),
         ]
     }
 

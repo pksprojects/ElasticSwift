@@ -87,9 +87,7 @@ public struct GetRequest: Request {
             throw RequestBuilderError.missingRequiredField("id")
         }
 
-        index = builder.index!
-        type = builder.type ?? "_doc"
-        id = builder.id!
+        self.init(index: builder.index!, type: builder.type ?? "_doc", id: builder.id!)
     }
 
     public var endPoint: String {
