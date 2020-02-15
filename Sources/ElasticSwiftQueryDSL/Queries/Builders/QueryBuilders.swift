@@ -121,4 +121,8 @@ public final class QueryBuilders {
     public static func parentIdQuery() -> ParentIdQueryBuilder {
         return ParentIdQueryBuilder()
     }
+    
+    public static func geoShapeQuery() -> GeoShapeQueryBuilder {
+        return GeoShapeQueryBuilder()
+    }
 }
