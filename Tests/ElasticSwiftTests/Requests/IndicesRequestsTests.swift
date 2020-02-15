@@ -180,18 +180,18 @@ class IndicesRequestsTests: XCTestCase {
         client.indices.create(createIndexRequest, completionHandler: createIndexRequestHandler)
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_04_index_open_and_close() throws {
         let e = expectation(description: "execution complete")
-        
+
         let openRequest = try OpenIndexRequestBuilder()
             .set(indices: indexName)
             .build()
-        
+
         let closeRequest = try CloseIndexRequestBuilder()
             .set(indices: indexName)
             .build()
-        
+
         func handlerOpen(_ result: Result<AcknowledgedResponse, Error>) {
             switch result {
             case let .failure(error):
@@ -203,7 +203,7 @@ class IndicesRequestsTests: XCTestCase {
             }
             e.fulfill()
         }
-        
+
         func handlerClose(_ result: Result<AcknowledgedResponse, Error>) {
             switch result {
             case let .failure(error):
@@ -212,7 +212,7 @@ class IndicesRequestsTests: XCTestCase {
             case let .success(response):
                 logger.info("Close Response: \(response)")
                 XCTAssert(response.acknowledged == true, "Acknowledged: \(response.acknowledged)")
-                self.client.indices.open(openRequest, completionHandler: handlerOpen)
+                client.indices.open(openRequest, completionHandler: handlerOpen)
             }
         }
 
