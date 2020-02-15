@@ -90,12 +90,7 @@ public struct BoolQuery: Query {
             throw QueryBuilderError.atleastOneFieldRequired(["filterClauses", "mustClauses", "mustNotClauses", "shouldClauses"])
         }
 
-        mustClauses = builder.mustClauses
-        mustNotClauses = builder.mustNotClauses
-        shouldClauses = builder.shouldClauses
-        filterClauses = builder.filterClauses
-        boost = builder.boost
-        minimumShouldMatch = builder.minimumShouldMatch
+        self.init(must: builder.mustClauses, mustNot: builder.mustNotClauses, should: builder.shouldClauses, filter: builder.filterClauses, minimumShouldMatch: builder.minimumShouldMatch, boost: builder.boost)
     }
 
     public func toDic() -> [String: Any] {
@@ -201,9 +196,7 @@ public struct DisMaxQuery: Query {
             throw QueryBuilderError.missingRequiredField("query")
         }
 
-        tieBreaker = builder.tieBreaker ?? DisMaxQuery.DEFAULT_TIE_BREAKER
-        boost = builder.boost
-        queries = builder.queries
+        self.init(builder.queries, tieBreaker: builder.tieBreaker ?? DisMaxQuery.DEFAULT_TIE_BREAKER, boost: builder.boost)
     }
 
     public func toDic() -> [String: Any] {
@@ -265,7 +258,7 @@ public struct FunctionScoreQuery: Query {
     public let minScore: Decimal?
     public let functions: [ScoreFunction]
 
-    public init(query: Query, boost: Decimal? = nil, boostMode: BoostMode? = nil, maxBoost: Decimal? = nil, scoreMode: ScoreMode? = nil, minScore: Decimal? = nil, functions: ScoreFunction...) {
+    public init(query: Query, boost: Decimal? = nil, boostMode: BoostMode? = nil, maxBoost: Decimal? = nil, scoreMode: ScoreMode? = nil, minScore: Decimal? = nil, functions: [ScoreFunction]) {
         self.query = query
         self.boost = boost
         self.boostMode = boostMode
@@ -273,6 +266,10 @@ public struct FunctionScoreQuery: Query {
         self.scoreMode = scoreMode
         self.minScore = minScore
         self.functions = functions
+    }
+
+    public init(query: Query, boost: Decimal? = nil, boostMode: BoostMode? = nil, maxBoost: Decimal? = nil, scoreMode: ScoreMode? = nil, minScore: Decimal? = nil, functions: ScoreFunction...) {
+        self.init(query: query, boost: boost, boostMode: boostMode, maxBoost: maxBoost, scoreMode: scoreMode, minScore: minScore, functions: functions)
     }
 
     internal init(withBuilder builder: FunctionScoreQueryBuilder) throws {
@@ -284,13 +281,7 @@ public struct FunctionScoreQuery: Query {
             throw QueryBuilderError.atlestOneElementRequired("functions")
         }
 
-        query = builder.query!
-        boost = builder.boost
-        boostMode = builder.boostMode
-        maxBoost = builder.maxBoost
-        scoreMode = builder.scoreMode
-        minScore = builder.minScore
-        functions = builder.functions
+        self.init(query: builder.query!, boost: builder.boost, boostMode: builder.boostMode, maxBoost: builder.maxBoost, scoreMode: builder.scoreMode, minScore: builder.minScore, functions: builder.functions)
     }
 
     public func toDic() -> [String: Any] {

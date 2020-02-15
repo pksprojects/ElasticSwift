@@ -188,18 +188,7 @@ public struct MultiGetRequest: Request {
             throw RequestBuilderError.atlestOneElementRequired("item")
         }
 
-        items = builder.items
-        index = builder.index
-        type = builder.type
-        source = builder.source
-        preference = builder.preference
-        sourceIncludes = builder.sourceIncludes
-        sourceExcludes = builder.sourceExcludes
-        source = builder.source
-        routing = builder.routing
-        storedFields = builder.storedFields
-        realTime = builder.realTime
-        refresh = builder.refresh
+        self.init(index: builder.index, type: builder.type, items: builder.items, source: builder.source, sourceExcludes: builder.sourceIncludes, sourceIncludes: builder.sourceExcludes, realTime: builder.realTime, refresh: builder.refresh, routing: builder.routing, preference: builder.preference, storedFields: builder.storedFields)
     }
 
     public var queryParams: [URLQueryItem] {

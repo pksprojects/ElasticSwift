@@ -25,7 +25,7 @@ public struct WeightScoreFunction: ScoreFunction {
             throw ScoreFunctionBuilderError.missingRequiredField("weight")
         }
 
-        weight = builder.weight!
+        self.init(builder.weight!)
     }
 
     public func toDic() -> [String: Any] {
@@ -74,8 +74,7 @@ public struct RandomScoreFunction: ScoreFunction {
             throw ScoreFunctionBuilderError.missingRequiredField("field")
         }
 
-        seed = builder.seed!
-        field = builder.field!
+        self.init(field: builder.field!, seed: builder.seed!)
     }
 
     public func toDic() -> [String: Any] {
@@ -120,8 +119,12 @@ public struct ScriptScoreFunction: ScoreFunction {
 
     public let script: Script
 
+    public init(_ script: Script) {
+        self.script = script
+    }
+
     public init(source: String, lang: String? = nil, params: [String: CodableValue]? = nil) {
-        script = Script(source, lang: lang, params: params)
+        self.init(Script(source, lang: lang, params: params))
     }
 
     internal init(withBuilder builder: ScriptScoreFunctionBuilder) throws {
@@ -129,7 +132,7 @@ public struct ScriptScoreFunction: ScoreFunction {
             throw ScoreFunctionBuilderError.missingRequiredField("script")
         }
 
-        script = builder.script!
+        self.init(builder.script!)
     }
 
     public func toDic() -> [String: Any] {

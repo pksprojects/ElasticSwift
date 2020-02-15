@@ -79,15 +79,27 @@ public struct BulkRequest: Request {
     public var sourceIncludes: [String]?
     public var pipeline: String?
 
-    internal init(withBuilder builder: BulkRequestBuilder) throws {
-        index = builder.index
-        type = builder.type
+    internal init(index: String? = nil, type: String? = nil, requests: [BulkableRequest], waitForActiveShards: String? = nil, refresh: IndexRefresh? = nil, routing: String? = nil, timeout: String? = nil, fields: [String]? = nil, source: [String]? = nil, sourceExcludes: [String]? = nil, sourceIncludes: [String]? = nil, pipeline: String? = nil) {
+        self.index = index
+        self.type = type
+        self.requests = requests
+        self.waitForActiveShards = waitForActiveShards
+        self.refresh = refresh
+        self.routing = routing
+        self.timeout = timeout
+        self.fields = fields
+        self.source = source
+        self.sourceExcludes = sourceExcludes
+        self.sourceIncludes = sourceIncludes
+        self.pipeline = pipeline
+    }
 
+    internal init(withBuilder builder: BulkRequestBuilder) throws {
         guard !builder.requests.isEmpty else {
             throw RequestBuilderError.atlestOneElementRequired("requests")
         }
 
-        requests = builder.requests
+        self.init(index: builder.index, type: builder.type, requests: builder.requests)
     }
 
     public var headers: HTTPHeaders {

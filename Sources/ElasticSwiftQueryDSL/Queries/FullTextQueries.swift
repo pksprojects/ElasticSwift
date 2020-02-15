@@ -311,7 +311,7 @@ public struct MultiMatchQuery: Query {
     public let query: String
     public let fields: [String]
 
-    internal init(tieBreaker: Decimal?, type: MultiMatchQueryType?, query: String, fields: [String]) {
+    internal init(query: String, fields: [String], tieBreaker: Decimal?, type: MultiMatchQueryType?) {
         self.tieBreaker = tieBreaker
         self.type = type
         self.query = query
@@ -327,10 +327,7 @@ public struct MultiMatchQuery: Query {
             throw QueryBuilderError.missingRequiredField("query")
         }
 
-        query = builder.query!
-        fields = builder.fields
-        tieBreaker = builder.tieBreaker
-        type = builder.type
+        self.init(query: builder.query!, fields: builder.fields, tieBreaker: builder.tieBreaker, type: builder.type)
     }
 
     public func toDic() -> [String: Any] {
@@ -560,27 +557,11 @@ public struct QueryStringQuery: Query {
     }
 
     internal init(withBuilder builder: QueryStringQueryBuilder) throws {
-        defaultField = builder.defaultField
-        value = builder.value!
-        defaultOperator = builder.defaultOperator
-        analyzer = builder.analyzer
-        quoteAnalyzer = builder.quoteAnalyzer
-        allowLeadingWildcard = builder.allowLeadingWildcard
-        enablePositionIncrements = builder.enablePositionIncrements
-        fuzzyMaxExpansions = builder.fuzzyMaxExpansions
-        fuzziness = builder.fuzziness
-        fuzzyPrefixLength = builder.fuzzyPrefixLength
-        fuzzyTranspositions = builder.fuzzyTranspositions
-        phraseSlop = builder.phraseSlop
-        boost = builder.boost
-        autoGeneratePhraseQueries = builder.autoGeneratePhraseQueries
-        analyzeWildcard = builder.analyzeWildcard
-        maxDeterminizedStates = builder.maxDeterminizedStates
-        minimumShouldMatch = builder.minimumShouldMatch
-        lenient = builder.lenient
-        timeZone = builder.timeZone
-        quoteFieldSuffix = builder.quoteFieldSuffix
-        autoGenerateSynonymsPhraseQuery = builder.autoGenerateSynonymsPhraseQuery
+        guard builder.value != nil else {
+            throw QueryBuilderError.missingRequiredField("value")
+        }
+
+        self.init(builder.value!, defaultField: builder.defaultField, defaultOperator: builder.defaultOperator, analyzer: builder.analyzer, quoteAnalyzer: builder.quoteAnalyzer, allowLeadingWildcard: builder.allowLeadingWildcard, enablePositionIncrements: builder.enablePositionIncrements, fuzzyMaxExpansions: builder.fuzzyMaxExpansions, fuzziness: builder.fuzziness, fuzzyPrefixLength: builder.fuzzyPrefixLength, fuzzyTranspositions: builder.fuzzyTranspositions, phraseSlop: builder.phraseSlop, boost: builder.boost, autoGeneratePhraseQueries: builder.autoGeneratePhraseQueries, analyzeWildcard: builder.analyzeWildcard, maxDeterminizedStates: builder.maxDeterminizedStates, minimumShouldMatch: builder.minimumShouldMatch, lenient: builder.lenient, timeZone: builder.timeZone, quoteFieldSuffix: builder.quoteFieldSuffix, autoGenerateSynonymsPhraseQuery: builder.autoGenerateSynonymsPhraseQuery)
     }
 
     public func toDic() -> [String: Any] {

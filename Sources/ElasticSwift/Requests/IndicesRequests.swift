@@ -216,7 +216,7 @@ public struct IndexExistsRequest: Request {
             throw RequestBuilderError.missingRequiredField("name")
         }
 
-        name = builder.index!
+        self.init(builder.index!)
     }
 
     public var method: HTTPMethod {
@@ -269,10 +269,7 @@ public struct CreateIndexRequest: Request {
             throw RequestBuilderError.missingRequiredField("name")
         }
 
-        name = builder.name!
-        aliases = builder.aliases
-        mappings = builder.mappings
-        settings = builder.settings
+        self.init(builder.name!, aliases: builder.aliases, mappings: builder.mappings, settings: builder.settings)
     }
 
     public var method: HTTPMethod {
@@ -352,7 +349,7 @@ public struct GetIndexRequest: Request {
             throw RequestBuilderError.missingRequiredField("name")
         }
 
-        name = builder.name!
+        self.init(builder.name!)
     }
 
     public var method: HTTPMethod {
@@ -397,7 +394,7 @@ public struct DeleteIndexRequest: Request {
             throw RequestBuilderError.missingRequiredField("name")
         }
 
-        name = builder.name!
+        self.init(builder.name!)
     }
 
     public var method: HTTPMethod {
@@ -434,7 +431,7 @@ public struct OpenIndexRequest: Request {
     public let indices: [String]
 
     public init(_ indices: String...) {
-        self.indices = indices
+        self.init(indices)
     }
 
     public init(_ indices: [String]) {
@@ -487,7 +484,7 @@ public struct CloseIndexRequest: Request {
     public let indices: [String]
 
     public init(_ indices: String...) {
-        self.indices = indices
+        self.init(indices)
     }
 
     public init(_ indices: [String]) {

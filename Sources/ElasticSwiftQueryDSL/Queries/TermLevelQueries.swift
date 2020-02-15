@@ -116,8 +116,7 @@ public struct TermsQuery: Query {
             throw QueryBuilderError.atlestOneElementRequired("values")
         }
 
-        field = builder.field!
-        values = builder.values
+        self.init(field: builder.field!, values: builder.values)
     }
 
     public func toDic() -> [String: Any] {
@@ -191,15 +190,7 @@ public struct RangeQuery: Query {
             throw QueryBuilderError.atleastOneFieldRequired(["gte", "gt", "lt", "lte"])
         }
 
-        field = builder.field!
-        gt = builder.gt
-        gte = builder.gte
-        lt = builder.lt
-        lte = builder.lte
-        format = builder.format
-        timeZone = builder.timeZone
-        boost = builder.boost
-        relation = builder.relation
+        self.init(field: builder.field!, gte: builder.gte, gt: builder.gt, lte: builder.lte, lt: builder.lt, format: builder.format, timeZone: builder.timeZone, boost: builder.boost, relation: builder.relation)
     }
 
     public func toDic() -> [String: Any] {
@@ -311,7 +302,7 @@ public struct ExistsQuery: Query {
             throw QueryBuilderError.missingRequiredField("field")
         }
 
-        field = builder.field!
+        self.init(field: builder.field!)
     }
 
     public func toDic() -> [String: Any] {
@@ -741,7 +732,7 @@ public struct TypeQuery: Query {
             throw QueryBuilderError.missingRequiredField("type")
         }
 
-        type = builder.type!
+        self.init(type: builder.type!)
     }
 
     public func toDic() -> [String: Any] {
@@ -783,9 +774,13 @@ public struct IdsQuery: Query {
     public let type: String?
     public let ids: [String]
 
-    public init(ids: String..., type: String? = nil) {
+    public init(ids: [String], type: String? = nil) {
         self.type = type
         self.ids = ids
+    }
+
+    public init(ids: String..., type: String? = nil) {
+        self.init(ids: ids, type: type)
     }
 
     internal init(withBuilder builder: IdsQueryBuilder) throws {
@@ -793,8 +788,7 @@ public struct IdsQuery: Query {
             throw QueryBuilderError.atlestOneElementRequired("ids")
         }
 
-        ids = builder.ids
-        type = builder.type
+        self.init(ids: builder.ids, type: builder.type)
     }
 
     public func toDic() -> [String: Any] {

@@ -96,10 +96,7 @@ public struct UpdateByQueryRequest: Request {
             throw RequestBuilderError.missingRequiredField("index")
         }
 
-        index = builder.index!
-        type = builder.type
-        query = builder.query
-        script = builder.script
+        self.init(index: builder.index!, type: builder.type, script: builder.script, query: builder.query)
     }
 
     public var queryParams: [URLQueryItem] {
