@@ -103,15 +103,15 @@ class GeoQueryBuilderTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_06_geoBoundingBoxQueryBuilder() throws {
         XCTAssertNoThrow(try QueryBuilders.geoBoundingBoxQuery().set(field: "locaion").set(topLeft: .init(lat: 40.10, lon: -74.12)).set(bottomRight: .init(lat: 40.72, lon: -71.10)).build(), "Should not throw")
     }
-    
+
     func test_07_geoBoundingBoxQueryBuilder() throws {
         XCTAssertNoThrow(try QueryBuilders.geoBoundingBoxQuery().set(field: "locaion").set(topLeft: .init(lat: 40.10, lon: -74.12)).set(bottomRight: .init(lat: 40.72, lon: -71.10)).set(type: .memory).set(validationMethod: .ignoreMalformed).build(), "Should not throw")
     }
-    
+
     func test_08_geoBoundingBoxQueryBuilder_missing_field() throws {
         XCTAssertThrowsError(try QueryBuilders.geoBoundingBoxQuery().set(topLeft: .init(lat: 40.10, lon: -74.12)).set(bottomRight: .init(lat: 40.72, lon: -71.10)).set(type: .memory).set(validationMethod: .ignoreMalformed).build(), "missing field") { error in
             logger.info("Expected Error: \(error)")
@@ -125,7 +125,7 @@ class GeoQueryBuilderTests: XCTestCase {
             }
         }
     }
-    
+
     func test_09_geoBoundingBoxQueryBuilder_missing_topLeft() throws {
         XCTAssertThrowsError(try QueryBuilders.geoBoundingBoxQuery().set(field: "location").set(bottomRight: .init(lat: 40.72, lon: -71.10)).set(type: .memory).set(validationMethod: .ignoreMalformed).build(), "missing field") { error in
             logger.info("Expected Error: \(error)")
@@ -139,7 +139,7 @@ class GeoQueryBuilderTests: XCTestCase {
             }
         }
     }
-    
+
     func test_10_geoBoundingBoxQueryBuilder_missing_bottomRight() throws {
         XCTAssertThrowsError(try QueryBuilders.geoBoundingBoxQuery().set(field: "location").set(topLeft: .init(lat: 40.10, lon: -74.12)).set(type: .memory).set(validationMethod: .ignoreMalformed).build(), "missing field") { error in
             logger.info("Expected Error: \(error)")

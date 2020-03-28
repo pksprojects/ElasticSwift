@@ -209,7 +209,7 @@ public struct IndexRequest<T: Codable>: Request, BulkableRequest where T: Equata
         if let refresh = self.refresh {
             queryItems.append(URLQueryItem(name: QueryParams.refresh, value: refresh.rawValue))
         }
-        if let parentId = self.parent {
+        if let parentId = parent {
             queryItems.append(URLQueryItem(name: QueryParams.parent, value: parentId))
         }
 

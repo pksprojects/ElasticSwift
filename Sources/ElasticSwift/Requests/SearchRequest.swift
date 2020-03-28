@@ -375,7 +375,7 @@ public struct SearchRequest: Request {
     }
 
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-        if let body = self.searchSource {
+        if let body = searchSource {
             return serializer.encode(body).mapError { error -> MakeBodyError in
                 MakeBodyError.wrapped(error)
             }
@@ -549,7 +549,7 @@ public struct SearchScrollRequest: Request {
 
     public var queryParams: [URLQueryItem] {
         var params = [URLQueryItem]()
-        if let totalHitsAsInt = self.restTotalHitsAsInt {
+        if let totalHitsAsInt = restTotalHitsAsInt {
             params.append(URLQueryItem(name: QueryParams.restTotalHitsAsInt, value: totalHitsAsInt))
         }
         return params

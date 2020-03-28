@@ -196,10 +196,10 @@ public struct MultiGetRequest: Request {
         if let source = self.source {
             params.append(URLQueryItem(name: QueryParams.source.rawValue, value: source))
         }
-        if let excludes = self.sourceExcludes {
+        if let excludes = sourceExcludes {
             params.append(URLQueryItem(name: QueryParams.sourceExcludes.rawValue, value: excludes.joined(separator: ",")))
         }
-        if let includes = self.sourceIncludes {
+        if let includes = sourceIncludes {
             params.append(URLQueryItem(name: QueryParams.sourceIncludes.rawValue, value: includes.joined(separator: ",")))
         }
         if let realTime = self.realTime {
@@ -292,7 +292,7 @@ public struct MultiGetRequest: Request {
             try container.encodeIfPresent(routing, forKey: .routing)
             try container.encodeIfPresent(parent, forKey: .parent)
             try container.encodeIfPresent(storedFields, forKey: .storedFields)
-            if let fetchSource = self.fetchSource, self.sourceIncludes == nil && self.sourceExcludes == nil {
+            if let fetchSource = self.fetchSource, self.sourceIncludes == nil && sourceExcludes == nil {
                 try container.encodeIfPresent(fetchSource, forKey: .source)
             } else if sourceIncludes != nil || sourceExcludes != nil {
                 var nested = container.nestedContainer(keyedBy: SourceCodingKeys.self, forKey: .source)

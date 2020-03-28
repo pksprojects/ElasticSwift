@@ -184,7 +184,7 @@ extension SearchHit: Codable {
         if let fields = self.fields {
             try container.encode(fields.mapValues { $0.values }, forKey: .fields)
         }
-        if let highlight = self.highlightFields {
+        if let highlight = highlightFields {
             try container.encode(highlight.mapValues { $0.fragments }, forKey: .highlightFields)
         }
     }
@@ -269,7 +269,7 @@ public struct NestedIdentity {
     }
 
     public var child: NestedIdentity? {
-        if let nested = self._nested, !nested.isEmpty {
+        if let nested = _nested, !nested.isEmpty {
             return nested[0]
         }
         return nil
@@ -281,7 +281,7 @@ extension NestedIdentity: Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(field, forKey: .field)
         try container.encode(offset, forKey: .offset)
-        if let nested = self._nested, !nested.isEmpty {
+        if let nested = _nested, !nested.isEmpty {
             try container.encode(nested[0], forKey: .nested)
         }
     }

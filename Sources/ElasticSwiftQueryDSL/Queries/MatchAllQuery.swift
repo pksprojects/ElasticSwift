@@ -69,7 +69,7 @@ public struct MatchNoneQuery: Query {
     }
 
     public func toDic() -> [String: Any] {
-        return [self.queryType.name: [:]]
+        return [queryType.name: [:]]
     }
 }
 
