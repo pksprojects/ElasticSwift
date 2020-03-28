@@ -37,6 +37,7 @@ public enum QueryTypes: String, Codable {
     case hasParent = "has_parent"
     case parentId = "parent_id"
     case geoShape = "geo_shape"
+    case geoBoundingBox = "geo_bounding_box"
 }
 
 extension QueryTypes: QueryType {
@@ -102,6 +103,8 @@ extension QueryTypes: QueryType {
             return ParentIdQuery.self
         case .geoShape:
             return GeoShapeQuery.self
+        case .geoBoundingBox:
+            return GeoBoundingBoxQuery.self
         }
     }
 }

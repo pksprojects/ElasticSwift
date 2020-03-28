@@ -1,6 +1,6 @@
 //
 //  GeoQueryBuilderTests.swift
-//  
+//
 //
 //  Created by Prafull Kumar Soni on 2/15/20.
 //
@@ -28,7 +28,7 @@ class GeoQueryBuilderTests: XCTestCase {
         super.tearDown()
         logger.info("====================TEST=END===============================")
     }
-    
+
     func test_01_geoShapeQueryBuilder() throws {
         let e = expectation(description: "execution complete")
 
@@ -37,7 +37,7 @@ class GeoQueryBuilderTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_02_geoShapeQueryBuilder() throws {
         let e = expectation(description: "execution complete")
 
@@ -46,7 +46,7 @@ class GeoQueryBuilderTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_03_geoShapeQueryBuilder_missing_indexedShapeType() throws {
         let e = expectation(description: "execution complete")
 
@@ -65,7 +65,7 @@ class GeoQueryBuilderTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_04_geoShapeQueryBuilder_missing_no_shape_no_indexedShapeId() throws {
         let e = expectation(description: "execution complete")
 
@@ -74,7 +74,7 @@ class GeoQueryBuilderTests: XCTestCase {
             if let error = error as? QueryBuilderError {
                 switch error {
                 case let .atleastOneFieldRequired(fields):
-                    XCTAssertEqual(["shape","indexedShapeId"], fields)
+                    XCTAssertEqual(["shape", "indexedShapeId"], fields)
                     e.fulfill()
                 default:
                     XCTFail("UnExpectedError: \(error)")
@@ -84,7 +84,7 @@ class GeoQueryBuilderTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_05_geoShapeQueryBuilder_missing_field() throws {
         let e = expectation(description: "execution complete")
 
@@ -104,4 +104,53 @@ class GeoQueryBuilderTests: XCTestCase {
         waitForExpectations(timeout: 10)
     }
     
+    func test_06_geoBoundingBoxQueryBuilder() throws {
+        XCTAssertNoThrow(try QueryBuilders.geoBoundingBoxQuery().set(field: "locaion").set(topLeft: .init(lat: 40.10, lon: -74.12)).set(bottomRight: .init(lat: 40.72, lon: -71.10)).build(), "Should not throw")
+    }
+    
+    func test_07_geoBoundingBoxQueryBuilder() throws {
+        XCTAssertNoThrow(try QueryBuilders.geoBoundingBoxQuery().set(field: "locaion").set(topLeft: .init(lat: 40.10, lon: -74.12)).set(bottomRight: .init(lat: 40.72, lon: -71.10)).set(type: .memory).set(validationMethod: .ignoreMalformed).build(), "Should not throw")
+    }
+    
+    func test_08_geoBoundingBoxQueryBuilder_missing_field() throws {
+        XCTAssertThrowsError(try QueryBuilders.geoBoundingBoxQuery().set(topLeft: .init(lat: 40.10, lon: -74.12)).set(bottomRight: .init(lat: 40.72, lon: -71.10)).set(type: .memory).set(validationMethod: .ignoreMalformed).build(), "missing field") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("field", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+    
+    func test_09_geoBoundingBoxQueryBuilder_missing_topLeft() throws {
+        XCTAssertThrowsError(try QueryBuilders.geoBoundingBoxQuery().set(field: "location").set(bottomRight: .init(lat: 40.72, lon: -71.10)).set(type: .memory).set(validationMethod: .ignoreMalformed).build(), "missing field") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("topLeft", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+    
+    func test_10_geoBoundingBoxQueryBuilder_missing_bottomRight() throws {
+        XCTAssertThrowsError(try QueryBuilders.geoBoundingBoxQuery().set(field: "location").set(topLeft: .init(lat: 40.10, lon: -74.12)).set(type: .memory).set(validationMethod: .ignoreMalformed).build(), "missing field") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("bottomRight", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
 }
