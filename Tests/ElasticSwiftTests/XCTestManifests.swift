@@ -95,6 +95,7 @@
             ("test_01_CreateIndex", test_01_CreateIndex),
             ("test_02_GetIndex", test_02_GetIndex),
             ("test_03_IndexExists", test_03_IndexExists),
+            ("test_04_index_open_and_close", test_04_index_open_and_close),
             ("test_999_DeleteIndex", test_999_DeleteIndex),
         ]
     }
