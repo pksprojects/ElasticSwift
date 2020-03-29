@@ -105,4 +105,73 @@ class GeoQueriesTests: XCTestCase {
 
         XCTAssertEqual(query, decoded)
     }
+
+    func test_05_geoBoundingBoxQuery_encode_2() throws {
+        let query = GeoBoundingBoxQuery(field: "pin.location", topLeft: .init(geoHash: "dr5r9ydj2y73"), bottomRight: .init(geoHash: "drj7teegpus6"))
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "geo_bounding_box" : {
+                "pin.location" : {
+                    "top_left" : "dr5r9ydj2y73",
+                    "bottom_right" : "drj7teegpus6"
+                }
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_06_geoBoundingBoxQuery_decode_2() throws {
+        let query = GeoBoundingBoxQuery(field: "pin.location", topLeft: .init(geoHash: "dr5r9ydj2y73"), bottomRight: .init(geoHash: "drj7teegpus6"))
+
+        let jsonStr = """
+        {
+            "geo_bounding_box" : {
+                "pin.location" : {
+                    "top_left" : "dr5r9ydj2y73",
+                    "bottom_right" : "drj7teegpus6"
+                }
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(GeoBoundingBoxQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
+
+    func test_07_geoBoundingBoxQuery_decode_fail() throws {
+        let jsonStr = """
+        {
+            "geo_bounding_box" : {
+                "pin.location" : {
+                    "top_left" : "dr5r9ydj2y73",
+                    "bottom_right" : "drj7teegpus6"
+                },
+                "invalid_key": "random_value"
+            }
+        }
+        """
+
+        XCTAssertThrowsError(try JSONDecoder().decode(GeoBoundingBoxQuery.self, from: jsonStr.data(using: .utf8)!), "invalid_key in json") { error in
+            if let error = error as? Swift.DecodingError {
+                switch error {
+                case let .typeMismatch(type, context):
+                    XCTAssertEqual("\(GeoBoundingBoxQuery.self)", "\(type)")
+                    XCTAssertEqual(context.debugDescription, "Unable to find field name in key(s) expect: 1 key found: 2.")
+                default:
+                    XCTAssert(false)
+                }
+            }
+        }
+    }
 }

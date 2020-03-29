@@ -195,8 +195,26 @@ public struct GeoBoundingBoxQuery: Query {
 
     public func toDic() -> [String: Any] {
         var dic: [String: Any] = [:]
+        var fieldDic: [String: Any] = [:]
+        fieldDic[CodingKeys.topLeft.rawValue] = (topLeft.geoHash != nil) ? topLeft.geoHash : [
+            GeoPoint.CodingKeys.lat: topLeft.lat,
+            GeoPoint.CodingKeys.lon: topLeft.lon,
+        ]
+        fieldDic[CodingKeys.bottomRight.rawValue] = (bottomRight.geoHash != nil) ? bottomRight.geoHash : [
+            GeoPoint.CodingKeys.lat: bottomRight.lat,
+            GeoPoint.CodingKeys.lon: bottomRight.lon,
+        ]
+        dic[field] = fieldDic
+        if let type = self.type {
+            dic[CodingKeys.type.rawValue] = type.rawValue
+        }
+
+        if let validationMethod = self.validationMethod {
+            dic[CodingKeys.validationMethod.rawValue] = validationMethod.rawValue
+        }
+
         if let ignoreUnmapped = self.ignoreUnmapped {
-            dic[ignoreUnmapped.description] = ignoreUnmapped
+            dic[CodingKeys.ignoreUnmapped.rawValue] = ignoreUnmapped
         }
         return [queryType.name: dic]
     }
