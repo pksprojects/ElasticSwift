@@ -406,20 +406,9 @@ extension KeyedDecodingContainer {
         var arrayContainer = try nestedUnkeyedContainer(forKey: key)
         var result = [Query]()
         if let count = arrayContainer.count {
-            var iterations = 0
             while !arrayContainer.isAtEnd {
-                var copy = arrayContainer
-                let elementContainer = try copy.nestedContainer(keyedBy: DynamicCodingKeys.self)
-                for qKey in elementContainer.allKeys {
-                    if let qType = QueryTypes(qKey.stringValue) {
-                        let q = try qType.metaType.init(from: arrayContainer.superDecoder())
-                        result.append(q)
-                    }
-                }
-                iterations += 1
-                if iterations > count {
-                    break
-                }
+                let query = try arrayContainer.decodeQuery()
+                result.append(query)
             }
             if result.count != count {
                 throw Swift.DecodingError.dataCorrupted(.init(codingPath: arrayContainer.codingPath, debugDescription: "Unable to decode all Queries expected: \(count) actual: \(result.count). Probable cause: Unable to determine QueryType form key(s)"))
@@ -458,20 +447,9 @@ extension KeyedDecodingContainer {
         var arrayContainer = try nestedUnkeyedContainer(forKey: key)
         var result = [ScoreFunction]()
         if let count = arrayContainer.count {
-            var iterations = 0
             while !arrayContainer.isAtEnd {
-                var copy = arrayContainer
-                let elementContainer = try copy.nestedContainer(keyedBy: DynamicCodingKeys.self)
-                for fKey in elementContainer.allKeys {
-                    if let fType = ScoreFunctionType(rawValue: fKey.stringValue) {
-                        let f = try fType.metaType.init(from: arrayContainer.superDecoder())
-                        result.append(f)
-                    }
-                }
-                iterations += 1
-                if iterations > count {
-                    break
-                }
+                let function = try arrayContainer.decodeScoreFunction()
+                result.append(function)
             }
             if result.count != count {
                 throw Swift.DecodingError.dataCorrupted(.init(codingPath: arrayContainer.codingPath, debugDescription: "Unable to decode all ScoreFunctions expected: \(count) actual: \(result.count). Probable cause: Unable to determine ScoreFunctionType form key(s)"))
@@ -486,5 +464,29 @@ extension KeyedDecodingContainer {
         }
 
         return try decodeScoreFunctions(forKey: key)
+    }
+}
+
+extension UnkeyedDecodingContainer {
+    mutating func decodeQuery() throws -> Query {
+        var copy = self
+        let elementContainer = try copy.nestedContainer(keyedBy: DynamicCodingKeys.self)
+        for qKey in elementContainer.allKeys {
+            if let qType = QueryTypes(qKey.stringValue) {
+                return try qType.metaType.init(from: superDecoder())
+            }
+        }
+        throw Swift.DecodingError.typeMismatch(QueryTypes.self, .init(codingPath: codingPath, debugDescription: "Unable to identify query type from key(s) \(elementContainer.allKeys)"))
+    }
+
+    mutating func decodeScoreFunction() throws -> ScoreFunction {
+        var copy = self
+        let elementContainer = try copy.nestedContainer(keyedBy: DynamicCodingKeys.self)
+        for fKey in elementContainer.allKeys {
+            if let fType = ScoreFunctionType(rawValue: fKey.stringValue) {
+                return try fType.metaType.init(from: superDecoder())
+            }
+        }
+        throw Swift.DecodingError.typeMismatch(ScoreFunctionType.self, .init(codingPath: codingPath, debugDescription: "Unable to identify score function type from key(s) \(elementContainer.allKeys)"))
     }
 }
