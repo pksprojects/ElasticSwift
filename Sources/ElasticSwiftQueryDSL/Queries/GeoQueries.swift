@@ -233,7 +233,7 @@ extension GeoBoundingBoxQuery {
         }
 
         guard fieldKey.count == 1 else {
-            throw Swift.DecodingError.typeMismatch(GeoBoundingBoxQuery.self, .init(codingPath: nested.codingPath, debugDescription: "Unable to find field name in key(s) expect: 1 key found: \(nested.allKeys.count)."))
+            throw Swift.DecodingError.typeMismatch(GeoBoundingBoxQuery.self, .init(codingPath: nested.codingPath, debugDescription: "Unable to find field name in key(s) expect: 1 key found: \(fieldKey.count)."))
         }
 
         field = fieldKey.first!.stringValue
