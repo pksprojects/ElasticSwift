@@ -174,4 +174,71 @@ class GeoQueriesTests: XCTestCase {
             }
         }
     }
+
+    func test_08_geoDistanceQuery_encode() throws {
+        let query = GeoDistanceQuery(field: "pin.location", point: .init(geoHash: "drm3btev3e86"), distance: "12km")
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "geo_distance" : {
+                "distance" : "12km",
+                "pin.location" : "drm3btev3e86"
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_09_geoDistanceQuery_decode() throws {
+        let query = GeoDistanceQuery(field: "pin.location", point: .init(lat: 40, lon: -70), distance: "200km", distanceType: .plane)
+
+        let jsonStr = """
+        {
+            "geo_distance" : {
+                "distance" : "200km",
+                "pin.location" : {
+                    "lat" : 40,
+                    "lon" : -70
+                },
+                "distance_type": "plane"
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(GeoDistanceQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
+
+    func test_10_geoDistanceQuery_decode_fail() throws {
+        let jsonStr = """
+        {
+            "geo_distance" : {
+                "distance" : "200km",
+                "pin.location" : "drm3btev3e86",
+                "invalid_key": "random_value"
+            }
+        }
+        """
+
+        XCTAssertThrowsError(try JSONDecoder().decode(GeoDistanceQuery.self, from: jsonStr.data(using: .utf8)!), "invalid_key in json") { error in
+            if let error = error as? Swift.DecodingError {
+                switch error {
+                case let .typeMismatch(type, context):
+                    XCTAssertEqual("\(GeoDistanceQuery.self)", "\(type)")
+                    XCTAssertEqual(context.debugDescription, "Unable to find field name in key(s) expect: 1 key found: 2.")
+                default:
+                    XCTAssert(false)
+                }
+            }
+        }
+    }
 }

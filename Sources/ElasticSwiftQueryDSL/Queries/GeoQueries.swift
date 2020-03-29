@@ -279,21 +279,114 @@ extension GeoBoundingBoxQuery: Equatable {
 
 // MARK: - Geo Distance Query
 
-// internal struct GeoDistanceQuery: Query {
-//    // TODO: remove at time of implementation and conform to Equatable
-//    func isEqualTo(_ other: Query) -> Bool {
-//        return type == other.type
-//    }
-//
-//    public let type: String = ""
-//
-//    public init(withBuilder _: GeoDistanceQueryBuilder) {}
-//
-//    public func toDic() -> [String: Any] {
-//        let dic: [String: Any] = [:]
-//        return dic
-//    }
-// }
+public struct GeoDistanceQuery: Query {
+    public let queryType: QueryType = QueryTypes.geoDistance
+
+    public let field: String
+    public let point: GeoPoint
+    public let distance: String?
+    public let distanceType: GeoDistanceType?
+    public let validationMethod: GeoValidationMethod?
+    public let ignoreUnmapped: Bool?
+
+    public init(field: String, point: GeoPoint, distance: String? = nil, distanceType: GeoDistanceType? = nil, validationMethod: GeoValidationMethod? = nil, ignoreUnmapped: Bool? = nil) {
+        self.field = field
+        self.point = point
+        self.distance = distance
+        self.distanceType = distanceType
+        self.validationMethod = validationMethod
+        self.ignoreUnmapped = ignoreUnmapped
+    }
+
+    internal init(withBuilder builder: GeoDistanceQueryBuilder) throws {
+        guard builder.field != nil else {
+            throw QueryBuilderError.missingRequiredField("field")
+        }
+
+        guard builder.point != nil else {
+            throw QueryBuilderError.missingRequiredField("point")
+        }
+
+        self.init(field: builder.field!, point: builder.point!, distance: builder.distance, distanceType: builder.distanceType, validationMethod: builder.validationMethod, ignoreUnmapped: builder.ignoreUnmapped)
+    }
+
+    public func toDic() -> [String: Any] {
+        var dic: [String: Any] = [field: (point.geoHash != nil) ? point.geoHash! : [
+            GeoPoint.CodingKeys.lat.rawValue: point.lat,
+            GeoPoint.CodingKeys.lon.rawValue: point.lon,
+        ]]
+
+        if let distance = self.distance {
+            dic[CodingKeys.distance.rawValue] = distance
+        }
+
+        if let distanceType = self.distanceType {
+            dic[CodingKeys.distanceType.rawValue] = distanceType.rawValue
+        }
+
+        if let validationMethod = self.validationMethod {
+            dic[CodingKeys.validationMethod.rawValue] = validationMethod.rawValue
+        }
+
+        if let ignoreUnmapped = self.ignoreUnmapped {
+            dic[CodingKeys.ignoreUnmapped.rawValue] = ignoreUnmapped
+        }
+        return [queryType.name: dic]
+    }
+}
+
+extension GeoDistanceQuery: Codable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
+        let nested = try container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
+
+        let fieldKey = nested.allKeys.filter { k in
+            if CodingKeys(rawValue: k.stringValue) != nil {
+                return false
+            }
+            return true
+        }
+
+        guard fieldKey.count == 1 else {
+            throw Swift.DecodingError.typeMismatch(GeoDistanceQuery.self, .init(codingPath: nested.codingPath, debugDescription: "Unable to find field name in key(s) expect: 1 key found: \(fieldKey.count)."))
+        }
+        field = fieldKey.first!.stringValue
+        point = try nested.decode(GeoPoint.self, forKey: fieldKey.first!)
+        distance = try nested.decodeStringIfPresent(forKey: .key(named: CodingKeys.distance.rawValue))
+        distanceType = try nested.decodeIfPresent(GeoDistanceType.self, forKey: .key(named: CodingKeys.distanceType.rawValue))
+        validationMethod = try nested.decodeIfPresent(GeoValidationMethod.self, forKey: .key(named: CodingKeys.validationMethod.rawValue))
+        ignoreUnmapped = try nested.decodeBoolIfPresent(forKey: .key(named: CodingKeys.ignoreUnmapped.rawValue))
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: DynamicCodingKeys.self)
+        var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
+        try nested.encode(point, forKey: .key(named: field))
+        try nested.encodeIfPresent(distance, forKey: .key(named: CodingKeys.distance.rawValue))
+        try nested.encodeIfPresent(distanceType, forKey: .key(named: CodingKeys.distanceType.rawValue))
+        try nested.encodeIfPresent(validationMethod, forKey: .key(named: CodingKeys.validationMethod.rawValue))
+        try nested.encodeIfPresent(ignoreUnmapped, forKey: .key(named: CodingKeys.ignoreUnmapped.rawValue))
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case distance
+        case distanceType = "distance_type"
+        case validationMethod = "validation_method"
+        case ignoreUnmapped = "ignore_unmapped"
+    }
+}
+
+extension GeoDistanceQuery: Equatable {
+    public static func == (lhs: GeoDistanceQuery, rhs: GeoDistanceQuery) -> Bool {
+        return lhs.queryType.isEqualTo(rhs.queryType)
+            && lhs.field == rhs.field
+            && lhs.point == rhs.point
+            && lhs.distance == rhs.distance
+            && lhs.distanceType == rhs.distanceType
+            && lhs.validationMethod == rhs.validationMethod
+            && lhs.ignoreUnmapped == rhs.ignoreUnmapped
+    }
+}
 
 // MARK: - Geo Polygon Query
 
@@ -376,4 +469,9 @@ public enum GeoValidationMethod: String, Codable {
 public enum GeoExecType: String, Codable {
     case memory
     case indexed
+}
+
+public enum GeoDistanceType: String, Codable {
+    case arc
+    case plane
 }

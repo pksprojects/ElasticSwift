@@ -180,6 +180,70 @@ class GeoQueryBuilderTests: XCTestCase {
         ]]
         XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic))
     }
+
+    func test_12_geoDistanceQueryBuilder() throws {
+        let query = try QueryBuilders.geoDistanceQuery()
+            .set(field: "location")
+            .set(point: GeoPoint(lat: 40, lon: -70))
+            .set(distance: "12km")
+            .set(distanceType: .arc)
+            .set(validationMethod: .strict)
+            .set(ignoreUnmapped: true)
+            .build()
+        XCTAssertEqual(query.field, "location")
+        XCTAssertEqual(query.point, GeoPoint(lat: 40, lon: -70))
+        XCTAssertEqual(query.distance, "12km")
+        XCTAssertEqual(query.distanceType, GeoDistanceType.arc)
+        XCTAssertEqual(query.validationMethod, GeoValidationMethod.strict)
+        XCTAssertEqual(query.ignoreUnmapped, true)
+        let expectedDic = ["geo_distance": [
+            "location": [
+                "lat": Decimal(string: "40"),
+                "lon": Decimal(string: "-70"),
+            ],
+            "distance": "12km",
+            "distance_type": "arc",
+            "validation_method": "strict",
+            "ignore_unmapped": true,
+        ]]
+        XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic))
+    }
+
+    func test_13_geoDistanceQueryBuilder() throws {
+        XCTAssertNoThrow(try QueryBuilders.geoDistanceQuery().set(field: "locaion").set(point: .init(lat: 40.10, lon: -74.12)).build(), "Should not throw")
+    }
+
+    func test_14_geoDistanceQueryBuilder() throws {
+        XCTAssertNoThrow(try QueryBuilders.geoDistanceQuery().set(field: "locaion").set(point: .init(lat: 40.10, lon: -74.12)).set(distanceType: .plane).set(validationMethod: .ignoreMalformed).build(), "Should not throw")
+    }
+
+    func test_15_geoDistanceQueryBuilder_missing_field() throws {
+        XCTAssertThrowsError(try QueryBuilders.geoDistanceQuery().set(point: .init(lat: 40.10, lon: -74.12)).set(distanceType: .plane).set(validationMethod: .ignoreMalformed).build(), "missing field") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("field", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_16_geoDistanceQueryBuilder_missing_point() throws {
+        XCTAssertThrowsError(try QueryBuilders.geoDistanceQuery().set(field: "locaion").set(distanceType: .plane).set(validationMethod: .ignoreMalformed).build(), "missing point") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("point", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
 }
 
 func isEqualDictionaries(lhs: [String: Any], rhs: [String: Any]) -> Bool {

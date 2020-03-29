@@ -189,11 +189,80 @@ public class GeoBoundingBoxQueryBuilder: QueryBuilder {
 
 // MARK: - Geo Distance Query Builder
 
-// internal class GeoDistanceQueryBuilder: QueryBuilder {
-//    public func build() throws -> GeoDistanceQuery {
-//        return GeoDistanceQuery(withBuilder: self)
-//    }
-// }
+public class GeoDistanceQueryBuilder: QueryBuilder {
+    private var _field: String?
+    private var _point: GeoPoint?
+    private var _distance: String?
+    private var _distanceType: GeoDistanceType?
+    private var _validationMethod: GeoValidationMethod?
+    private var _ignoreUnmapped: Bool?
+
+    public init() {}
+
+    @discardableResult
+    public func set(field: String) -> Self {
+        _field = field
+        return self
+    }
+
+    @discardableResult
+    public func set(point: GeoPoint) -> Self {
+        _point = point
+        return self
+    }
+
+    @discardableResult
+    public func set(distance: String) -> Self {
+        _distance = distance
+        return self
+    }
+
+    @discardableResult
+    public func set(distanceType: GeoDistanceType) -> Self {
+        _distanceType = distanceType
+        return self
+    }
+
+    @discardableResult
+    public func set(validationMethod: GeoValidationMethod) -> Self {
+        _validationMethod = validationMethod
+        return self
+    }
+
+    @discardableResult
+    public func set(ignoreUnmapped: Bool) -> Self {
+        _ignoreUnmapped = ignoreUnmapped
+        return self
+    }
+
+    public var field: String? {
+        return _field
+    }
+
+    public var point: GeoPoint? {
+        return _point
+    }
+
+    public var distance: String? {
+        return _distance
+    }
+
+    public var distanceType: GeoDistanceType? {
+        return _distanceType
+    }
+
+    public var validationMethod: GeoValidationMethod? {
+        return _validationMethod
+    }
+
+    public var ignoreUnmapped: Bool? {
+        return _ignoreUnmapped
+    }
+
+    public func build() throws -> GeoDistanceQuery {
+        return try GeoDistanceQuery(withBuilder: self)
+    }
+}
 
 // MARK: - Geo Polygon Query Builder
 
