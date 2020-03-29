@@ -157,10 +157,10 @@ public struct MatchPhraseQuery: Query {
     public func toDic() -> [String: Any] {
         var dic: [String: Any] = [:]
         if let analyzer = analyzer {
-            dic[queryType.name] = [self.field: [CodingKeys.query.rawValue: self.value,
-                                                CodingKeys.analyzer.rawValue: analyzer]]
+            dic[queryType.name] = [field: [CodingKeys.query.rawValue: value,
+                                           CodingKeys.analyzer.rawValue: analyzer]]
         } else {
-            dic[queryType.name] = [self.field: self.value]
+            dic[queryType.name] = [field: value]
         }
         return dic
     }
@@ -176,7 +176,7 @@ extension MatchPhraseQuery {
         }
 
         field = nested.allKeys.first!.stringValue
-        if let fieldContainer = try? nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.field)) {
+        if let fieldContainer = try? nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field)) {
             value = try fieldContainer.decodeString(forKey: .query)
             analyzer = try fieldContainer.decodeStringIfPresent(forKey: .analyzer)
         } else {
@@ -244,10 +244,10 @@ public struct MatchPhrasePrefixQuery: Query {
     public func toDic() -> [String: Any] {
         var dic: [String: Any] = [:]
         if let maxExpansions = maxExpansions {
-            dic[queryType.name] = [self.field: [CodingKeys.query.rawValue: self.value,
-                                                CodingKeys.maxExpansions.rawValue: maxExpansions]]
+            dic[queryType.name] = [field: [CodingKeys.query.rawValue: value,
+                                           CodingKeys.maxExpansions.rawValue: maxExpansions]]
         } else {
-            dic[queryType.name] = [self.field: self.value]
+            dic[queryType.name] = [field: value]
         }
         return dic
     }
@@ -263,7 +263,7 @@ extension MatchPhrasePrefixQuery {
         }
 
         field = nested.allKeys.first!.stringValue
-        if let fieldContainer = try? nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.field)) {
+        if let fieldContainer = try? nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field)) {
             value = try fieldContainer.decodeString(forKey: .query)
             maxExpansions = try fieldContainer.decodeIntIfPresent(forKey: .maxExpansions)
         } else {
@@ -432,7 +432,7 @@ public struct CommonTermsQuery: Query {
         if let minimumShouldMatch = self.minimumShouldMatch {
             dic[CodingKeys.minimumShouldMatch.rawValue] = minimumShouldMatch
         }
-        if let minHighFreq = self.minimumShouldMatchHighFreq, let minLowFreq = self.minimumShouldMatchLowFreq {
+        if let minHighFreq = minimumShouldMatchHighFreq, let minLowFreq = minimumShouldMatchLowFreq {
             dic[CodingKeys.minimumShouldMatch.rawValue] = [
                 CodingKeys.lowFreq.rawValue: minHighFreq,
                 CodingKeys.highFreq.rawValue: minLowFreq,
@@ -474,7 +474,7 @@ extension CommonTermsQuery {
         try bodyContainer.encodeIfPresent(lowFrequencyOperator, forKey: .lowFreqOperator)
         try bodyContainer.encodeIfPresent(highFrequencyOperator, forKey: .highFreqOperator)
         try bodyContainer.encodeIfPresent(minimumShouldMatch, forKey: .minimumShouldMatch)
-        if let minHighFreq = self.minimumShouldMatchHighFreq, let minLowFreq = self.minimumShouldMatchLowFreq {
+        if let minHighFreq = minimumShouldMatchHighFreq, let minLowFreq = minimumShouldMatchLowFreq {
             var minShouldMatchContainer = bodyContainer.nestedContainer(keyedBy: CodingKeys.self, forKey: .minimumShouldMatch)
             try minShouldMatchContainer.encode(minLowFreq, forKey: .lowFreq)
             try minShouldMatchContainer.encode(minHighFreq, forKey: .highFreq)
@@ -579,16 +579,16 @@ public struct QueryStringQuery: Query {
         if let quoteAnalyzer = self.quoteAnalyzer {
             dic[CodingKeys.quoteAnalyzer.rawValue] = quoteAnalyzer
         }
-        if let allowLeadingWildCard = self.allowLeadingWildcard {
+        if let allowLeadingWildCard = allowLeadingWildcard {
             dic[CodingKeys.allowLeadingWildcard.rawValue] = allowLeadingWildCard
         }
         if let enablePositionIncrements = self.enablePositionIncrements {
             dic[CodingKeys.enablePositionIncrements.rawValue] = enablePositionIncrements
         }
-        if let fuzzyMaxExpantions = self.fuzzyMaxExpansions {
+        if let fuzzyMaxExpantions = fuzzyMaxExpansions {
             dic[CodingKeys.fuzzyMaxExpansions.rawValue] = fuzzyMaxExpantions
         }
-        if let fuzzines = self.fuzziness {
+        if let fuzzines = fuzziness {
             dic[CodingKeys.fuzziness.rawValue] = fuzzines
         }
         if let fuzzyPrefixLength = self.fuzzyPrefixLength {
@@ -603,13 +603,13 @@ public struct QueryStringQuery: Query {
         if let boost = self.boost {
             dic[CodingKeys.boost.rawValue] = boost
         }
-        if let autoGeneratePhraseQuries = self.autoGeneratePhraseQueries {
+        if let autoGeneratePhraseQuries = autoGeneratePhraseQueries {
             dic[CodingKeys.autoGeneratePhraseQueries.rawValue] = autoGeneratePhraseQuries
         }
-        if let analyzeWildCard = self.analyzeWildcard {
+        if let analyzeWildCard = analyzeWildcard {
             dic[CodingKeys.analyzeWildcard.rawValue] = analyzeWildCard
         }
-        if let maxDeterminedStates = self.maxDeterminizedStates {
+        if let maxDeterminedStates = maxDeterminizedStates {
             dic[CodingKeys.maxDeterminizedStates.rawValue] = maxDeterminedStates
         }
         if let minimumShouldMatch = self.minimumShouldMatch {
@@ -788,7 +788,7 @@ public struct SimpleQueryStringQuery: Query {
         if let analyzer = self.analyzer {
             dic[CodingKeys.analyzer.rawValue] = analyzer
         }
-        if let fuzzyMaxExpantions = self.fuzzyMaxExpansions {
+        if let fuzzyMaxExpantions = fuzzyMaxExpansions {
             dic[CodingKeys.fuzzyMaxExpansions.rawValue] = fuzzyMaxExpantions
         }
         if let fuzzyPrefixLength = self.fuzzyPrefixLength {

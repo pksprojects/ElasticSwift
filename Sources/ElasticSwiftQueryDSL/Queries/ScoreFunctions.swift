@@ -29,7 +29,7 @@ public struct WeightScoreFunction: ScoreFunction {
     }
 
     public func toDic() -> [String: Any] {
-        return [self.scoreFunctionType.rawValue: self.weight]
+        return [scoreFunctionType.rawValue: weight]
     }
 }
 
@@ -78,8 +78,8 @@ public struct RandomScoreFunction: ScoreFunction {
     }
 
     public func toDic() -> [String: Any] {
-        return [self.scoreFunctionType.rawValue: [CodingKeys.seed.rawValue: self.seed,
-                                                  CodingKeys.field.rawValue: self.field]]
+        return [scoreFunctionType.rawValue: [CodingKeys.seed.rawValue: seed,
+                                             CodingKeys.field.rawValue: field]]
     }
 }
 
@@ -136,7 +136,7 @@ public struct ScriptScoreFunction: ScoreFunction {
     }
 
     public func toDic() -> [String: Any] {
-        return [self.scoreFunctionType.rawValue: [CodingKeys.script.rawValue: self.script.toDic()]]
+        return [scoreFunctionType.rawValue: [CodingKeys.script.rawValue: script.toDic()]]
     }
 }
 
@@ -266,19 +266,19 @@ public class DecayScoreFunction: ScoreFunction {
 
     public func toDic() -> [String: Any] {
         var dic: [String: Any] = [
-            self.field: [
-                CodingKeys.origin.rawValue: self.origin,
-                CodingKeys.scale.rawValue: self.scale,
+            field: [
+                CodingKeys.origin.rawValue: origin,
+                CodingKeys.scale.rawValue: scale,
             ],
         ]
         if let offset = self.offset {
-            if var subDic = dic[self.field] as? [String: Any] {
+            if var subDic = dic[field] as? [String: Any] {
                 subDic[CodingKeys.offset.rawValue] = offset
             }
         }
 
         if let decay = self.decay {
-            if var subDic = dic[self.field] as? [String: Any] {
+            if var subDic = dic[field] as? [String: Any] {
                 subDic[CodingKeys.decay.rawValue] = decay
             }
         }
@@ -287,7 +287,7 @@ public class DecayScoreFunction: ScoreFunction {
             dic[CodingKeys.multiValueMode.rawValue] = multiValueMode
         }
 
-        return [self.scoreFunctionType.rawValue: dic]
+        return [scoreFunctionType.rawValue: dic]
     }
 
     public required init(from decoder: Decoder) throws {
@@ -412,8 +412,8 @@ public struct FieldValueFactorScoreFunction: ScoreFunction {
 
     public func toDic() -> [String: Any] {
         var dic: [String: Any] = [
-            CodingKeys.field.rawValue: self.field,
-            CodingKeys.factor.rawValue: self.factor,
+            CodingKeys.field.rawValue: field,
+            CodingKeys.factor.rawValue: factor,
         ]
         if let modifier = self.modifier {
             dic[CodingKeys.modifier.rawValue] = modifier.rawValue
@@ -421,7 +421,7 @@ public struct FieldValueFactorScoreFunction: ScoreFunction {
         if let missing = self.missing {
             dic[CodingKeys.missing.rawValue] = missing
         }
-        return [self.scoreFunctionType.rawValue: dic]
+        return [scoreFunctionType.rawValue: dic]
     }
 
     public enum Modifier: String, Codable {

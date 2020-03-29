@@ -101,7 +101,7 @@ public struct DeleteByQueryRequest: Request {
         if let refresh = self.refresh {
             params.append(URLQueryItem(name: QueryParams.refresh.rawValue, value: refresh.rawValue))
         }
-        if let startegy = self.conflicts {
+        if let startegy = conflicts {
             params.append(URLQueryItem(name: QueryParams.conflicts.rawValue, value: startegy.rawValue))
         }
         if let routing = self.routing {

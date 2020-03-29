@@ -38,12 +38,12 @@ public struct TermQuery: Query {
     public func toDic() -> [String: Any] {
         var dic: [String: Any] = [:]
         if let boost = boost {
-            dic = [self.field: [CodingKeys.value.rawValue: self.value,
-                                CodingKeys.boost.rawValue: boost]]
+            dic = [field: [CodingKeys.value.rawValue: value,
+                           CodingKeys.boost.rawValue: boost]]
         } else {
-            dic = [self.field: self.value]
+            dic = [field: value]
         }
-        return [self.queryType.name: dic]
+        return [queryType.name: dic]
     }
 }
 
@@ -56,7 +56,7 @@ extension TermQuery {
         }
 
         field = nested.allKeys.first!.stringValue
-        if let fieldContainer = try? nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.field)) {
+        if let fieldContainer = try? nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field)) {
             value = try fieldContainer.decodeString(forKey: .value)
             boost = try fieldContainer.decodeDecimalIfPresent(forKey: .boost)
         } else {
@@ -120,8 +120,8 @@ public struct TermsQuery: Query {
     }
 
     public func toDic() -> [String: Any] {
-        let dic: [String: Any] = [self.field: self.values]
-        return [self.queryType.name: dic]
+        let dic: [String: Any] = [field: values]
+        return [queryType.name: dic]
     }
 }
 
@@ -219,7 +219,7 @@ public struct RangeQuery: Query {
         if let relation = self.relation {
             dic[CodingKeys.relation.rawValue] = relation
         }
-        return [self.queryType.name: [self.field: dic]]
+        return [queryType.name: [field: dic]]
     }
 }
 
@@ -306,8 +306,8 @@ public struct ExistsQuery: Query {
     }
 
     public func toDic() -> [String: Any] {
-        let dic: [String: Any] = [CodingKeys.field.rawValue: self.field]
-        return [self.queryType.name: dic]
+        let dic: [String: Any] = [CodingKeys.field.rawValue: field]
+        return [queryType.name: dic]
     }
 }
 
@@ -367,11 +367,11 @@ public struct PrefixQuery: Query {
     public func toDic() -> [String: Any] {
         var dic: [String: Any] = [:]
         if let boost = self.boost {
-            dic = [self.field: [CodingKeys.value.rawValue: self.value, CodingKeys.boost.rawValue: boost]]
+            dic = [field: [CodingKeys.value.rawValue: value, CodingKeys.boost.rawValue: boost]]
         } else {
-            dic = [self.field: self.value]
+            dic = [field: value]
         }
-        return [self.queryType.name: dic]
+        return [queryType.name: dic]
     }
 }
 
@@ -384,7 +384,7 @@ extension PrefixQuery {
         }
 
         field = nested.allKeys.first!.stringValue
-        if let fieldContainer = try? nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.field)) {
+        if let fieldContainer = try? nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field)) {
             value = try fieldContainer.decodeString(forKey: .value)
             boost = try fieldContainer.decodeDecimalIfPresent(forKey: .boost)
         } else {
@@ -453,12 +453,12 @@ public struct WildCardQuery: Query {
     public func toDic() -> [String: Any] {
         var dic: [String: Any] = [:]
         if let boost = self.boost {
-            dic = [self.field: [CodingKeys.value.rawValue: self.value,
-                                CodingKeys.boost.rawValue: boost]]
+            dic = [field: [CodingKeys.value.rawValue: value,
+                           CodingKeys.boost.rawValue: boost]]
         } else {
-            dic = [self.field: self.value]
+            dic = [field: value]
         }
-        return [self.queryType.name: dic]
+        return [queryType.name: dic]
     }
 }
 
@@ -471,7 +471,7 @@ extension WildCardQuery {
         }
 
         field = nested.allKeys.first!.stringValue
-        if let fieldContainer = try? nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: self.field)) {
+        if let fieldContainer = try? nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field)) {
             value = try fieldContainer.decodeString(forKey: .value)
             boost = try fieldContainer.decodeDecimalIfPresent(forKey: .boost)
         } else {
@@ -553,7 +553,7 @@ public struct RegexpQuery: Query {
             dic[CodingKeys.maxDeterminizedStates.rawValue] = maxDeterminizedStates
         }
         dic[CodingKeys.value.rawValue] = value
-        return [self.queryType.name: [self.field: dic]]
+        return [queryType.name: [field: dic]]
     }
 }
 
@@ -658,7 +658,7 @@ public struct FuzzyQuery: Query {
         }
 
         dic[CodingKeys.value.rawValue] = value
-        return [self.queryType.name: [self.field: dic]]
+        return [queryType.name: [field: dic]]
     }
 }
 
@@ -736,7 +736,7 @@ public struct TypeQuery: Query {
     }
 
     public func toDic() -> [String: Any] {
-        return [self.queryType.name: [CodingKeys.value.rawValue: self.type]]
+        return [queryType.name: [CodingKeys.value.rawValue: type]]
     }
 }
 
@@ -792,11 +792,11 @@ public struct IdsQuery: Query {
     }
 
     public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [CodingKeys.values.rawValue: self.ids]
+        var dic: [String: Any] = [CodingKeys.values.rawValue: ids]
         if let type = self.type {
             dic[CodingKeys.type.rawValue] = type
         }
-        return [self.queryType.name: dic]
+        return [queryType.name: dic]
     }
 }
 

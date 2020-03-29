@@ -36,6 +36,10 @@ public enum QueryTypes: String, Codable {
     case hasChild = "has_child"
     case hasParent = "has_parent"
     case parentId = "parent_id"
+    case geoShape = "geo_shape"
+    case geoBoundingBox = "geo_bounding_box"
+    case geoDistance = "geo_distance"
+    case geoPolygon = "geo_polygon"
 }
 
 extension QueryTypes: QueryType {
@@ -99,6 +103,14 @@ extension QueryTypes: QueryType {
             return HasParentQuery.self
         case .parentId:
             return ParentIdQuery.self
+        case .geoShape:
+            return GeoShapeQuery.self
+        case .geoBoundingBox:
+            return GeoBoundingBoxQuery.self
+        case .geoDistance:
+            return GeoDistanceQuery.self
+        case .geoPolygon:
+            return GeoPolygonQuery.self
         }
     }
 }
@@ -198,10 +210,10 @@ public struct Script: Codable, Equatable {
 }
 
 public enum ShapeRelation: String, Codable {
-    case INTERSECTS = "intersects"
-    case DISJOINT = "disjoint"
-    case WITHIN = "within"
-    case CONTAINS = "contains"
+    case intersects
+    case disjoint
+    case within
+    case contains
 }
 
 public enum RegexFlag: String, Codable {

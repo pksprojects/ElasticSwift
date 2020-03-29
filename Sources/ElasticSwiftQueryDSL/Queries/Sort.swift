@@ -90,10 +90,10 @@ public struct Sort {
     }
 
     public func toDic() -> [String: Any] {
-        return (!fieldTypeisArray) ? [self.field: self.sortOrder.rawValue] :
-            [self.field: [
-                Sort.ORDER: self.sortOrder.rawValue,
-                Sort.MODE: self.mode?.rawValue,
+        return (!fieldTypeisArray) ? [field: sortOrder.rawValue] :
+            [field: [
+                Sort.ORDER: sortOrder.rawValue,
+                Sort.MODE: mode?.rawValue,
             ]]
     }
 }

@@ -31,7 +31,7 @@ public struct ConstantScoreQuery: Query {
     }
 
     public func toDic() -> [String: Any] {
-        return [self.queryType.name: [CodingKeys.filter.rawValue: self.query.toDic(), CodingKeys.boost.rawValue: self.boost]]
+        return [queryType.name: [CodingKeys.filter.rawValue: query.toDic(), CodingKeys.boost.rawValue: boost]]
     }
 }
 
@@ -113,7 +113,7 @@ public struct BoolQuery: Query {
         if let minimumShouldMatch = self.minimumShouldMatch {
             dic[CodingKeys.minShouldMatch.rawValue] = minimumShouldMatch
         }
-        return [self.queryType.name: dic]
+        return [queryType.name: dic]
     }
 }
 
@@ -206,7 +206,7 @@ public struct DisMaxQuery: Query {
             dic[CodingKeys.boost.rawValue] = boost
         }
         dic[CodingKeys.queries.rawValue] = queries.map { $0.toDic() }
-        return [self.queryType.name: dic]
+        return [queryType.name: dic]
     }
 }
 
@@ -311,7 +311,7 @@ public struct FunctionScoreQuery: Query {
                 dic[CodingKeys.functions.rawValue] = functions.map { $0.toDic() }
             }
         }
-        return [self.queryType.name: dic]
+        return [queryType.name: dic]
     }
 }
 
@@ -403,7 +403,7 @@ public struct BoostingQuery: Query {
         if let negativeBoost = self.negativeBoost {
             dic[CodingKeys.negativeBoost.rawValue] = negativeBoost
         }
-        return [self.queryType.name: dic]
+        return [queryType.name: dic]
     }
 }
 
