@@ -28,7 +28,7 @@ class CompoundQueriesTest: XCTestCase {
         logger.info("====================TEST=END===============================")
     }
 
-    func testConstantScoreQuery_encode() throws {
+    func test_01_constantScoreQuery_encode() throws {
         let query = ConstantScoreQuery(MatchAllQuery(), boost: 1.1)
 
         let data = try! JSONEncoder().encode(query)
@@ -43,7 +43,7 @@ class CompoundQueriesTest: XCTestCase {
         XCTAssertEqual(expectedDic, dic)
     }
 
-    func testConstantScoreQuery_decode() throws {
+    func test_02_constantScoreQuery_decode() throws {
         let query = ConstantScoreQuery(MatchAllQuery(1.1), boost: 1.1)
 
         let jsonStr = "{\"constant_score\":{\"filter\":{\"match_all\":{\"boost\":1.1}},\"boost\":1.1}}"
@@ -53,7 +53,7 @@ class CompoundQueriesTest: XCTestCase {
         XCTAssertEqual(query, decoded)
     }
 
-    func testBoolQuery_encode() throws {
+    func test_03_boolQuery_encode() throws {
         let query = try BoolQueryBuilder()
             .filter(query: MatchAllQuery())
             .filter(query: MatchNoneQuery())
@@ -73,7 +73,7 @@ class CompoundQueriesTest: XCTestCase {
         XCTAssertEqual(expectedDic, dic)
     }
 
-    func testBoolQuery_decode() throws {
+    func test_04_boolQuery_decode() throws {
         let query = try BoolQueryBuilder()
             .filter(query: MatchAllQuery())
             .filter(query: MatchNoneQuery())
@@ -88,7 +88,7 @@ class CompoundQueriesTest: XCTestCase {
         XCTAssertEqual(query, decoded)
     }
 
-    func testFunctionScoreQuery_encode() throws {
+    func test_05_functionScoreQuery_encode() throws {
         let scoreFunction = try LinearDecayFunctionBuilder()
             .set(field: "date")
             .set(origin: "2013-09-17")
@@ -112,5 +112,54 @@ class CompoundQueriesTest: XCTestCase {
 
         let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: "{\"function_score\":{\"query\":{\"match_all\":{}},\"functions\":[{\"linear\":{\"date\":{\"decay\":0.5,\"offset\":\"5d\",\"origin\":\"2013-09-17\",\"scale\":\"10d\"}}}]}}".data(using: .utf8)!)
         XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_06_functionScoreQuery_decode() throws {
+        let gaussFunction = try GaussDecayFunctionBuilder()
+            .set(field: "price")
+            .set(origin: "0")
+            .set(scale: "20")
+            .build()
+        let gaussFunction2 = try GaussDecayFunctionBuilder()
+            .set(field: "location")
+            .set(origin: "11, 12")
+            .set(scale: "2km")
+            .build()
+        let query = FunctionScoreQuery(query: MatchQuery(field: "properties", value: "balcony"), scoreMode: .MULTIPLY, functions: gaussFunction, gaussFunction2)
+
+        let jsonStr = """
+        {
+            "function_score": {
+              "functions": [
+                {
+                  "gauss": {
+                    "price": {
+                      "origin": "0",
+                      "scale": "20"
+                    }
+                  }
+                },
+                {
+                  "gauss": {
+                    "location": {
+                      "origin": "11, 12",
+                      "scale": "2km"
+                    }
+                  }
+                }
+              ],
+              "query": {
+                "match": {
+                  "properties": "balcony"
+                }
+              },
+              "score_mode": "multiply"
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(FunctionScoreQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
     }
 }
