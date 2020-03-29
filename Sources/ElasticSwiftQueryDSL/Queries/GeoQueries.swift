@@ -196,14 +196,8 @@ public struct GeoBoundingBoxQuery: Query {
     public func toDic() -> [String: Any] {
         var dic: [String: Any] = [:]
         var fieldDic: [String: Any] = [:]
-        fieldDic[CodingKeys.topLeft.rawValue] = (topLeft.geoHash != nil) ? topLeft.geoHash : [
-            GeoPoint.CodingKeys.lat: topLeft.lat,
-            GeoPoint.CodingKeys.lon: topLeft.lon,
-        ]
-        fieldDic[CodingKeys.bottomRight.rawValue] = (bottomRight.geoHash != nil) ? bottomRight.geoHash : [
-            GeoPoint.CodingKeys.lat: bottomRight.lat,
-            GeoPoint.CodingKeys.lon: bottomRight.lon,
-        ]
+        fieldDic[CodingKeys.topLeft.rawValue] = topLeft.toQueryDicValue()
+        fieldDic[CodingKeys.bottomRight.rawValue] = bottomRight.toQueryDicValue()
         dic[field] = fieldDic
         if let type = self.type {
             dic[CodingKeys.type.rawValue] = type.rawValue
@@ -311,10 +305,7 @@ public struct GeoDistanceQuery: Query {
     }
 
     public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [field: (point.geoHash != nil) ? point.geoHash! : [
-            GeoPoint.CodingKeys.lat.rawValue: point.lat,
-            GeoPoint.CodingKeys.lon.rawValue: point.lon,
-        ]]
+        var dic: [String: Any] = [field: point.toQueryDicValue()]
 
         if let distance = self.distance {
             dic[CodingKeys.distance.rawValue] = distance
