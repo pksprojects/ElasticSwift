@@ -6,11 +6,12 @@
         //   `swift test --generate-linuxmain`
         // to regenerate.
         static let __allTests__CompoundQueriesTest = [
-            ("testBoolQuery_decode", testBoolQuery_decode),
-            ("testBoolQuery_encode", testBoolQuery_encode),
-            ("testConstantScoreQuery_decode", testConstantScoreQuery_decode),
-            ("testConstantScoreQuery_encode", testConstantScoreQuery_encode),
-            ("testFunctionScoreQuery_encode", testFunctionScoreQuery_encode),
+            ("test_01_constantScoreQuery_encode", test_01_constantScoreQuery_encode),
+            ("test_02_constantScoreQuery_decode", test_02_constantScoreQuery_decode),
+            ("test_03_boolQuery_encode", test_03_boolQuery_encode),
+            ("test_04_boolQuery_decode", test_04_boolQuery_decode),
+            ("test_05_functionScoreQuery_encode", test_05_functionScoreQuery_encode),
+            ("test_06_functionScoreQuery_decode", test_06_functionScoreQuery_decode),
         ]
     }
 
