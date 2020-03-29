@@ -133,4 +133,8 @@ public final class QueryBuilders {
     public static func geoDistanceQuery() -> GeoDistanceQueryBuilder {
         return GeoDistanceQueryBuilder()
     }
+
+    public static func geoPolygonQuery() -> GeoPolygonQueryBuilder {
+        return GeoPolygonQueryBuilder()
+    }
 }

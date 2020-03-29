@@ -39,6 +39,7 @@ public enum QueryTypes: String, Codable {
     case geoShape = "geo_shape"
     case geoBoundingBox = "geo_bounding_box"
     case geoDistance = "geo_distance"
+    case geoPolygon = "geo_polygon"
 }
 
 extension QueryTypes: QueryType {
@@ -108,6 +109,8 @@ extension QueryTypes: QueryType {
             return GeoBoundingBoxQuery.self
         case .geoDistance:
             return GeoDistanceQuery.self
+        case .geoPolygon:
+            return GeoPolygonQuery.self
         }
     }
 }

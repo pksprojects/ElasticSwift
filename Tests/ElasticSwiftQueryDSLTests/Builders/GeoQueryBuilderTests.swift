@@ -244,6 +244,70 @@ class GeoQueryBuilderTests: XCTestCase {
             }
         }
     }
+
+    func test_17_geoPloygonQueryBuilder() throws {
+        let query = try QueryBuilders.geoPolygonQuery()
+            .set(field: "location")
+            .add(point: GeoPoint(lat: 40, lon: -70))
+            .set(points: [GeoPoint(lat: 40, lon: -70)])
+            .add(point: GeoPoint(lat: 41, lon: -70))
+            .set(validationMethod: .strict)
+            .set(ignoreUnmapped: true)
+            .build()
+        XCTAssertEqual(query.field, "location")
+        XCTAssertEqual(query.points, [GeoPoint(lat: 40, lon: -70), GeoPoint(lat: 41, lon: -70)])
+        XCTAssertEqual(query.validationMethod, GeoValidationMethod.strict)
+        XCTAssertEqual(query.ignoreUnmapped, true)
+        let expectedDic = ["geo_polygon": [
+            "location": [
+                "points": [
+                    [
+                        "lat": Decimal(string: "40"),
+                        "lon": Decimal(string: "-70"),
+                    ],
+                    [
+                        "lat": Decimal(string: "41"),
+                        "lon": Decimal(string: "-70"),
+                    ],
+                ],
+            ],
+            "validation_method": "strict",
+            "ignore_unmapped": true,
+        ]]
+        XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual \(query.toDic())")
+    }
+
+    func test_18_geoPloygonQueryBuilder() throws {
+        XCTAssertNoThrow(try QueryBuilders.geoPolygonQuery().set(field: "locaion").add(point: .init(lat: 40.10, lon: -74.12)).build(), "Should not throw")
+    }
+
+    func test_19_geoPloygonQueryBuilder_missing_field() throws {
+        XCTAssertThrowsError(try QueryBuilders.geoPolygonQuery().add(point: .init(lat: 40.10, lon: -74.12)).set(validationMethod: .ignoreMalformed).build(), "missing field") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("field", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_20_geoPloygonQueryBuilder_missing_points() throws {
+        XCTAssertThrowsError(try QueryBuilders.geoPolygonQuery().set(field: "locaion").set(validationMethod: .ignoreMalformed).build(), "missing points") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .atlestOneElementRequired(field):
+                    XCTAssertEqual("points", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
 }
 
 func isEqualDictionaries(lhs: [String: Any], rhs: [String: Any]) -> Bool {
@@ -323,6 +387,8 @@ func isEqualDictionaries(lhs: [String: Any], rhs: [String: Any]) -> Bool {
             return lhs == rhs
         case let (lhs as [String], rhs as [String]):
             return lhs == rhs
+        case let (lhs as [[String: Any]], rhs as [[String: Any]]):
+            return lhs.elementsEqual(rhs, by: isEqualDictionaries(lhs:rhs:))
         default:
             return false
         }

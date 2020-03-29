@@ -390,21 +390,91 @@ extension GeoDistanceQuery: Equatable {
 
 // MARK: - Geo Polygon Query
 
-// internal struct GeoPolygonQuery: Query {
-//    // TODO: remove at time of implementation and conform to Equatable
-//    func isEqualTo(_ other: Query) -> Bool {
-//        return queryType.isEqualTo(other.queryType)
-//    }
-//
-//    public let queryType: QueryType = QueryTypes.geoPolygon
-//
-//    public init(withBuilder _: GeoPolygonQueryBuilder) {}
-//
-//    public func toDic() -> [String: Any] {
-//        let dic: [String: Any] = [:]
-//        return dic
-//    }
-// }
+public struct GeoPolygonQuery: Query {
+    public let queryType: QueryType = QueryTypes.geoPolygon
+
+    public let field: String
+    public let points: [GeoPoint]
+    public let validationMethod: GeoValidationMethod?
+    public let ignoreUnmapped: Bool?
+
+    public init(field: String, points: [GeoPoint], validationMethod: GeoValidationMethod? = nil, ignoreUnmapped: Bool? = nil) {
+        self.field = field
+        self.points = points
+        self.validationMethod = validationMethod
+        self.ignoreUnmapped = ignoreUnmapped
+    }
+
+    internal init(withBuilder builder: GeoPolygonQueryBuilder) throws {
+        guard builder.field != nil else {
+            throw QueryBuilderError.missingRequiredField("field")
+        }
+
+        guard builder.points != nil, !builder.points!.isEmpty else {
+            throw QueryBuilderError.atlestOneElementRequired("points")
+        }
+
+        self.init(field: builder.field!, points: builder.points!, validationMethod: builder.validationMethod, ignoreUnmapped: builder.ignoreUnmapped)
+    }
+
+    public func toDic() -> [String: Any] {
+        var dic: [String: Any] = [:]
+        let fieldDic: [String: Any] = [CodingKeys.points.rawValue: points.map { $0.toQueryDicValue() }]
+        dic[field] = fieldDic
+        if let validationMethod = self.validationMethod {
+            dic[CodingKeys.validationMethod.rawValue] = validationMethod.rawValue
+        }
+
+        if let ignoreUnmapped = self.ignoreUnmapped {
+            dic[CodingKeys.ignoreUnmapped.rawValue] = ignoreUnmapped
+        }
+        return [queryType.name: dic]
+    }
+}
+
+extension GeoPolygonQuery: Codable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
+        let nested = try container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
+
+        let fieldKey = nested.allKeys.filter { k in
+            if CodingKeys(rawValue: k.stringValue) != nil {
+                return false
+            }
+            return true
+        }
+
+        guard fieldKey.count == 1 else {
+            throw Swift.DecodingError.typeMismatch(GeoPolygonQuery.self, .init(codingPath: nested.codingPath, debugDescription: "Unable to find field name in key(s) expect: 1 key found: \(fieldKey.count)."))
+        }
+        field = fieldKey.first!.stringValue
+        let fieldContainer = try nested.nestedContainer(keyedBy: CodingKeys.self, forKey: fieldKey.first!)
+        points = try fieldContainer.decodeArray(forKey: .points)
+        validationMethod = try nested.decodeIfPresent(GeoValidationMethod.self, forKey: .key(named: CodingKeys.validationMethod.rawValue))
+        ignoreUnmapped = try nested.decodeBoolIfPresent(forKey: .key(named: CodingKeys.ignoreUnmapped.rawValue))
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: DynamicCodingKeys.self)
+        var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
+        var fieldContainer = nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
+        try fieldContainer.encode(points, forKey: .points)
+        try nested.encodeIfPresent(validationMethod, forKey: .key(named: CodingKeys.validationMethod.rawValue))
+        try nested.encodeIfPresent(ignoreUnmapped, forKey: .key(named: CodingKeys.ignoreUnmapped.rawValue))
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case points
+        case validationMethod = "validation_method"
+        case ignoreUnmapped = "ignore_unmapped"
+    }
+}
+
+extension GeoPolygonQuery: Equatable {
+    public static func == (lhs: GeoPolygonQuery, rhs: GeoPolygonQuery) -> Bool {
+        return lhs.queryType.isEqualTo(rhs.queryType)
+    }
+}
 
 // MARK: - GeoPoint
 
@@ -455,6 +525,17 @@ extension GeoPoint: Codable {
     enum CodingKeys: String, CodingKey {
         case lat
         case lon
+    }
+
+    internal func toQueryDicValue() -> Any {
+        if geoHash != nil {
+            return geoHash!
+        } else {
+            return [
+                CodingKeys.lat.rawValue: lat!,
+                CodingKeys.lon.rawValue: lon!,
+            ]
+        }
     }
 }
 

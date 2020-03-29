@@ -241,4 +241,81 @@ class GeoQueriesTests: XCTestCase {
             }
         }
     }
+
+    func test_11_geoPolygonQuery_encode() throws {
+        let query = GeoPolygonQuery(field: "person.location", points: [.init(geoHash: "drn5x1g8cu2y")])
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "geo_polygon" : {
+                "person.location" : {
+                    "points" : [
+                        "drn5x1g8cu2y"
+                    ]
+                }
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_12_geoPolygonQuery_decode() throws {
+        let query = GeoPolygonQuery(field: "pin.location", points: [.init(lat: 40, lon: -70), .init(lat: 30, lon: -80), .init(lat: 20, lon: -90)], ignoreUnmapped: true)
+
+        let jsonStr = """
+        {
+            "geo_polygon" : {
+                "pin.location" : {
+                    "points" : [
+                        {"lat" : 40, "lon" : -70},
+                        {"lat" : 30, "lon" : -80},
+                        {"lat" : 20, "lon" : -90}
+                    ]
+                },
+                "ignore_unmapped": true
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(GeoPolygonQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
+
+    func test_13_geoPolygonQuery_decode_fail() throws {
+        let jsonStr = """
+        {
+            "geo_polygon" : {
+                "pin.location" : {
+                    "points" : [
+                        {"lat" : 40, "lon" : -70},
+                        {"lat" : 30, "lon" : -80},
+                        {"lat" : 20, "lon" : -90}
+                    ]
+                },
+                "invalid_key": "random_value"
+            }
+        }
+        """
+
+        XCTAssertThrowsError(try JSONDecoder().decode(GeoPolygonQuery.self, from: jsonStr.data(using: .utf8)!), "invalid_key in json") { error in
+            if let error = error as? Swift.DecodingError {
+                switch error {
+                case let .typeMismatch(type, context):
+                    XCTAssertEqual("\(GeoPolygonQuery.self)", "\(type)")
+                    XCTAssertEqual(context.debugDescription, "Unable to find field name in key(s) expect: 1 key found: 2.")
+                default:
+                    XCTAssert(false)
+                }
+            }
+        }
+    }
 }

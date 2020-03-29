@@ -266,8 +266,65 @@ public class GeoDistanceQueryBuilder: QueryBuilder {
 
 // MARK: - Geo Polygon Query Builder
 
-// internal class GeoPolygonQueryBuilder: QueryBuilder {
-//    public func build() throws -> GeoPolygonQuery {
-//        return GeoPolygonQuery(withBuilder: self)
-//    }
-// }
+public class GeoPolygonQueryBuilder: QueryBuilder {
+    private var _field: String?
+    private var _points: [GeoPoint]?
+    private var _validationMethod: GeoValidationMethod?
+    private var _ignoreUnmapped: Bool?
+
+    public init() {}
+
+    @discardableResult
+    public func set(field: String) -> Self {
+        _field = field
+        return self
+    }
+
+    @discardableResult
+    public func set(points: [GeoPoint]) -> Self {
+        _points = points
+        return self
+    }
+
+    @discardableResult
+    public func add(point: GeoPoint) -> Self {
+        if _points != nil {
+            _points?.append(point)
+        } else {
+            _points = [point]
+        }
+        return self
+    }
+
+    @discardableResult
+    public func set(validationMethod: GeoValidationMethod) -> Self {
+        _validationMethod = validationMethod
+        return self
+    }
+
+    @discardableResult
+    public func set(ignoreUnmapped: Bool) -> Self {
+        _ignoreUnmapped = ignoreUnmapped
+        return self
+    }
+
+    public var field: String? {
+        return _field
+    }
+
+    public var points: [GeoPoint]? {
+        return _points
+    }
+
+    public var validationMethod: GeoValidationMethod? {
+        return _validationMethod
+    }
+
+    public var ignoreUnmapped: Bool? {
+        return _ignoreUnmapped
+    }
+
+    public func build() throws -> GeoPolygonQuery {
+        return try GeoPolygonQuery(withBuilder: self)
+    }
+}
