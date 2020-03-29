@@ -208,7 +208,7 @@ class CompoundQueriesTest: XCTestCase {
 
         XCTAssertEqual(query, decoded)
     }
-    
+
     func test_09_boostingQuery_encode() throws {
         let query = BoostingQuery(positive: TermQuery(field: "text", value: "apple"), negative: TermQuery(field: "text", value: "pie tart fruit crumble tree"), negativeBoost: 0.5)
 
