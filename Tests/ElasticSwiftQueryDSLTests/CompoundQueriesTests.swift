@@ -162,4 +162,107 @@ class CompoundQueriesTest: XCTestCase {
 
         XCTAssertEqual(query, decoded)
     }
+
+    func test_07_disMaxQuery_encode() throws {
+        let query = DisMaxQuery([TermQuery(field: "title", value: "Quick pets"), TermQuery(field: "body", value: "Quick pets")], tieBreaker: 0.7, boost: 1.0)
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "dis_max" : {
+                "queries" : [
+                    { "term" : { "title" : "Quick pets" }},
+                    { "term" : { "body" : "Quick pets" }}
+                ],
+                "tie_breaker" : 0.7,
+                "boost": 1.0
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_08_disMaxQuery_decode() throws {
+        let query = DisMaxQuery([TermQuery(field: "title", value: "Quick pets"), TermQuery(field: "body", value: "Quick pets")], tieBreaker: 0.7)
+
+        let jsonStr = """
+        {
+            "dis_max" : {
+                "queries" : [
+                    { "term" : { "title" : "Quick pets" }},
+                    { "term" : { "body" : "Quick pets" }}
+                ],
+                "tie_breaker" : 0.7
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(DisMaxQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
+    
+    func test_09_boostingQuery_encode() throws {
+        let query = BoostingQuery(positive: TermQuery(field: "text", value: "apple"), negative: TermQuery(field: "text", value: "pie tart fruit crumble tree"), negativeBoost: 0.5)
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "boosting" : {
+                "positive" : {
+                    "term" : {
+                        "text" : "apple"
+                    }
+                },
+                "negative" : {
+                     "term" : {
+                         "text" : "pie tart fruit crumble tree"
+                    }
+                },
+                "negative_boost" : 0.5
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_10_boostingQuery_decode() throws {
+        let query = BoostingQuery(positive: TermQuery(field: "text", value: "apple"), negative: TermQuery(field: "text", value: "pie tart fruit crumble tree"), negativeBoost: 0.5)
+
+        let jsonStr = """
+        {
+            "boosting" : {
+                "positive" : {
+                    "term" : {
+                        "text" : "apple"
+                    }
+                },
+                "negative" : {
+                     "term" : {
+                         "text" : "pie tart fruit crumble tree"
+                    }
+                },
+                "negative_boost" : 0.5
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(BoostingQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
 }
