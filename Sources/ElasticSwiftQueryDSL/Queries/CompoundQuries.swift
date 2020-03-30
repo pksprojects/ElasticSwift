@@ -15,9 +15,9 @@ public struct ConstantScoreQuery: Query {
     public let queryType: QueryType = QueryTypes.constantScore
 
     public let query: Query
-    public let boost: Decimal
+    public let boost: Decimal?
 
-    public init(_ query: Query, boost: Decimal = 1.0) {
+    public init(_ query: Query, boost: Decimal? = nil) {
         self.query = query
         self.boost = boost
     }
@@ -27,11 +27,17 @@ public struct ConstantScoreQuery: Query {
             throw QueryBuilderError.missingRequiredField("query")
         }
 
-        self.init(builder.query!, boost: builder.boost!)
+        self.init(builder.query!, boost: builder.boost)
     }
 
     public func toDic() -> [String: Any] {
-        return [queryType.name: [CodingKeys.filter.rawValue: query.toDic(), CodingKeys.boost.rawValue: boost]]
+        var dic: [String: Any] = [
+            CodingKeys.filter.rawValue: query.toDic(),
+        ]
+        if let boost = self.boost {
+            dic[CodingKeys.boost.rawValue] = boost
+        }
+        return [queryType.name: dic]
     }
 }
 
@@ -39,7 +45,7 @@ extension ConstantScoreQuery {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
-        boost = try nested.decode(Decimal.self, forKey: .boost)
+        boost = try nested.decodeIfPresent(Decimal.self, forKey: .boost)
         query = try nested.decodeQuery(forKey: .filter)
     }
 
@@ -47,7 +53,7 @@ extension ConstantScoreQuery {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         try nested.encode(query, forKey: .filter)
-        try nested.encode(boost, forKey: .boost)
+        try nested.encodeIfPresent(boost, forKey: .boost)
     }
 
     enum CodingKeys: String, CodingKey {
