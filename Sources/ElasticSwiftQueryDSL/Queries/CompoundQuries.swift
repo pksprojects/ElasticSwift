@@ -298,13 +298,13 @@ public struct FunctionScoreQuery: Query {
             dic[CodingKeys.boost.rawValue] = boost
         }
         if let boostMode = self.boostMode {
-            dic[CodingKeys.boostMode.rawValue] = boostMode
+            dic[CodingKeys.boostMode.rawValue] = boostMode.rawValue
         }
         if let maxBoost = self.maxBoost {
             dic[CodingKeys.maxBoost.rawValue] = maxBoost
         }
         if let scoreMode = self.scoreMode {
-            dic[CodingKeys.scoreMode.rawValue] = scoreMode
+            dic[CodingKeys.scoreMode.rawValue] = scoreMode.rawValue
         }
         if let minScore = self.minScore {
             dic[CodingKeys.minScore.rawValue] = minScore
@@ -403,8 +403,8 @@ public struct BoostingQuery: Query {
     public func toDic() -> [String: Any] {
         var dic: [String: Any] = [:]
 
-        dic[CodingKeys.positive.rawValue] = positive
-        dic[CodingKeys.negative.rawValue] = negative
+        dic[CodingKeys.positive.rawValue] = positive.toDic()
+        dic[CodingKeys.negative.rawValue] = negative.toDic()
 
         if let negativeBoost = self.negativeBoost {
             dic[CodingKeys.negativeBoost.rawValue] = negativeBoost
