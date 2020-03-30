@@ -64,4 +64,47 @@ class CompoundQueryBuilderTests: XCTestCase {
         ]] as [String: Any]
         XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
     }
+
+    func test_05_boolQueryBuilder() throws {
+        XCTAssertNoThrow(try QueryBuilders.boolQuery().should(query: MatchAllQuery()).set(boost: 0.9).build(), "Should not throw")
+    }
+
+    func test_06_boolQueryBuilder_atleast_one_required() throws {
+        XCTAssertThrowsError(try QueryBuilders.boolQuery().build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .atleastOneFieldRequired(fields):
+                    XCTAssertEqual(["filterClauses", "mustClauses", "mustNotClauses", "shouldClauses"], fields)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_07_boolQueryBuilder() throws {
+        let query = try QueryBuilders.boolQuery()
+            .should(query: MatchAllQuery())
+            .filter(query: MatchAllQuery())
+            .must(query: MatchAllQuery())
+            .mustNot(query: MatchAllQuery())
+            .set(boost: 0.8)
+            .set(minimumShouldMatch: 10)
+            .build()
+        XCTAssertEqual(query.shouldClauses.first as! MatchAllQuery, MatchAllQuery())
+        XCTAssertEqual(query.filterClauses.first as! MatchAllQuery, MatchAllQuery())
+        XCTAssertEqual(query.mustClauses.first as! MatchAllQuery, MatchAllQuery())
+        XCTAssertEqual(query.mustNotClauses.first as! MatchAllQuery, MatchAllQuery())
+        XCTAssertEqual(query.boost, 0.8)
+        let expectedDic = ["bool": [
+            "filter": [["match_all": [:]]],
+            "must": [["match_all": [:]]],
+            "must_not": [["match_all": [:]]],
+            "should": [["match_all": [:]]],
+            "boost": Decimal(string: "0.8")!,
+            "minimum_should_match": 10,
+        ]] as [String: Any]
+        XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
+    }
 }
