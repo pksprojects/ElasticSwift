@@ -209,6 +209,13 @@ public struct Script: Codable, Equatable {
     }
 }
 
+public enum Fuzziness: String, Codable {
+    case zero = "ZERO"
+    case one = "ONE"
+    case two = "TWO"
+    case auto = "AUTO"
+}
+
 public enum ShapeRelation: String, Codable {
     case intersects
     case disjoint

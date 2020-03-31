@@ -13,12 +13,11 @@ import Foundation
 public class MatchQueryBuilder: QueryBuilder {
     private var _field: String?
     private var _value: String?
-    private var _isFuzzy: Bool?
     private var _boost: Decimal?
     private var _operator: MatchQueryOperator?
     private var _zeroTermQuery: ZeroTermQuery?
     private var _cutoffFrequency: Decimal?
-    private var _fuzziness: String?
+    private var _fuzziness: Fuzziness?
     private var _autoGenSynonymnsPhraseQuery: Bool?
 
     public init() {}
@@ -54,19 +53,13 @@ public class MatchQueryBuilder: QueryBuilder {
     }
 
     @discardableResult
-    public func set(isFuzzy: Bool) -> MatchQueryBuilder {
-        _isFuzzy = isFuzzy
-        return self
-    }
-
-    @discardableResult
     public func set(boost: Decimal) -> MatchQueryBuilder {
         _boost = boost
         return self
     }
 
     @discardableResult
-    public func set(fuzziness: String) -> MatchQueryBuilder {
+    public func set(fuzziness: Fuzziness) -> MatchQueryBuilder {
         _fuzziness = fuzziness
         return self
     }
@@ -85,10 +78,6 @@ public class MatchQueryBuilder: QueryBuilder {
         return _value
     }
 
-    public var isFuzzy: Bool? {
-        return _isFuzzy
-    }
-
     public var boost: Decimal? {
         return _boost
     }
@@ -105,7 +94,7 @@ public class MatchQueryBuilder: QueryBuilder {
         return _cutoffFrequency
     }
 
-    public var fuzziness: String? {
+    public var fuzziness: Fuzziness? {
         return _fuzziness
     }
 

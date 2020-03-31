@@ -18,12 +18,14 @@ public struct MatchQuery: Query {
     public let `operator`: MatchQueryOperator?
     public let zeroTermQuery: ZeroTermQuery?
     public let cutoffFrequency: Decimal?
-    public let fuzziness: String?
+    public let fuzziness: Fuzziness?
     public let autoGenSynonymnsPhraseQuery: Bool?
+    public let boost: Decimal?
 
-    public init(field: String, value: String, operator: MatchQueryOperator? = nil, zeroTermQuery: ZeroTermQuery? = nil, cutoffFrequency: Decimal? = nil, fuzziness: String? = nil, autoGenSynonymnsPhraseQuery: Bool? = nil) {
+    public init(field: String, value: String, boost: Decimal? = nil, operator: MatchQueryOperator? = nil, zeroTermQuery: ZeroTermQuery? = nil, cutoffFrequency: Decimal? = nil, fuzziness: Fuzziness? = nil, autoGenSynonymnsPhraseQuery: Bool? = nil) {
         self.field = field
         self.value = value
+        self.boost = boost
         self.operator = `operator`
         self.zeroTermQuery = zeroTermQuery
         self.cutoffFrequency = cutoffFrequency
@@ -40,12 +42,15 @@ public struct MatchQuery: Query {
             throw QueryBuilderError.missingRequiredField("value")
         }
 
-        self.init(field: builder.field!, value: builder.value!, operator: builder.operator, zeroTermQuery: builder.zeroTermQuery, cutoffFrequency: builder.cutoffFrequency, fuzziness: builder.fuzziness, autoGenSynonymnsPhraseQuery: builder.autoGenSynonymnsPhraseQuery)
+        self.init(field: builder.field!, value: builder.value!, boost: builder.boost, operator: builder.operator, zeroTermQuery: builder.zeroTermQuery, cutoffFrequency: builder.cutoffFrequency, fuzziness: builder.fuzziness, autoGenSynonymnsPhraseQuery: builder.autoGenSynonymnsPhraseQuery)
     }
 
     public func toDic() -> [String: Any] {
         var dic: [String: Any] = [:]
         dic[CodingKeys.query.rawValue] = value
+        if let boost = self.boost {
+            dic[CodingKeys.boost.rawValue] = boost
+        }
         if let `operator` = self.operator {
             dic[CodingKeys.operator.rawValue] = `operator`.rawValue
         }
@@ -56,7 +61,7 @@ public struct MatchQuery: Query {
             dic[CodingKeys.cutoffFrequency.rawValue] = cutoffFrequency
         }
         if let fuzziness = self.fuzziness {
-            dic[CodingKeys.fuzziness.rawValue] = fuzziness
+            dic[CodingKeys.fuzziness.rawValue] = fuzziness.rawValue
         }
         if let autoGenSynonymnsPhraseQuery = self.autoGenSynonymnsPhraseQuery {
             dic[CodingKeys.autoGenerateSynonymsPhraseQuery.rawValue] = autoGenSynonymnsPhraseQuery
@@ -77,10 +82,11 @@ extension MatchQuery {
         field = nested.allKeys.first!.stringValue
         if let fieldContainer = try? nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field)) {
             value = try fieldContainer.decodeString(forKey: .query)
+            boost = try fieldContainer.decodeDecimalIfPresent(forKey: .boost)
             `operator` = try fieldContainer.decodeIfPresent(MatchQueryOperator.self, forKey: .operator)
             zeroTermQuery = try fieldContainer.decodeIfPresent(ZeroTermQuery.self, forKey: .zeroTermsQuery)
             cutoffFrequency = try fieldContainer.decodeDecimalIfPresent(forKey: .cutoffFrequency)
-            fuzziness = try fieldContainer.decodeStringIfPresent(forKey: .fuzziness)
+            fuzziness = try fieldContainer.decodeIfPresent(Fuzziness.self, forKey: .fuzziness)
             autoGenSynonymnsPhraseQuery = try fieldContainer.decodeBoolIfPresent(forKey: .autoGenerateSynonymsPhraseQuery)
         } else {
             value = try nested.decodeString(forKey: .key(named: field))
@@ -89,6 +95,7 @@ extension MatchQuery {
             cutoffFrequency = nil
             fuzziness = nil
             autoGenSynonymnsPhraseQuery = nil
+            boost = nil
         }
     }
 
@@ -97,6 +104,7 @@ extension MatchQuery {
         var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
         var fieldContainer = nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
         try fieldContainer.encode(value, forKey: .query)
+        try fieldContainer.encodeIfPresent(boost, forKey: .boost)
         try fieldContainer.encodeIfPresent(`operator`, forKey: .operator)
         try fieldContainer.encodeIfPresent(zeroTermQuery, forKey: .zeroTermsQuery)
         try fieldContainer.encodeIfPresent(cutoffFrequency, forKey: .cutoffFrequency)
@@ -106,6 +114,7 @@ extension MatchQuery {
 
     enum CodingKeys: String, CodingKey {
         case query
+        case boost
         case `operator`
         case fuzziness
         case zeroTermsQuery = "zero_terms_query"
