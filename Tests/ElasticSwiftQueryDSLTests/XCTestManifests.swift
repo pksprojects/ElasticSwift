@@ -70,6 +70,7 @@
             ("test_01_matchQuery_encode", test_01_matchQuery_encode),
             ("test_02_matchQuery_decode", test_02_matchQuery_decode),
             ("test_03_matchQuery_decode_2", test_03_matchQuery_decode_2),
+            ("test_04_matchQuery_decode_fail", test_04_matchQuery_decode_fail),
         ]
     }
 

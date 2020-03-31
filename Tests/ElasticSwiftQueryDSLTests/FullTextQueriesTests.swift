@@ -95,4 +95,27 @@ class FullTextQueriesTest: XCTestCase {
 
         XCTAssertEqual(query, decoded)
     }
+
+    func test_04_matchQuery_decode_fail() throws {
+        let jsonStr = """
+        {
+            "match" : {
+                "message" : "this is a test",
+                "invalid_key" : "random"
+            }
+        }
+        """
+
+        XCTAssertThrowsError(try JSONDecoder().decode(MatchQuery.self, from: jsonStr.data(using: .utf8)!), "invalid_key in json") { error in
+            if let error = error as? Swift.DecodingError {
+                switch error {
+                case let .typeMismatch(type, context):
+                    XCTAssertEqual("\(MatchQuery.self)", "\(type)")
+                    XCTAssertEqual(context.debugDescription, "Unable to find field name in key(s) expect: 1 key found: 2.")
+                default:
+                    XCTAssert(false)
+                }
+            }
+        }
+    }
 }
