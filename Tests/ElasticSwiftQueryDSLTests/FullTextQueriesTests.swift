@@ -118,4 +118,93 @@ class FullTextQueriesTest: XCTestCase {
             }
         }
     }
+
+    func test_05_matchPhraseQuery_encode() throws {
+        let query = MatchPhraseQuery(field: "message", value: "this is a test", analyzer: "my_analyzer")
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "match_phrase" : {
+                "message" : {
+                    "query" : "this is a test",
+                    "analyzer" : "my_analyzer"
+                }
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_06_matchPhraseQuery_decode() throws {
+        let query = try QueryBuilders.matchPhraseQuery()
+            .set(field: "message")
+            .set(value: "this is a test")
+            .set(analyzer: "my_analyzer")
+            .build()
+
+        let jsonStr = """
+        {
+            "match_phrase" : {
+                "message" : {
+                    "query" : "this is a test",
+                    "analyzer" : "my_analyzer"
+                }
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(MatchPhraseQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
+
+    func test_07_matchPhraseQuery_decode_2() throws {
+        let query = try QueryBuilders.matchPhraseQuery()
+            .set(field: "message")
+            .set(value: "this is a test")
+            .build()
+
+        let jsonStr = """
+        {
+            "match_phrase" : {
+                "message" : "this is a test"
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(MatchPhraseQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
+
+    func test_08_matchPhraseQuery_decode_fail() throws {
+        let jsonStr = """
+        {
+            "match_phrase" : {
+                "message" : "this is a test",
+                "invalid_key": "random"
+            }
+        }
+        """
+
+        XCTAssertThrowsError(try JSONDecoder().decode(MatchPhraseQuery.self, from: jsonStr.data(using: .utf8)!), "invalid_key in json") { error in
+            if let error = error as? Swift.DecodingError {
+                switch error {
+                case let .typeMismatch(type, context):
+                    XCTAssertEqual("\(MatchPhraseQuery.self)", "\(type)")
+                    XCTAssertEqual(context.debugDescription, "Unable to find field name in key(s) expect: 1 key found: 2.")
+                default:
+                    XCTAssert(false)
+                }
+            }
+        }
+    }
 }
