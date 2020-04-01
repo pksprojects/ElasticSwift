@@ -33,6 +33,7 @@ class ElasticSwiftNetworkingTests: XCTestCase {
     func test_01_adaptor_init() throws {
         let adaptor = URLSessionAdaptor(forHost: esConnection.host, adaptorConfig: URLSessionAdaptorConfiguration.default)
         XCTAssertNotNil(adaptor)
+        XCTAssertEqual(adaptor.host, esConnection.host)
     }
 
     func test_02_adaptor_execute() throws {
@@ -66,6 +67,13 @@ class ElasticSwiftNetworkingTests: XCTestCase {
             e.fulfill()
         }
         waitForExpectations(timeout: 10)
+    }
+
+    func test_03_ssl_config() throws {
+        let sslConfig = SSLConfiguration(certPath: "/path/to/ssl.cert", isSelf: true)
+        XCTAssertNotNil(sslConfig)
+        XCTAssertEqual(sslConfig.certPath, "/path/to/ssl.cert")
+        XCTAssertEqual(sslConfig.isSelfSigned, true)
     }
 }
 
