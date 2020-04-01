@@ -34,7 +34,7 @@ class ElasticSwiftNetworkingTests: XCTestCase {
         let adaptor = URLSessionAdaptor(forHost: esConnection.host, adaptorConfig: URLSessionAdaptorConfiguration.default)
         XCTAssertNotNil(adaptor)
     }
-    
+
     func test_02_adaptor_execute() throws {
         let e = expectation(description: "execution complete")
         let adaptor = URLSessionAdaptor(forHost: esConnection.host, adaptorConfig: URLSessionAdaptorConfiguration.default)
@@ -48,10 +48,10 @@ class ElasticSwiftNetworkingTests: XCTestCase {
             .build()
         adaptor.performRequest(request) { result in
             switch result {
-            case .failure(let error):
+            case let .failure(error):
                 self.logger.error("Error: \(error.localizedDescription)")
                 XCTAssert(false)
-            case .success(let response):
+            case let .success(response):
                 self.logger.info("Response: \(response)")
                 XCTAssertEqual(response.status, HTTPResponseStatus.ok)
                 if let data = response.body {
@@ -62,7 +62,6 @@ class ElasticSwiftNetworkingTests: XCTestCase {
                         self.logger.error("Error: \(error)")
                     }
                 }
-                
             }
             e.fulfill()
         }
