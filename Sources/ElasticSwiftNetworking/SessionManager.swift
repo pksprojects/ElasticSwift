@@ -31,8 +31,11 @@ class SessionManager: NSObject, URLSessionDelegate {
         self.url = url
         super.init()
         self.sslConfig = sslConfig
-
-        let config: URLSessionConfiguration = config ?? URLSessionConfiguration.ephemeral
+        #if swift(<5.1) && os(Linux)
+            let config: URLSessionConfiguration = config ?? URLSessionConfiguration.default
+        #else
+            let config: URLSessionConfiguration = config ?? URLSessionConfiguration.ephemeral
+        #endif
         let queue = OperationQueue()
         session = URLSession(configuration: config, delegate: self, delegateQueue: queue)
     }

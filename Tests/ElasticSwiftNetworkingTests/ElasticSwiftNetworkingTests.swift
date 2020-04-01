@@ -31,11 +31,7 @@ class ElasticSwiftNetworkingTests: XCTestCase {
     }
 
     func test_01_adaptor_init() throws {
-        #if swift(<5.1)
-            let adaptorConfig = URLSessionAdaptorConfiguration(adaptor: URLSessionAdaptor.self, urlSessionConfiguration: .default)
-        #else
-            let adaptorConfig = URLSessionAdaptorConfiguration.default
-        #endif
+        let adaptorConfig = URLSessionAdaptorConfiguration(urlSessionConfiguration: .default)
         let adaptor = URLSessionAdaptor(forHost: esConnection.host, adaptorConfig: adaptorConfig)
         XCTAssertNotNil(adaptor)
         XCTAssertEqual(adaptor.host, esConnection.host)
@@ -43,11 +39,8 @@ class ElasticSwiftNetworkingTests: XCTestCase {
 
     func test_02_adaptor_execute() throws {
         let e = expectation(description: "execution complete")
-        #if swift(<5.1)
-            let adaptorConfig = URLSessionAdaptorConfiguration(adaptor: URLSessionAdaptor.self, urlSessionConfiguration: .default)
-        #else
-            let adaptorConfig = URLSessionAdaptorConfiguration.default
-        #endif
+
+        let adaptorConfig = URLSessionAdaptorConfiguration.default
         let adaptor = URLSessionAdaptor(forHost: esConnection.host, adaptorConfig: adaptorConfig)
         let base64 = "\(esConnection.uname):\(esConnection.passwd)".data(using: .utf8)!.base64EncodedString()
         var headers = HTTPHeaders()
