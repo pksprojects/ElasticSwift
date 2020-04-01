@@ -23,20 +23,21 @@ class SessionManager: NSObject, URLSessionDelegate {
     private let logger = Logger(label: "org.pksprojects.ElasticSwift.Networking.SessionManager")
 
     private var session: URLSession?
-    private let url: URL
+    public let url: URL
 
     private var sslConfig: SSLConfiguration?
 
-    init(forHost url: URL, sslConfig: SSLConfiguration? = nil) {
+    init(forHost url: URL, config: URLSessionConfiguration? = nil, sslConfig: SSLConfiguration? = nil) {
         self.url = url
         super.init()
         self.sslConfig = sslConfig
-        let config = URLSessionConfiguration.ephemeral
+
+        let config: URLSessionConfiguration = config ?? URLSessionConfiguration.ephemeral
         let queue = OperationQueue()
         session = URLSession(configuration: config, delegate: self, delegateQueue: queue)
     }
 
-    func createReqeust(_ httpRequest: HTTPRequest) -> URLRequest {
+    func makeReqeust(_ httpRequest: HTTPRequest) -> URLRequest {
         var components = URLComponents()
         components.queryItems = httpRequest.queryParams
         components.path = httpRequest.path

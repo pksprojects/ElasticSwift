@@ -23,11 +23,11 @@ public final class URLSessionAdaptor: ManagedHTTPClientAdaptor {
 
     public required init(forHost host: URL, adaptorConfig: HTTPAdaptorConfiguration = URLSessionAdaptorConfiguration.default) {
         let config = adaptorConfig as! URLSessionAdaptorConfiguration
-        sessionManager = SessionManager(forHost: host, sslConfig: config.sslConfig)
+        sessionManager = SessionManager(forHost: host, config: config.urlSessionConfiguration, sslConfig: config.sslConfig)
     }
 
     public func performRequest(_ request: HTTPRequest, callback: @escaping (Result<HTTPResponse, Error>) -> Void) {
-        let urlRequest = sessionManager.createReqeust(request)
+        let urlRequest = sessionManager.makeReqeust(request)
         sessionManager.execute(urlRequest) { data, response, error in
             guard error == nil else {
                 return callback(.failure(error!))
@@ -58,6 +58,10 @@ public final class URLSessionAdaptor: ManagedHTTPClientAdaptor {
             }
         }
     }
+
+    public var host: URL {
+        return sessionManager.url
+    }
 }
 
 // MARK: - URLSessionAdaptor Configuration
@@ -70,9 +74,12 @@ public class URLSessionAdaptorConfiguration: HTTPAdaptorConfiguration {
     // Note:- This config will have an effect only on apple platforms. `ElasticSwiftNetworkingNIO` on linux
     public let sslConfig: SSLConfiguration?
 
-    public init(adaptor: ManagedHTTPClientAdaptor.Type = URLSessionAdaptor.self, sslConfig: SSLConfiguration? = nil) {
+    public let urlSessionConfiguration: URLSessionConfiguration?
+
+    public init(adaptor: ManagedHTTPClientAdaptor.Type = URLSessionAdaptor.self, urlSessionConfiguration: URLSessionConfiguration? = nil, sslConfig: SSLConfiguration? = nil) {
         self.sslConfig = sslConfig
         self.adaptor = adaptor
+        self.urlSessionConfiguration = urlSessionConfiguration
     }
 
     public static var `default`: HTTPAdaptorConfiguration {
