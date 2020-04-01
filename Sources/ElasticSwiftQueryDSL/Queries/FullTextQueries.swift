@@ -189,8 +189,7 @@ extension MatchPhraseQuery {
             value = try fieldContainer.decodeString(forKey: .query)
             analyzer = try fieldContainer.decodeStringIfPresent(forKey: .analyzer)
         } else {
-            var fieldContainer = try nested.nestedUnkeyedContainer(forKey: .key(named: field))
-            value = try fieldContainer.decode(String.self)
+            value = try nested.decodeString(forKey: .key(named: field))
             analyzer = nil
         }
     }
