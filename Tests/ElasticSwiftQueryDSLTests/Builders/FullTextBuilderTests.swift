@@ -159,4 +159,71 @@ class FullTextBuilderTests: XCTestCase {
         ]] as [String: Any]
         XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
     }
+
+    func test_11_matchPhrasePrefixQueryBuilder() throws {
+        XCTAssertNoThrow(try QueryBuilders.matchPhrasePrefixQuery().set(field: "text").set(value: "test search").build(), "Should not throw")
+    }
+
+    func test_12_matchPhrasePrefixQueryBuilder() throws {
+        XCTAssertNoThrow(try QueryBuilders.matchPhrasePrefixQuery().set(field: "text").set(value: "test search").set(maxExpansions: 10).build(), "Should not throw")
+    }
+
+    func test_13_matchPhrasePrefixQueryBuilder_missing_field() throws {
+        XCTAssertThrowsError(try QueryBuilders.matchPhrasePrefixQuery().set(value: "test search").build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("field", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_14_matchPhrasePrefixQueryBuilder_missing_value() throws {
+        XCTAssertThrowsError(try QueryBuilders.matchPhrasePrefixQuery().set(field: "text").build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("value", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_15_matchPhrasePrefixQueryBuilder() throws {
+        let query = try QueryBuilders.matchPhrasePrefixQuery()
+            .set(field: "message")
+            .set(value: "quick brown f")
+            .set(maxExpansions: 10)
+            .build()
+        XCTAssertEqual(query.field, "message")
+        XCTAssertEqual(query.value, "quick brown f")
+        XCTAssertEqual(query.maxExpansions, 10)
+        let expectedDic = ["match_phrase_prefix": [
+            "message": [
+                "query": "quick brown f",
+                "max_expansions": 10,
+            ],
+        ]] as [String: Any]
+        XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
+    }
+
+    func test_16_matchPhrasePrefixQueryBuilder() throws {
+        let query = try QueryBuilders.matchPhrasePrefixQuery()
+            .set(field: "message")
+            .set(value: "quick brown f")
+            .build()
+        XCTAssertEqual(query.field, "message")
+        XCTAssertEqual(query.value, "quick brown f")
+        let expectedDic = ["match_phrase_prefix": [
+            "message": "quick brown f",
+        ]] as [String: Any]
+        XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
+    }
 }

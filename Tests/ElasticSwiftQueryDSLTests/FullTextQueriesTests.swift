@@ -207,4 +207,93 @@ class FullTextQueriesTest: XCTestCase {
             }
         }
     }
+
+    func test_09_matchPhrasePrefixQuery_encode() throws {
+        let query = MatchPhrasePrefixQuery(field: "message", value: "quick brown f", maxExpansions: 10)
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "match_phrase_prefix" : {
+                "message" : {
+                    "query" : "quick brown f",
+                    "max_expansions" : 10
+                }
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_10_matchPhrasePrefixQuery_decode() throws {
+        let query = try QueryBuilders.matchPhrasePrefixQuery()
+            .set(field: "message")
+            .set(value: "quick brown f")
+            .set(maxExpansions: 10)
+            .build()
+
+        let jsonStr = """
+        {
+            "match_phrase_prefix" : {
+                "message" : {
+                    "query" : "quick brown f",
+                    "max_expansions" : 10
+                }
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(MatchPhrasePrefixQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
+
+    func test_11_matchPhrasePrefixQuery_decode_2() throws {
+        let query = try QueryBuilders.matchPhrasePrefixQuery()
+            .set(field: "message")
+            .set(value: "quick brown f")
+            .build()
+
+        let jsonStr = """
+        {
+            "match_phrase_prefix" : {
+                "message" : "quick brown f"
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(MatchPhrasePrefixQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
+
+    func test_12_matchPhrasePrefixQuery_decode_fail() throws {
+        let jsonStr = """
+        {
+            "match_phrase_prefix" : {
+                "message" : "quick brown f",
+                "invalid_key": "random"
+            }
+        }
+        """
+
+        XCTAssertThrowsError(try JSONDecoder().decode(MatchPhrasePrefixQuery.self, from: jsonStr.data(using: .utf8)!), "invalid_key in json") { error in
+            if let error = error as? Swift.DecodingError {
+                switch error {
+                case let .typeMismatch(type, context):
+                    XCTAssertEqual("\(MatchPhrasePrefixQuery.self)", "\(type)")
+                    XCTAssertEqual(context.debugDescription, "Unable to find field name in key(s) expect: 1 key found: 2.")
+                default:
+                    XCTAssert(false)
+                }
+            }
+        }
+    }
 }

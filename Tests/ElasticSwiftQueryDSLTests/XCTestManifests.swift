@@ -65,6 +65,12 @@
             ("test_08_matchPhraseQueryBuilder_missing_value", test_08_matchPhraseQueryBuilder_missing_value),
             ("test_09_matchPhraseQueryBuilder", test_09_matchPhraseQueryBuilder),
             ("test_10_matchPhraseQueryBuilder", test_10_matchPhraseQueryBuilder),
+            ("test_11_matchPhrasePrefixQueryBuilder", test_11_matchPhrasePrefixQueryBuilder),
+            ("test_12_matchPhrasePrefixQueryBuilder", test_12_matchPhrasePrefixQueryBuilder),
+            ("test_13_matchPhrasePrefixQueryBuilder_missing_field", test_13_matchPhrasePrefixQueryBuilder_missing_field),
+            ("test_14_matchPhrasePrefixQueryBuilder_missing_value", test_14_matchPhrasePrefixQueryBuilder_missing_value),
+            ("test_15_matchPhrasePrefixQueryBuilder", test_15_matchPhrasePrefixQueryBuilder),
+            ("test_16_matchPhrasePrefixQueryBuilder", test_16_matchPhrasePrefixQueryBuilder),
         ]
     }
 
@@ -81,6 +87,10 @@
             ("test_06_matchPhraseQuery_decode", test_06_matchPhraseQuery_decode),
             ("test_07_matchPhraseQuery_decode_2", test_07_matchPhraseQuery_decode_2),
             ("test_08_matchPhraseQuery_decode_fail", test_08_matchPhraseQuery_decode_fail),
+            ("test_09_matchPhrasePrefixQuery_encode", test_09_matchPhrasePrefixQuery_encode),
+            ("test_10_matchPhrasePrefixQuery_decode", test_10_matchPhrasePrefixQuery_decode),
+            ("test_11_matchPhrasePrefixQuery_decode_2", test_11_matchPhrasePrefixQuery_decode_2),
+            ("test_12_matchPhrasePrefixQuery_decode_fail", test_12_matchPhrasePrefixQuery_decode_fail),
         ]
     }
 
