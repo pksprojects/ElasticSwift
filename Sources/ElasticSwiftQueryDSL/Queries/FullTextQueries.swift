@@ -267,7 +267,7 @@ extension MatchPhrasePrefixQuery {
         let nested = try container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
 
         guard nested.allKeys.count == 1 else {
-            throw Swift.DecodingError.typeMismatch(MatchPhraseQuery.self, .init(codingPath: nested.codingPath, debugDescription: "Unable to find field name in key(s) expect: 1 key found: \(nested.allKeys.count)."))
+            throw Swift.DecodingError.typeMismatch(MatchPhrasePrefixQuery.self, .init(codingPath: nested.codingPath, debugDescription: "Unable to find field name in key(s) expect: 1 key found: \(nested.allKeys.count)."))
         }
 
         field = nested.allKeys.first!.stringValue
@@ -275,8 +275,7 @@ extension MatchPhrasePrefixQuery {
             value = try fieldContainer.decodeString(forKey: .query)
             maxExpansions = try fieldContainer.decodeIntIfPresent(forKey: .maxExpansions)
         } else {
-            var fieldContainer = try nested.nestedUnkeyedContainer(forKey: .key(named: field))
-            value = try fieldContainer.decode(String.self)
+            value = try nested.decodeString(forKey: .key(named: field))
             maxExpansions = nil
         }
     }
