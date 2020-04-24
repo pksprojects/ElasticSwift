@@ -342,7 +342,7 @@ public struct MultiMatchQuery: Query {
         dic[CodingKeys.query.rawValue] = query
         dic[CodingKeys.fields.rawValue] = fields
         if let type = self.type {
-            dic[CodingKeys.type.rawValue] = type
+            dic[CodingKeys.type.rawValue] = type.rawValue
         }
         if let tieBreaker = self.tieBreaker {
             dic[CodingKeys.tieBreaker.rawValue] = tieBreaker
