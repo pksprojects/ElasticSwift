@@ -226,4 +226,60 @@ class FullTextBuilderTests: XCTestCase {
         ]] as [String: Any]
         XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
     }
+
+    func test_17_multiMatchQueryBuilder() throws {
+        XCTAssertNoThrow(try QueryBuilders.multiMatchQuery().set(fields: "text").set(query: "test search").build(), "Should not throw")
+    }
+
+    func test_18_multiMatchQueryBuilder() throws {
+        XCTAssertNoThrow(try QueryBuilders.multiMatchQuery().set(fields: "text").set(query: "test search").set(tieBreaker: 10).set(type: .bestFields).build(), "Should not throw")
+    }
+
+    func test_19_multiMatchQueryBuilder_missing_field() throws {
+        XCTAssertThrowsError(try QueryBuilders.multiMatchQuery().set(query: "test search").build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .atlestOneElementRequired(field):
+                    XCTAssertEqual("fields", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_20_multiMatchQueryBuilder_missing_value() throws {
+        XCTAssertThrowsError(try QueryBuilders.multiMatchQuery().add(field: "text").build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("query", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_21_multiMatchQueryBuilder() throws {
+        let query = try QueryBuilders.multiMatchQuery()
+            .set(fields: "subject", "message")
+            .set(query: "this is a test")
+            .set(tieBreaker: 0.3)
+            .set(type: .bestFields)
+            .build()
+        XCTAssertEqual(query.fields, ["subject", "message"])
+        XCTAssertEqual(query.query, "this is a test")
+        XCTAssertEqual(query.tieBreaker, 0.3)
+        XCTAssertEqual(query.type, .bestFields)
+        let expectedDic = ["multi_match": [
+            "query": "this is a test",
+            "fields": ["subject", "message"],
+            "tie_breaker": Decimal(0.3),
+            "type": "best_fields",
+        ]] as [String: Any]
+        XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
+    }
 }

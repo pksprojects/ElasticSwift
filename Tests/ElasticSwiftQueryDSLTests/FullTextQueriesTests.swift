@@ -296,4 +296,71 @@ class FullTextQueriesTest: XCTestCase {
             }
         }
     }
+
+    func test_13_multiMatchQuery_encode() throws {
+        let query = MultiMatchQuery(query: "this is a test", fields: ["subject", "message"], tieBreaker: nil, type: nil)
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "multi_match" : {
+              "query":    "this is a test",
+              "fields": [ "subject", "message" ]
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_14_multiMatchQuery_decode() throws {
+        let query = try QueryBuilders.multiMatchQuery()
+            .set(query: "brown fox")
+            .set(fields: "subject", "message")
+            .set(tieBreaker: 0.3)
+            .set(type: .bestFields)
+            .build()
+
+        let jsonStr = """
+        {
+            "multi_match" : {
+              "query":      "brown fox",
+              "type":       "best_fields",
+              "fields":     [ "subject", "message" ],
+              "tie_breaker": 0.3
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(MultiMatchQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
+
+    func test_15_multiMatchQuery_decode_2() throws {
+        let query = try QueryBuilders.multiMatchQuery()
+            .add(field: "subject^3")
+            .add(field: "message")
+            .set(query: "this is a test")
+            .build()
+
+        let jsonStr = """
+        {
+            "multi_match" : {
+              "query" : "this is a test",
+              "fields" : [ "subject^3", "message" ]
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(MultiMatchQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
 }
