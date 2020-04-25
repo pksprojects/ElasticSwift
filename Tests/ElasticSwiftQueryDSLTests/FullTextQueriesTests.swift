@@ -471,4 +471,32 @@ class FullTextQueriesTest: XCTestCase {
 
         XCTAssertEqual(query, decoded)
     }
+
+    func test_20_commonTermsQuery_encode_2() throws {
+        let query = CommonTermsQuery(query: "nelly the elephant not as a cartoon", cutoffFrequency: 0.001, minimumShouldMatchLowFreq: 2, minimumShouldMatchHighFreq: 3)
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "common": {
+                "body": {
+                    "query": "nelly the elephant not as a cartoon",
+                    "cutoff_frequency": 0.001,
+                    "minimum_should_match": {
+                        "low_freq" : 2,
+                        "high_freq" : 3
+                    }
+                }
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
 }

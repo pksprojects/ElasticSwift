@@ -441,8 +441,8 @@ public struct CommonTermsQuery: Query {
         }
         if let minHighFreq = minimumShouldMatchHighFreq, let minLowFreq = minimumShouldMatchLowFreq {
             dic[CodingKeys.minimumShouldMatch.rawValue] = [
-                CodingKeys.lowFreq.rawValue: minHighFreq,
-                CodingKeys.highFreq.rawValue: minLowFreq,
+                CodingKeys.lowFreq.rawValue: minLowFreq,
+                CodingKeys.highFreq.rawValue: minHighFreq,
             ]
         }
         return [queryType.name: [CommonTermsQuery.BODY: dic]]

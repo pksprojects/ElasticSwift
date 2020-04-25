@@ -343,4 +343,35 @@ class FullTextBuilderTests: XCTestCase {
         ]] as [String: Any]
         XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
     }
+
+    func test_27_commonTermsQueryBuilder() throws {
+        let query = try QueryBuilders.commonTermsQuery()
+            .set(query: "this is a test")
+            .set(cutoffFrequency: 0.001)
+            .set(highFrequencyOperator: .and)
+            .set(lowFrequencyOperator: .or)
+            .set(minimumShouldMatchLowFreq: 2)
+            .set(minimumShouldMatchHighFreq: 3)
+            .build()
+        XCTAssertEqual(query.cutoffFrequency, 0.001)
+        XCTAssertEqual(query.query, "this is a test")
+        XCTAssertEqual(query.highFrequencyOperator, .and)
+        XCTAssertEqual(query.lowFrequencyOperator, .or)
+        XCTAssertEqual(query.minimumShouldMatch, nil)
+        XCTAssertEqual(query.minimumShouldMatchLowFreq, 2)
+        XCTAssertEqual(query.minimumShouldMatchHighFreq, 3)
+        let expectedDic = ["common": [
+            "body": [
+                "query": "this is a test",
+                "cutoff_frequency": Decimal(0.001),
+                "low_freq_operator": "or",
+                "high_freq_operator": "and",
+                "minimum_should_match": [
+                    "low_freq": 2,
+                    "high_freq": 3,
+                ],
+            ],
+        ]] as [String: Any]
+        XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
+    }
 }
