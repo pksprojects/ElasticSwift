@@ -252,6 +252,24 @@ public enum BoostMode: String, Codable {
     case MAX = "max"
 }
 
+public enum MultiMatchQueryType: String, Codable {
+    case bestFields = "best_fields"
+    case mostFields = "most_fields"
+    case crossFields = "cross_fields"
+    case phrase
+    case phrasePrefix = "phrase_prefix"
+}
+
+public enum ZeroTermQuery: String, Codable {
+    case none
+    case all
+}
+
+public enum Operator: String, Codable {
+    case and
+    case or
+}
+
 // MARK: - Rescore Query
 
 /// Wrapper for Query for use in `QueryRescorer` to facilitate rescoring in `SearchRequest`

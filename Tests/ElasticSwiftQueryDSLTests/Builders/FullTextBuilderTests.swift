@@ -77,7 +77,7 @@ class FullTextBuilderTests: XCTestCase {
         XCTAssertEqual(query.value, "to be or not to be")
         XCTAssertEqual(query.zeroTermQuery, ZeroTermQuery.all)
         XCTAssertEqual(query.cutoffFrequency, Decimal(0.1))
-        XCTAssertEqual(query.operator, MatchQueryOperator.or)
+        XCTAssertEqual(query.operator, Operator.or)
         // XCTAssertEqual(query.boost, 0.8)
         let expectedDic = ["match": [
             "message": [
@@ -279,6 +279,67 @@ class FullTextBuilderTests: XCTestCase {
             "fields": ["subject", "message"],
             "tie_breaker": Decimal(0.3),
             "type": "best_fields",
+        ]] as [String: Any]
+        XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
+    }
+
+    func test_22_commonTermsQueryBuilder() throws {
+        XCTAssertNoThrow(try QueryBuilders.commonTermsQuery().set(query: "test search").set(cutoffFrequency: 0.001).build(), "Should not throw")
+    }
+
+    func test_23_commonTermsQueryBuilder() throws {
+        XCTAssertNoThrow(try QueryBuilders.commonTermsQuery().set(query: "test search").set(cutoffFrequency: 0.001).set(highFrequencyOperator: .and).set(lowFrequencyOperator: .or).set(minimumShouldMatch: 2).build(), "Should not throw")
+    }
+
+    func test_24_commonTermsQueryBuilder_missing_field() throws {
+        XCTAssertThrowsError(try QueryBuilders.commonTermsQuery().set(query: "test search").build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .atlestOneElementRequired(field):
+                    XCTAssertEqual("cutoffFrequency", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_25_commonTermsQueryBuilder_missing_value() throws {
+        XCTAssertThrowsError(try QueryBuilders.commonTermsQuery().set(cutoffFrequency: 0.001).build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("query", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_26_commonTermsQueryBuilder() throws {
+        let query = try QueryBuilders.commonTermsQuery()
+            .set(query: "this is a test")
+            .set(cutoffFrequency: 0.001)
+            .set(highFrequencyOperator: .and)
+            .set(lowFrequencyOperator: .or)
+            .set(minimumShouldMatch: 2)
+            .build()
+        XCTAssertEqual(query.cutoffFrequency, 0.001)
+        XCTAssertEqual(query.query, "this is a test")
+        XCTAssertEqual(query.highFrequencyOperator, .and)
+        XCTAssertEqual(query.lowFrequencyOperator, .or)
+        XCTAssertEqual(query.minimumShouldMatch, 2)
+        let expectedDic = ["common": [
+            "body": [
+                "query": "this is a test",
+                "cutoff_frequency": Decimal(0.001),
+                "low_freq_operator": "or",
+                "high_freq_operator": "and",
+                "minimum_should_match": 2,
+            ],
         ]] as [String: Any]
         XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
     }

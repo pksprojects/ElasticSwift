@@ -14,7 +14,7 @@ public class MatchQueryBuilder: QueryBuilder {
     private var _field: String?
     private var _value: String?
     private var _boost: Decimal?
-    private var _operator: MatchQueryOperator?
+    private var _operator: Operator?
     private var _zeroTermQuery: ZeroTermQuery?
     private var _cutoffFrequency: Decimal?
     private var _fuzziness: Fuzziness?
@@ -41,7 +41,7 @@ public class MatchQueryBuilder: QueryBuilder {
     }
 
     @discardableResult
-    public func set(operator: MatchQueryOperator) -> MatchQueryBuilder {
+    public func set(operator: Operator) -> MatchQueryBuilder {
         _operator = `operator`
         return self
     }
@@ -82,7 +82,7 @@ public class MatchQueryBuilder: QueryBuilder {
         return _boost
     }
 
-    public var `operator`: MatchQueryOperator? {
+    public var `operator`: Operator? {
         return _operator
     }
 
@@ -262,8 +262,8 @@ public class MultiMatchQueryBuilder: QueryBuilder {
 public class CommonTermsQueryBuilder: QueryBuilder {
     private var _query: String?
     private var _cutoffFrequency: Decimal?
-    private var _lowFrequencyOperator: String?
-    private var _highFrequencyOperator: String?
+    private var _lowFrequencyOperator: Operator?
+    private var _highFrequencyOperator: Operator?
     private var _minimumShouldMatch: Int?
     private var _minimumShouldMatchLowFreq: Int?
     private var _minimumShouldMatchHighFreq: Int?
@@ -283,13 +283,13 @@ public class CommonTermsQueryBuilder: QueryBuilder {
     }
 
     @discardableResult
-    public func set(lowFrequencyOperator: String) -> CommonTermsQueryBuilder {
+    public func set(lowFrequencyOperator: Operator) -> CommonTermsQueryBuilder {
         _lowFrequencyOperator = lowFrequencyOperator
         return self
     }
 
     @discardableResult
-    public func set(highFrequencyOperator: String) -> CommonTermsQueryBuilder {
+    public func set(highFrequencyOperator: Operator) -> CommonTermsQueryBuilder {
         _highFrequencyOperator = highFrequencyOperator
         return self
     }
@@ -320,11 +320,11 @@ public class CommonTermsQueryBuilder: QueryBuilder {
         return _cutoffFrequency
     }
 
-    public var lowFrequencyOperator: String? {
+    public var lowFrequencyOperator: Operator? {
         return _lowFrequencyOperator
     }
 
-    public var highFrequencyOperator: String? {
+    public var highFrequencyOperator: Operator? {
         return _highFrequencyOperator
     }
 

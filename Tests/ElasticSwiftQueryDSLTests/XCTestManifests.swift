@@ -76,6 +76,11 @@
             ("test_19_multiMatchQueryBuilder_missing_field", test_19_multiMatchQueryBuilder_missing_field),
             ("test_20_multiMatchQueryBuilder_missing_value", test_20_multiMatchQueryBuilder_missing_value),
             ("test_21_multiMatchQueryBuilder", test_21_multiMatchQueryBuilder),
+            ("test_22_commonTermsQueryBuilder", test_22_commonTermsQueryBuilder),
+            ("test_23_commonTermsQueryBuilder", test_23_commonTermsQueryBuilder),
+            ("test_24_commonTermsQueryBuilder_missing_field", test_24_commonTermsQueryBuilder_missing_field),
+            ("test_25_commonTermsQueryBuilder_missing_value", test_25_commonTermsQueryBuilder_missing_value),
+            ("test_26_commonTermsQueryBuilder", test_26_commonTermsQueryBuilder),
         ]
     }
 
@@ -99,6 +104,10 @@
             ("test_13_multiMatchQuery_encode", test_13_multiMatchQuery_encode),
             ("test_14_multiMatchQuery_decode", test_14_multiMatchQuery_decode),
             ("test_15_multiMatchQuery_decode_2", test_15_multiMatchQuery_decode_2),
+            ("test_16_commonTermsQuery_encode", test_16_commonTermsQuery_encode),
+            ("test_17_commonTermsQuery_decode", test_17_commonTermsQuery_decode),
+            ("test_18_commonTermsQuery_decode_2", test_18_commonTermsQuery_decode_2),
+            ("test_19_commonTermsQuery_decode_3", test_19_commonTermsQuery_decode_3),
         ]
     }
 

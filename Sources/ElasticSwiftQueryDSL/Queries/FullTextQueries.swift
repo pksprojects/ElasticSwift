@@ -15,14 +15,14 @@ public struct MatchQuery: Query {
 
     public let field: String
     public let value: String
-    public let `operator`: MatchQueryOperator?
+    public let `operator`: Operator?
     public let zeroTermQuery: ZeroTermQuery?
     public let cutoffFrequency: Decimal?
     public let fuzziness: Fuzziness?
     public let autoGenSynonymnsPhraseQuery: Bool?
     public let boost: Decimal?
 
-    public init(field: String, value: String, boost: Decimal? = nil, operator: MatchQueryOperator? = nil, zeroTermQuery: ZeroTermQuery? = nil, cutoffFrequency: Decimal? = nil, fuzziness: Fuzziness? = nil, autoGenSynonymnsPhraseQuery: Bool? = nil) {
+    public init(field: String, value: String, boost: Decimal? = nil, operator: Operator? = nil, zeroTermQuery: ZeroTermQuery? = nil, cutoffFrequency: Decimal? = nil, fuzziness: Fuzziness? = nil, autoGenSynonymnsPhraseQuery: Bool? = nil) {
         self.field = field
         self.value = value
         self.boost = boost
@@ -83,7 +83,7 @@ extension MatchQuery {
         if let fieldContainer = try? nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field)) {
             value = try fieldContainer.decodeString(forKey: .query)
             boost = try fieldContainer.decodeDecimalIfPresent(forKey: .boost)
-            `operator` = try fieldContainer.decodeIfPresent(MatchQueryOperator.self, forKey: .operator)
+            `operator` = try fieldContainer.decodeIfPresent(Operator.self, forKey: .operator)
             zeroTermQuery = try fieldContainer.decodeIfPresent(ZeroTermQuery.self, forKey: .zeroTermsQuery)
             cutoffFrequency = try fieldContainer.decodeDecimalIfPresent(forKey: .cutoffFrequency)
             fuzziness = try fieldContainer.decodeIfPresent(Fuzziness.self, forKey: .fuzziness)
@@ -398,13 +398,13 @@ public struct CommonTermsQuery: Query {
 
     public let query: String
     public let cutoffFrequency: Decimal
-    public let lowFrequencyOperator: String?
-    public let highFrequencyOperator: String?
+    public let lowFrequencyOperator: Operator?
+    public let highFrequencyOperator: Operator?
     public let minimumShouldMatch: Int?
     public let minimumShouldMatchLowFreq: Int?
     public let minimumShouldMatchHighFreq: Int?
 
-    public init(query: String, cutoffFrequency: Decimal, lowFrequencyOperator: String? = nil, highFrequencyOperator: String? = nil, minimumShouldMatch: Int? = nil, minimumShouldMatchLowFreq: Int? = nil, minimumShouldMatchHighFreq: Int? = nil) {
+    public init(query: String, cutoffFrequency: Decimal, lowFrequencyOperator: Operator? = nil, highFrequencyOperator: Operator? = nil, minimumShouldMatch: Int? = nil, minimumShouldMatchLowFreq: Int? = nil, minimumShouldMatchHighFreq: Int? = nil) {
         self.query = query
         self.cutoffFrequency = cutoffFrequency
         self.lowFrequencyOperator = lowFrequencyOperator
@@ -431,10 +431,10 @@ public struct CommonTermsQuery: Query {
         dic[CodingKeys.query.rawValue] = query
         dic[CodingKeys.cutoffFrequency.rawValue] = cutoffFrequency
         if let lowFrequencyOperator = self.lowFrequencyOperator {
-            dic[CodingKeys.lowFreqOperator.rawValue] = lowFrequencyOperator
+            dic[CodingKeys.lowFreqOperator.rawValue] = lowFrequencyOperator.rawValue
         }
         if let highFrequencyOperator = self.highFrequencyOperator {
-            dic[CodingKeys.highFreqOperator.rawValue] = highFrequencyOperator
+            dic[CodingKeys.highFreqOperator.rawValue] = highFrequencyOperator.rawValue
         }
         if let minimumShouldMatch = self.minimumShouldMatch {
             dic[CodingKeys.minimumShouldMatch.rawValue] = minimumShouldMatch
@@ -457,8 +457,8 @@ extension CommonTermsQuery {
 
         query = try bodyContainer.decodeString(forKey: .query)
         cutoffFrequency = try bodyContainer.decodeDecimal(forKey: .cutoffFrequency)
-        lowFrequencyOperator = try bodyContainer.decodeStringIfPresent(forKey: .lowFreqOperator)
-        highFrequencyOperator = try bodyContainer.decodeStringIfPresent(forKey: .highFreqOperator)
+        lowFrequencyOperator = try bodyContainer.decodeIfPresent(Operator.self, forKey: .lowFreqOperator)
+        highFrequencyOperator = try bodyContainer.decodeIfPresent(Operator.self, forKey: .highFreqOperator)
         if let minShouldMatch = try? bodyContainer.decodeIntIfPresent(forKey: .minimumShouldMatch) {
             minimumShouldMatch = minShouldMatch
             minimumShouldMatchLowFreq = nil
@@ -491,7 +491,7 @@ extension CommonTermsQuery {
     enum CodingKeys: String, CodingKey {
         case query
         case cutoffFrequency = "cutoff_frequency"
-        case lowFreqOperator
+        case lowFreqOperator = "low_freq_operator"
         case highFreqOperator = "high_freq_operator"
         case minimumShouldMatch = "minimum_should_match"
         case lowFreq = "low_freq"
@@ -891,22 +891,4 @@ extension SimpleQueryStringQuery: Equatable {
             && lhs.minimumShouldMatch == rhs.minimumShouldMatch
             && lhs.quoteFieldSuffix == rhs.quoteFieldSuffix
     }
-}
-
-public enum MultiMatchQueryType: String, Codable {
-    case bestFields = "best_fields"
-    case mostFields = "most_fields"
-    case crossFields = "cross_fields"
-    case phrase
-    case phrasePrefix = "phrase_prefix"
-}
-
-public enum MatchQueryOperator: String, Codable {
-    case and
-    case or
-}
-
-public enum ZeroTermQuery: String, Codable {
-    case none
-    case all
 }

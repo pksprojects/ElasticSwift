@@ -363,4 +363,112 @@ class FullTextQueriesTest: XCTestCase {
 
         XCTAssertEqual(query, decoded)
     }
+
+    func test_16_commonTermsQuery_encode() throws {
+        let query = CommonTermsQuery(query: "this is bonsai cool", cutoffFrequency: 0.001)
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "common": {
+                "body": {
+                    "query": "this is bonsai cool",
+                    "cutoff_frequency": 0.001
+                }
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_17_commonTermsQuery_decode() throws {
+        let query = try QueryBuilders.commonTermsQuery()
+            .set(query: "nelly the elephant as a cartoon")
+            .set(cutoffFrequency: 0.001)
+            .set(minimumShouldMatch: 2)
+            .build()
+
+        let jsonStr = """
+        {
+            "common": {
+                "body": {
+                    "query": "nelly the elephant as a cartoon",
+                    "cutoff_frequency": 0.001,
+                    "minimum_should_match": 2
+                }
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(CommonTermsQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
+
+    func test_18_commonTermsQuery_decode_2() throws {
+        let query = try QueryBuilders.commonTermsQuery()
+            .set(query: "nelly the elephant not as a cartoon")
+            .set(cutoffFrequency: 0.001)
+            .set(minimumShouldMatchLowFreq: 2)
+            .set(minimumShouldMatchHighFreq: 3)
+            .build()
+
+        let jsonStr = """
+        {
+            "common": {
+                "body": {
+                    "query": "nelly the elephant not as a cartoon",
+                    "cutoff_frequency": 0.001,
+                    "minimum_should_match": {
+                        "low_freq" : 2,
+                        "high_freq" : 3
+                    }
+                }
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(CommonTermsQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
+
+    func test_19_commonTermsQuery_decode_3() throws {
+        let query = try QueryBuilders.commonTermsQuery()
+            .set(query: "nelly the elephant not as a cartoon")
+            .set(cutoffFrequency: 0.001)
+            .set(lowFrequencyOperator: .and)
+            .set(highFrequencyOperator: .or)
+            .set(minimumShouldMatchLowFreq: 2)
+            .set(minimumShouldMatchHighFreq: 3)
+            .build()
+
+        let jsonStr = """
+        {
+            "common": {
+                "body": {
+                    "query": "nelly the elephant not as a cartoon",
+                    "cutoff_frequency": 0.001,
+                    "low_freq_operator": "and",
+                    "high_freq_operator": "or",
+                    "minimum_should_match": {
+                        "low_freq" : 2,
+                        "high_freq" : 3
+                    }
+                }
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(CommonTermsQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
 }
