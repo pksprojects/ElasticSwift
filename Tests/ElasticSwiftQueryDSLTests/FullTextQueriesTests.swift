@@ -690,4 +690,130 @@ class FullTextQueriesTest: XCTestCase {
 
         XCTAssertEqual(query, decoded)
     }
+
+    func test_25_simpleQueryStringQuery_encode() throws {
+        let query = SimpleQueryStringQuery(query: "foo bar -baz", fields: ["content"], defaultOperator: "and")
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "simple_query_string" : {
+                "fields" : ["content"],
+                "query" : "foo bar -baz",
+                "default_operator" : "and"
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_26_simpleQueryStringQuery_encode_2() throws {
+        let query = try QueryBuilders.simpleQueryStringQuery()
+            .set(query: "this is a test")
+            .set(minimumShouldMatch: 2)
+            .set(autoGenerateSynonymsPhraseQuery: false)
+            .set(fields: "test", "test2")
+            .set(lenient: false)
+            .set(flags: "OR|AND|PREFIX")
+            .set(analyzer: "test_analyzer")
+            .set(defaultOperator: "OR")
+            .set(quoteFieldSuffix: "s")
+            .set(fuzzyTranspositions: false)
+            .set(fuzzyPrefixLength: 1)
+            .set(fuzzyMaxExpansions: 2)
+            .build()
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "simple_query_string" : {
+                "fields" : ["test", "test2"],
+                "query" : "this is a test",
+                "default_operator" : "OR",
+                "minimum_should_match": 2,
+                "auto_generate_synonyms_phrase_query": false,
+                "lenient": false,
+                "flags": "OR|AND|PREFIX",
+                "analyzer": "test_analyzer",
+                "quote_field_suffix": "s",
+                "fuzzy_transpositions": false,
+                "fuzzy_prefix_length": 1,
+                "fuzzy_max_expansions": 2
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_27_simpleQueryStringQuery_decode() throws {
+        let query = SimpleQueryStringQuery(query: "foo bar -baz", fields: ["content"], defaultOperator: "and")
+
+        let jsonStr = """
+        {
+            "simple_query_string" : {
+                "fields" : ["content"],
+                "query" : "foo bar -baz",
+                "default_operator" : "and"
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(SimpleQueryStringQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
+
+    func test_28_simpleQueryStringQuery_decode_2() throws {
+        let query = try QueryBuilders.simpleQueryStringQuery()
+            .set(query: "this is a test")
+            .set(minimumShouldMatch: 2)
+            .set(autoGenerateSynonymsPhraseQuery: false)
+            .set(fields: "test", "test2")
+            .set(lenient: false)
+            .set(flags: "OR|AND|PREFIX")
+            .set(analyzer: "test_analyzer")
+            .set(defaultOperator: "OR")
+            .set(quoteFieldSuffix: "s")
+            .set(fuzzyTranspositions: false)
+            .set(fuzzyPrefixLength: 1)
+            .set(fuzzyMaxExpansions: 2)
+            .build()
+
+        let jsonStr = """
+        {
+            "simple_query_string" : {
+                "fields" : ["test", "test2"],
+                "query" : "this is a test",
+                "default_operator" : "OR",
+                "minimum_should_match": 2,
+                "auto_generate_synonyms_phrase_query": false,
+                "lenient": false,
+                "flags": "OR|AND|PREFIX",
+                "analyzer": "test_analyzer",
+                "quote_field_suffix": "s",
+                "fuzzy_transpositions": false,
+                "fuzzy_prefix_length": 1,
+                "fuzzy_max_expansions": 2
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(SimpleQueryStringQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
 }

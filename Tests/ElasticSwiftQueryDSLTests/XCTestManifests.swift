@@ -85,6 +85,9 @@
             ("test_28_queryStringQueryBuilder", test_28_queryStringQueryBuilder),
             ("test_29_queryStringQueryBuilder_missing_field", test_29_queryStringQueryBuilder_missing_field),
             ("test_30_queryStringQueryBuilder", test_30_queryStringQueryBuilder),
+            ("test_31_simpleQueryStringQueryBuilder", test_31_simpleQueryStringQueryBuilder),
+            ("test_32_simpleQueryStringQueryBuilder_missing_field", test_32_simpleQueryStringQueryBuilder_missing_field),
+            ("test_33_simpleQueryStringQueryBuilder", test_33_simpleQueryStringQueryBuilder),
         ]
     }
 
@@ -117,6 +120,10 @@
             ("test_22_queryStringQuery_encode_2", test_22_queryStringQuery_encode_2),
             ("test_23_queryStringQuery_decode", test_23_queryStringQuery_decode),
             ("test_24_queryStringQuery_decode_2", test_24_queryStringQuery_decode_2),
+            ("test_25_simpleQueryStringQuery_encode", test_25_simpleQueryStringQuery_encode),
+            ("test_26_simpleQueryStringQuery_encode_2", test_26_simpleQueryStringQuery_encode_2),
+            ("test_27_simpleQueryStringQuery_decode", test_27_simpleQueryStringQuery_decode),
+            ("test_28_simpleQueryStringQuery_decode_2", test_28_simpleQueryStringQuery_decode_2),
         ]
     }
 

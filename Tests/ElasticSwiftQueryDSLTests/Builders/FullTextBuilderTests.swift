@@ -381,4 +381,51 @@ class FullTextBuilderTests: XCTestCase {
         XCTAssertEqual(query.enablePositionIncrements, false)
         XCTAssertEqual(query.autoGeneratePhraseQueries, false)
     }
+
+    func test_31_simpleQueryStringQueryBuilder() throws {
+        XCTAssertNoThrow(try QueryBuilders.simpleQueryStringQuery().set(query: "test search").build(), "Should not throw")
+    }
+
+    func test_32_simpleQueryStringQueryBuilder_missing_field() throws {
+        XCTAssertThrowsError(try QueryBuilders.simpleQueryStringQuery().set(minimumShouldMatch: 2).build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("query", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_33_simpleQueryStringQueryBuilder() throws {
+        let query = try QueryBuilders.simpleQueryStringQuery()
+            .set(query: "this is a test")
+            .set(minimumShouldMatch: 2)
+            .set(autoGenerateSynonymsPhraseQuery: false)
+            .set(fields: "test", "test2")
+            .set(lenient: false)
+            .set(analyzer: "test_analyzer")
+            .set(flags: "OR|AND|PREFIX")
+            .set(defaultOperator: "OR")
+            .set(quoteFieldSuffix: "s")
+            .set(fuzzyTranspositions: false)
+            .set(fuzzyPrefixLength: 1)
+            .set(fuzzyMaxExpansions: 2)
+            .build()
+        XCTAssertEqual(query.minimumShouldMatch, 2)
+        XCTAssertEqual(query.query, "this is a test")
+        XCTAssertEqual(query.autoGenerateSynonymsPhraseQuery, false)
+        XCTAssertEqual(query.fields, ["test", "test2"])
+        XCTAssertEqual(query.lenient, false)
+        XCTAssertEqual(query.analyzer, "test_analyzer")
+        XCTAssertEqual(query.flags, "OR|AND|PREFIX")
+        XCTAssertEqual(query.defaultOperator, "OR")
+        XCTAssertEqual(query.quoteFieldSuffix, "s")
+        XCTAssertEqual(query.fuzzyTranspositions, false)
+        XCTAssertEqual(query.fuzzyPrefixLength, 1)
+        XCTAssertEqual(query.fuzzyMaxExpansions, 2)
+    }
 }
