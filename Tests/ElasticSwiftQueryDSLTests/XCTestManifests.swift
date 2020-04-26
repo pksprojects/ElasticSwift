@@ -273,6 +273,10 @@
             ("test_04_termQuery_decode_2", test_04_termQuery_decode_2),
             ("test_05_termsQuery_encode", test_05_termsQuery_encode),
             ("test_06_termsQuery_decode", test_06_termsQuery_decode),
+            ("test_07_rangeQuery_encode", test_07_rangeQuery_encode),
+            ("test_08_rangeQuery_encode_2", test_08_rangeQuery_encode_2),
+            ("test_09_rangeQuery_decode", test_09_rangeQuery_decode),
+            ("test_10_rangeQuery_decode_2", test_10_rangeQuery_decode_2),
         ]
     }
 
@@ -283,11 +287,17 @@
         static let __allTests__TermLevelQueryBuilderTests = [
             ("test_01_termQueryBuilder", test_01_termQueryBuilder),
             ("test_02_termQueryBuilder_2", test_02_termQueryBuilder_2),
-            ("test_03_matchQueryBuilder_missing_field", test_03_matchQueryBuilder_missing_field),
-            ("test_04_matchQueryBuilder_missing_value", test_04_matchQueryBuilder_missing_value),
+            ("test_03_termQueryBuilder_missing_field", test_03_termQueryBuilder_missing_field),
+            ("test_04_termQueryBuilder_missing_value", test_04_termQueryBuilder_missing_value),
             ("test_05_termsQueryBuilder", test_05_termsQueryBuilder),
             ("test_06_termsQueryBuilder_missing_field", test_06_termsQueryBuilder_missing_field),
             ("test_07_termsQueryBuilder_missing_value", test_07_termsQueryBuilder_missing_value),
+            ("test_08_termQueryBuilder", test_08_termQueryBuilder),
+            ("test_09_termsQueryBuilder", test_09_termsQueryBuilder),
+            ("test_10_rangeQueryBuilder", test_10_rangeQueryBuilder),
+            ("test_11_rangeQueryBuilder_missing_field", test_11_rangeQueryBuilder_missing_field),
+            ("test_12_rangeQueryBuilder_missing_value", test_12_rangeQueryBuilder_missing_value),
+            ("test_13_rangeQueryBuilder", test_13_rangeQueryBuilder),
         ]
     }
 

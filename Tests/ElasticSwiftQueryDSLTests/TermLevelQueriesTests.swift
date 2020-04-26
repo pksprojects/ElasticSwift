@@ -137,4 +137,124 @@ class TermLevelQueriesTests: XCTestCase {
 
         XCTAssertEqual(query, decoded)
     }
+
+    func test_07_rangeQuery_encode() throws {
+        let query = RangeQuery(field: "age", gte: "10", gt: nil, lte: "20", lt: nil, boost: 2.0)
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "range" : {
+                "age" : {
+                    "gte" : "10",
+                    "lte" : "20",
+                    "boost" : 2.0
+                }
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_08_rangeQuery_encode_2() throws {
+        let query = try QueryBuilders.rangeQuery()
+            .set(field: "age")
+            .set(gt: "14")
+            .set(lt: "45")
+            .set(gte: "15")
+            .set(lte: "45")
+            .set(format: "dd/MM/yyyy||yyyy")
+            .set(relation: .contains)
+            .set(timeZone: "UTC")
+            .set(boost: 2.0)
+            .build()
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "range" : {
+                "age" : {
+                    "gte": "15",
+                    "lte": "45",
+                    "gt": "14",
+                    "lt": "45",
+                    "format": "dd/MM/yyyy||yyyy",
+                    "time_zone": "UTC",
+                    "relation": "contains",
+                    "boost" : 2.0
+                }
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_09_rangeQuery_decode() throws {
+        let query = RangeQuery(field: "age", gte: "10", gt: nil, lte: "20", lt: nil, boost: 2.0)
+
+        let jsonStr = """
+        {
+            "range" : {
+                "age" : {
+                    "gte" : "10",
+                    "lte" : "20",
+                    "boost" : 2.0
+                }
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(RangeQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
+
+    func test_10_rangeQuery_decode_2() throws {
+        let query = try QueryBuilders.rangeQuery()
+            .set(field: "age")
+            .set(gt: "14")
+            .set(lt: "45")
+            .set(gte: "15")
+            .set(lte: "45")
+            .set(format: "dd/MM/yyyy||yyyy")
+            .set(relation: .contains)
+            .set(timeZone: "UTC")
+            .set(boost: 2.0)
+            .build()
+
+        let jsonStr = """
+        {
+            "range" : {
+                "age" : {
+                    "gte": "15",
+                    "lte": "45",
+                    "gt": "14",
+                    "lt": "45",
+                    "format": "dd/MM/yyyy||yyyy",
+                    "time_zone": "UTC",
+                    "relation": "contains",
+                    "boost" : 2.0
+                }
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(RangeQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
 }

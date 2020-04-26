@@ -37,7 +37,7 @@ class TermLevelQueryBuilderTests: XCTestCase {
         XCTAssertNoThrow(try QueryBuilders.termQuery().set(field: "text").set(value: "test search").set(boost: 1.0).build(), "Should not throw")
     }
 
-    func test_03_matchQueryBuilder_missing_field() throws {
+    func test_03_termQueryBuilder_missing_field() throws {
         XCTAssertThrowsError(try QueryBuilders.termQuery().set(value: "test search").build(), "Should not throw") { error in
             logger.info("Expected Error: \(error)")
             if let error = error as? QueryBuilderError {
@@ -51,7 +51,7 @@ class TermLevelQueryBuilderTests: XCTestCase {
         }
     }
 
-    func test_04_matchQueryBuilder_missing_value() throws {
+    func test_04_termQueryBuilder_missing_value() throws {
         XCTAssertThrowsError(try QueryBuilders.termQuery().set(field: "text").build(), "Should not throw") { error in
             logger.info("Expected Error: \(error)")
             if let error = error as? QueryBuilderError {
@@ -95,5 +95,81 @@ class TermLevelQueryBuilderTests: XCTestCase {
                 }
             }
         }
+    }
+
+    func test_08_termQueryBuilder() throws {
+        let query = try QueryBuilders.termQuery()
+            .set(field: "message")
+            .set(value: "to be or not to be")
+            .set(boost: 2.0)
+            .build()
+        XCTAssertEqual(query.field, "message")
+        XCTAssertEqual(query.value, "to be or not to be")
+        XCTAssertEqual(query.boost, 2.0)
+    }
+
+    func test_09_termsQueryBuilder() throws {
+        let query = try QueryBuilders.termsQuery()
+            .set(field: "message")
+            .set(values: "to be or not to be")
+            .add(value: "test")
+            .build()
+        XCTAssertEqual(query.field, "message")
+        XCTAssertEqual(query.values, ["to be or not to be", "test"])
+    }
+
+    func test_10_rangeQueryBuilder() throws {
+        XCTAssertNoThrow(try QueryBuilders.rangeQuery().set(field: "age").set(gt: "14").build(), "Should not throw")
+    }
+
+    func test_11_rangeQueryBuilder_missing_field() throws {
+        XCTAssertThrowsError(try QueryBuilders.rangeQuery().set(gt: "10").set(boost: 2.0).build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("field", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_12_rangeQueryBuilder_missing_value() throws {
+        XCTAssertThrowsError(try QueryBuilders.rangeQuery().set(field: "text").build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .atleastOneFieldRequired(fields):
+                    XCTAssertEqual(["gte", "gt", "lt", "lte"], fields)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_13_rangeQueryBuilder() throws {
+        let query = try QueryBuilders.rangeQuery()
+            .set(field: "age")
+            .set(gt: "14")
+            .set(lt: "45")
+            .set(gte: "15")
+            .set(lte: "45")
+            .set(format: "format")
+            .set(relation: .contains)
+            .set(timeZone: "UTC")
+            .set(boost: 2.0)
+            .build()
+        XCTAssertEqual(query.field, "age")
+        XCTAssertEqual(query.gt, "14")
+        XCTAssertEqual(query.lt, "45")
+        XCTAssertEqual(query.gte, "15")
+        XCTAssertEqual(query.lte, "45")
+        XCTAssertEqual(query.format, "format")
+        XCTAssertEqual(query.relation, .contains)
+        XCTAssertEqual(query.timeZone, "UTC")
+        XCTAssertEqual(query.boost, 2.0)
     }
 }
