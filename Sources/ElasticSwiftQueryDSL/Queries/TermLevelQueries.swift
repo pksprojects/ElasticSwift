@@ -119,8 +119,7 @@ extension TermsQuery {
 
         field = nested.allKeys.first!.stringValue
 
-        var fieldContainer = try nested.nestedUnkeyedContainer(forKey: .key(named: field))
-        values = try fieldContainer.decode([String].self)
+        values = try nested.decode([String].self, forKey: .key(named: field))
     }
 
     public func encode(to encoder: Encoder) throws {
