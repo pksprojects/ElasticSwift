@@ -197,4 +197,98 @@ class TermLevelQueryBuilderTests: XCTestCase {
             .build()
         XCTAssertEqual(query.field, "message")
     }
+
+    func test_17_prefixQueryBuilder() throws {
+        XCTAssertNoThrow(try QueryBuilders.prefixQuery().set(field: "text").set(value: "test search").build(), "Should not throw")
+    }
+
+    func test_18_prefixQueryBuilder_2() throws {
+        XCTAssertNoThrow(try QueryBuilders.prefixQuery().set(field: "text").set(value: "test search").set(boost: 1.0).build(), "Should not throw")
+    }
+
+    func test_19_prefixQueryBuilder_missing_field() throws {
+        XCTAssertThrowsError(try QueryBuilders.prefixQuery().set(value: "test search").build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("field", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_20_prefixQueryBuilder_missing_value() throws {
+        XCTAssertThrowsError(try QueryBuilders.prefixQuery().set(field: "text").build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("value", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_21_prefixQueryBuilder() throws {
+        let query = try QueryBuilders.prefixQuery()
+            .set(field: "message")
+            .set(value: "to be or not to be")
+            .set(boost: 2.0)
+            .build()
+        XCTAssertEqual(query.field, "message")
+        XCTAssertEqual(query.value, "to be or not to be")
+        XCTAssertEqual(query.boost, 2.0)
+    }
+
+    func test_22_wildCardQueryBuilder() throws {
+        XCTAssertNoThrow(try QueryBuilders.wildCardQuery().set(field: "text").set(value: "test search").build(), "Should not throw")
+    }
+
+    func test_23_wildCardQueryBuilder_2() throws {
+        XCTAssertNoThrow(try QueryBuilders.wildCardQuery().set(field: "text").set(value: "test search").set(boost: 1.0).build(), "Should not throw")
+    }
+
+    func test_24_wildCardQueryBuilder_missing_field() throws {
+        XCTAssertThrowsError(try QueryBuilders.wildCardQuery().set(value: "test search").build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("field", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_25_wildCardQueryBuilder_missing_value() throws {
+        XCTAssertThrowsError(try QueryBuilders.wildCardQuery().set(field: "text").build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("value", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_26_wildCardQueryBuilder() throws {
+        let query = try QueryBuilders.wildCardQuery()
+            .set(field: "message")
+            .set(value: "to be or not to be")
+            .set(boost: 2.0)
+            .build()
+        XCTAssertEqual(query.field, "message")
+        XCTAssertEqual(query.value, "to be or not to be")
+        XCTAssertEqual(query.boost, 2.0)
+    }
 }

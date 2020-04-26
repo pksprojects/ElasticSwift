@@ -279,6 +279,14 @@
             ("test_10_rangeQuery_decode_2", test_10_rangeQuery_decode_2),
             ("test_11_existsQuery_encode", test_11_existsQuery_encode),
             ("test_12_existsQuery_decode", test_12_existsQuery_decode),
+            ("test_13_prefixQuery_encode", test_13_prefixQuery_encode),
+            ("test_14_prefixQuery_encode_2", test_14_prefixQuery_encode_2),
+            ("test_15_prefixQuery_decode", test_15_prefixQuery_decode),
+            ("test_16_prefixQuery_decode_2", test_16_prefixQuery_decode_2),
+            ("test_17_wildCardQuery_encode", test_17_wildCardQuery_encode),
+            ("test_18_wildCardQuery_encode_2", test_18_wildCardQuery_encode_2),
+            ("test_19_wildCardQuery_decode", test_19_wildCardQuery_decode),
+            ("test_20_wildCardQuery_decode_2", test_20_wildCardQuery_decode_2),
         ]
     }
 
@@ -303,6 +311,16 @@
             ("test_14_existsQueryBuilder", test_14_existsQueryBuilder),
             ("test_15_existsQueryBuilder_missing_field", test_15_existsQueryBuilder_missing_field),
             ("test_16_existsQueryBuilder", test_16_existsQueryBuilder),
+            ("test_17_prefixQueryBuilder", test_17_prefixQueryBuilder),
+            ("test_18_prefixQueryBuilder_2", test_18_prefixQueryBuilder_2),
+            ("test_19_prefixQueryBuilder_missing_field", test_19_prefixQueryBuilder_missing_field),
+            ("test_20_prefixQueryBuilder_missing_value", test_20_prefixQueryBuilder_missing_value),
+            ("test_21_prefixQueryBuilder", test_21_prefixQueryBuilder),
+            ("test_22_wildCardQueryBuilder", test_22_wildCardQueryBuilder),
+            ("test_23_wildCardQueryBuilder_2", test_23_wildCardQueryBuilder_2),
+            ("test_24_wildCardQueryBuilder_missing_field", test_24_wildCardQueryBuilder_missing_field),
+            ("test_25_wildCardQueryBuilder_missing_value", test_25_wildCardQueryBuilder_missing_value),
+            ("test_26_wildCardQueryBuilder", test_26_wildCardQueryBuilder),
         ]
     }
 

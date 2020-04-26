@@ -294,4 +294,150 @@ class TermLevelQueriesTests: XCTestCase {
 
         XCTAssertEqual(query, decoded)
     }
+
+    func test_13_prefixQuery_encode() throws {
+        let query = PrefixQuery(field: "user", value: "ki")
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "prefix" : { "user" : "ki" }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_14_prefixQuery_encode_2() throws {
+        let query = PrefixQuery(field: "user", value: "ki", boost: 2.0)
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "prefix" : { "user" :  { "value" : "ki", "boost" : 2.0 } }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_15_prefixQuery_decode() throws {
+        let query = PrefixQuery(field: "user", value: "ki")
+
+        let jsonStr = """
+        {
+            "prefix" : { "user" : "ki" }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(PrefixQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
+
+    func test_16_prefixQuery_decode_2() throws {
+        let query = PrefixQuery(field: "user", value: "ki", boost: 2.0)
+
+        let jsonStr = """
+        {
+            "prefix" : { "user" :  { "value" : "ki", "boost" : 2.0 } }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(PrefixQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
+
+    func test_17_wildCardQuery_encode() throws {
+        let query = WildCardQuery(field: "user", value: "ki*y")
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "wildcard": {
+                "user": "ki*y"
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_18_wildCardQuery_encode_2() throws {
+        let query = WildCardQuery(field: "user", value: "ki*y", boost: 2.0)
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "wildcard": {
+                "user": {
+                    "value": "ki*y",
+                    "boost": 2.0
+                }
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_19_wildCardQuery_decode() throws {
+        let query = WildCardQuery(field: "user", value: "ki*y")
+
+        let jsonStr = """
+        {
+            "wildcard": {
+                "user": "ki*y"
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(WildCardQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
+
+    func test_20_wildCardQuery_decode_2() throws {
+        let query = WildCardQuery(field: "user", value: "ki*y", boost: 2.0)
+
+        let jsonStr = """
+        {
+            "wildcard": {
+                "user": {
+                    "value": "ki*y",
+                    "boost": 2.0
+                }
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(WildCardQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
 }
