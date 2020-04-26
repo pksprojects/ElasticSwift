@@ -172,4 +172,29 @@ class TermLevelQueryBuilderTests: XCTestCase {
         XCTAssertEqual(query.timeZone, "UTC")
         XCTAssertEqual(query.boost, 2.0)
     }
+
+    func test_14_existsQueryBuilder() throws {
+        XCTAssertNoThrow(try QueryBuilders.existsQuery().set(field: "age").build(), "Should not throw")
+    }
+
+    func test_15_existsQueryBuilder_missing_field() throws {
+        XCTAssertThrowsError(try QueryBuilders.existsQuery().build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("field", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_16_existsQueryBuilder() throws {
+        let query = try QueryBuilders.existsQuery()
+            .set(field: "message")
+            .build()
+        XCTAssertEqual(query.field, "message")
+    }
 }

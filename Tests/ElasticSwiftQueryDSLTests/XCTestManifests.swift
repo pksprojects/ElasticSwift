@@ -277,6 +277,8 @@
             ("test_08_rangeQuery_encode_2", test_08_rangeQuery_encode_2),
             ("test_09_rangeQuery_decode", test_09_rangeQuery_decode),
             ("test_10_rangeQuery_decode_2", test_10_rangeQuery_decode_2),
+            ("test_11_existsQuery_encode", test_11_existsQuery_encode),
+            ("test_12_existsQuery_decode", test_12_existsQuery_decode),
         ]
     }
 
@@ -298,6 +300,9 @@
             ("test_11_rangeQueryBuilder_missing_field", test_11_rangeQueryBuilder_missing_field),
             ("test_12_rangeQueryBuilder_missing_value", test_12_rangeQueryBuilder_missing_value),
             ("test_13_rangeQueryBuilder", test_13_rangeQueryBuilder),
+            ("test_14_existsQueryBuilder", test_14_existsQueryBuilder),
+            ("test_15_existsQueryBuilder_missing_field", test_15_existsQueryBuilder_missing_field),
+            ("test_16_existsQueryBuilder", test_16_existsQueryBuilder),
         ]
     }
 

@@ -257,4 +257,41 @@ class TermLevelQueriesTests: XCTestCase {
 
         XCTAssertEqual(query, decoded)
     }
+
+    func test_11_existsQuery_encode() throws {
+        let query = ExistsQuery(field: "user")
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "exists": {
+                "field": "user"
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_12_existsQuery_decode() throws {
+        let query = ExistsQuery(field: "user")
+
+        let jsonStr = """
+        {
+            "exists": {
+                "field": "user"
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(ExistsQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
 }
