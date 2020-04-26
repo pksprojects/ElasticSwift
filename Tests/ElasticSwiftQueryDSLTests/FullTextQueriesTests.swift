@@ -499,4 +499,195 @@ class FullTextQueriesTest: XCTestCase {
         """.data(using: .utf8)!)
         XCTAssertEqual(expectedDic, dic)
     }
+
+    func test_21_queryStringQuery_encode() throws {
+        let query = QueryStringQuery("(content:this OR name:this) AND (content:that OR name:that)")
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "query_string": {
+                "query": "(content:this OR name:this) AND (content:that OR name:that)"
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_22_queryStringQuery_encode_2() throws {
+        let query = try QueryBuilders.queryStringQuery()
+            .set(query: "this OR that OR thus")
+            .set(minimumShouldMatch: 2)
+            .set(boost: 1)
+            .set(type: .bestFields)
+            .set(autoGenerateSynonymsPhraseQuery: false)
+            .set(tieBreaker: 0)
+            .set(fields: ["title", "content"])
+            .set(lenient: false)
+            .set(analyzer: "test_analyzer")
+            .set(timeZone: "UTC")
+            .set(fuzziness: "fuzz")
+            .set(phraseSlop: 1)
+            .set(defaultField: "test")
+            .set(quoteAnalyzer: "quote_analyzer")
+            .set(analyzeWildcard: true)
+            .set(defaultOperator: "OR")
+            .set(quoteFieldSuffix: "s")
+            .set(fuzzyTranspositions: false)
+            .set(allowLeadingWildcard: true)
+            .set(fuzzyPrefixLength: 1)
+            .set(fuzzyMaxExpansions: 2)
+            .set(maxDeterminizedStates: 4)
+            .set(enablePositionIncrements: false)
+            .set(autoGeneratePhraseQueries: false)
+            .build()
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "query_string": {
+                "fields": [
+                    "title",
+                    "content"
+                ],
+                "query": "this OR that OR thus",
+                "minimum_should_match": 2,
+                "type": "best_fields",
+                "tie_breaker" : 0,
+                "auto_generate_synonyms_phrase_query" : false,
+                "boost": 1,
+                "lenient": false,
+                "analyzer": "test_analyzer",
+                "time_zone": "UTC",
+                "fuzziness": "fuzz",
+                "phrase_slop": 1,
+                "default_field": "test",
+                "quote_analyzer": "quote_analyzer",
+                "analyze_wildcard": true,
+                "default_operator": "OR",
+                "quote_field_suffix": "s",
+                "fuzzy_transpositions": false,
+                "allow_leading_wildcard": true,
+                "fuzzy_prefix_length": 1,
+                "fuzzy_max_expansions": 2,
+                "max_determinized_states": 4,
+                "enable_position_increments": false,
+                "auto_generate_phrase_queries": false
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_23_queryStringQuery_decode() throws {
+        let query = try QueryBuilders.queryStringQuery()
+            .set(query: "this OR that OR thus")
+            .set(fields: ["title", "content"])
+            .set(type: .crossFields)
+            .set(tieBreaker: 0)
+            .set(autoGenerateSynonymsPhraseQuery: false)
+            .set(minimumShouldMatch: 2)
+            .build()
+
+        let jsonStr = """
+        {
+            "query_string": {
+                "fields": [
+                    "title",
+                    "content"
+                ],
+                "query": "this OR that OR thus",
+                "minimum_should_match": 2,
+                "type": "cross_fields",
+                "tie_breaker" : 0,
+                "auto_generate_synonyms_phrase_query" : false
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(QueryStringQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
+
+    func test_24_queryStringQuery_decode_2() throws {
+        let query = try QueryBuilders.queryStringQuery()
+            .set(query: "this OR that OR thus")
+            .set(minimumShouldMatch: 2)
+            .set(boost: 1)
+            .set(type: .bestFields)
+            .set(autoGenerateSynonymsPhraseQuery: false)
+            .set(tieBreaker: 0)
+            .set(fields: ["title", "content"])
+            .set(lenient: false)
+            .set(analyzer: "test_analyzer")
+            .set(timeZone: "UTC")
+            .set(fuzziness: "fuzz")
+            .set(phraseSlop: 1)
+            .set(defaultField: "test")
+            .set(quoteAnalyzer: "quote_analyzer")
+            .set(analyzeWildcard: true)
+            .set(defaultOperator: "OR")
+            .set(quoteFieldSuffix: "s")
+            .set(fuzzyTranspositions: false)
+            .set(allowLeadingWildcard: true)
+            .set(fuzzyPrefixLength: 1)
+            .set(fuzzyMaxExpansions: 2)
+            .set(maxDeterminizedStates: 4)
+            .set(enablePositionIncrements: false)
+            .set(autoGeneratePhraseQueries: false)
+            .build()
+
+        let jsonStr = """
+        {
+            "query_string": {
+                "fields": [
+                    "title",
+                    "content"
+                ],
+                "query": "this OR that OR thus",
+                "minimum_should_match": 2,
+                "type": "best_fields",
+                "tie_breaker" : 0,
+                "auto_generate_synonyms_phrase_query" : false,
+                "boost": 1,
+                "lenient": false,
+                "analyzer": "test_analyzer",
+                "time_zone": "UTC",
+                "fuzziness": "fuzz",
+                "phrase_slop": 1,
+                "default_field": "test",
+                "quote_analyzer": "quote_analyzer",
+                "analyze_wildcard": true,
+                "default_operator": "OR",
+                "quote_field_suffix": "s",
+                "fuzzy_transpositions": false,
+                "allow_leading_wildcard": true,
+                "fuzzy_prefix_length": 1,
+                "fuzzy_max_expansions": 2,
+                "max_determinized_states": 4,
+                "enable_position_increments": false,
+                "auto_generate_phrase_queries": false
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(QueryStringQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
 }

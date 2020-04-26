@@ -518,7 +518,10 @@ public struct QueryStringQuery: Query {
     public let queryType: QueryType = QueryTypes.queryString
 
     public let defaultField: String?
-    public let value: String
+    public let query: String
+    public let fields: [String]?
+    public let type: MultiMatchQueryType?
+    public let tieBreaker: Decimal?
     public let defaultOperator: String?
     public let analyzer: String?
     public let quoteAnalyzer: String?
@@ -539,9 +542,12 @@ public struct QueryStringQuery: Query {
     public let quoteFieldSuffix: String?
     public let autoGenerateSynonymsPhraseQuery: Bool?
 
-    public init(_ value: String, defaultField: String? = nil, defaultOperator: String? = nil, analyzer: String? = nil, quoteAnalyzer: String? = nil, allowLeadingWildcard: Bool? = nil, enablePositionIncrements: Bool? = nil, fuzzyMaxExpansions: Int? = nil, fuzziness: String? = nil, fuzzyPrefixLength: Int? = nil, fuzzyTranspositions: Bool? = nil, phraseSlop: Int? = nil, boost: Decimal? = nil, autoGeneratePhraseQueries: Bool? = nil, analyzeWildcard: Bool? = nil, maxDeterminizedStates: Int? = nil, minimumShouldMatch: Int? = nil, lenient: Bool? = nil, timeZone: String? = nil, quoteFieldSuffix: String? = nil, autoGenerateSynonymsPhraseQuery: Bool? = nil) {
+    public init(_ query: String, fields: [String]? = nil, type: MultiMatchQueryType? = nil, tieBreaker: Decimal? = nil, defaultField: String? = nil, defaultOperator: String? = nil, analyzer: String? = nil, quoteAnalyzer: String? = nil, allowLeadingWildcard: Bool? = nil, enablePositionIncrements: Bool? = nil, fuzzyMaxExpansions: Int? = nil, fuzziness: String? = nil, fuzzyPrefixLength: Int? = nil, fuzzyTranspositions: Bool? = nil, phraseSlop: Int? = nil, boost: Decimal? = nil, autoGeneratePhraseQueries: Bool? = nil, analyzeWildcard: Bool? = nil, maxDeterminizedStates: Int? = nil, minimumShouldMatch: Int? = nil, lenient: Bool? = nil, timeZone: String? = nil, quoteFieldSuffix: String? = nil, autoGenerateSynonymsPhraseQuery: Bool? = nil) {
         self.defaultField = defaultField
-        self.value = value
+        self.query = query
+        self.fields = fields
+        self.type = type
+        self.tieBreaker = tieBreaker
         self.defaultOperator = defaultOperator
         self.analyzer = analyzer
         self.quoteAnalyzer = quoteAnalyzer
@@ -564,16 +570,16 @@ public struct QueryStringQuery: Query {
     }
 
     internal init(withBuilder builder: QueryStringQueryBuilder) throws {
-        guard builder.value != nil else {
-            throw QueryBuilderError.missingRequiredField("value")
+        guard builder.query != nil else {
+            throw QueryBuilderError.missingRequiredField("query")
         }
 
-        self.init(builder.value!, defaultField: builder.defaultField, defaultOperator: builder.defaultOperator, analyzer: builder.analyzer, quoteAnalyzer: builder.quoteAnalyzer, allowLeadingWildcard: builder.allowLeadingWildcard, enablePositionIncrements: builder.enablePositionIncrements, fuzzyMaxExpansions: builder.fuzzyMaxExpansions, fuzziness: builder.fuzziness, fuzzyPrefixLength: builder.fuzzyPrefixLength, fuzzyTranspositions: builder.fuzzyTranspositions, phraseSlop: builder.phraseSlop, boost: builder.boost, autoGeneratePhraseQueries: builder.autoGeneratePhraseQueries, analyzeWildcard: builder.analyzeWildcard, maxDeterminizedStates: builder.maxDeterminizedStates, minimumShouldMatch: builder.minimumShouldMatch, lenient: builder.lenient, timeZone: builder.timeZone, quoteFieldSuffix: builder.quoteFieldSuffix, autoGenerateSynonymsPhraseQuery: builder.autoGenerateSynonymsPhraseQuery)
+        self.init(builder.query!, fields: builder.fields, type: builder.type, tieBreaker: builder.tieBreaker, defaultField: builder.defaultField, defaultOperator: builder.defaultOperator, analyzer: builder.analyzer, quoteAnalyzer: builder.quoteAnalyzer, allowLeadingWildcard: builder.allowLeadingWildcard, enablePositionIncrements: builder.enablePositionIncrements, fuzzyMaxExpansions: builder.fuzzyMaxExpansions, fuzziness: builder.fuzziness, fuzzyPrefixLength: builder.fuzzyPrefixLength, fuzzyTranspositions: builder.fuzzyTranspositions, phraseSlop: builder.phraseSlop, boost: builder.boost, autoGeneratePhraseQueries: builder.autoGeneratePhraseQueries, analyzeWildcard: builder.analyzeWildcard, maxDeterminizedStates: builder.maxDeterminizedStates, minimumShouldMatch: builder.minimumShouldMatch, lenient: builder.lenient, timeZone: builder.timeZone, quoteFieldSuffix: builder.quoteFieldSuffix, autoGenerateSynonymsPhraseQuery: builder.autoGenerateSynonymsPhraseQuery)
     }
 
     public func toDic() -> [String: Any] {
         var dic: [String: Any] = [:]
-        dic[CodingKeys.query.rawValue] = value
+        dic[CodingKeys.query.rawValue] = query
         if let defaultField = self.defaultField {
             dic[CodingKeys.defaultField.rawValue] = defaultField
         }
@@ -642,11 +648,14 @@ extension QueryStringQuery {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
-        value = try nested.decodeString(forKey: .query)
+        query = try nested.decodeString(forKey: .query)
+        fields = try nested.decodeArrayIfPresent(forKey: .fields)
+        type = try nested.decodeIfPresent(MultiMatchQueryType.self, forKey: .type)
+        tieBreaker = try nested.decodeDecimalIfPresent(forKey: .tieBreaker)
         defaultField = try nested.decodeStringIfPresent(forKey: .defaultField)
-        defaultOperator = try nested.decodeStringIfPresent(forKey: .defaultField)
-        analyzer = try nested.decodeStringIfPresent(forKey: .defaultField)
-        quoteAnalyzer = try nested.decodeStringIfPresent(forKey: .defaultField)
+        defaultOperator = try nested.decodeStringIfPresent(forKey: .defaultOperator)
+        analyzer = try nested.decodeStringIfPresent(forKey: .analyzer)
+        quoteAnalyzer = try nested.decodeStringIfPresent(forKey: .quoteAnalyzer)
         allowLeadingWildcard = try nested.decodeBoolIfPresent(forKey: .allowLeadingWildcard)
         enablePositionIncrements = try nested.decodeBoolIfPresent(forKey: .enablePositionIncrements)
         fuzzyMaxExpansions = try nested.decodeIntIfPresent(forKey: .fuzzyMaxExpansions)
@@ -668,7 +677,10 @@ extension QueryStringQuery {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
-        try nested.encode(value, forKey: .query)
+        try nested.encode(query, forKey: .query)
+        try nested.encodeIfPresent(fields, forKey: .fields)
+        try nested.encodeIfPresent(type, forKey: .type)
+        try nested.encodeIfPresent(tieBreaker, forKey: .tieBreaker)
         try nested.encodeIfPresent(defaultField, forKey: .defaultField)
         try nested.encodeIfPresent(defaultOperator, forKey: .defaultOperator)
         try nested.encodeIfPresent(analyzer, forKey: .analyzer)
@@ -693,6 +705,9 @@ extension QueryStringQuery {
 
     enum CodingKeys: String, CodingKey {
         case query
+        case fields
+        case type
+        case tieBreaker = "tie_breaker"
         case defaultField = "default_field"
         case defaultOperator = "default_operator"
         case analyzer
@@ -719,7 +734,10 @@ extension QueryStringQuery {
 extension QueryStringQuery: Equatable {
     public static func == (lhs: QueryStringQuery, rhs: QueryStringQuery) -> Bool {
         return lhs.queryType.isEqualTo(rhs.queryType)
-            && lhs.value == rhs.value
+            && lhs.query == rhs.query
+            && lhs.fields == rhs.fields
+            && lhs.type == rhs.type
+            && lhs.tieBreaker == rhs.tieBreaker
             && lhs.analyzer == rhs.analyzer
             && lhs.allowLeadingWildcard == rhs.allowLeadingWildcard
             && lhs.analyzeWildcard == rhs.analyzeWildcard

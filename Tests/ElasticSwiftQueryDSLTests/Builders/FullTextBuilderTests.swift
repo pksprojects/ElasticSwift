@@ -374,4 +374,75 @@ class FullTextBuilderTests: XCTestCase {
         ]] as [String: Any]
         XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
     }
+
+    func test_28_queryStringQueryBuilder() throws {
+        XCTAssertNoThrow(try QueryBuilders.queryStringQuery().set(query: "test search").build(), "Should not throw")
+    }
+
+    func test_29_queryStringQueryBuilder_missing_field() throws {
+        XCTAssertThrowsError(try QueryBuilders.queryStringQuery().set(boost: 0).build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("query", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_30_queryStringQueryBuilder() throws {
+        let query = try QueryBuilders.queryStringQuery()
+            .set(query: "this is a test")
+            .set(minimumShouldMatch: 2)
+            .set(boost: 1)
+            .set(type: .bestFields)
+            .set(autoGenerateSynonymsPhraseQuery: false)
+            .set(tieBreaker: 0)
+            .set(fields: ["test"])
+            .set(lenient: false)
+            .set(analyzer: "test_analyzer")
+            .set(timeZone: "UTC")
+            .set(fuzziness: "fuzz")
+            .set(phraseSlop: 1)
+            .set(defaultField: "test")
+            .set(quoteAnalyzer: "quote_analyzer")
+            .set(analyzeWildcard: true)
+            .set(defaultOperator: "OR")
+            .set(quoteFieldSuffix: "s")
+            .set(fuzzyTranspositions: false)
+            .set(allowLeadingWildcard: true)
+            .set(fuzzyPrefixLength: 1)
+            .set(fuzzyMaxExpansions: 2)
+            .set(maxDeterminizedStates: 4)
+            .set(enablePositionIncrements: false)
+            .set(autoGeneratePhraseQueries: false)
+            .build()
+        XCTAssertEqual(query.minimumShouldMatch, 2)
+        XCTAssertEqual(query.query, "this is a test")
+        XCTAssertEqual(query.boost, 1)
+        XCTAssertEqual(query.autoGenerateSynonymsPhraseQuery, false)
+        XCTAssertEqual(query.type, .bestFields)
+        XCTAssertEqual(query.tieBreaker, 0)
+        XCTAssertEqual(query.fields, ["test"])
+        XCTAssertEqual(query.lenient, false)
+        XCTAssertEqual(query.analyzer, "test_analyzer")
+        XCTAssertEqual(query.timeZone, "UTC")
+        XCTAssertEqual(query.fuzziness, "fuzz")
+        XCTAssertEqual(query.phraseSlop, 1)
+        XCTAssertEqual(query.defaultField, "test")
+        XCTAssertEqual(query.quoteAnalyzer, "quote_analyzer")
+        XCTAssertEqual(query.analyzeWildcard, true)
+        XCTAssertEqual(query.defaultOperator, "OR")
+        XCTAssertEqual(query.quoteFieldSuffix, "s")
+        XCTAssertEqual(query.fuzzyTranspositions, false)
+        XCTAssertEqual(query.allowLeadingWildcard, true)
+        XCTAssertEqual(query.fuzzyPrefixLength, 1)
+        XCTAssertEqual(query.fuzzyMaxExpansions, 2)
+        XCTAssertEqual(query.maxDeterminizedStates, 4)
+        XCTAssertEqual(query.enablePositionIncrements, false)
+        XCTAssertEqual(query.autoGeneratePhraseQueries, false)
+    }
 }

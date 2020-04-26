@@ -349,7 +349,10 @@ public class CommonTermsQueryBuilder: QueryBuilder {
 
 public class QueryStringQueryBuilder: QueryBuilder {
     private var _defaultField: String?
-    private var _value: String?
+    private var _query: String?
+    private var _fields: [String]?
+    private var _type: MultiMatchQueryType?
+    private var _tieBreaker: Decimal?
     private var _defaultOperator: String?
     private var _analyzer: String?
     private var _quoteAnalyzer: String?
@@ -379,8 +382,26 @@ public class QueryStringQueryBuilder: QueryBuilder {
     }
 
     @discardableResult
-    public func set(value: String) -> Self {
-        _value = value
+    public func set(query: String) -> Self {
+        _query = query
+        return self
+    }
+
+    @discardableResult
+    public func set(fields: [String]) -> Self {
+        _fields = fields
+        return self
+    }
+
+    @discardableResult
+    public func set(type: MultiMatchQueryType) -> Self {
+        _type = type
+        return self
+    }
+
+    @discardableResult
+    public func set(tieBreaker: Decimal) -> Self {
+        _tieBreaker = tieBreaker
         return self
     }
 
@@ -502,8 +523,20 @@ public class QueryStringQueryBuilder: QueryBuilder {
         return _defaultField
     }
 
-    public var value: String? {
-        return _value
+    public var query: String? {
+        return _query
+    }
+
+    public var fields: [String]? {
+        return _fields
+    }
+
+    public var type: MultiMatchQueryType? {
+        return _type
+    }
+
+    public var tieBreaker: Decimal? {
+        return _tieBreaker
     }
 
     public var defaultOperator: String? {
