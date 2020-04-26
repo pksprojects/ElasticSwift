@@ -701,22 +701,22 @@ extension ClearScrollRequest: Equatable {}
 
 /// Search type represent the manner at which the search operation is executed.
 public enum SearchType: String, Codable {
-    /// Same as [query_then_fetch](x-source-tag://query_then_fetch), except for an initial scatter phase which goes and computes the distributed
+    /// Same as [queryThenFetch](x-source-tag://queryThenFetch), except for an initial scatter phase which goes and computes the distributed
     /// term frequencies for more accurate scoring.
-    case dfs_query_then_fetch
+    case dfsQueryThenFetch = "dfs_query_then_fetch"
     /// The query is executed against all shards, but only enough information is returned (not the document content).
     /// The results are then sorted and ranked, and based on it, only the relevant shards are asked for the actual
     /// document content. The return number of hits is exactly as specified in size, since they are the only ones that
     /// are fetched. This is very handy when the index has a lot of shards (not replicas, shard id groups).
-    /// - Tag: `query_then_fetch`
-    case query_then_fetch
+    /// - Tag: `queryThenFetch`
+    case queryThenFetch = "query_then_fetch"
 
     /// Only used for pre 5.3 request where this type is still needed
     @available(*, deprecated, message: "Only used for pre 5.3 request where this type is still needed")
-    case query_and_fetch
+    case queryAndFetch = "query_and_fetch"
 
-    /// The default search type [query_then_fetch](x-source-tag://query_then_fetch)
-    public static let DEFAULT = SearchType.query_then_fetch
+    /// The default search type [queryThenFetch](x-source-tag://queryThenFetch)
+    public static let DEFAULT = SearchType.queryThenFetch
 }
 
 // MARK: - Source Filtering

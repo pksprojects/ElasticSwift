@@ -209,32 +209,32 @@ public enum ShapeRelation: String, Codable {
 }
 
 public enum RegexFlag: String, Codable {
-    case INTERSECTION
-    case COMPLEMENT
-    case EMPTY
-    case ANYSTRING
-    case INTERVAL
-    case NONE
-    case ALL
+    case intersection = "INTERSECTION"
+    case complement = "COMPLEMENT"
+    case empty = "EMPTY"
+    case anyString = "ANYSTRING"
+    case interval = "INTERVAL"
+    case none = "NONE"
+    case all = "ALL"
 }
 
 public enum ScoreMode: String, Codable {
-    case FIRST = "first"
-    case AVG = "avg"
-    case MAX = "max"
-    case SUM = "sum"
-    case MIN = "min"
-    case MULTIPLY = "multiply"
-    case TOTAL = "total"
+    case first
+    case avg
+    case max
+    case sum
+    case min
+    case multiply
+    case total
 }
 
 public enum BoostMode: String, Codable {
-    case MULTIPLY = "multiply"
-    case REPLACE = "replace"
-    case SUM = "sum"
-    case AVG = "avg"
-    case MIN = "min"
-    case MAX = "max"
+    case multiply
+    case replace
+    case sum
+    case avg
+    case min
+    case max
 }
 
 public enum MultiMatchQueryType: String, Codable {
