@@ -269,8 +269,10 @@
         static let __allTests__TermLevelQueriesTests = [
             ("test_01_termQuery_encode", test_01_termQuery_encode),
             ("test_02_termQuery_encode_2", test_02_termQuery_encode_2),
-            ("test_03_matchQuery_decode", test_03_matchQuery_decode),
-            ("test_04_matchQuery_decode_2", test_04_matchQuery_decode_2),
+            ("test_03_termQuery_decode", test_03_termQuery_decode),
+            ("test_04_termQuery_decode_2", test_04_termQuery_decode_2),
+            ("test_05_termsQuery_encode", test_05_termsQuery_encode),
+            ("test_06_termsQuery_decode", test_06_termsQuery_decode),
         ]
     }
 
@@ -283,6 +285,9 @@
             ("test_02_termQueryBuilder_2", test_02_termQueryBuilder_2),
             ("test_03_matchQueryBuilder_missing_field", test_03_matchQueryBuilder_missing_field),
             ("test_04_matchQueryBuilder_missing_value", test_04_matchQueryBuilder_missing_value),
+            ("test_05_termsQueryBuilder", test_05_termsQueryBuilder),
+            ("test_06_termsQueryBuilder_missing_field", test_06_termsQueryBuilder_missing_field),
+            ("test_07_termsQueryBuilder_missing_value", test_07_termsQueryBuilder_missing_value),
         ]
     }
 

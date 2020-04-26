@@ -64,4 +64,36 @@ class TermLevelQueryBuilderTests: XCTestCase {
             }
         }
     }
+
+    func test_05_termsQueryBuilder() throws {
+        XCTAssertNoThrow(try QueryBuilders.termsQuery().set(field: "text").set(values: "test search").build(), "Should not throw")
+    }
+
+    func test_06_termsQueryBuilder_missing_field() throws {
+        XCTAssertThrowsError(try QueryBuilders.termsQuery().set(values: "test search").build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("field", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_07_termsQueryBuilder_missing_value() throws {
+        XCTAssertThrowsError(try QueryBuilders.termsQuery().set(field: "text").build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .atlestOneElementRequired(field):
+                    XCTAssertEqual("values", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
 }
