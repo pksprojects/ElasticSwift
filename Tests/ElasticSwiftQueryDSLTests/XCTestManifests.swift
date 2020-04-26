@@ -209,6 +209,10 @@
             ("test_10_parentIdQueryBuilder", test_10_parentIdQueryBuilder),
             ("test_11_parentIdQueryBuilder_missing_type", test_11_parentIdQueryBuilder_missing_type),
             ("test_12_parentIdQueryBuilder_missing_id", test_12_parentIdQueryBuilder_missing_id),
+            ("test_13_parentIdQueryBuilder", test_13_parentIdQueryBuilder),
+            ("test_14_hasParentQueryBuilder_missing_id", test_14_hasParentQueryBuilder_missing_id),
+            ("test_15_hasChildQueryBuilder", test_15_hasChildQueryBuilder),
+            ("test_16_nestedQueryBuilder_missing_id", test_16_nestedQueryBuilder_missing_id),
         ]
     }
 
