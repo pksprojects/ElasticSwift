@@ -52,7 +52,6 @@ public struct GeoShapeQuery: Query {
 }
 
 extension GeoShapeQuery {
-
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
