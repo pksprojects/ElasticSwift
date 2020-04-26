@@ -45,7 +45,7 @@ class JoiningQueriesTests: XCTestCase {
     }
 
     func test_02_nestedQuery_decode() throws {
-        let query = NestedQuery("obj1", query: BoolQuery(must: [MatchQuery(field: "obj1.name", value: "blue"), RangeQuery(field: "obj1.count", gte: nil, gt: "5", lte: nil, lt: nil)], mustNot: [], should: [], filter: []), scoreMode: .AVG)
+        let query = NestedQuery("obj1", query: BoolQuery(must: [MatchQuery(field: "obj1.name", value: "blue"), RangeQuery(field: "obj1.count", gte: nil, gt: "5", lte: nil, lt: nil)], mustNot: [], should: [], filter: []), scoreMode: .avg)
 
         let jsonStr = """
         {
@@ -85,7 +85,7 @@ class JoiningQueriesTests: XCTestCase {
     }
 
     func test_04_hasChildQuery_decode() throws {
-        let query = HasChildQuery("blog_tag", query: TermQuery(field: "tag", value: "something"), scoreMode: .MIN, minChildren: 2, maxChildren: 10)
+        let query = HasChildQuery("blog_tag", query: TermQuery(field: "tag", value: "something"), scoreMode: .min, minChildren: 2, maxChildren: 10)
 
         let jsonStr = """
         {

@@ -253,7 +253,7 @@ class JoiningQueryBuilderTests: XCTestCase {
             .set(minChildren: 1)
             .set(maxChildren: 2)
             .set(innerHits: [])
-            .set(scoreMode: .AVG)
+            .set(scoreMode: .avg)
             .build()
 
         XCTAssertTrue(query.query.isEqualTo(MatchAllQuery()))
@@ -262,7 +262,7 @@ class JoiningQueryBuilderTests: XCTestCase {
         XCTAssertEqual(query.minChildren, 1)
         XCTAssertEqual(query.maxChildren, 2)
         XCTAssertEqual(query.innerHits, [])
-        XCTAssertEqual(query.scoreMode, .AVG)
+        XCTAssertEqual(query.scoreMode, .avg)
     }
 
     func test_16_nestedQueryBuilder_missing_id() throws {
@@ -271,13 +271,13 @@ class JoiningQueryBuilderTests: XCTestCase {
             .set(path: "type")
             .set(ignoreUnmapped: false)
             .set(innerHits: [])
-            .set(scoreMode: .AVG)
+            .set(scoreMode: .avg)
             .build()
 
         XCTAssertTrue(query.query.isEqualTo(MatchAllQuery()))
         XCTAssertEqual(query.path, "type")
         XCTAssertEqual(query.ignoreUnmapped, false)
         XCTAssertEqual(query.innerHits, [])
-        XCTAssertEqual(query.scoreMode, .AVG)
+        XCTAssertEqual(query.scoreMode, .avg)
     }
 }

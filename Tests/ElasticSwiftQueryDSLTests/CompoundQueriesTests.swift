@@ -125,7 +125,7 @@ class CompoundQueriesTest: XCTestCase {
             .set(origin: "11, 12")
             .set(scale: "2km")
             .build()
-        let query = FunctionScoreQuery(query: MatchQuery(field: "properties", value: "balcony"), scoreMode: .MULTIPLY, functions: gaussFunction, gaussFunction2)
+        let query = FunctionScoreQuery(query: MatchQuery(field: "properties", value: "balcony"), scoreMode: .multiply, functions: gaussFunction, gaussFunction2)
 
         let jsonStr = """
         {
