@@ -44,30 +44,6 @@ public struct MatchQuery: Query {
 
         self.init(field: builder.field!, value: builder.value!, boost: builder.boost, operator: builder.operator, zeroTermQuery: builder.zeroTermQuery, cutoffFrequency: builder.cutoffFrequency, fuzziness: builder.fuzziness, autoGenSynonymnsPhraseQuery: builder.autoGenSynonymnsPhraseQuery)
     }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        dic[CodingKeys.query.rawValue] = value
-        if let boost = self.boost {
-            dic[CodingKeys.boost.rawValue] = boost
-        }
-        if let `operator` = self.operator {
-            dic[CodingKeys.operator.rawValue] = `operator`.rawValue
-        }
-        if let zeroTermQuery = self.zeroTermQuery {
-            dic[CodingKeys.zeroTermsQuery.rawValue] = zeroTermQuery.rawValue
-        }
-        if let cutoffFrequency = self.cutoffFrequency {
-            dic[CodingKeys.cutoffFrequency.rawValue] = cutoffFrequency
-        }
-        if let fuzziness = self.fuzziness {
-            dic[CodingKeys.fuzziness.rawValue] = fuzziness.rawValue
-        }
-        if let autoGenSynonymnsPhraseQuery = self.autoGenSynonymnsPhraseQuery {
-            dic[CodingKeys.autoGenerateSynonymsPhraseQuery.rawValue] = autoGenSynonymnsPhraseQuery
-        }
-        return [queryType.name: [field: dic]]
-    }
 }
 
 extension MatchQuery {
@@ -162,17 +138,6 @@ public struct MatchPhraseQuery: Query {
 
         self.init(field: builder.field!, value: builder.value!, analyzer: builder.analyzer)
     }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        if let analyzer = analyzer {
-            dic[queryType.name] = [field: [CodingKeys.query.rawValue: value,
-                                           CodingKeys.analyzer.rawValue: analyzer]]
-        } else {
-            dic[queryType.name] = [field: value]
-        }
-        return dic
-    }
 }
 
 extension MatchPhraseQuery {
@@ -247,17 +212,6 @@ public struct MatchPhrasePrefixQuery: Query {
         }
 
         self.init(field: builder.field!, value: builder.value!, maxExpansions: builder.maxExpansions)
-    }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        if let maxExpansions = maxExpansions {
-            dic[queryType.name] = [field: [CodingKeys.query.rawValue: value,
-                                           CodingKeys.maxExpansions.rawValue: maxExpansions]]
-        } else {
-            dic[queryType.name] = [field: value]
-        }
-        return dic
     }
 }
 
@@ -336,19 +290,6 @@ public struct MultiMatchQuery: Query {
 
         self.init(query: builder.query!, fields: builder.fields, tieBreaker: builder.tieBreaker, type: builder.type)
     }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        dic[CodingKeys.query.rawValue] = query
-        dic[CodingKeys.fields.rawValue] = fields
-        if let type = self.type {
-            dic[CodingKeys.type.rawValue] = type.rawValue
-        }
-        if let tieBreaker = self.tieBreaker {
-            dic[CodingKeys.tieBreaker.rawValue] = tieBreaker
-        }
-        return [queryType.name: dic]
-    }
 }
 
 extension MultiMatchQuery {
@@ -424,28 +365,6 @@ public struct CommonTermsQuery: Query {
         }
 
         self.init(query: builder.query!, cutoffFrequency: builder.cutoffFrequency!, lowFrequencyOperator: builder.lowFrequencyOperator, highFrequencyOperator: builder.highFrequencyOperator, minimumShouldMatch: builder.minimumShouldMatch, minimumShouldMatchLowFreq: builder.minimumShouldMatchLowFreq, minimumShouldMatchHighFreq: builder.minimumShouldMatchHighFreq)
-    }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        dic[CodingKeys.query.rawValue] = query
-        dic[CodingKeys.cutoffFrequency.rawValue] = cutoffFrequency
-        if let lowFrequencyOperator = self.lowFrequencyOperator {
-            dic[CodingKeys.lowFreqOperator.rawValue] = lowFrequencyOperator.rawValue
-        }
-        if let highFrequencyOperator = self.highFrequencyOperator {
-            dic[CodingKeys.highFreqOperator.rawValue] = highFrequencyOperator.rawValue
-        }
-        if let minimumShouldMatch = self.minimumShouldMatch {
-            dic[CodingKeys.minimumShouldMatch.rawValue] = minimumShouldMatch
-        }
-        if let minHighFreq = minimumShouldMatchHighFreq, let minLowFreq = minimumShouldMatchLowFreq {
-            dic[CodingKeys.minimumShouldMatch.rawValue] = [
-                CodingKeys.lowFreq.rawValue: minLowFreq,
-                CodingKeys.highFreq.rawValue: minHighFreq,
-            ]
-        }
-        return [queryType.name: [CommonTermsQuery.BODY: dic]]
     }
 }
 
@@ -575,72 +494,6 @@ public struct QueryStringQuery: Query {
         }
 
         self.init(builder.query!, fields: builder.fields, type: builder.type, tieBreaker: builder.tieBreaker, defaultField: builder.defaultField, defaultOperator: builder.defaultOperator, analyzer: builder.analyzer, quoteAnalyzer: builder.quoteAnalyzer, allowLeadingWildcard: builder.allowLeadingWildcard, enablePositionIncrements: builder.enablePositionIncrements, fuzzyMaxExpansions: builder.fuzzyMaxExpansions, fuzziness: builder.fuzziness, fuzzyPrefixLength: builder.fuzzyPrefixLength, fuzzyTranspositions: builder.fuzzyTranspositions, phraseSlop: builder.phraseSlop, boost: builder.boost, autoGeneratePhraseQueries: builder.autoGeneratePhraseQueries, analyzeWildcard: builder.analyzeWildcard, maxDeterminizedStates: builder.maxDeterminizedStates, minimumShouldMatch: builder.minimumShouldMatch, lenient: builder.lenient, timeZone: builder.timeZone, quoteFieldSuffix: builder.quoteFieldSuffix, autoGenerateSynonymsPhraseQuery: builder.autoGenerateSynonymsPhraseQuery)
-    }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        dic[CodingKeys.query.rawValue] = query
-        if let defaultField = self.defaultField {
-            dic[CodingKeys.defaultField.rawValue] = defaultField
-        }
-        if let defaultOperator = self.defaultOperator {
-            dic[CodingKeys.defaultOperator.rawValue] = defaultOperator
-        }
-        if let analyzer = self.analyzer {
-            dic[CodingKeys.analyzer.rawValue] = analyzer
-        }
-        if let quoteAnalyzer = self.quoteAnalyzer {
-            dic[CodingKeys.quoteAnalyzer.rawValue] = quoteAnalyzer
-        }
-        if let allowLeadingWildCard = allowLeadingWildcard {
-            dic[CodingKeys.allowLeadingWildcard.rawValue] = allowLeadingWildCard
-        }
-        if let enablePositionIncrements = self.enablePositionIncrements {
-            dic[CodingKeys.enablePositionIncrements.rawValue] = enablePositionIncrements
-        }
-        if let fuzzyMaxExpantions = fuzzyMaxExpansions {
-            dic[CodingKeys.fuzzyMaxExpansions.rawValue] = fuzzyMaxExpantions
-        }
-        if let fuzzines = fuzziness {
-            dic[CodingKeys.fuzziness.rawValue] = fuzzines
-        }
-        if let fuzzyPrefixLength = self.fuzzyPrefixLength {
-            dic[CodingKeys.fuzzyPrefixLength.rawValue] = fuzzyPrefixLength
-        }
-        if let fuzzyTranspositions = self.fuzzyTranspositions {
-            dic[CodingKeys.fuzzyTranspositions.rawValue] = fuzzyTranspositions
-        }
-        if let phraseSlop = self.phraseSlop {
-            dic[CodingKeys.phraseSlop.rawValue] = phraseSlop
-        }
-        if let boost = self.boost {
-            dic[CodingKeys.boost.rawValue] = boost
-        }
-        if let autoGeneratePhraseQuries = autoGeneratePhraseQueries {
-            dic[CodingKeys.autoGeneratePhraseQueries.rawValue] = autoGeneratePhraseQuries
-        }
-        if let analyzeWildCard = analyzeWildcard {
-            dic[CodingKeys.analyzeWildcard.rawValue] = analyzeWildCard
-        }
-        if let maxDeterminedStates = maxDeterminizedStates {
-            dic[CodingKeys.maxDeterminizedStates.rawValue] = maxDeterminedStates
-        }
-        if let minimumShouldMatch = self.minimumShouldMatch {
-            dic[CodingKeys.minimumShouldMatch.rawValue] = minimumShouldMatch
-        }
-        if let lenient = self.lenient {
-            dic[CodingKeys.lenient.rawValue] = lenient
-        }
-        if let timeZone = self.timeZone {
-            dic[CodingKeys.timeZone.rawValue] = timeZone
-        }
-        if let quoteFieldSuffix = self.quoteFieldSuffix {
-            dic[CodingKeys.quoteFieldSuffix.rawValue] = quoteFieldSuffix
-        }
-        if let autoGenerateSynonymsPhraseQuery = self.autoGenerateSynonymsPhraseQuery {
-            dic[CodingKeys.autoGenerateSynonymsPhraseQuery.rawValue] = autoGenerateSynonymsPhraseQuery
-        }
-        return [queryType.name: dic]
     }
 }
 
@@ -799,45 +652,6 @@ public struct SimpleQueryStringQuery: Query {
         }
 
         self.init(query: builder.query!, fields: builder.fields, defaultOperator: builder.defaultOperator, analyzer: builder.analyzer, flags: builder.flags, lenient: builder.lenient, minimumShouldMatch: builder.minimumShouldMatch, fuzzyMaxExpansions: builder.fuzzyMaxExpansions, fuzzyPrefixLength: builder.fuzzyPrefixLength, fuzzyTranspositions: builder.fuzzyTranspositions, quoteFieldSuffix: builder.quoteFieldSuffix, autoGenerateSynonymsPhraseQuery: builder.autoGenerateSynonymsPhraseQuery)
-    }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        dic[CodingKeys.query.rawValue] = query
-        if let fields = self.fields {
-            dic[CodingKeys.fields.rawValue] = fields
-        }
-        if let defaultOperator = self.defaultOperator {
-            dic[CodingKeys.defaultOperator.rawValue] = defaultOperator
-        }
-        if let analyzer = self.analyzer {
-            dic[CodingKeys.analyzer.rawValue] = analyzer
-        }
-        if let fuzzyMaxExpantions = fuzzyMaxExpansions {
-            dic[CodingKeys.fuzzyMaxExpansions.rawValue] = fuzzyMaxExpantions
-        }
-        if let fuzzyPrefixLength = self.fuzzyPrefixLength {
-            dic[CodingKeys.fuzzyPrefixLength.rawValue] = fuzzyPrefixLength
-        }
-        if let fuzzyTranspositions = self.fuzzyTranspositions {
-            dic[CodingKeys.fuzzyTranspositions.rawValue] = fuzzyTranspositions
-        }
-        if let minimumShouldMatch = self.minimumShouldMatch {
-            dic[CodingKeys.minimumShouldMatch.rawValue] = minimumShouldMatch
-        }
-        if let flags = self.flags {
-            dic[CodingKeys.flags.rawValue] = flags
-        }
-        if let lenient = self.lenient {
-            dic[CodingKeys.lenient.rawValue] = lenient
-        }
-        if let quoteFieldSuffix = self.quoteFieldSuffix {
-            dic[CodingKeys.quoteFieldSuffix.rawValue] = quoteFieldSuffix
-        }
-        if let autoGenerateSynonymsPhraseQuery = self.autoGenerateSynonymsPhraseQuery {
-            dic[CodingKeys.autoGenerateSynonymsPhraseQuery.rawValue] = autoGenerateSynonymsPhraseQuery
-        }
-        return [queryType.name: dic]
     }
 }
 

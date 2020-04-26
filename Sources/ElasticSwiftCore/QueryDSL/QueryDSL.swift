@@ -15,8 +15,6 @@ public protocol Query: Codable {
     var queryType: QueryType { get }
 
     func isEqualTo(_ other: Query) -> Bool
-
-    func toDic() -> [String: Any]
 }
 
 extension Query where Self: Equatable {

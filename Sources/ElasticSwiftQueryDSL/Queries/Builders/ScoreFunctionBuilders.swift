@@ -57,8 +57,6 @@ public protocol ScoreFunction: Codable {
     var scoreFunctionType: ScoreFunctionType { get }
 
     func isEqualTo(_ other: ScoreFunction) -> Bool
-
-    func toDic() -> [String: Any]
 }
 
 extension ScoreFunction where Self: Equatable {

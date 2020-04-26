@@ -19,11 +19,6 @@ import Foundation
 //    public let type: String = ""
 //
 //    public init(withBuilder _: MoreLikeThisQueryBuilder) {}
-//
-//    public func toDic() -> [String: Any] {
-//        let dic: [String: Any] = [:]
-//        return dic
-//    }
 // }
 
 // MARK: - Script Query
@@ -37,11 +32,6 @@ import Foundation
 //    public let type: String = ""
 //
 //    public init(withBuilder _: ScriptQueryBuilder) {}
-//
-//    public func toDic() -> [String: Any] {
-//        let dic: [String: Any] = [:]
-//        return dic
-//    }
 // }
 
 // MARK: - Percolate Query
@@ -55,11 +45,6 @@ import Foundation
 //    public let type: String = ""
 //
 //    public init(withBuilder _: PercoloteQueryBuilder) {}
-//
-//    public func toDic() -> [String: Any] {
-//        let dic: [String: Any] = [:]
-//        return dic
-//    }
 // }
 
 // MARK: - Wrapper Query
@@ -73,9 +58,4 @@ import Foundation
 //    public let type: String = ""
 //
 //    public init(withBuilder _: WrapperQueryBuilder) {}
-//
-//    public func toDic() -> [String: Any] {
-//        let dic: [String: Any] = [:]
-//        return dic
-//    }
 // }

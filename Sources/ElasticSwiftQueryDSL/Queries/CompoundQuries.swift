@@ -29,16 +29,6 @@ public struct ConstantScoreQuery: Query {
 
         self.init(builder.query!, boost: builder.boost)
     }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [
-            CodingKeys.filter.rawValue: query.toDic(),
-        ]
-        if let boost = self.boost {
-            dic[CodingKeys.boost.rawValue] = boost
-        }
-        return [queryType.name: dic]
-    }
 }
 
 extension ConstantScoreQuery {
@@ -97,29 +87,6 @@ public struct BoolQuery: Query {
         }
 
         self.init(must: builder.mustClauses, mustNot: builder.mustNotClauses, should: builder.shouldClauses, filter: builder.filterClauses, minimumShouldMatch: builder.minimumShouldMatch, boost: builder.boost)
-    }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        if !mustClauses.isEmpty {
-            dic[CodingKeys.must.rawValue] = mustClauses.map { $0.toDic() }
-        }
-        if !mustNotClauses.isEmpty {
-            dic[CodingKeys.mustNot.rawValue] = mustNotClauses.map { $0.toDic() }
-        }
-        if !shouldClauses.isEmpty {
-            dic[CodingKeys.should.rawValue] = shouldClauses.map { $0.toDic() }
-        }
-        if !filterClauses.isEmpty {
-            dic[CodingKeys.filter.rawValue] = filterClauses.map { $0.toDic() }
-        }
-        if let boost = self.boost {
-            dic[CodingKeys.boost.rawValue] = boost
-        }
-        if let minimumShouldMatch = self.minimumShouldMatch {
-            dic[CodingKeys.minShouldMatch.rawValue] = minimumShouldMatch
-        }
-        return [queryType.name: dic]
     }
 }
 
@@ -204,16 +171,6 @@ public struct DisMaxQuery: Query {
 
         self.init(builder.queries, tieBreaker: builder.tieBreaker ?? DisMaxQuery.DEFAULT_TIE_BREAKER, boost: builder.boost)
     }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        dic[CodingKeys.tieBreaker.rawValue] = tieBreaker
-        if let boost = self.boost {
-            dic[CodingKeys.boost.rawValue] = boost
-        }
-        dic[CodingKeys.queries.rawValue] = queries.map { $0.toDic() }
-        return [queryType.name: dic]
-    }
 }
 
 extension DisMaxQuery {
@@ -288,36 +245,6 @@ public struct FunctionScoreQuery: Query {
         }
 
         self.init(query: builder.query!, boost: builder.boost, boostMode: builder.boostMode, maxBoost: builder.maxBoost, scoreMode: builder.scoreMode, minScore: builder.minScore, functions: builder.functions)
-    }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-
-        dic[CodingKeys.query.rawValue] = query.toDic()
-        if let boost = self.boost {
-            dic[CodingKeys.boost.rawValue] = boost
-        }
-        if let boostMode = self.boostMode {
-            dic[CodingKeys.boostMode.rawValue] = boostMode.rawValue
-        }
-        if let maxBoost = self.maxBoost {
-            dic[CodingKeys.maxBoost.rawValue] = maxBoost
-        }
-        if let scoreMode = self.scoreMode {
-            dic[CodingKeys.scoreMode.rawValue] = scoreMode.rawValue
-        }
-        if let minScore = self.minScore {
-            dic[CodingKeys.minScore.rawValue] = minScore
-        }
-        if !functions.isEmpty {
-            if functions.count == 1 {
-                let scoreFunction = functions[0]
-                dic[scoreFunction.scoreFunctionType.rawValue] = scoreFunction.toDic()[scoreFunction.scoreFunctionType.rawValue]
-            } else {
-                dic[CodingKeys.functions.rawValue] = functions.map { $0.toDic() }
-            }
-        }
-        return [queryType.name: dic]
     }
 }
 
@@ -398,18 +325,6 @@ public struct BoostingQuery: Query {
         }
 
         self.init(positive: builder.positive!, negative: builder.negative!, negativeBoost: builder.negativeBoost)
-    }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-
-        dic[CodingKeys.positive.rawValue] = positive.toDic()
-        dic[CodingKeys.negative.rawValue] = negative.toDic()
-
-        if let negativeBoost = self.negativeBoost {
-            dic[CodingKeys.negativeBoost.rawValue] = negativeBoost
-        }
-        return [queryType.name: dic]
     }
 }
 

@@ -159,21 +159,6 @@ public struct Script: Codable, Equatable {
         self.params = params
     }
 
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-
-        dic[CodingKeys.source.stringValue] = source
-
-        if let lang = self.lang, !lang.isEmpty {
-            dic[CodingKeys.lang.stringValue] = lang
-        }
-
-        if let params = self.params, !params.isEmpty {
-            dic[CodingKeys.params.stringValue] = params
-        }
-        return dic
-    }
-
     public init(from decoder: Decoder) throws {
         if let container = try? decoder.container(keyedBy: CodingKeys.self) {
             source = try container.decodeString(forKey: .source)
@@ -311,23 +296,6 @@ extension RescoreQuery {
         case rescoreQueryWeight = "rescore_query_weight"
         case queryWeight = "query_weight"
         case scoreMode = "score_mode"
-    }
-
-    public func toDic() -> [String: Any] {
-        var dic = [String: Any]()
-
-        dic[CodingKeys.query.rawValue] = query.toDic()
-
-        if let rescoreQueryWeight = self.rescoreQueryWeight {
-            dic[CodingKeys.rescoreQueryWeight.rawValue] = rescoreQueryWeight
-        }
-        if let queryWeight = self.queryWeight {
-            dic[CodingKeys.queryWeight.rawValue] = queryWeight
-        }
-        if let scoreMode = self.scoreMode {
-            dic[CodingKeys.scoreMode.rawValue] = scoreMode
-        }
-        return dic
     }
 }
 

@@ -34,17 +34,6 @@ public struct TermQuery: Query {
 
         self.init(field: builder.field!, value: builder.value!, boost: builder.boost)
     }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        if let boost = boost {
-            dic = [field: [CodingKeys.value.rawValue: value,
-                           CodingKeys.boost.rawValue: boost]]
-        } else {
-            dic = [field: value]
-        }
-        return [queryType.name: dic]
-    }
 }
 
 extension TermQuery {
@@ -118,11 +107,6 @@ public struct TermsQuery: Query {
 
         self.init(field: builder.field!, values: builder.values)
     }
-
-    public func toDic() -> [String: Any] {
-        let dic: [String: Any] = [field: values]
-        return [queryType.name: dic]
-    }
 }
 
 extension TermsQuery {
@@ -191,35 +175,6 @@ public struct RangeQuery: Query {
         }
 
         self.init(field: builder.field!, gte: builder.gte, gt: builder.gt, lte: builder.lte, lt: builder.lt, format: builder.format, timeZone: builder.timeZone, boost: builder.boost, relation: builder.relation)
-    }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        if let gt = self.gt {
-            dic[CodingKeys.gt.rawValue] = gt
-        }
-        if let gte = self.gte {
-            dic[CodingKeys.gte.rawValue] = gte
-        }
-        if let lt = self.lt {
-            dic[CodingKeys.lt.rawValue] = lt
-        }
-        if let lte = self.lte {
-            dic[CodingKeys.lte.rawValue] = lte
-        }
-        if let boost = self.boost {
-            dic[CodingKeys.boost.rawValue] = boost
-        }
-        if let format = self.format {
-            dic[CodingKeys.format.rawValue] = format
-        }
-        if let timeZone = self.timeZone {
-            dic[CodingKeys.timeZone.rawValue] = timeZone
-        }
-        if let relation = self.relation {
-            dic[CodingKeys.relation.rawValue] = relation
-        }
-        return [queryType.name: [field: dic]]
     }
 }
 
@@ -304,11 +259,6 @@ public struct ExistsQuery: Query {
 
         self.init(field: builder.field!)
     }
-
-    public func toDic() -> [String: Any] {
-        let dic: [String: Any] = [CodingKeys.field.rawValue: field]
-        return [queryType.name: dic]
-    }
 }
 
 extension ExistsQuery {
@@ -362,16 +312,6 @@ public struct PrefixQuery: Query {
         }
 
         self.init(field: builder.field!, value: builder.value!, boost: builder.boost)
-    }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        if let boost = self.boost {
-            dic = [field: [CodingKeys.value.rawValue: value, CodingKeys.boost.rawValue: boost]]
-        } else {
-            dic = [field: value]
-        }
-        return [queryType.name: dic]
     }
 }
 
@@ -448,17 +388,6 @@ public struct WildCardQuery: Query {
         }
 
         self.init(field: builder.field!, value: builder.value!, boost: builder.boost)
-    }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        if let boost = self.boost {
-            dic = [field: [CodingKeys.value.rawValue: value,
-                           CodingKeys.boost.rawValue: boost]]
-        } else {
-            dic = [field: value]
-        }
-        return [queryType.name: dic]
     }
 }
 
@@ -539,21 +468,6 @@ public struct RegexpQuery: Query {
         }
 
         self.init(field: builder.field!, value: builder.value!, boost: builder.boost, regexFlags: builder.regexFlags, maxDeterminizedStates: builder.maxDeterminizedStates)
-    }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        if let boost = self.boost {
-            dic[CodingKeys.boost.rawValue] = boost
-        }
-        if !regexFlags.isEmpty {
-            dic[CodingKeys.flags.rawValue] = regexFlags
-        }
-        if let maxDeterminizedStates = self.maxDeterminizedStates {
-            dic[CodingKeys.maxDeterminizedStates.rawValue] = maxDeterminizedStates
-        }
-        dic[CodingKeys.value.rawValue] = value
-        return [queryType.name: [field: dic]]
     }
 }
 
@@ -638,28 +552,6 @@ public struct FuzzyQuery: Query {
 
         self.init(field: builder.field!, value: builder.value!, boost: builder.boost, fuzziness: builder.fuzziness, prefixLenght: builder.prefixLenght, maxExpansions: builder.maxExpansions, transpositions: builder.transpositions)
     }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        if let boost = self.boost {
-            dic[CodingKeys.boost.rawValue] = boost
-        }
-        if let fuzziness = self.fuzziness {
-            dic[CodingKeys.fuzziness.rawValue] = fuzziness
-        }
-        if let prefixLenght = self.prefixLenght {
-            dic[CodingKeys.prefixLength.rawValue] = prefixLenght
-        }
-        if let maxExpansions = self.maxExpansions {
-            dic[CodingKeys.maxExpansions.rawValue] = maxExpansions
-        }
-        if let transpositions = self.transpositions {
-            dic[CodingKeys.tranpositions.rawValue] = transpositions
-        }
-
-        dic[CodingKeys.value.rawValue] = value
-        return [queryType.name: [field: dic]]
-    }
 }
 
 extension FuzzyQuery {
@@ -734,10 +626,6 @@ public struct TypeQuery: Query {
 
         self.init(type: builder.type!)
     }
-
-    public func toDic() -> [String: Any] {
-        return [queryType.name: [CodingKeys.value.rawValue: type]]
-    }
 }
 
 extension TypeQuery {
@@ -789,14 +677,6 @@ public struct IdsQuery: Query {
         }
 
         self.init(ids: builder.ids, type: builder.type)
-    }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [CodingKeys.values.rawValue: ids]
-        if let type = self.type {
-            dic[CodingKeys.type.rawValue] = type
-        }
-        return [queryType.name: dic]
     }
 }
 

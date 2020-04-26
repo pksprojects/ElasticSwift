@@ -19,11 +19,6 @@ import Foundation
 //    public let type: String = ""
 //
 //    public init(withBuilder _: SpanTermQueryBuilder) {}
-//
-//    public func toDic() -> [String: Any] {
-//        let dic: [String: Any] = [:]
-//        return dic
-//    }
 // }
 
 // MARK: - Span Multi Term Query
@@ -37,11 +32,6 @@ import Foundation
 //    public let type: String = ""
 //
 //    public init(withBuilder _: SpanMultiTermQueryBuilder) {}
-//
-//    public func toDic() -> [String: Any] {
-//        let dic: [String: Any] = [:]
-//        return dic
-//    }
 // }
 
 // MARK: - Span First Query
@@ -55,11 +45,6 @@ import Foundation
 //    public let type: String = ""
 //
 //    public init(withBuilder _: SpanFirstQueryBuilder) {}
-//
-//    public func toDic() -> [String: Any] {
-//        let dic: [String: Any] = [:]
-//        return dic
-//    }
 // }
 
 // MARK: - Span Near Query
@@ -73,11 +58,6 @@ import Foundation
 //    public let type: String = ""
 //
 //    public init(withBuilder _: SpanNearQueryBuilder) {}
-//
-//    public func toDic() -> [String: Any] {
-//        let dic: [String: Any] = [:]
-//        return dic
-//    }
 // }
 
 // MARK: - Span Or Query
@@ -91,11 +71,6 @@ import Foundation
 //    public let type: String = ""
 //
 //    public init(withBuilder _: SpanOrQueryBuilder) {}
-//
-//    public func toDic() -> [String: Any] {
-//        let dic: [String: Any] = [:]
-//        return dic
-//    }
 // }
 
 // MARK: - Span Not Query
@@ -109,11 +84,6 @@ import Foundation
 //    public let type: String = ""
 //
 //    public init(withBuilder _: SpanNotQueryBuilder) {}
-//
-//    public func toDic() -> [String: Any] {
-//        let dic: [String: Any] = [:]
-//        return dic
-//    }
 // }
 
 // MARK: - Span Containing Query
@@ -127,11 +97,6 @@ import Foundation
 //    public let type: String = ""
 //
 //    public init(withBuilder _: SpanContainingQueryBuilder) {}
-//
-//    public func toDic() -> [String: Any] {
-//        let dic: [String: Any] = [:]
-//        return dic
-//    }
 // }
 
 // MARK: - Span Within Query
@@ -145,11 +110,6 @@ import Foundation
 //    public let type: String = ""
 //
 //    public init(withBuilder _: SpanWithinQueryBuilder) {}
-//
-//    public func toDic() -> [String: Any] {
-//        let dic: [String: Any] = [:]
-//        return dic
-//    }
 // }
 
 // MARK: - Span Field Masking Query
@@ -163,9 +123,4 @@ import Foundation
 //    public let type: String = ""
 //
 //    public init(withBuilder _: SpanFieldMaskingQueryBuilder) {}
-//
-//    public func toDic() -> [String: Any] {
-//        let dic: [String: Any] = [:]
-//        return dic
-//    }
 // }

@@ -88,14 +88,6 @@ public struct Sort {
         sortOrder = builder.sortOrder ?? .desc
         fieldTypeisArray = (mode != nil) ? true : false
     }
-
-    public func toDic() -> [String: Any] {
-        return (!fieldTypeisArray) ? [field: sortOrder.rawValue] :
-            [field: [
-                Sort.ORDER: sortOrder.rawValue,
-                Sort.MODE: mode?.rawValue,
-            ]]
-    }
 }
 
 extension Sort: Codable {

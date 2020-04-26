@@ -58,11 +58,6 @@ class CompoundQueryBuilderTests: XCTestCase {
             .build()
         XCTAssertEqual(query.query as! MatchAllQuery, MatchAllQuery())
         XCTAssertEqual(query.boost, 0.8)
-        let expectedDic = ["constant_score": [
-            "filter": ["match_all": [:]],
-            "boost": Decimal(string: "0.8")!,
-        ]] as [String: Any]
-        XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
     }
 
     func test_05_boolQueryBuilder() throws {
@@ -97,15 +92,6 @@ class CompoundQueryBuilderTests: XCTestCase {
         XCTAssertEqual(query.mustClauses.first as! MatchAllQuery, MatchAllQuery())
         XCTAssertEqual(query.mustNotClauses.first as! MatchAllQuery, MatchAllQuery())
         XCTAssertEqual(query.boost, 0.8)
-        let expectedDic = ["bool": [
-            "filter": [["match_all": [:]]],
-            "must": [["match_all": [:]]],
-            "must_not": [["match_all": [:]]],
-            "should": [["match_all": [:]]],
-            "boost": Decimal(string: "0.8")!,
-            "minimum_should_match": 10,
-        ]] as [String: Any]
-        XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
     }
 
     func test_08_disMaxQueryBuilder() throws {
@@ -143,12 +129,6 @@ class CompoundQueryBuilderTests: XCTestCase {
         XCTAssertEqual(query.queries.first as! MatchAllQuery, MatchAllQuery())
         XCTAssertEqual(query.tieBreaker, 1.0)
         XCTAssertEqual(query.boost, 0.8)
-        let expectedDic = ["dis_max": [
-            "queries": [["match_all": [:]]],
-            "boost": Decimal(string: "0.8")!,
-            "tie_breaker": Decimal(string: "1.0")!,
-        ]] as [String: Any]
-        XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
     }
 
     func test_13_functionScoreQueryBuilder() throws {
@@ -204,16 +184,6 @@ class CompoundQueryBuilderTests: XCTestCase {
         XCTAssertEqual(query.boostMode, BoostMode.AVG)
         XCTAssertEqual(query.scoreMode, ScoreMode.MULTIPLY)
         XCTAssertEqual(query.boost, 0.8)
-        let expectedDic = ["function_score": [
-            "query": ["match_all": [:]],
-            "boost": Decimal(string: "0.8")!,
-            "min_score": Decimal(string: "0.5")!,
-            "max_boost": Decimal(string: "1.0")!,
-            "random_score": [:],
-            "score_mode": "multiply",
-            "boost_mode": "avg",
-        ]] as [String: Any]
-        XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
     }
 
     func test_18_functionScoreQueryBuilder() throws {
@@ -235,19 +205,6 @@ class CompoundQueryBuilderTests: XCTestCase {
         XCTAssertEqual(query.boostMode, BoostMode.AVG)
         XCTAssertEqual(query.scoreMode, ScoreMode.MULTIPLY)
         XCTAssertEqual(query.boost, 0.8)
-        let expectedDic = ["function_score": [
-            "query": ["match_all": [:]],
-            "boost": Decimal(string: "0.8")!,
-            "min_score": Decimal(string: "0.5")!,
-            "max_boost": Decimal(string: "1.0")!,
-            "functions": [
-                ["random_score": [:]],
-                ["weight": Decimal(string: "1.1")!],
-            ],
-            "score_mode": "multiply",
-            "boost_mode": "avg",
-        ]] as [String: Any]
-        XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
     }
 
     func test_19_boostingQueryBuilder() throws {
@@ -295,11 +252,5 @@ class CompoundQueryBuilderTests: XCTestCase {
         XCTAssertEqual(query.positive as! MatchAllQuery, MatchAllQuery())
         XCTAssertEqual(query.negative as! TermQuery, TermQuery(field: "text", value: "random"))
         XCTAssertEqual(query.negativeBoost, 0.8)
-        let expectedDic = ["boosting": [
-            "positive": ["match_all": [:]],
-            "negative": ["term": ["text": "random"]],
-            "negative_boost": Decimal(string: "0.8")!,
-        ]] as [String: Any]
-        XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
     }
 }

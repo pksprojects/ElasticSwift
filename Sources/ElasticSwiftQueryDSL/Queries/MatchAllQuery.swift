@@ -22,14 +22,6 @@ public struct MatchAllQuery: Query {
     internal init(withBuilder builder: MatchAllQueryBuilder) {
         self.init(builder.boost)
     }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        if let boost = self.boost {
-            dic[CodingKeys.boost.rawValue] = boost
-        }
-        return [queryType.name: dic]
-    }
 }
 
 extension MatchAllQuery {
@@ -66,10 +58,6 @@ public struct MatchNoneQuery: Query {
 
     internal init(withBuilder _: MatchNoneQueryBuilder) {
         self.init()
-    }
-
-    public func toDic() -> [String: Any] {
-        return [queryType.name: [:]]
     }
 }
 

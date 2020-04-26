@@ -78,19 +78,7 @@ class FullTextBuilderTests: XCTestCase {
         XCTAssertEqual(query.zeroTermQuery, ZeroTermQuery.all)
         XCTAssertEqual(query.cutoffFrequency, Decimal(0.1))
         XCTAssertEqual(query.operator, Operator.or)
-        // XCTAssertEqual(query.boost, 0.8)
-        let expectedDic = ["match": [
-            "message": [
-                "query": "to be or not to be",
-                "boost": Decimal(0.8),
-                "fuzziness": "AUTO",
-                "operator": "or",
-                "zero_terms_query": "all",
-                "cutoff_frequency": Decimal(0.1),
-                "auto_generate_synonyms_phrase_query": false,
-            ],
-        ]] as [String: Any]
-        XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
+        XCTAssertEqual(query.boost, 0.8)
     }
 
     func test_05_matchPhraseQueryBuilder() throws {
@@ -138,13 +126,6 @@ class FullTextBuilderTests: XCTestCase {
         XCTAssertEqual(query.field, "message")
         XCTAssertEqual(query.value, "this is a test")
         XCTAssertEqual(query.analyzer, "my_analyzer")
-        let expectedDic = ["match_phrase": [
-            "message": [
-                "query": "this is a test",
-                "analyzer": "my_analyzer",
-            ],
-        ]] as [String: Any]
-        XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
     }
 
     func test_10_matchPhraseQueryBuilder() throws {
@@ -154,10 +135,6 @@ class FullTextBuilderTests: XCTestCase {
             .build()
         XCTAssertEqual(query.field, "message")
         XCTAssertEqual(query.value, "this is a test")
-        let expectedDic = ["match_phrase": [
-            "message": "this is a test",
-        ]] as [String: Any]
-        XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
     }
 
     func test_11_matchPhrasePrefixQueryBuilder() throws {
@@ -205,13 +182,6 @@ class FullTextBuilderTests: XCTestCase {
         XCTAssertEqual(query.field, "message")
         XCTAssertEqual(query.value, "quick brown f")
         XCTAssertEqual(query.maxExpansions, 10)
-        let expectedDic = ["match_phrase_prefix": [
-            "message": [
-                "query": "quick brown f",
-                "max_expansions": 10,
-            ],
-        ]] as [String: Any]
-        XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
     }
 
     func test_16_matchPhrasePrefixQueryBuilder() throws {
@@ -221,10 +191,6 @@ class FullTextBuilderTests: XCTestCase {
             .build()
         XCTAssertEqual(query.field, "message")
         XCTAssertEqual(query.value, "quick brown f")
-        let expectedDic = ["match_phrase_prefix": [
-            "message": "quick brown f",
-        ]] as [String: Any]
-        XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
     }
 
     func test_17_multiMatchQueryBuilder() throws {
@@ -274,13 +240,6 @@ class FullTextBuilderTests: XCTestCase {
         XCTAssertEqual(query.query, "this is a test")
         XCTAssertEqual(query.tieBreaker, 0.3)
         XCTAssertEqual(query.type, .bestFields)
-        let expectedDic = ["multi_match": [
-            "query": "this is a test",
-            "fields": ["subject", "message"],
-            "tie_breaker": Decimal(0.3),
-            "type": "best_fields",
-        ]] as [String: Any]
-        XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
     }
 
     func test_22_commonTermsQueryBuilder() throws {
@@ -332,16 +291,6 @@ class FullTextBuilderTests: XCTestCase {
         XCTAssertEqual(query.highFrequencyOperator, .and)
         XCTAssertEqual(query.lowFrequencyOperator, .or)
         XCTAssertEqual(query.minimumShouldMatch, 2)
-        let expectedDic = ["common": [
-            "body": [
-                "query": "this is a test",
-                "cutoff_frequency": Decimal(0.001),
-                "low_freq_operator": "or",
-                "high_freq_operator": "and",
-                "minimum_should_match": 2,
-            ],
-        ]] as [String: Any]
-        XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
     }
 
     func test_27_commonTermsQueryBuilder() throws {
@@ -360,19 +309,6 @@ class FullTextBuilderTests: XCTestCase {
         XCTAssertEqual(query.minimumShouldMatch, nil)
         XCTAssertEqual(query.minimumShouldMatchLowFreq, 2)
         XCTAssertEqual(query.minimumShouldMatchHighFreq, 3)
-        let expectedDic = ["common": [
-            "body": [
-                "query": "this is a test",
-                "cutoff_frequency": Decimal(0.001),
-                "low_freq_operator": "or",
-                "high_freq_operator": "and",
-                "minimum_should_match": [
-                    "low_freq": 2,
-                    "high_freq": 3,
-                ],
-            ],
-        ]] as [String: Any]
-        XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual: \(query.toDic())")
     }
 
     func test_28_queryStringQueryBuilder() throws {
