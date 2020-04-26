@@ -195,7 +195,7 @@ extension RangeQuery {
         format = try fieldContainer.decodeStringIfPresent(forKey: .format)
         timeZone = try fieldContainer.decodeStringIfPresent(forKey: .timeZone)
         boost = try fieldContainer.decodeDecimalIfPresent(forKey: .boost)
-        relation = try fieldContainer.decodeIfPresent(ShapeRelation.self, forKey: .gte)
+        relation = try fieldContainer.decodeIfPresent(ShapeRelation.self, forKey: .relation)
     }
 
     public func encode(to encoder: Encoder) throws {
