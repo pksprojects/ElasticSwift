@@ -295,6 +295,12 @@
             ("test_26_regexpQuery_encode_2", test_26_regexpQuery_encode_2),
             ("test_27_regexpQuery_decode", test_27_regexpQuery_decode),
             ("test_28_regexpQuery_decode_2", test_28_regexpQuery_decode_2),
+            ("test_29_typeQuery_encode", test_29_typeQuery_encode),
+            ("test_30_typeQuery_decode", test_30_typeQuery_decode),
+            ("test_31_idsQuery_encode", test_31_idsQuery_encode),
+            ("test_32_idsQuery_encode_2", test_32_idsQuery_encode_2),
+            ("test_33_idsQuery_decode", test_33_idsQuery_decode),
+            ("test_34_idsQuery_decode_2", test_34_idsQuery_decode_2),
         ]
     }
 
@@ -339,6 +345,13 @@
             ("test_34_fuzzyQueryBuilder_missing_field", test_34_fuzzyQueryBuilder_missing_field),
             ("test_35_fuzzyQueryBuilder_missing_value", test_35_fuzzyQueryBuilder_missing_value),
             ("test_36_fuzzyQueryBuilder", test_36_fuzzyQueryBuilder),
+            ("test_37_typeQueryBuilder", test_37_typeQueryBuilder),
+            ("test_38_typeQueryBuilder_missing_field", test_38_typeQueryBuilder_missing_field),
+            ("test_39_typeQueryBuilder", test_39_typeQueryBuilder),
+            ("test_40_idsQueryBuilder", test_40_idsQueryBuilder),
+            ("test_41_idsQueryBuilder", test_41_idsQueryBuilder),
+            ("test_42_idsQueryBuilder_missing_field", test_42_idsQueryBuilder_missing_field),
+            ("test_43_idsQueryBuilder", test_43_idsQueryBuilder),
         ]
     }
 

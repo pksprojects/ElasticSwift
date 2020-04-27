@@ -608,4 +608,117 @@ class TermLevelQueriesTests: XCTestCase {
 
         XCTAssertEqual(query, decoded)
     }
+
+    func test_29_typeQuery_encode() throws {
+        let query = TypeQuery(type: "_doc")
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "type" : {
+                "value" : "_doc"
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_30_typeQuery_decode() throws {
+        let query = TypeQuery(type: "_doc")
+
+        let jsonStr = """
+        {
+            "type" : {
+                "value" : "_doc"
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(TypeQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
+
+    func test_31_idsQuery_encode() throws {
+        let query = IdsQuery(ids: ["1", "4", "100"])
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "ids" : {
+                "values" : ["1", "4", "100"]
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_32_idsQuery_encode_2() throws {
+        let query = IdsQuery(ids: ["1", "4", "100"], type: "_doc")
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "ids" : {
+                "type" : "_doc",
+                "values" : ["1", "4", "100"]
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_33_idsQuery_decode() throws {
+        let query = IdsQuery(ids: ["1", "4", "100"])
+
+        let jsonStr = """
+        {
+            "ids" : {
+                "values" : ["1", "4", "100"]
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(IdsQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
+
+    func test_34_idsQuery_decode_2() throws {
+        let query = IdsQuery(ids: ["1", "4", "100"], type: "_doc")
+
+        let jsonStr = """
+        {
+            "ids" : {
+                "type" : "_doc",
+                "values" : ["1", "4", "100"]
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(IdsQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
 }

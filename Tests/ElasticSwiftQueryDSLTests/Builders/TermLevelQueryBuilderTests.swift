@@ -398,4 +398,60 @@ class TermLevelQueryBuilderTests: XCTestCase {
         XCTAssertEqual(query.transpositions, true)
         XCTAssertEqual(query.boost, 2.0)
     }
+
+    func test_37_typeQueryBuilder() throws {
+        XCTAssertNoThrow(try QueryBuilders.typeQuery().set(type: "age").build(), "Should not throw")
+    }
+
+    func test_38_typeQueryBuilder_missing_field() throws {
+        XCTAssertThrowsError(try QueryBuilders.typeQuery().build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("type", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_39_typeQueryBuilder() throws {
+        let query = try QueryBuilders.typeQuery()
+            .set(type: "message")
+            .build()
+        XCTAssertEqual(query.type, "message")
+    }
+
+    func test_40_idsQueryBuilder() throws {
+        XCTAssertNoThrow(try QueryBuilders.idsQuery().set(ids: "1").set(type: "age").build(), "Should not throw")
+    }
+
+    func test_41_idsQueryBuilder() throws {
+        XCTAssertNoThrow(try QueryBuilders.idsQuery().set(ids: "1").build(), "Should not throw")
+    }
+
+    func test_42_idsQueryBuilder_missing_field() throws {
+        XCTAssertThrowsError(try QueryBuilders.idsQuery().set(type: "type").build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .atlestOneElementRequired(field):
+                    XCTAssertEqual("ids", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_43_idsQueryBuilder() throws {
+        let query = try QueryBuilders.idsQuery()
+            .set(type: "_doc")
+            .set(ids: "1", "4", "100")
+            .build()
+        XCTAssertEqual(query.type, "_doc")
+        XCTAssertEqual(query.ids, ["1", "4", "100"])
+    }
 }

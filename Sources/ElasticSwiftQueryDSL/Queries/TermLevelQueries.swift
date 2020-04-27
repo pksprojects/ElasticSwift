@@ -719,7 +719,7 @@ extension IdsQuery {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
 
-        type = try nested.decodeString(forKey: .type)
+        type = try nested.decodeStringIfPresent(forKey: .type)
         ids = try nested.decode([String].self, forKey: .values)
     }
 
