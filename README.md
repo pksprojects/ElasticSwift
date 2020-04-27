@@ -2,6 +2,10 @@
 
 [![Build Status](https://travis-ci.org/pksprojects/ElasticSwift.svg?branch=master)](https://travis-ci.org/pksprojects/ElasticSwift)
 [![codecov](https://codecov.io/gh/pksprojects/ElasticSwift/branch/master/graph/badge.svg)](https://codecov.io/gh/pksprojects/ElasticSwift)
+[![Swift Version](https://img.shields.io/badge/Swift-5.0-orange.svg)](https://swift.org)
+[![SwiftPM Compatible](https://img.shields.io/badge/SwiftPM-compatible-4BC51D.svg?style=flat)](https://swift.org/package-manager/)
+[![Supported Platforms](https://img.shields.io/badge/platform-iOS%7CmacOS%7CtvOS%7Clinux-lightgrey?style=flat)](https://github.com/pksprojects/ElasticSwift)
+[![CocoaPods Compatible](https://img.shields.io/cocoapods/v/ElasticSwift.svg)](https://cocoapods.org/pods/ElasticSwift)
 
 ## Project Status
 
@@ -128,11 +132,11 @@ func createHandler(_ result: Result<CreateIndexResponse, Error>) -> Void {
 }
 
 // creating index
-let createIndexRequest = CreateIndexRequest(name: "indexName")
+let createIndexRequest = CreateIndexRequest("indexName")
 client.indices.create(createIndexRequest, completionHandler: createHandler) // executes request
 
 // delete index
-func deleteHandler(_ response: DeleteIndexResponse?, _ error: Error?) -> Void {
+func deleteHandler(_ result: Result<AcknowledgedResponse, Error>) -> Void {
     switch result {
         case .failure(let error):
             print("Error", error)
@@ -141,7 +145,7 @@ func deleteHandler(_ response: DeleteIndexResponse?, _ error: Error?) -> Void {
     }
 }
 
-let deleteIndexRequest = DeleteIndexRequest(name: "indexName")
+let deleteIndexRequest = DeleteIndexRequest("indexName")
 client.indices.delete(deleteIndexRequest, completionHandler: deleteHandler) // executes request
 
 ```
@@ -151,7 +155,7 @@ client.indices.delete(deleteIndexRequest, completionHandler: deleteHandler) // e
 Document CRUD
 
 ```swift
-class MyClass: Codable {
+class MyClass: Codable, Equatable {
   var myField: String?
 }
 
@@ -187,7 +191,7 @@ func getHandler(_ result: Result<GetResponse<MyClass>, Error>) -> Void {
     }
 }
 
-let getRequest = GetRequestBuilder<MyClass>()
+let getRequest = try GetRequestBuilder()
     .set(id: "id")
     .set(index: "indexName")
     .set(type: "type")
@@ -222,8 +226,8 @@ Currently not all QueryBuilders are available. Future releases will add support 
 ```swift
 
 let builder = QueryBuilders.boolQuery()
-let mustMatch = try QueryBuilders.matchQuery().match(field: "fieldName", value: "value").build()
-let mustNotMatch = try QueryBuilders.matchQuery().match(field: "fieldName", value: "value").build()
+let mustMatch = try QueryBuilders.matchQuery().set(field: "fieldName").set(value: "value").build()
+let mustNotMatch = try QueryBuilders.matchQuery().set(field: "someFieldName").set(value: "value").build()
 builder.must(query: mustMatch)
 builder.mustNot(query: mustNotMatch)
 let boolQuery = try builder.build()
@@ -245,7 +249,7 @@ func handler(_ result: Result<SearchResponse<Message>, Error>) -> Void {
 }
 
 let queryBuilder = QueryBuilders.boolQuery()
-let match = try QueryBuilders.matchQuery().match(field: "myField", value: "MySearchValue").build()
+let match = try QueryBuilders.matchQuery().set(field: "msg").set(value: "Message").build() 
 queryBuilder.must(query: match)
 
 let query =  try queryBuilder.build()
@@ -258,7 +262,7 @@ let request = try SearchRequestBuilder()
         .set(indices: "indexName")
         .set(types: "type")
         .set(query: query)
-        .set(sort: sort)
+        .add(sort: sort)
         .build()
 
 client.search(request, completionHandler: handler)
