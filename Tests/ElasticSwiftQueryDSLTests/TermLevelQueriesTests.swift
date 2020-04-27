@@ -524,4 +524,88 @@ class TermLevelQueriesTests: XCTestCase {
 
         XCTAssertEqual(query, decoded)
     }
+
+    func test_25_regexpQuery_encode() throws {
+        let query = FuzzyQuery(field: "user", value: "ki")
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "fuzzy" : { "user" : "ki" }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_26_regexpQuery_encode_2() throws {
+        let query = FuzzyQuery(field: "user", value: "ki", boost: 1.0, fuzziness: 2, prefixLenght: 0, maxExpansions: 100, transpositions: false)
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "fuzzy" : {
+                "user" : {
+                    "value": "ki",
+                    "boost": 1.0,
+                    "fuzziness": 2,
+                    "prefix_length": 0,
+                    "max_expansions": 100,
+                    "transpositions": false
+                }
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_27_regexpQuery_decode() throws {
+        let query = FuzzyQuery(field: "user", value: "ki")
+
+        let jsonStr = """
+        {
+            "fuzzy" : { "user" : "ki" }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(FuzzyQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
+
+    func test_28_regexpQuery_decode_2() throws {
+        let query = FuzzyQuery(field: "user", value: "ki", boost: 1.0, fuzziness: 2, prefixLenght: 0, maxExpansions: 100, transpositions: true)
+
+        let jsonStr = """
+        {
+            "fuzzy" : {
+                "user" : {
+                    "value": "ki",
+                    "boost": 1.0,
+                    "fuzziness": 2,
+                    "prefix_length": 0,
+                    "max_expansions": 100,
+                    "transpositions": true
+                }
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(FuzzyQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
 }

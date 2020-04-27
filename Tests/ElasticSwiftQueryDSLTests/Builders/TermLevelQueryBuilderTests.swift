@@ -343,4 +343,59 @@ class TermLevelQueryBuilderTests: XCTestCase {
         XCTAssertEqual(query.boost, 2.0)
         XCTAssertEqual(query.maxDeterminizedStates, 1)
     }
+
+    func test_32_fuzzyQueryBuilder() throws {
+        XCTAssertNoThrow(try QueryBuilders.fuzzyQuery().set(field: "text").set(value: "test search").build(), "Should not throw")
+    }
+
+    func test_33_fuzzyQueryBuilder_2() throws {
+        XCTAssertNoThrow(try QueryBuilders.fuzzyQuery().set(field: "text").set(value: "test search").set(boost: 1.0).build(), "Should not throw")
+    }
+
+    func test_34_fuzzyQueryBuilder_missing_field() throws {
+        XCTAssertThrowsError(try QueryBuilders.fuzzyQuery().set(value: "test search").build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("field", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_35_fuzzyQueryBuilder_missing_value() throws {
+        XCTAssertThrowsError(try QueryBuilders.fuzzyQuery().set(field: "text").build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("value", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_36_fuzzyQueryBuilder() throws {
+        let query = try QueryBuilders.fuzzyQuery()
+            .set(field: "message")
+            .set(value: "to be or not to be")
+            .set(boost: 2.0)
+            .set(fuzziness: 2)
+            .set(prefixLength: 0)
+            .set(maxExpansions: 100)
+            .set(transpositions: true)
+            .build()
+        XCTAssertEqual(query.field, "message")
+        XCTAssertEqual(query.value, "to be or not to be")
+        XCTAssertEqual(query.fuzziness, 2)
+        XCTAssertEqual(query.prefixLenght, 0)
+        XCTAssertEqual(query.maxExpansions, 100)
+        XCTAssertEqual(query.transpositions, true)
+        XCTAssertEqual(query.boost, 2.0)
+    }
 }

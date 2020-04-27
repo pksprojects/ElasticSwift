@@ -291,6 +291,10 @@
             ("test_22_regexpQuery_encode_2", test_22_regexpQuery_encode_2),
             ("test_23_regexpQuery_decode", test_23_regexpQuery_decode),
             ("test_24_regexpQuery_decode_2", test_24_regexpQuery_decode_2),
+            ("test_25_regexpQuery_encode", test_25_regexpQuery_encode),
+            ("test_26_regexpQuery_encode_2", test_26_regexpQuery_encode_2),
+            ("test_27_regexpQuery_decode", test_27_regexpQuery_decode),
+            ("test_28_regexpQuery_decode_2", test_28_regexpQuery_decode_2),
         ]
     }
 
@@ -330,6 +334,11 @@
             ("test_29_regexpQueryBuilder_missing_field", test_29_regexpQueryBuilder_missing_field),
             ("test_30_regexpQueryBuilder_missing_value", test_30_regexpQueryBuilder_missing_value),
             ("test_31_regexpQueryBuilder", test_31_regexpQueryBuilder),
+            ("test_32_fuzzyQueryBuilder", test_32_fuzzyQueryBuilder),
+            ("test_33_fuzzyQueryBuilder_2", test_33_fuzzyQueryBuilder_2),
+            ("test_34_fuzzyQueryBuilder_missing_field", test_34_fuzzyQueryBuilder_missing_field),
+            ("test_35_fuzzyQueryBuilder_missing_value", test_35_fuzzyQueryBuilder_missing_value),
+            ("test_36_fuzzyQueryBuilder", test_36_fuzzyQueryBuilder),
         ]
     }
 

@@ -582,18 +582,33 @@ extension FuzzyQuery {
         }
 
         field = nested.allKeys.first!.stringValue
-        let fieldContainer = try nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
-        value = try fieldContainer.decodeString(forKey: .value)
-        boost = try fieldContainer.decodeDecimalIfPresent(forKey: .boost)
-        fuzziness = try fieldContainer.decodeIntIfPresent(forKey: .fuzziness)
-        prefixLenght = try fieldContainer.decodeIntIfPresent(forKey: .prefixLength)
-        maxExpansions = try fieldContainer.decodeIntIfPresent(forKey: .maxExpansions)
-        transpositions = try fieldContainer.decodeBoolIfPresent(forKey: .tranpositions)
+        if let val = try? nested.decodeString(forKey: .key(named: field)) {
+            value = val
+            boost = nil
+            fuzziness = nil
+            prefixLenght = nil
+            maxExpansions = nil
+            transpositions = nil
+        } else {
+            let fieldContainer = try nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
+            value = try fieldContainer.decodeString(forKey: .value)
+            boost = try fieldContainer.decodeDecimalIfPresent(forKey: .boost)
+            fuzziness = try fieldContainer.decodeIntIfPresent(forKey: .fuzziness)
+            prefixLenght = try fieldContainer.decodeIntIfPresent(forKey: .prefixLength)
+            maxExpansions = try fieldContainer.decodeIntIfPresent(forKey: .maxExpansions)
+            transpositions = try fieldContainer.decodeBoolIfPresent(forKey: .transpositions)
+        }
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
+
+        guard boost != nil || fuzziness != nil || maxExpansions != nil || prefixLenght != nil || transpositions != nil else {
+            try nested.encode(value, forKey: .key(named: field))
+            return
+        }
+
         var fieldContainer = nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
 
         try fieldContainer.encode(value, forKey: .value)
@@ -601,7 +616,7 @@ extension FuzzyQuery {
         try fieldContainer.encodeIfPresent(fuzziness, forKey: .fuzziness)
         try fieldContainer.encodeIfPresent(maxExpansions, forKey: .maxExpansions)
         try fieldContainer.encodeIfPresent(prefixLenght, forKey: .prefixLength)
-        try fieldContainer.encodeIfPresent(transpositions, forKey: .tranpositions)
+        try fieldContainer.encodeIfPresent(transpositions, forKey: .transpositions)
     }
 
     enum CodingKeys: String, CodingKey {
@@ -610,7 +625,7 @@ extension FuzzyQuery {
         case fuzziness
         case prefixLength = "prefix_length"
         case maxExpansions = "max_expansions"
-        case tranpositions
+        case transpositions
     }
 }
 
