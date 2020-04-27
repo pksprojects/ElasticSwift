@@ -287,6 +287,10 @@
             ("test_18_wildCardQuery_encode_2", test_18_wildCardQuery_encode_2),
             ("test_19_wildCardQuery_decode", test_19_wildCardQuery_decode),
             ("test_20_wildCardQuery_decode_2", test_20_wildCardQuery_decode_2),
+            ("test_21_regexpQuery_encode", test_21_regexpQuery_encode),
+            ("test_22_regexpQuery_encode_2", test_22_regexpQuery_encode_2),
+            ("test_23_regexpQuery_decode", test_23_regexpQuery_decode),
+            ("test_24_regexpQuery_decode_2", test_24_regexpQuery_decode_2),
         ]
     }
 
@@ -321,6 +325,11 @@
             ("test_24_wildCardQueryBuilder_missing_field", test_24_wildCardQueryBuilder_missing_field),
             ("test_25_wildCardQueryBuilder_missing_value", test_25_wildCardQueryBuilder_missing_value),
             ("test_26_wildCardQueryBuilder", test_26_wildCardQueryBuilder),
+            ("test_27_regexpQueryBuilder", test_27_regexpQueryBuilder),
+            ("test_28_regexpQueryBuilder_2", test_28_regexpQueryBuilder_2),
+            ("test_29_regexpQueryBuilder_missing_field", test_29_regexpQueryBuilder_missing_field),
+            ("test_30_regexpQueryBuilder_missing_value", test_30_regexpQueryBuilder_missing_value),
+            ("test_31_regexpQueryBuilder", test_31_regexpQueryBuilder),
         ]
     }
 

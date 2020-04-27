@@ -440,4 +440,88 @@ class TermLevelQueriesTests: XCTestCase {
 
         XCTAssertEqual(query, decoded)
     }
+
+    func test_21_regexpQuery_encode() throws {
+        let query = RegexpQuery(field: "name.first", value: "s.*y")
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "regexp":{
+                "name.first": "s.*y"
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_22_regexpQuery_encode_2() throws {
+        let query = RegexpQuery(field: "name.first", value: "s.*y", boost: 1.2, regexFlags: [.intersection, .complement, .empty], maxDeterminizedStates: 20000)
+
+        let data = try JSONEncoder().encode(query)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "regexp":{
+                "name.first":{
+                    "value":"s.*y",
+                    "flags" : "INTERSECTION|COMPLEMENT|EMPTY",
+                    "max_determinized_states": 20000,
+                    "boost": 1.2
+                }
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_23_regexpQuery_decode() throws {
+        let query = RegexpQuery(field: "name.first", value: "s.*y")
+
+        let jsonStr = """
+        {
+            "regexp":{
+                "name.first": "s.*y"
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(RegexpQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
+
+    func test_24_regexpQuery_decode_2() throws {
+        let query = RegexpQuery(field: "name.first", value: "s.*y", boost: 1.2, regexFlags: [.intersection, .complement, .empty], maxDeterminizedStates: 20000)
+
+        let jsonStr = """
+        {
+            "regexp":{
+                "name.first":{
+                    "value":"s.*y",
+                    "flags" : "INTERSECTION|COMPLEMENT|EMPTY",
+                    "max_determinized_states": 20000,
+                    "boost": 1.2
+                }
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(RegexpQuery.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(query, decoded)
+    }
 }

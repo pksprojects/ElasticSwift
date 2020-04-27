@@ -444,14 +444,14 @@ public struct RegexpQuery: Query {
     public let field: String
     public let value: String
     public let boost: Decimal?
-    public let regexFlags: String
+    public let regexFlags: [RegexFlag]
     public let maxDeterminizedStates: Int?
 
     public init(field: String, value: String, boost: Decimal? = nil, regexFlags: [RegexFlag] = [], maxDeterminizedStates: Int? = nil) {
         self.field = field
         self.value = value
         self.boost = boost
-        self.regexFlags = regexFlags.map { flag in flag.rawValue }.joined(separator: "|")
+        self.regexFlags = regexFlags
         self.maxDeterminizedStates = maxDeterminizedStates
     }
 
@@ -466,6 +466,10 @@ public struct RegexpQuery: Query {
 
         self.init(field: builder.field!, value: builder.value!, boost: builder.boost, regexFlags: builder.regexFlags, maxDeterminizedStates: builder.maxDeterminizedStates)
     }
+
+    public var regexFlagsStr: String {
+        return regexFlags.map { flag in flag.rawValue }.joined(separator: "|")
+    }
 }
 
 extension RegexpQuery {
@@ -477,22 +481,40 @@ extension RegexpQuery {
         }
 
         field = nested.allKeys.first!.stringValue
-        let fieldContainer = try nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
+        if let val = try? nested.decodeString(forKey: .key(named: field)) {
+            value = val
+            boost = nil
+            regexFlags = []
+            maxDeterminizedStates = nil
+        } else {
+            let fieldContainer = try nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
 
-        value = try fieldContainer.decodeString(forKey: .value)
-        boost = try fieldContainer.decodeDecimalIfPresent(forKey: .boost)
-        regexFlags = try fieldContainer.decodeString(forKey: .flags)
-        maxDeterminizedStates = try fieldContainer.decodeIntIfPresent(forKey: .maxDeterminizedStates)
+            value = try fieldContainer.decodeString(forKey: .value)
+            boost = try fieldContainer.decodeDecimalIfPresent(forKey: .boost)
+            let regexFlagStr = try fieldContainer.decodeStringIfPresent(forKey: .flags)
+            if let flagStr = regexFlagStr {
+                regexFlags = flagStr.split(separator: "|").map(String.init).map { RegexFlag(rawValue: $0)! }
+            } else {
+                regexFlags = []
+            }
+            maxDeterminizedStates = try fieldContainer.decodeIntIfPresent(forKey: .maxDeterminizedStates)
+        }
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
+
+        guard boost != nil || !regexFlags.isEmpty || maxDeterminizedStates != nil else {
+            try nested.encode(value, forKey: .key(named: field))
+            return
+        }
+
         var fieldContainer = nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
 
         try fieldContainer.encode(value, forKey: .value)
         try fieldContainer.encodeIfPresent(boost, forKey: .boost)
-        try fieldContainer.encodeIfPresent(regexFlags, forKey: .flags)
+        try fieldContainer.encodeIfPresent(regexFlagsStr, forKey: .flags)
         try fieldContainer.encodeIfPresent(maxDeterminizedStates, forKey: .maxDeterminizedStates)
     }
 

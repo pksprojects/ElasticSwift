@@ -291,4 +291,56 @@ class TermLevelQueryBuilderTests: XCTestCase {
         XCTAssertEqual(query.value, "to be or not to be")
         XCTAssertEqual(query.boost, 2.0)
     }
+
+    func test_27_regexpQueryBuilder() throws {
+        XCTAssertNoThrow(try QueryBuilders.regexpQuery().set(field: "text").set(value: "test search").build(), "Should not throw")
+    }
+
+    func test_28_regexpQueryBuilder_2() throws {
+        XCTAssertNoThrow(try QueryBuilders.regexpQuery().set(field: "text").set(value: "test search").set(boost: 1.0).build(), "Should not throw")
+    }
+
+    func test_29_regexpQueryBuilder_missing_field() throws {
+        XCTAssertThrowsError(try QueryBuilders.regexpQuery().set(value: "test search").build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("field", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_30_regexpQueryBuilder_missing_value() throws {
+        XCTAssertThrowsError(try QueryBuilders.regexpQuery().set(field: "text").build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? QueryBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("value", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_31_regexpQueryBuilder() throws {
+        let query = try QueryBuilders.regexpQuery()
+            .set(field: "message")
+            .set(value: "to be or not to be")
+            .set(boost: 2.0)
+            .set(regexFlags: .intersection, .empty)
+            .set(maxDeterminizedStates: 1)
+            .build()
+        XCTAssertEqual(query.field, "message")
+        XCTAssertEqual(query.value, "to be or not to be")
+        XCTAssertEqual(query.regexFlags, [.intersection, .empty])
+        XCTAssertEqual(query.regexFlagsStr, "INTERSECTION|EMPTY")
+        XCTAssertEqual(query.boost, 2.0)
+        XCTAssertEqual(query.maxDeterminizedStates, 1)
+    }
 }
