@@ -34,7 +34,7 @@ class MatchAllQueryTests: XCTestCase {
         let query = try! QueryBuilders.matchAllQuery().build()
         let expectedJson = "{\"match_all\":{}}"
         do {
-            let data = try JSONSerialization.data(withJSONObject: query.toDic(), options: [])
+            let data = try JSONEncoder().encode(query)
             let dataStr = String(data: data, encoding: .utf8)
             XCTAssert(expectedJson == dataStr)
         } catch {
@@ -51,7 +51,7 @@ class MatchAllQueryTests: XCTestCase {
         let query = try! QueryBuilders.matchAllQuery().set(boost: 1.1).build()
         let expectedJson = "{\"match_all\":{\"boost\":1.1}}"
         do {
-            let data = try JSONSerialization.data(withJSONObject: query.toDic(), options: [])
+            let data = try JSONEncoder().encode(query)
             let dataStr = String(data: data, encoding: .utf8)
             XCTAssert(expectedJson == dataStr)
         } catch {
@@ -64,7 +64,7 @@ class MatchAllQueryTests: XCTestCase {
         let query = try! MatchNoneQueryBuilder().build()
         let expectedJson = "{\"match_none\":{}}"
         do {
-            let data = try JSONSerialization.data(withJSONObject: query.toDic(), options: [])
+            let data = try JSONEncoder().encode(query)
             let dataStr = String(data: data, encoding: .utf8)
             XCTAssert(expectedJson == dataStr)
         } catch {

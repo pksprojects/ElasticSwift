@@ -258,7 +258,7 @@ class SearchRequestTests: XCTestCase {
             .set(types: "_doc")
             .set(query: try! queryBuilder.build())
             .set(sourceFilter: .fetchSource(false))
-            .set(searchType: .dfs_query_then_fetch)
+            .set(searchType: .dfsQueryThenFetch)
             .add(sort: sort)
             .build()
 
@@ -1019,7 +1019,7 @@ class SearchRequestTests: XCTestCase {
             e.fulfill()
         }
 
-        let rescorer = QueryRescorer(query: RescoreQuery(MatchPhraseQuery(field: "msg", value: "the quick brown"), scoreMode: .TOTAL, queryWeight: 0.7, rescoreQueryWeight: 1.2), windowSize: 100)
+        let rescorer = QueryRescorer(query: RescoreQuery(MatchPhraseQuery(field: "msg", value: "the quick brown"), scoreMode: .total, queryWeight: 0.7, rescoreQueryWeight: 1.2), windowSize: 100)
 
         let scoreFunction = try ScoreFunctionBuilders.scriptFunction()
             .set(script: Script("Math.log10(doc.likes.value + 2)"))
@@ -1030,7 +1030,7 @@ class SearchRequestTests: XCTestCase {
             .set(query: MatchAllQuery())
             .build()
 
-        let rescorer1 = QueryRescorer(query: RescoreQuery(functionScore, scoreMode: .MULTIPLY), windowSize: 10)
+        let rescorer1 = QueryRescorer(query: RescoreQuery(functionScore, scoreMode: .multiply), windowSize: 10)
 
         let request = try SearchRequestBuilder()
             .set(indices: indexName)
@@ -1232,7 +1232,7 @@ class SearchRequestTests: XCTestCase {
     func test_20_searchSource() throws {
         var s1 = SearchSource()
         s1.query = MatchAllQuery()
-        s1.rescore = [.init(query: .init(MatchAllQuery(), scoreMode: .AVG, queryWeight: 1.0, rescoreQueryWeight: 1.3))]
+        s1.rescore = [.init(query: .init(MatchAllQuery(), scoreMode: .avg, queryWeight: 1.0, rescoreQueryWeight: 1.3))]
         s1.sorts = [FieldSortBuilder("test_field").build()]
         s1.scriptFields = [.init(field: "test", script: Script("test script"))]
 

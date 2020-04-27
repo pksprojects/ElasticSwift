@@ -39,22 +39,6 @@ public struct NestedQuery: Query {
 
         self.init(builder.path!, query: builder.query!, scoreMode: builder.scoreMode, ignoreUnmapped: builder.ignoreUnmapped, innerHits: builder.innerHits)
     }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        dic[CodingKeys.path.stringValue] = path
-        dic[CodingKeys.query.stringValue] = query.toDic()
-        if let ignoreUnmapped = self.ignoreUnmapped {
-            dic[CodingKeys.ignoreUnmapped.stringValue] = ignoreUnmapped
-        }
-        if let scoreMode = self.scoreMode {
-            dic[CodingKeys.scoreMode.stringValue] = scoreMode
-        }
-        if let innerHits = self.innerHits {
-            dic[CodingKeys.innerHits.stringValue] = innerHits
-        }
-        return [queryType.name: dic]
-    }
 }
 
 extension NestedQuery {
@@ -137,28 +121,6 @@ public struct HasChildQuery: Query {
         }
 
         self.init(builder.type!, query: builder.query!, scoreMode: builder.scoreMode, minChildren: builder.minChildren, maxChildren: builder.maxChildren, ignoreUnmapped: builder.ignoreUnmapped, innerHits: builder.innerHits)
-    }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        dic[CodingKeys.type.stringValue] = type
-        dic[CodingKeys.query.stringValue] = query.toDic()
-        if let ignoreUnmapped = self.ignoreUnmapped {
-            dic[CodingKeys.ignoreUnmapped.stringValue] = ignoreUnmapped
-        }
-        if let minChildren = self.minChildren {
-            dic[CodingKeys.minChildren.stringValue] = minChildren
-        }
-        if let maxChildren = self.maxChildren {
-            dic[CodingKeys.maxChildren.stringValue] = maxChildren
-        }
-        if let scoreMode = self.scoreMode {
-            dic[CodingKeys.scoreMode.stringValue] = scoreMode
-        }
-        if let innerHits = self.innerHits {
-            dic[CodingKeys.innerHits.stringValue] = innerHits
-        }
-        return [queryType.name: dic]
     }
 }
 
@@ -246,22 +208,6 @@ public struct HasParentQuery: Query {
 
         self.init(builder.parentType!, query: builder.query!, score: builder.score, ignoreUnmapped: builder.ignoreUnmapped, innerHits: builder.innerHits)
     }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        dic[CodingKeys.parentType.stringValue] = parentType
-        dic[CodingKeys.query.stringValue] = query.toDic()
-        if let ignoreUnmapped = self.ignoreUnmapped {
-            dic[CodingKeys.ignoreUnmapped.stringValue] = ignoreUnmapped
-        }
-        if let score = self.score {
-            dic[CodingKeys.score.stringValue] = score
-        }
-        if let innerHits = self.innerHits {
-            dic[CodingKeys.innerHits.stringValue] = innerHits
-        }
-        return [queryType.name: dic]
-    }
 }
 
 extension HasParentQuery {
@@ -335,16 +281,6 @@ public struct ParentIdQuery: Query {
             throw QueryBuilderError.missingRequiredField("type")
         }
         self.init(builder.id!, type: builder.type!, ignoreUnmapped: builder.ignoreUnmapped)
-    }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        dic[CodingKeys.id.stringValue] = id
-        dic[CodingKeys.type.stringValue] = type
-        if let ignoreUnmapped = self.ignoreUnmapped {
-            dic[CodingKeys.ignoreUnmapped.stringValue] = ignoreUnmapped
-        }
-        return [queryType.name: dic]
     }
 }
 

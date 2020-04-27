@@ -52,33 +52,6 @@ public struct GeoShapeQuery: Query {
 }
 
 extension GeoShapeQuery {
-    public func toDic() -> [String: Any] {
-        var dic = [String: Any]()
-
-        var fieldDic = [String: Any]()
-
-        if let shape = self.shape {
-            fieldDic[CodingKeys.shape.rawValue] = shape.value
-        }
-
-        if let indexedShapeId = self.indexedShapeId, let indexedShapeType = self.indexedShapeType {
-            var indexedShapeDic = [String: Any]()
-            indexedShapeDic[IndexedShape.CodingKeys.id.rawValue] = indexedShapeId
-            indexedShapeDic[IndexedShape.CodingKeys.type.rawValue] = indexedShapeType
-            if let indexedShapeIndex = self.indexedShapeIndex {
-                indexedShapeDic[IndexedShape.CodingKeys.index.rawValue] = indexedShapeIndex
-            }
-            if let indexedShapePath = self.indexedShapePath {
-                indexedShapeDic[IndexedShape.CodingKeys.path.rawValue] = indexedShapePath
-            }
-            fieldDic[CodingKeys.indexedShape.rawValue] = indexedShapeDic
-        }
-
-        dic[field] = fieldDic
-
-        return [queryType.name: dic]
-    }
-
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
@@ -192,26 +165,6 @@ public struct GeoBoundingBoxQuery: Query {
 
         self.init(field: builder.field!, topLeft: builder.topLeft!, bottomRight: builder.bottomRight!, type: builder.type, validationMethod: builder.validationMethod, ignoreUnmapped: builder.ignoreUnmapped)
     }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        var fieldDic: [String: Any] = [:]
-        fieldDic[CodingKeys.topLeft.rawValue] = topLeft.toQueryDicValue()
-        fieldDic[CodingKeys.bottomRight.rawValue] = bottomRight.toQueryDicValue()
-        dic[field] = fieldDic
-        if let type = self.type {
-            dic[CodingKeys.type.rawValue] = type.rawValue
-        }
-
-        if let validationMethod = self.validationMethod {
-            dic[CodingKeys.validationMethod.rawValue] = validationMethod.rawValue
-        }
-
-        if let ignoreUnmapped = self.ignoreUnmapped {
-            dic[CodingKeys.ignoreUnmapped.rawValue] = ignoreUnmapped
-        }
-        return [queryType.name: dic]
-    }
 }
 
 extension GeoBoundingBoxQuery {
@@ -303,27 +256,6 @@ public struct GeoDistanceQuery: Query {
 
         self.init(field: builder.field!, point: builder.point!, distance: builder.distance, distanceType: builder.distanceType, validationMethod: builder.validationMethod, ignoreUnmapped: builder.ignoreUnmapped)
     }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [field: point.toQueryDicValue()]
-
-        if let distance = self.distance {
-            dic[CodingKeys.distance.rawValue] = distance
-        }
-
-        if let distanceType = self.distanceType {
-            dic[CodingKeys.distanceType.rawValue] = distanceType.rawValue
-        }
-
-        if let validationMethod = self.validationMethod {
-            dic[CodingKeys.validationMethod.rawValue] = validationMethod.rawValue
-        }
-
-        if let ignoreUnmapped = self.ignoreUnmapped {
-            dic[CodingKeys.ignoreUnmapped.rawValue] = ignoreUnmapped
-        }
-        return [queryType.name: dic]
-    }
 }
 
 extension GeoDistanceQuery: Codable {
@@ -406,20 +338,6 @@ public struct GeoPolygonQuery: Query {
         }
 
         self.init(field: builder.field!, points: builder.points!, validationMethod: builder.validationMethod, ignoreUnmapped: builder.ignoreUnmapped)
-    }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        let fieldDic: [String: Any] = [CodingKeys.points.rawValue: points.map { $0.toQueryDicValue() }]
-        dic[field] = fieldDic
-        if let validationMethod = self.validationMethod {
-            dic[CodingKeys.validationMethod.rawValue] = validationMethod.rawValue
-        }
-
-        if let ignoreUnmapped = self.ignoreUnmapped {
-            dic[CodingKeys.ignoreUnmapped.rawValue] = ignoreUnmapped
-        }
-        return [queryType.name: dic]
     }
 }
 

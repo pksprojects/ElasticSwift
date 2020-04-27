@@ -27,10 +27,6 @@ public struct WeightScoreFunction: ScoreFunction {
 
         self.init(builder.weight!)
     }
-
-    public func toDic() -> [String: Any] {
-        return [scoreFunctionType.rawValue: weight]
-    }
 }
 
 extension WeightScoreFunction {
@@ -57,29 +53,24 @@ extension WeightScoreFunction: Equatable {
 public struct RandomScoreFunction: ScoreFunction {
     public let scoreFunctionType: ScoreFunctionType = .randomScore
 
-    public let seed: Int
-    public let field: String
+    public let seed: Int?
+    public let field: String?
 
-    public init(field: String, seed: Int) {
+    public init(field: String? = nil, seed: Int? = nil) {
         self.seed = seed
         self.field = field
     }
 
     internal init(withBuilder builder: RandomScoreFunctionBuilder) throws {
-        guard builder.seed != nil else {
-            throw ScoreFunctionBuilderError.missingRequiredField("seed")
-        }
-
-        guard builder.field != nil else {
-            throw ScoreFunctionBuilderError.missingRequiredField("field")
-        }
+//        guard builder.seed != nil else {
+//            throw ScoreFunctionBuilderError.missingRequiredField("seed")
+//        }
+//
+//        guard builder.field != nil else {
+//            throw ScoreFunctionBuilderError.missingRequiredField("field")
+//        }
 
         self.init(field: builder.field!, seed: builder.seed!)
-    }
-
-    public func toDic() -> [String: Any] {
-        return [scoreFunctionType.rawValue: [CodingKeys.seed.rawValue: seed,
-                                             CodingKeys.field.rawValue: field]]
     }
 }
 
@@ -87,15 +78,15 @@ extension RandomScoreFunction {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: scoreFunctionType))
-        seed = try nested.decodeInt(forKey: .seed)
-        field = try nested.decodeString(forKey: .field)
+        seed = try nested.decodeIntIfPresent(forKey: .seed)
+        field = try nested.decodeStringIfPresent(forKey: .field)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: scoreFunctionType))
-        try nested.encode(seed, forKey: .seed)
-        try nested.encode(field, forKey: .field)
+        try nested.encodeIfPresent(seed, forKey: .seed)
+        try nested.encodeIfPresent(field, forKey: .field)
     }
 
     enum CodingKeys: String, CodingKey {
@@ -133,10 +124,6 @@ public struct ScriptScoreFunction: ScoreFunction {
         }
 
         self.init(builder.script!)
-    }
-
-    public func toDic() -> [String: Any] {
-        return [scoreFunctionType.rawValue: [CodingKeys.script.rawValue: script.toDic()]]
     }
 }
 
@@ -181,7 +168,7 @@ public class LinearDecayScoreFunction: DecayScoreFunction {
             throw ScoreFunctionBuilderError.missingRequiredField("scale")
         }
 
-        super.init(type: .linear, field: builder.field!, origin: builder.origin!, scale: builder.scale!, offset: builder.offset!, decay: builder.decay!, multiValueMode: builder.multiValueMode)
+        super.init(type: .linear, field: builder.field!, origin: builder.origin!, scale: builder.scale!, offset: builder.offset, decay: builder.decay, multiValueMode: builder.multiValueMode)
     }
 
     public required init(from decoder: Decoder) throws {
@@ -205,7 +192,7 @@ public class GaussScoreFunction: DecayScoreFunction {
             throw ScoreFunctionBuilderError.missingRequiredField("scale")
         }
 
-        super.init(type: .gauss, field: builder.field!, origin: builder.origin!, scale: builder.scale!, offset: builder.offset!, decay: builder.decay!, multiValueMode: builder.multiValueMode)
+        super.init(type: .gauss, field: builder.field!, origin: builder.origin!, scale: builder.scale!, offset: builder.offset, decay: builder.decay, multiValueMode: builder.multiValueMode)
     }
 
     public required init(from decoder: Decoder) throws {
@@ -229,7 +216,7 @@ public class ExponentialDecayScoreFunction: DecayScoreFunction {
             throw ScoreFunctionBuilderError.missingRequiredField("scale")
         }
 
-        super.init(type: .exp, field: builder.field!, origin: builder.origin!, scale: builder.scale!, offset: builder.offset!, decay: builder.decay!, multiValueMode: builder.multiValueMode)
+        super.init(type: .exp, field: builder.field!, origin: builder.origin!, scale: builder.scale!, offset: builder.offset, decay: builder.decay, multiValueMode: builder.multiValueMode)
     }
 
     public required init(from decoder: Decoder) throws {
@@ -262,32 +249,6 @@ public class DecayScoreFunction: ScoreFunction {
 
     public var scoreFunctionType: ScoreFunctionType {
         return type.scoreFunctionType
-    }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [
-            field: [
-                CodingKeys.origin.rawValue: origin,
-                CodingKeys.scale.rawValue: scale,
-            ],
-        ]
-        if let offset = self.offset {
-            if var subDic = dic[field] as? [String: Any] {
-                subDic[CodingKeys.offset.rawValue] = offset
-            }
-        }
-
-        if let decay = self.decay {
-            if var subDic = dic[field] as? [String: Any] {
-                subDic[CodingKeys.decay.rawValue] = decay
-            }
-        }
-
-        if let multiValueMode = self.multiValueMode {
-            dic[CodingKeys.multiValueMode.rawValue] = multiValueMode
-        }
-
-        return [scoreFunctionType.rawValue: dic]
     }
 
     public required init(from decoder: Decoder) throws {
@@ -350,7 +311,7 @@ extension DecayScoreFunction: Equatable {
         return lhs.type == rhs.type
             && lhs.field == rhs.field
             && lhs.origin == rhs.origin
-            && lhs.scale == rhs.origin
+            && lhs.scale == rhs.scale
             && lhs.offset == rhs.offset
             && lhs.decay == rhs.decay
             && lhs.multiValueMode == rhs.multiValueMode
@@ -408,20 +369,6 @@ public struct FieldValueFactorScoreFunction: ScoreFunction {
         }
 
         self.init(field: builder.field!, factor: builder.factor!, modifier: builder.modifier, missing: builder.missing)
-    }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [
-            CodingKeys.field.rawValue: field,
-            CodingKeys.factor.rawValue: factor,
-        ]
-        if let modifier = self.modifier {
-            dic[CodingKeys.modifier.rawValue] = modifier.rawValue
-        }
-        if let missing = self.missing {
-            dic[CodingKeys.missing.rawValue] = missing
-        }
-        return [scoreFunctionType.rawValue: dic]
     }
 
     public enum Modifier: String, Codable {

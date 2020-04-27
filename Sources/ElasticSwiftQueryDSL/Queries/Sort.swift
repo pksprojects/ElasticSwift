@@ -6,7 +6,6 @@
 //
 //
 
-import ElasticSwiftCodableUtils
 import ElasticSwiftCore
 import Foundation
 
@@ -67,18 +66,13 @@ protocol SortBuilder {
 }
 
 public struct Sort {
-    private static let ORDER = "order"
-    private static let MODE = "mode"
-
     public let field: String
     public let sortOrder: SortOrder
-    public let fieldTypeisArray: Bool
     public let mode: SortMode?
 
     init(withBuilder builder: ScoreSortBuilder) {
         field = builder.field
         sortOrder = builder.sortOrder ?? .desc
-        fieldTypeisArray = false
         mode = nil
     }
 
@@ -86,85 +80,43 @@ public struct Sort {
         field = builder.field!
         mode = builder.mode
         sortOrder = builder.sortOrder ?? .desc
-        fieldTypeisArray = (mode != nil) ? true : false
-    }
-
-    public func toDic() -> [String: Any] {
-        return (!fieldTypeisArray) ? [field: sortOrder.rawValue] :
-            [field: [
-                Sort.ORDER: sortOrder.rawValue,
-                Sort.MODE: mode?.rawValue,
-            ]]
     }
 }
 
 extension Sort: Codable {
     public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        let dic = try container.decode([String: CodableValue].self)
-        let item = dic.first!
-        field = item.key
-        if let order = item.value.value as? String {
-            if let sortOrder = SortOrder(rawValue: order) {
-                self.sortOrder = sortOrder
-            } else {
-                throw Swift.DecodingError.typeMismatch(SortOrder.self, .init(codingPath: container.codingPath, debugDescription: "Unable to serialize value \(order) as SortOrder"))
-            }
-            mode = nil
-        } else if let subDic = item.value.value as? [String: String] {
-            if let order = subDic[Sort.ORDER] {
-                if let sortOrder = SortOrder(rawValue: order) {
-                    self.sortOrder = sortOrder
-                } else {
-                    throw Swift.DecodingError.typeMismatch(SortOrder.self, .init(codingPath: container.codingPath, debugDescription: "Unable to serialize value \(order) as SortOrder"))
-                }
-            } else {
-                throw Swift.DecodingError.valueNotFound(SortOrder.self, .init(codingPath: container.codingPath, debugDescription: "No value for SortOrder with key order"))
-            }
-            if let mode = subDic[Sort.MODE] {
-                if let sortMode = SortMode(rawValue: mode) {
-                    self.mode = sortMode
-                } else {
-                    throw Swift.DecodingError.typeMismatch(SortMode.self, .init(codingPath: container.codingPath, debugDescription: "Unable to serialize value \(mode) as SortMode"))
-                }
-            } else {
-                mode = nil
-            }
-        } else {
-            throw Swift.DecodingError.dataCorrupted(.init(codingPath: container.codingPath, debugDescription: "Unable to serialize sort from  \(dic)"))
+        let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
+
+        guard container.allKeys.count == 1 else {
+            throw Swift.DecodingError.typeMismatch(Sort.self, .init(codingPath: container.codingPath, debugDescription: "Unable to find field name in key(s) expect: 1 key found: \(container.allKeys.count)."))
         }
 
-        fieldTypeisArray = mode != nil
+        field = container.allKeys.first!.stringValue
+        if let fieldContainer = try? container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field)) {
+            sortOrder = try fieldContainer.decode(SortOrder.self, forKey: .order)
+            mode = try fieldContainer.decodeIfPresent(SortMode.self, forKey: .mode)
+        } else {
+            sortOrder = try container.decode(SortOrder.self, forKey: .key(named: field))
+            mode = nil
+        }
     }
 
     public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if fieldTypeisArray {
-            var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
-            try nested.encode(sortOrder, forKey: .key(named: Sort.ORDER))
-            try nested.encode(mode, forKey: .key(named: Sort.MODE))
-        } else {
+        var container = encoder.container(keyedBy: DynamicCodingKeys.self)
+
+        guard mode != nil else {
             try container.encode(sortOrder, forKey: .key(named: field))
+            return
         }
+
+        var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
+        try nested.encode(sortOrder, forKey: .order)
+        try nested.encode(mode, forKey: .mode)
     }
 
-    private struct CodingKeys: CodingKey {
-        var stringValue: String
-
-        init?(stringValue: String) {
-            self.stringValue = stringValue
-        }
-
-        var intValue: Int?
-
-        init?(intValue: Int) {
-            self.intValue = intValue
-            stringValue = String(intValue)
-        }
-
-        public static func key(named name: String) -> CodingKeys {
-            return CodingKeys(stringValue: name)!
-        }
+    enum CodingKeys: String, CodingKey {
+        case order
+        case mode
     }
 }
 
@@ -173,7 +125,6 @@ extension Sort: Equatable {
         return lhs.field == rhs.field
             && lhs.sortOrder == rhs.sortOrder
             && lhs.mode == rhs.mode
-            && lhs.fieldTypeisArray == rhs.fieldTypeisArray
     }
 }
 

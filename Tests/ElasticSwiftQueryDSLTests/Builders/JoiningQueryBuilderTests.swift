@@ -216,4 +216,68 @@ class JoiningQueryBuilderTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
+
+    func test_13_parentIdQueryBuilder() throws {
+        let query = try QueryBuilders.parentIdQuery()
+            .set(id: "id")
+            .set(type: "type")
+            .set(ignoreUnmapped: false)
+            .build()
+
+        XCTAssertEqual(query.id, "id")
+        XCTAssertEqual(query.type, "type")
+        XCTAssertEqual(query.ignoreUnmapped, false)
+    }
+
+    func test_14_hasParentQueryBuilder_missing_id() throws {
+        let query = try QueryBuilders.hasParentQuery()
+            .set(query: MatchAllQuery())
+            .set(parentType: "parentType")
+            .set(ignoreUnmapped: false)
+            .set(score: true)
+            .set(innerHits: [])
+            .build()
+
+        XCTAssertTrue(query.query.isEqualTo(MatchAllQuery()))
+        XCTAssertEqual(query.parentType, "parentType")
+        XCTAssertEqual(query.ignoreUnmapped, false)
+        XCTAssertEqual(query.innerHits, [])
+        XCTAssertEqual(query.score, true)
+    }
+
+    func test_15_hasChildQueryBuilder() throws {
+        let query = try QueryBuilders.hasChildQuery()
+            .set(query: MatchAllQuery())
+            .set(type: "type")
+            .set(ignoreUnmapped: false)
+            .set(minChildren: 1)
+            .set(maxChildren: 2)
+            .set(innerHits: [])
+            .set(scoreMode: .avg)
+            .build()
+
+        XCTAssertTrue(query.query.isEqualTo(MatchAllQuery()))
+        XCTAssertEqual(query.type, "type")
+        XCTAssertEqual(query.ignoreUnmapped, false)
+        XCTAssertEqual(query.minChildren, 1)
+        XCTAssertEqual(query.maxChildren, 2)
+        XCTAssertEqual(query.innerHits, [])
+        XCTAssertEqual(query.scoreMode, .avg)
+    }
+
+    func test_16_nestedQueryBuilder_missing_id() throws {
+        let query = try QueryBuilders.nestedQuery()
+            .set(query: MatchAllQuery())
+            .set(path: "type")
+            .set(ignoreUnmapped: false)
+            .set(innerHits: [])
+            .set(scoreMode: .avg)
+            .build()
+
+        XCTAssertTrue(query.query.isEqualTo(MatchAllQuery()))
+        XCTAssertEqual(query.path, "type")
+        XCTAssertEqual(query.ignoreUnmapped, false)
+        XCTAssertEqual(query.innerHits, [])
+        XCTAssertEqual(query.scoreMode, .avg)
+    }
 }

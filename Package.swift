@@ -84,6 +84,10 @@ let package = Package(
             name: "ElasticSwiftCoreTests",
             dependencies: ["ElasticSwiftCore", "Logging", "UnitTestSettings"]
         ),
+        .testTarget(
+            name: "ElasticSwiftNetworkingTests",
+            dependencies: ["ElasticSwiftNetworking", "ElasticSwiftCore", "Logging", "NIOHTTP1", "UnitTestSettings"]
+        ),
         .target(
             name: "UnitTestSettings",
             dependencies: ["Logging"],

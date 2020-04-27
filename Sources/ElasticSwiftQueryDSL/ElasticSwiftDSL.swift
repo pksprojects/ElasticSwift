@@ -159,21 +159,6 @@ public struct Script: Codable, Equatable {
         self.params = params
     }
 
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-
-        dic[CodingKeys.source.stringValue] = source
-
-        if let lang = self.lang, !lang.isEmpty {
-            dic[CodingKeys.lang.stringValue] = lang
-        }
-
-        if let params = self.params, !params.isEmpty {
-            dic[CodingKeys.params.stringValue] = params
-        }
-        return dic
-    }
-
     public init(from decoder: Decoder) throws {
         if let container = try? decoder.container(keyedBy: CodingKeys.self) {
             source = try container.decodeString(forKey: .source)
@@ -209,6 +194,13 @@ public struct Script: Codable, Equatable {
     }
 }
 
+public enum Fuzziness: String, Codable {
+    case zero = "ZERO"
+    case one = "ONE"
+    case two = "TWO"
+    case auto = "AUTO"
+}
+
 public enum ShapeRelation: String, Codable {
     case intersects
     case disjoint
@@ -217,32 +209,50 @@ public enum ShapeRelation: String, Codable {
 }
 
 public enum RegexFlag: String, Codable {
-    case INTERSECTION
-    case COMPLEMENT
-    case EMPTY
-    case ANYSTRING
-    case INTERVAL
-    case NONE
-    case ALL
+    case intersection = "INTERSECTION"
+    case complement = "COMPLEMENT"
+    case empty = "EMPTY"
+    case anyString = "ANYSTRING"
+    case interval = "INTERVAL"
+    case none = "NONE"
+    case all = "ALL"
 }
 
 public enum ScoreMode: String, Codable {
-    case FIRST = "first"
-    case AVG = "avg"
-    case MAX = "max"
-    case SUM = "sum"
-    case MIN = "min"
-    case MULTIPLY = "multiply"
-    case TOTAL = "total"
+    case first
+    case avg
+    case max
+    case sum
+    case min
+    case multiply
+    case total
 }
 
 public enum BoostMode: String, Codable {
-    case MULTIPLY = "multiply"
-    case REPLACE = "replace"
-    case SUM = "sum"
-    case AVG = "avg"
-    case MIN = "min"
-    case MAX = "max"
+    case multiply
+    case replace
+    case sum
+    case avg
+    case min
+    case max
+}
+
+public enum MultiMatchQueryType: String, Codable {
+    case bestFields = "best_fields"
+    case mostFields = "most_fields"
+    case crossFields = "cross_fields"
+    case phrase
+    case phrasePrefix = "phrase_prefix"
+}
+
+public enum ZeroTermQuery: String, Codable {
+    case none
+    case all
+}
+
+public enum Operator: String, Codable {
+    case and
+    case or
 }
 
 // MARK: - Rescore Query
@@ -286,23 +296,6 @@ extension RescoreQuery {
         case rescoreQueryWeight = "rescore_query_weight"
         case queryWeight = "query_weight"
         case scoreMode = "score_mode"
-    }
-
-    public func toDic() -> [String: Any] {
-        var dic = [String: Any]()
-
-        dic[CodingKeys.query.rawValue] = query.toDic()
-
-        if let rescoreQueryWeight = self.rescoreQueryWeight {
-            dic[CodingKeys.rescoreQueryWeight.rawValue] = rescoreQueryWeight
-        }
-        if let queryWeight = self.queryWeight {
-            dic[CodingKeys.queryWeight.rawValue] = queryWeight
-        }
-        if let scoreMode = self.scoreMode {
-            dic[CodingKeys.scoreMode.rawValue] = scoreMode
-        }
-        return dic
     }
 }
 
@@ -406,20 +399,9 @@ extension KeyedDecodingContainer {
         var arrayContainer = try nestedUnkeyedContainer(forKey: key)
         var result = [Query]()
         if let count = arrayContainer.count {
-            var iterations = 0
             while !arrayContainer.isAtEnd {
-                var copy = arrayContainer
-                let elementContainer = try copy.nestedContainer(keyedBy: DynamicCodingKeys.self)
-                for qKey in elementContainer.allKeys {
-                    if let qType = QueryTypes(qKey.stringValue) {
-                        let q = try qType.metaType.init(from: arrayContainer.superDecoder())
-                        result.append(q)
-                    }
-                }
-                iterations += 1
-                if iterations > count {
-                    break
-                }
+                let query = try arrayContainer.decodeQuery()
+                result.append(query)
             }
             if result.count != count {
                 throw Swift.DecodingError.dataCorrupted(.init(codingPath: arrayContainer.codingPath, debugDescription: "Unable to decode all Queries expected: \(count) actual: \(result.count). Probable cause: Unable to determine QueryType form key(s)"))
@@ -458,20 +440,9 @@ extension KeyedDecodingContainer {
         var arrayContainer = try nestedUnkeyedContainer(forKey: key)
         var result = [ScoreFunction]()
         if let count = arrayContainer.count {
-            var iterations = 0
             while !arrayContainer.isAtEnd {
-                var copy = arrayContainer
-                let elementContainer = try copy.nestedContainer(keyedBy: DynamicCodingKeys.self)
-                for fKey in elementContainer.allKeys {
-                    if let fType = ScoreFunctionType(rawValue: fKey.stringValue) {
-                        let f = try fType.metaType.init(from: arrayContainer.superDecoder())
-                        result.append(f)
-                    }
-                }
-                iterations += 1
-                if iterations > count {
-                    break
-                }
+                let function = try arrayContainer.decodeScoreFunction()
+                result.append(function)
             }
             if result.count != count {
                 throw Swift.DecodingError.dataCorrupted(.init(codingPath: arrayContainer.codingPath, debugDescription: "Unable to decode all ScoreFunctions expected: \(count) actual: \(result.count). Probable cause: Unable to determine ScoreFunctionType form key(s)"))
@@ -486,5 +457,29 @@ extension KeyedDecodingContainer {
         }
 
         return try decodeScoreFunctions(forKey: key)
+    }
+}
+
+extension UnkeyedDecodingContainer {
+    mutating func decodeQuery() throws -> Query {
+        var copy = self
+        let elementContainer = try copy.nestedContainer(keyedBy: DynamicCodingKeys.self)
+        for qKey in elementContainer.allKeys {
+            if let qType = QueryTypes(qKey.stringValue) {
+                return try qType.metaType.init(from: superDecoder())
+            }
+        }
+        throw Swift.DecodingError.typeMismatch(QueryTypes.self, .init(codingPath: codingPath, debugDescription: "Unable to identify query type from key(s) \(elementContainer.allKeys)"))
+    }
+
+    mutating func decodeScoreFunction() throws -> ScoreFunction {
+        var copy = self
+        let elementContainer = try copy.nestedContainer(keyedBy: DynamicCodingKeys.self)
+        for fKey in elementContainer.allKeys {
+            if let fType = ScoreFunctionType(rawValue: fKey.stringValue) {
+                return try fType.metaType.init(from: superDecoder())
+            }
+        }
+        throw Swift.DecodingError.typeMismatch(ScoreFunctionType.self, .init(codingPath: codingPath, debugDescription: "Unable to identify score function type from key(s) \(elementContainer.allKeys)"))
     }
 }

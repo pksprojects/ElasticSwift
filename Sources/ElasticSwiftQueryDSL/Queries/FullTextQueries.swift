@@ -15,15 +15,17 @@ public struct MatchQuery: Query {
 
     public let field: String
     public let value: String
-    public let `operator`: MatchQueryOperator?
+    public let `operator`: Operator?
     public let zeroTermQuery: ZeroTermQuery?
     public let cutoffFrequency: Decimal?
-    public let fuzziness: String?
+    public let fuzziness: Fuzziness?
     public let autoGenSynonymnsPhraseQuery: Bool?
+    public let boost: Decimal?
 
-    public init(field: String, value: String, operator: MatchQueryOperator? = nil, zeroTermQuery: ZeroTermQuery? = nil, cutoffFrequency: Decimal? = nil, fuzziness: String? = nil, autoGenSynonymnsPhraseQuery: Bool? = nil) {
+    public init(field: String, value: String, boost: Decimal? = nil, operator: Operator? = nil, zeroTermQuery: ZeroTermQuery? = nil, cutoffFrequency: Decimal? = nil, fuzziness: Fuzziness? = nil, autoGenSynonymnsPhraseQuery: Bool? = nil) {
         self.field = field
         self.value = value
+        self.boost = boost
         self.operator = `operator`
         self.zeroTermQuery = zeroTermQuery
         self.cutoffFrequency = cutoffFrequency
@@ -40,28 +42,7 @@ public struct MatchQuery: Query {
             throw QueryBuilderError.missingRequiredField("value")
         }
 
-        self.init(field: builder.field!, value: builder.value!, operator: builder.operator, zeroTermQuery: builder.zeroTermQuery, cutoffFrequency: builder.cutoffFrequency, fuzziness: builder.fuzziness, autoGenSynonymnsPhraseQuery: builder.autoGenSynonymnsPhraseQuery)
-    }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        dic[CodingKeys.query.rawValue] = value
-        if let `operator` = self.operator {
-            dic[CodingKeys.operator.rawValue] = `operator`.rawValue
-        }
-        if let zeroTermQuery = self.zeroTermQuery {
-            dic[CodingKeys.zeroTermsQuery.rawValue] = zeroTermQuery.rawValue
-        }
-        if let cutoffFrequency = self.cutoffFrequency {
-            dic[CodingKeys.cutoffFrequency.rawValue] = cutoffFrequency
-        }
-        if let fuzziness = self.fuzziness {
-            dic[CodingKeys.fuzziness.rawValue] = fuzziness
-        }
-        if let autoGenSynonymnsPhraseQuery = self.autoGenSynonymnsPhraseQuery {
-            dic[CodingKeys.autoGenerateSynonymsPhraseQuery.rawValue] = autoGenSynonymnsPhraseQuery
-        }
-        return [queryType.name: [field: dic]]
+        self.init(field: builder.field!, value: builder.value!, boost: builder.boost, operator: builder.operator, zeroTermQuery: builder.zeroTermQuery, cutoffFrequency: builder.cutoffFrequency, fuzziness: builder.fuzziness, autoGenSynonymnsPhraseQuery: builder.autoGenSynonymnsPhraseQuery)
     }
 }
 
@@ -77,10 +58,11 @@ extension MatchQuery {
         field = nested.allKeys.first!.stringValue
         if let fieldContainer = try? nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field)) {
             value = try fieldContainer.decodeString(forKey: .query)
-            `operator` = try fieldContainer.decodeIfPresent(MatchQueryOperator.self, forKey: .operator)
+            boost = try fieldContainer.decodeDecimalIfPresent(forKey: .boost)
+            `operator` = try fieldContainer.decodeIfPresent(Operator.self, forKey: .operator)
             zeroTermQuery = try fieldContainer.decodeIfPresent(ZeroTermQuery.self, forKey: .zeroTermsQuery)
             cutoffFrequency = try fieldContainer.decodeDecimalIfPresent(forKey: .cutoffFrequency)
-            fuzziness = try fieldContainer.decodeStringIfPresent(forKey: .fuzziness)
+            fuzziness = try fieldContainer.decodeIfPresent(Fuzziness.self, forKey: .fuzziness)
             autoGenSynonymnsPhraseQuery = try fieldContainer.decodeBoolIfPresent(forKey: .autoGenerateSynonymsPhraseQuery)
         } else {
             value = try nested.decodeString(forKey: .key(named: field))
@@ -89,6 +71,7 @@ extension MatchQuery {
             cutoffFrequency = nil
             fuzziness = nil
             autoGenSynonymnsPhraseQuery = nil
+            boost = nil
         }
     }
 
@@ -97,6 +80,7 @@ extension MatchQuery {
         var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
         var fieldContainer = nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
         try fieldContainer.encode(value, forKey: .query)
+        try fieldContainer.encodeIfPresent(boost, forKey: .boost)
         try fieldContainer.encodeIfPresent(`operator`, forKey: .operator)
         try fieldContainer.encodeIfPresent(zeroTermQuery, forKey: .zeroTermsQuery)
         try fieldContainer.encodeIfPresent(cutoffFrequency, forKey: .cutoffFrequency)
@@ -106,6 +90,7 @@ extension MatchQuery {
 
     enum CodingKeys: String, CodingKey {
         case query
+        case boost
         case `operator`
         case fuzziness
         case zeroTermsQuery = "zero_terms_query"
@@ -153,17 +138,6 @@ public struct MatchPhraseQuery: Query {
 
         self.init(field: builder.field!, value: builder.value!, analyzer: builder.analyzer)
     }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        if let analyzer = analyzer {
-            dic[queryType.name] = [field: [CodingKeys.query.rawValue: value,
-                                           CodingKeys.analyzer.rawValue: analyzer]]
-        } else {
-            dic[queryType.name] = [field: value]
-        }
-        return dic
-    }
 }
 
 extension MatchPhraseQuery {
@@ -180,8 +154,7 @@ extension MatchPhraseQuery {
             value = try fieldContainer.decodeString(forKey: .query)
             analyzer = try fieldContainer.decodeStringIfPresent(forKey: .analyzer)
         } else {
-            var fieldContainer = try nested.nestedUnkeyedContainer(forKey: .key(named: field))
-            value = try fieldContainer.decode(String.self)
+            value = try nested.decodeString(forKey: .key(named: field))
             analyzer = nil
         }
     }
@@ -240,17 +213,6 @@ public struct MatchPhrasePrefixQuery: Query {
 
         self.init(field: builder.field!, value: builder.value!, maxExpansions: builder.maxExpansions)
     }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        if let maxExpansions = maxExpansions {
-            dic[queryType.name] = [field: [CodingKeys.query.rawValue: value,
-                                           CodingKeys.maxExpansions.rawValue: maxExpansions]]
-        } else {
-            dic[queryType.name] = [field: value]
-        }
-        return dic
-    }
 }
 
 extension MatchPhrasePrefixQuery {
@@ -259,7 +221,7 @@ extension MatchPhrasePrefixQuery {
         let nested = try container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
 
         guard nested.allKeys.count == 1 else {
-            throw Swift.DecodingError.typeMismatch(MatchPhraseQuery.self, .init(codingPath: nested.codingPath, debugDescription: "Unable to find field name in key(s) expect: 1 key found: \(nested.allKeys.count)."))
+            throw Swift.DecodingError.typeMismatch(MatchPhrasePrefixQuery.self, .init(codingPath: nested.codingPath, debugDescription: "Unable to find field name in key(s) expect: 1 key found: \(nested.allKeys.count)."))
         }
 
         field = nested.allKeys.first!.stringValue
@@ -267,8 +229,7 @@ extension MatchPhrasePrefixQuery {
             value = try fieldContainer.decodeString(forKey: .query)
             maxExpansions = try fieldContainer.decodeIntIfPresent(forKey: .maxExpansions)
         } else {
-            var fieldContainer = try nested.nestedUnkeyedContainer(forKey: .key(named: field))
-            value = try fieldContainer.decode(String.self)
+            value = try nested.decodeString(forKey: .key(named: field))
             maxExpansions = nil
         }
     }
@@ -329,19 +290,6 @@ public struct MultiMatchQuery: Query {
 
         self.init(query: builder.query!, fields: builder.fields, tieBreaker: builder.tieBreaker, type: builder.type)
     }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        dic[CodingKeys.query.rawValue] = query
-        dic[CodingKeys.fields.rawValue] = fields
-        if let type = self.type {
-            dic[CodingKeys.type.rawValue] = type
-        }
-        if let tieBreaker = self.tieBreaker {
-            dic[CodingKeys.tieBreaker.rawValue] = tieBreaker
-        }
-        return [queryType.name: dic]
-    }
 }
 
 extension MultiMatchQuery {
@@ -391,13 +339,13 @@ public struct CommonTermsQuery: Query {
 
     public let query: String
     public let cutoffFrequency: Decimal
-    public let lowFrequencyOperator: String?
-    public let highFrequencyOperator: String?
+    public let lowFrequencyOperator: Operator?
+    public let highFrequencyOperator: Operator?
     public let minimumShouldMatch: Int?
     public let minimumShouldMatchLowFreq: Int?
     public let minimumShouldMatchHighFreq: Int?
 
-    public init(query: String, cutoffFrequency: Decimal, lowFrequencyOperator: String? = nil, highFrequencyOperator: String? = nil, minimumShouldMatch: Int? = nil, minimumShouldMatchLowFreq: Int? = nil, minimumShouldMatchHighFreq: Int? = nil) {
+    public init(query: String, cutoffFrequency: Decimal, lowFrequencyOperator: Operator? = nil, highFrequencyOperator: Operator? = nil, minimumShouldMatch: Int? = nil, minimumShouldMatchLowFreq: Int? = nil, minimumShouldMatchHighFreq: Int? = nil) {
         self.query = query
         self.cutoffFrequency = cutoffFrequency
         self.lowFrequencyOperator = lowFrequencyOperator
@@ -418,28 +366,6 @@ public struct CommonTermsQuery: Query {
 
         self.init(query: builder.query!, cutoffFrequency: builder.cutoffFrequency!, lowFrequencyOperator: builder.lowFrequencyOperator, highFrequencyOperator: builder.highFrequencyOperator, minimumShouldMatch: builder.minimumShouldMatch, minimumShouldMatchLowFreq: builder.minimumShouldMatchLowFreq, minimumShouldMatchHighFreq: builder.minimumShouldMatchHighFreq)
     }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        dic[CodingKeys.query.rawValue] = query
-        dic[CodingKeys.cutoffFrequency.rawValue] = cutoffFrequency
-        if let lowFrequencyOperator = self.lowFrequencyOperator {
-            dic[CodingKeys.lowFreqOperator.rawValue] = lowFrequencyOperator
-        }
-        if let highFrequencyOperator = self.highFrequencyOperator {
-            dic[CodingKeys.highFreqOperator.rawValue] = highFrequencyOperator
-        }
-        if let minimumShouldMatch = self.minimumShouldMatch {
-            dic[CodingKeys.minimumShouldMatch.rawValue] = minimumShouldMatch
-        }
-        if let minHighFreq = minimumShouldMatchHighFreq, let minLowFreq = minimumShouldMatchLowFreq {
-            dic[CodingKeys.minimumShouldMatch.rawValue] = [
-                CodingKeys.lowFreq.rawValue: minHighFreq,
-                CodingKeys.highFreq.rawValue: minLowFreq,
-            ]
-        }
-        return [queryType.name: [CommonTermsQuery.BODY: dic]]
-    }
 }
 
 extension CommonTermsQuery {
@@ -450,8 +376,8 @@ extension CommonTermsQuery {
 
         query = try bodyContainer.decodeString(forKey: .query)
         cutoffFrequency = try bodyContainer.decodeDecimal(forKey: .cutoffFrequency)
-        lowFrequencyOperator = try bodyContainer.decodeStringIfPresent(forKey: .lowFreqOperator)
-        highFrequencyOperator = try bodyContainer.decodeStringIfPresent(forKey: .highFreqOperator)
+        lowFrequencyOperator = try bodyContainer.decodeIfPresent(Operator.self, forKey: .lowFreqOperator)
+        highFrequencyOperator = try bodyContainer.decodeIfPresent(Operator.self, forKey: .highFreqOperator)
         if let minShouldMatch = try? bodyContainer.decodeIntIfPresent(forKey: .minimumShouldMatch) {
             minimumShouldMatch = minShouldMatch
             minimumShouldMatchLowFreq = nil
@@ -484,7 +410,7 @@ extension CommonTermsQuery {
     enum CodingKeys: String, CodingKey {
         case query
         case cutoffFrequency = "cutoff_frequency"
-        case lowFreqOperator
+        case lowFreqOperator = "low_freq_operator"
         case highFreqOperator = "high_freq_operator"
         case minimumShouldMatch = "minimum_should_match"
         case lowFreq = "low_freq"
@@ -511,7 +437,10 @@ public struct QueryStringQuery: Query {
     public let queryType: QueryType = QueryTypes.queryString
 
     public let defaultField: String?
-    public let value: String
+    public let query: String
+    public let fields: [String]?
+    public let type: MultiMatchQueryType?
+    public let tieBreaker: Decimal?
     public let defaultOperator: String?
     public let analyzer: String?
     public let quoteAnalyzer: String?
@@ -532,9 +461,12 @@ public struct QueryStringQuery: Query {
     public let quoteFieldSuffix: String?
     public let autoGenerateSynonymsPhraseQuery: Bool?
 
-    public init(_ value: String, defaultField: String? = nil, defaultOperator: String? = nil, analyzer: String? = nil, quoteAnalyzer: String? = nil, allowLeadingWildcard: Bool? = nil, enablePositionIncrements: Bool? = nil, fuzzyMaxExpansions: Int? = nil, fuzziness: String? = nil, fuzzyPrefixLength: Int? = nil, fuzzyTranspositions: Bool? = nil, phraseSlop: Int? = nil, boost: Decimal? = nil, autoGeneratePhraseQueries: Bool? = nil, analyzeWildcard: Bool? = nil, maxDeterminizedStates: Int? = nil, minimumShouldMatch: Int? = nil, lenient: Bool? = nil, timeZone: String? = nil, quoteFieldSuffix: String? = nil, autoGenerateSynonymsPhraseQuery: Bool? = nil) {
+    public init(_ query: String, fields: [String]? = nil, type: MultiMatchQueryType? = nil, tieBreaker: Decimal? = nil, defaultField: String? = nil, defaultOperator: String? = nil, analyzer: String? = nil, quoteAnalyzer: String? = nil, allowLeadingWildcard: Bool? = nil, enablePositionIncrements: Bool? = nil, fuzzyMaxExpansions: Int? = nil, fuzziness: String? = nil, fuzzyPrefixLength: Int? = nil, fuzzyTranspositions: Bool? = nil, phraseSlop: Int? = nil, boost: Decimal? = nil, autoGeneratePhraseQueries: Bool? = nil, analyzeWildcard: Bool? = nil, maxDeterminizedStates: Int? = nil, minimumShouldMatch: Int? = nil, lenient: Bool? = nil, timeZone: String? = nil, quoteFieldSuffix: String? = nil, autoGenerateSynonymsPhraseQuery: Bool? = nil) {
         self.defaultField = defaultField
-        self.value = value
+        self.query = query
+        self.fields = fields
+        self.type = type
+        self.tieBreaker = tieBreaker
         self.defaultOperator = defaultOperator
         self.analyzer = analyzer
         self.quoteAnalyzer = quoteAnalyzer
@@ -557,77 +489,11 @@ public struct QueryStringQuery: Query {
     }
 
     internal init(withBuilder builder: QueryStringQueryBuilder) throws {
-        guard builder.value != nil else {
-            throw QueryBuilderError.missingRequiredField("value")
+        guard builder.query != nil else {
+            throw QueryBuilderError.missingRequiredField("query")
         }
 
-        self.init(builder.value!, defaultField: builder.defaultField, defaultOperator: builder.defaultOperator, analyzer: builder.analyzer, quoteAnalyzer: builder.quoteAnalyzer, allowLeadingWildcard: builder.allowLeadingWildcard, enablePositionIncrements: builder.enablePositionIncrements, fuzzyMaxExpansions: builder.fuzzyMaxExpansions, fuzziness: builder.fuzziness, fuzzyPrefixLength: builder.fuzzyPrefixLength, fuzzyTranspositions: builder.fuzzyTranspositions, phraseSlop: builder.phraseSlop, boost: builder.boost, autoGeneratePhraseQueries: builder.autoGeneratePhraseQueries, analyzeWildcard: builder.analyzeWildcard, maxDeterminizedStates: builder.maxDeterminizedStates, minimumShouldMatch: builder.minimumShouldMatch, lenient: builder.lenient, timeZone: builder.timeZone, quoteFieldSuffix: builder.quoteFieldSuffix, autoGenerateSynonymsPhraseQuery: builder.autoGenerateSynonymsPhraseQuery)
-    }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        dic[CodingKeys.query.rawValue] = value
-        if let defaultField = self.defaultField {
-            dic[CodingKeys.defaultField.rawValue] = defaultField
-        }
-        if let defaultOperator = self.defaultOperator {
-            dic[CodingKeys.defaultOperator.rawValue] = defaultOperator
-        }
-        if let analyzer = self.analyzer {
-            dic[CodingKeys.analyzer.rawValue] = analyzer
-        }
-        if let quoteAnalyzer = self.quoteAnalyzer {
-            dic[CodingKeys.quoteAnalyzer.rawValue] = quoteAnalyzer
-        }
-        if let allowLeadingWildCard = allowLeadingWildcard {
-            dic[CodingKeys.allowLeadingWildcard.rawValue] = allowLeadingWildCard
-        }
-        if let enablePositionIncrements = self.enablePositionIncrements {
-            dic[CodingKeys.enablePositionIncrements.rawValue] = enablePositionIncrements
-        }
-        if let fuzzyMaxExpantions = fuzzyMaxExpansions {
-            dic[CodingKeys.fuzzyMaxExpansions.rawValue] = fuzzyMaxExpantions
-        }
-        if let fuzzines = fuzziness {
-            dic[CodingKeys.fuzziness.rawValue] = fuzzines
-        }
-        if let fuzzyPrefixLength = self.fuzzyPrefixLength {
-            dic[CodingKeys.fuzzyPrefixLength.rawValue] = fuzzyPrefixLength
-        }
-        if let fuzzyTranspositions = self.fuzzyTranspositions {
-            dic[CodingKeys.fuzzyTranspositions.rawValue] = fuzzyTranspositions
-        }
-        if let phraseSlop = self.phraseSlop {
-            dic[CodingKeys.phraseSlop.rawValue] = phraseSlop
-        }
-        if let boost = self.boost {
-            dic[CodingKeys.boost.rawValue] = boost
-        }
-        if let autoGeneratePhraseQuries = autoGeneratePhraseQueries {
-            dic[CodingKeys.autoGeneratePhraseQueries.rawValue] = autoGeneratePhraseQuries
-        }
-        if let analyzeWildCard = analyzeWildcard {
-            dic[CodingKeys.analyzeWildcard.rawValue] = analyzeWildCard
-        }
-        if let maxDeterminedStates = maxDeterminizedStates {
-            dic[CodingKeys.maxDeterminizedStates.rawValue] = maxDeterminedStates
-        }
-        if let minimumShouldMatch = self.minimumShouldMatch {
-            dic[CodingKeys.minimumShouldMatch.rawValue] = minimumShouldMatch
-        }
-        if let lenient = self.lenient {
-            dic[CodingKeys.lenient.rawValue] = lenient
-        }
-        if let timeZone = self.timeZone {
-            dic[CodingKeys.timeZone.rawValue] = timeZone
-        }
-        if let quoteFieldSuffix = self.quoteFieldSuffix {
-            dic[CodingKeys.quoteFieldSuffix.rawValue] = quoteFieldSuffix
-        }
-        if let autoGenerateSynonymsPhraseQuery = self.autoGenerateSynonymsPhraseQuery {
-            dic[CodingKeys.autoGenerateSynonymsPhraseQuery.rawValue] = autoGenerateSynonymsPhraseQuery
-        }
-        return [queryType.name: dic]
+        self.init(builder.query!, fields: builder.fields, type: builder.type, tieBreaker: builder.tieBreaker, defaultField: builder.defaultField, defaultOperator: builder.defaultOperator, analyzer: builder.analyzer, quoteAnalyzer: builder.quoteAnalyzer, allowLeadingWildcard: builder.allowLeadingWildcard, enablePositionIncrements: builder.enablePositionIncrements, fuzzyMaxExpansions: builder.fuzzyMaxExpansions, fuzziness: builder.fuzziness, fuzzyPrefixLength: builder.fuzzyPrefixLength, fuzzyTranspositions: builder.fuzzyTranspositions, phraseSlop: builder.phraseSlop, boost: builder.boost, autoGeneratePhraseQueries: builder.autoGeneratePhraseQueries, analyzeWildcard: builder.analyzeWildcard, maxDeterminizedStates: builder.maxDeterminizedStates, minimumShouldMatch: builder.minimumShouldMatch, lenient: builder.lenient, timeZone: builder.timeZone, quoteFieldSuffix: builder.quoteFieldSuffix, autoGenerateSynonymsPhraseQuery: builder.autoGenerateSynonymsPhraseQuery)
     }
 }
 
@@ -635,11 +501,14 @@ extension QueryStringQuery {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
-        value = try nested.decodeString(forKey: .query)
+        query = try nested.decodeString(forKey: .query)
+        fields = try nested.decodeArrayIfPresent(forKey: .fields)
+        type = try nested.decodeIfPresent(MultiMatchQueryType.self, forKey: .type)
+        tieBreaker = try nested.decodeDecimalIfPresent(forKey: .tieBreaker)
         defaultField = try nested.decodeStringIfPresent(forKey: .defaultField)
-        defaultOperator = try nested.decodeStringIfPresent(forKey: .defaultField)
-        analyzer = try nested.decodeStringIfPresent(forKey: .defaultField)
-        quoteAnalyzer = try nested.decodeStringIfPresent(forKey: .defaultField)
+        defaultOperator = try nested.decodeStringIfPresent(forKey: .defaultOperator)
+        analyzer = try nested.decodeStringIfPresent(forKey: .analyzer)
+        quoteAnalyzer = try nested.decodeStringIfPresent(forKey: .quoteAnalyzer)
         allowLeadingWildcard = try nested.decodeBoolIfPresent(forKey: .allowLeadingWildcard)
         enablePositionIncrements = try nested.decodeBoolIfPresent(forKey: .enablePositionIncrements)
         fuzzyMaxExpansions = try nested.decodeIntIfPresent(forKey: .fuzzyMaxExpansions)
@@ -661,7 +530,10 @@ extension QueryStringQuery {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
-        try nested.encode(value, forKey: .query)
+        try nested.encode(query, forKey: .query)
+        try nested.encodeIfPresent(fields, forKey: .fields)
+        try nested.encodeIfPresent(type, forKey: .type)
+        try nested.encodeIfPresent(tieBreaker, forKey: .tieBreaker)
         try nested.encodeIfPresent(defaultField, forKey: .defaultField)
         try nested.encodeIfPresent(defaultOperator, forKey: .defaultOperator)
         try nested.encodeIfPresent(analyzer, forKey: .analyzer)
@@ -686,6 +558,9 @@ extension QueryStringQuery {
 
     enum CodingKeys: String, CodingKey {
         case query
+        case fields
+        case type
+        case tieBreaker = "tie_breaker"
         case defaultField = "default_field"
         case defaultOperator = "default_operator"
         case analyzer
@@ -712,7 +587,10 @@ extension QueryStringQuery {
 extension QueryStringQuery: Equatable {
     public static func == (lhs: QueryStringQuery, rhs: QueryStringQuery) -> Bool {
         return lhs.queryType.isEqualTo(rhs.queryType)
-            && lhs.value == rhs.value
+            && lhs.query == rhs.query
+            && lhs.fields == rhs.fields
+            && lhs.type == rhs.type
+            && lhs.tieBreaker == rhs.tieBreaker
             && lhs.analyzer == rhs.analyzer
             && lhs.allowLeadingWildcard == rhs.allowLeadingWildcard
             && lhs.analyzeWildcard == rhs.analyzeWildcard
@@ -774,45 +652,6 @@ public struct SimpleQueryStringQuery: Query {
         }
 
         self.init(query: builder.query!, fields: builder.fields, defaultOperator: builder.defaultOperator, analyzer: builder.analyzer, flags: builder.flags, lenient: builder.lenient, minimumShouldMatch: builder.minimumShouldMatch, fuzzyMaxExpansions: builder.fuzzyMaxExpansions, fuzzyPrefixLength: builder.fuzzyPrefixLength, fuzzyTranspositions: builder.fuzzyTranspositions, quoteFieldSuffix: builder.quoteFieldSuffix, autoGenerateSynonymsPhraseQuery: builder.autoGenerateSynonymsPhraseQuery)
-    }
-
-    public func toDic() -> [String: Any] {
-        var dic: [String: Any] = [:]
-        dic[CodingKeys.query.rawValue] = query
-        if let fields = self.fields {
-            dic[CodingKeys.fields.rawValue] = fields
-        }
-        if let defaultOperator = self.defaultOperator {
-            dic[CodingKeys.defaultOperator.rawValue] = defaultOperator
-        }
-        if let analyzer = self.analyzer {
-            dic[CodingKeys.analyzer.rawValue] = analyzer
-        }
-        if let fuzzyMaxExpantions = fuzzyMaxExpansions {
-            dic[CodingKeys.fuzzyMaxExpansions.rawValue] = fuzzyMaxExpantions
-        }
-        if let fuzzyPrefixLength = self.fuzzyPrefixLength {
-            dic[CodingKeys.fuzzyPrefixLength.rawValue] = fuzzyPrefixLength
-        }
-        if let fuzzyTranspositions = self.fuzzyTranspositions {
-            dic[CodingKeys.fuzzyTranspositions.rawValue] = fuzzyTranspositions
-        }
-        if let minimumShouldMatch = self.minimumShouldMatch {
-            dic[CodingKeys.minimumShouldMatch.rawValue] = minimumShouldMatch
-        }
-        if let flags = self.flags {
-            dic[CodingKeys.flags.rawValue] = flags
-        }
-        if let lenient = self.lenient {
-            dic[CodingKeys.lenient.rawValue] = lenient
-        }
-        if let quoteFieldSuffix = self.quoteFieldSuffix {
-            dic[CodingKeys.quoteFieldSuffix.rawValue] = quoteFieldSuffix
-        }
-        if let autoGenerateSynonymsPhraseQuery = self.autoGenerateSynonymsPhraseQuery {
-            dic[CodingKeys.autoGenerateSynonymsPhraseQuery.rawValue] = autoGenerateSynonymsPhraseQuery
-        }
-        return [queryType.name: dic]
     }
 }
 
@@ -884,22 +723,4 @@ extension SimpleQueryStringQuery: Equatable {
             && lhs.minimumShouldMatch == rhs.minimumShouldMatch
             && lhs.quoteFieldSuffix == rhs.quoteFieldSuffix
     }
-}
-
-public enum MultiMatchQueryType: String, Codable {
-    case bestFields = "best_fields"
-    case mostFields = "most_fields"
-    case crossFields = "cross_fields"
-    case phrase
-    case phrasePrefix = "phrase_prefix"
-}
-
-public enum MatchQueryOperator: String, Codable {
-    case and
-    case or
-}
-
-public enum ZeroTermQuery: String, Codable {
-    case none
-    case all
 }

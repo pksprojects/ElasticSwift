@@ -169,16 +169,6 @@ class GeoQueryBuilderTests: XCTestCase {
         XCTAssertEqual(query.type, GeoExecType.indexed)
         XCTAssertEqual(query.validationMethod, GeoValidationMethod.strict)
         XCTAssertEqual(query.ignoreUnmapped, true)
-        let expectedDic = ["geo_bounding_box": [
-            "location": [
-                "top_left": "dr5r9ydj2y73",
-                "bottom_right": "drj7teegpus6",
-            ],
-            "type": "indexed",
-            "validation_method": "strict",
-            "ignore_unmapped": true,
-        ]]
-        XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic))
     }
 
     func test_12_geoDistanceQueryBuilder() throws {
@@ -196,17 +186,6 @@ class GeoQueryBuilderTests: XCTestCase {
         XCTAssertEqual(query.distanceType, GeoDistanceType.arc)
         XCTAssertEqual(query.validationMethod, GeoValidationMethod.strict)
         XCTAssertEqual(query.ignoreUnmapped, true)
-        let expectedDic = ["geo_distance": [
-            "location": [
-                "lat": Decimal(string: "40"),
-                "lon": Decimal(string: "-70"),
-            ],
-            "distance": "12km",
-            "distance_type": "arc",
-            "validation_method": "strict",
-            "ignore_unmapped": true,
-        ]]
-        XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic))
     }
 
     func test_13_geoDistanceQueryBuilder() throws {
@@ -258,23 +237,6 @@ class GeoQueryBuilderTests: XCTestCase {
         XCTAssertEqual(query.points, [GeoPoint(lat: 40, lon: -70), GeoPoint(lat: 41, lon: -70)])
         XCTAssertEqual(query.validationMethod, GeoValidationMethod.strict)
         XCTAssertEqual(query.ignoreUnmapped, true)
-        let expectedDic = ["geo_polygon": [
-            "location": [
-                "points": [
-                    [
-                        "lat": Decimal(string: "40"),
-                        "lon": Decimal(string: "-70"),
-                    ],
-                    [
-                        "lat": Decimal(string: "41"),
-                        "lon": Decimal(string: "-70"),
-                    ],
-                ],
-            ],
-            "validation_method": "strict",
-            "ignore_unmapped": true,
-        ]]
-        XCTAssertTrue(isEqualDictionaries(lhs: query.toDic(), rhs: expectedDic), "Expected: \(expectedDic); Actual \(query.toDic())")
     }
 
     func test_18_geoPloygonQueryBuilder() throws {

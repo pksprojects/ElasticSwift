@@ -13,12 +13,11 @@ import Foundation
 public class MatchQueryBuilder: QueryBuilder {
     private var _field: String?
     private var _value: String?
-    private var _isFuzzy: Bool?
     private var _boost: Decimal?
-    private var _operator: MatchQueryOperator?
+    private var _operator: Operator?
     private var _zeroTermQuery: ZeroTermQuery?
     private var _cutoffFrequency: Decimal?
-    private var _fuzziness: String?
+    private var _fuzziness: Fuzziness?
     private var _autoGenSynonymnsPhraseQuery: Bool?
 
     public init() {}
@@ -42,7 +41,7 @@ public class MatchQueryBuilder: QueryBuilder {
     }
 
     @discardableResult
-    public func set(operator: MatchQueryOperator) -> MatchQueryBuilder {
+    public func set(operator: Operator) -> MatchQueryBuilder {
         _operator = `operator`
         return self
     }
@@ -54,19 +53,13 @@ public class MatchQueryBuilder: QueryBuilder {
     }
 
     @discardableResult
-    public func set(isFuzzy: Bool) -> MatchQueryBuilder {
-        _isFuzzy = isFuzzy
-        return self
-    }
-
-    @discardableResult
     public func set(boost: Decimal) -> MatchQueryBuilder {
         _boost = boost
         return self
     }
 
     @discardableResult
-    public func set(fuzziness: String) -> MatchQueryBuilder {
+    public func set(fuzziness: Fuzziness) -> MatchQueryBuilder {
         _fuzziness = fuzziness
         return self
     }
@@ -85,15 +78,11 @@ public class MatchQueryBuilder: QueryBuilder {
         return _value
     }
 
-    public var isFuzzy: Bool? {
-        return _isFuzzy
-    }
-
     public var boost: Decimal? {
         return _boost
     }
 
-    public var `operator`: MatchQueryOperator? {
+    public var `operator`: Operator? {
         return _operator
     }
 
@@ -105,7 +94,7 @@ public class MatchQueryBuilder: QueryBuilder {
         return _cutoffFrequency
     }
 
-    public var fuzziness: String? {
+    public var fuzziness: Fuzziness? {
         return _fuzziness
     }
 
@@ -273,8 +262,8 @@ public class MultiMatchQueryBuilder: QueryBuilder {
 public class CommonTermsQueryBuilder: QueryBuilder {
     private var _query: String?
     private var _cutoffFrequency: Decimal?
-    private var _lowFrequencyOperator: String?
-    private var _highFrequencyOperator: String?
+    private var _lowFrequencyOperator: Operator?
+    private var _highFrequencyOperator: Operator?
     private var _minimumShouldMatch: Int?
     private var _minimumShouldMatchLowFreq: Int?
     private var _minimumShouldMatchHighFreq: Int?
@@ -294,13 +283,13 @@ public class CommonTermsQueryBuilder: QueryBuilder {
     }
 
     @discardableResult
-    public func set(lowFrequencyOperator: String) -> CommonTermsQueryBuilder {
+    public func set(lowFrequencyOperator: Operator) -> CommonTermsQueryBuilder {
         _lowFrequencyOperator = lowFrequencyOperator
         return self
     }
 
     @discardableResult
-    public func set(highFrequencyOperator: String) -> CommonTermsQueryBuilder {
+    public func set(highFrequencyOperator: Operator) -> CommonTermsQueryBuilder {
         _highFrequencyOperator = highFrequencyOperator
         return self
     }
@@ -331,11 +320,11 @@ public class CommonTermsQueryBuilder: QueryBuilder {
         return _cutoffFrequency
     }
 
-    public var lowFrequencyOperator: String? {
+    public var lowFrequencyOperator: Operator? {
         return _lowFrequencyOperator
     }
 
-    public var highFrequencyOperator: String? {
+    public var highFrequencyOperator: Operator? {
         return _highFrequencyOperator
     }
 
@@ -360,7 +349,10 @@ public class CommonTermsQueryBuilder: QueryBuilder {
 
 public class QueryStringQueryBuilder: QueryBuilder {
     private var _defaultField: String?
-    private var _value: String?
+    private var _query: String?
+    private var _fields: [String]?
+    private var _type: MultiMatchQueryType?
+    private var _tieBreaker: Decimal?
     private var _defaultOperator: String?
     private var _analyzer: String?
     private var _quoteAnalyzer: String?
@@ -390,8 +382,26 @@ public class QueryStringQueryBuilder: QueryBuilder {
     }
 
     @discardableResult
-    public func set(value: String) -> Self {
-        _value = value
+    public func set(query: String) -> Self {
+        _query = query
+        return self
+    }
+
+    @discardableResult
+    public func set(fields: [String]) -> Self {
+        _fields = fields
+        return self
+    }
+
+    @discardableResult
+    public func set(type: MultiMatchQueryType) -> Self {
+        _type = type
+        return self
+    }
+
+    @discardableResult
+    public func set(tieBreaker: Decimal) -> Self {
+        _tieBreaker = tieBreaker
         return self
     }
 
@@ -513,8 +523,20 @@ public class QueryStringQueryBuilder: QueryBuilder {
         return _defaultField
     }
 
-    public var value: String? {
-        return _value
+    public var query: String? {
+        return _query
+    }
+
+    public var fields: [String]? {
+        return _fields
+    }
+
+    public var type: MultiMatchQueryType? {
+        return _type
+    }
+
+    public var tieBreaker: Decimal? {
+        return _tieBreaker
     }
 
     public var defaultOperator: String? {
