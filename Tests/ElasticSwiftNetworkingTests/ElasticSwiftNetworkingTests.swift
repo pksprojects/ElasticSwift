@@ -39,8 +39,14 @@ class ElasticSwiftNetworkingTests: XCTestCase {
 
     func test_02_adaptor_execute() throws {
         let e = expectation(description: "execution complete")
-
-        let adaptorConfig = URLSessionAdaptorConfiguration.default
+        var adaptorConfig: HTTPAdaptorConfiguration
+        if esConnection.isSecure, let certPath = esConnection.certPath {
+            let sslConfig = SSLConfiguration(certPath: certPath, isSelf: false)
+            adaptorConfig = URLSessionAdaptorConfiguration(sslConfig: sslConfig)
+        } else {
+            adaptorConfig = URLSessionAdaptorConfiguration.default
+        }
+        
         let adaptor = URLSessionAdaptor(forHost: esConnection.host, adaptorConfig: adaptorConfig)
         let base64 = "\(esConnection.uname):\(esConnection.passwd)".data(using: .utf8)!.base64EncodedString()
         var headers = HTTPHeaders()
