@@ -47,9 +47,11 @@ public let esConnection: ESConnection = {
     let passwd = env["ES_PASSWD"] ?? "elastic"
     let isProtected = Bool(env["IS_PROTECTED"] ?? "") ?? true
     let isSecure = Bool(env["IS_SECURE"] ?? "") ?? false
+    let caCert = env["CA_CERT"]
     let cert = env["SSL_CERT"]
+    let privateKey = env["SSL_KEY"]
 
-    return ESConnection(host: url, uname: uname, passwd: passwd, isProtected: isProtected, isSecure: isSecure, certPath: cert)
+    return ESConnection(host: url, uname: uname, passwd: passwd, isProtected: isProtected, isSecure: isSecure, certPath: cert, privateKey: privateKey, caCert: caCert)
 }()
 
 public struct ESConnection {
@@ -59,6 +61,8 @@ public struct ESConnection {
     public let isProtected: Bool
     public let isSecure: Bool
     public let certPath: String?
+    public let privateKey: String?
+    public let caCert: String?
 }
 
 /// Copy of `Logging.StreamLogHandler` with modifications to include label in log output

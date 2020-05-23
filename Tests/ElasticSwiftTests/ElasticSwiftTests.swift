@@ -1,5 +1,6 @@
 import Logging
 import UnitTestSettings
+import NIOSSL
 import XCTest
 
 @testable import ElasticSwift
@@ -9,7 +10,32 @@ import XCTest
 
 let elasticClient: ElasticClient = {
     let cred = BasicClientCredential(username: esConnection.uname, password: esConnection.passwd)
-    let adaptorConfig = AsyncHTTPClientAdaptorConfiguration.default
+    var adaptorConfig = AsyncHTTPClientAdaptorConfiguration.default
+    if esConnection.isSecure {
+        var tlsConfig = TLSConfiguration.forClient()
+        if let certPath = esConnection.certPath {
+            tlsConfig.certificateVerification = .noHostnameVerification
+            do {
+                tlsConfig.certificateChain = try NIOSSLCertificate.fromPEMFile(certPath).map { .certificate($0) }
+            } catch {
+                print("Error: \(error)")
+            }
+            if let privateKey = esConnection.privateKey {
+                do {
+                    let k = try NIOSSLPrivateKey(file: privateKey, format: .pem)
+                    tlsConfig.privateKey = .privateKey(k)
+                } catch {
+                    print("Error: \(error)")
+                }
+            }
+            if let caRoot = esConnection.caCert {
+                tlsConfig.trustRoots = NIOSSLTrustRoots.file(caRoot)
+            }
+        } else {
+            tlsConfig.certificateVerification = .none
+        }
+        adaptorConfig = AsyncHTTPClientAdaptorConfiguration(asyncClientConfig: .init(tlsConfiguration: tlsConfig))
+    }
     let settings = esConnection.isProtected ?
         Settings(forHost: esConnection.host, withCredentials: cred, adaptorConfig: adaptorConfig) :
         Settings(forHost: esConnection.host, adaptorConfig: adaptorConfig)
