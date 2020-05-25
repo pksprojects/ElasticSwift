@@ -40,6 +40,10 @@ public enum QueryTypes: String, Codable {
     case geoBoundingBox = "geo_bounding_box"
     case geoDistance = "geo_distance"
     case geoPolygon = "geo_polygon"
+    case moreLikeThis = "more_like_this"
+    case script
+    case percolate
+    case wrapper
 }
 
 extension QueryTypes: QueryType {
@@ -111,6 +115,14 @@ extension QueryTypes: QueryType {
             return GeoDistanceQuery.self
         case .geoPolygon:
             return GeoPolygonQuery.self
+        case .moreLikeThis:
+            return MoreLikeThisQuery.self
+        case .script:
+            return ScriptQuery.self
+        case .percolate:
+            return PercolateQuery.self
+        case .wrapper:
+            return WrapperQuery.self
         }
     }
 }
