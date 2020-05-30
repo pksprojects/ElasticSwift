@@ -44,6 +44,15 @@ public enum QueryTypes: String, Codable {
     case script
     case percolate
     case wrapper
+    case spanTerm = "span_term"
+    case spanMulti = "span_multi"
+    case spanFirst = "span_first"
+    case spanNear = "span_near"
+    case spanOr = "span_or"
+    case spanNot = "span_not"
+    case spanContaining = "span_containing"
+    case spanWithin = "span_within"
+    case spanFieldMasking = "field_masking_span"
 }
 
 extension QueryTypes: QueryType {
@@ -123,6 +132,24 @@ extension QueryTypes: QueryType {
             return PercolateQuery.self
         case .wrapper:
             return WrapperQuery.self
+        case .spanTerm:
+            return SpanTermQuery.self
+        case .spanMulti:
+            return SpanMultiTermQuery.self
+        case .spanFirst:
+            return SpanFirstQuery.self
+        case .spanNear:
+            return SpanNearQuery.self
+        case .spanOr:
+            return SpanOrQuery.self
+        case .spanNot:
+            return SpanNotQuery.self
+        case .spanContaining:
+            return SpanContainingQuery.self
+        case .spanWithin:
+            return SpanWithinQuery.self
+        case .spanFieldMasking:
+            return SpanFieldMaskingQuery.self
         }
     }
 }

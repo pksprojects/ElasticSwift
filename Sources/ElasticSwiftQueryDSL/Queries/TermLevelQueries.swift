@@ -137,9 +137,13 @@ extension TermsQuery: Equatable {
     }
 }
 
+// MARK: - Multi Term Query
+
+public protocol MultiTermQuery: Query {}
+
 // MARK: - Range Query
 
-public struct RangeQuery: Query {
+public struct RangeQuery: MultiTermQuery {
     public let queryType: QueryType = QueryTypes.range
 
     public let field: String
@@ -288,7 +292,7 @@ extension ExistsQuery: Equatable {
 
 // MARK: - Prefix Query
 
-public struct PrefixQuery: Query {
+public struct PrefixQuery: MultiTermQuery {
     public let queryType: QueryType = QueryTypes.prefix
 
     public let field: String
@@ -363,7 +367,7 @@ extension PrefixQuery: Equatable {
 
 // MARK: - WildCard Query
 
-public struct WildCardQuery: Query {
+public struct WildCardQuery: MultiTermQuery {
     public let queryType: QueryType = QueryTypes.wildcard
 
     public let field: String
@@ -438,7 +442,7 @@ extension WildCardQuery: Equatable {
 
 // MARK: - Regexp Query
 
-public struct RegexpQuery: Query {
+public struct RegexpQuery: MultiTermQuery {
     public let queryType: QueryType = QueryTypes.regexp
 
     public let field: String
@@ -539,7 +543,7 @@ extension RegexpQuery: Equatable {
 
 // MARK: - Fuzzy Query
 
-public struct FuzzyQuery: Query {
+public struct FuzzyQuery: MultiTermQuery {
     public let queryType: QueryType = QueryTypes.fuzzy
 
     public let field: String
