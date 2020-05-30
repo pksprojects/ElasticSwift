@@ -1,6 +1,6 @@
 import Logging
-import UnitTestSettings
 import NIOSSL
+import UnitTestSettings
 import XCTest
 
 @testable import ElasticSwift

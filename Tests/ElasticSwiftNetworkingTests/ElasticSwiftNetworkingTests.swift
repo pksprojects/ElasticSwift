@@ -46,7 +46,7 @@ class ElasticSwiftNetworkingTests: XCTestCase {
         } else {
             adaptorConfig = URLSessionAdaptorConfiguration.default
         }
-        
+
         let adaptor = URLSessionAdaptor(forHost: esConnection.host, adaptorConfig: adaptorConfig)
         let base64 = "\(esConnection.uname):\(esConnection.passwd)".data(using: .utf8)!.base64EncodedString()
         var headers = HTTPHeaders()
