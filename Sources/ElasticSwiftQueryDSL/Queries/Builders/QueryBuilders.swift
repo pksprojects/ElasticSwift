@@ -137,4 +137,20 @@ public final class QueryBuilders {
     public static func geoPolygonQuery() -> GeoPolygonQueryBuilder {
         return GeoPolygonQueryBuilder()
     }
+
+    public static func moreLikeThisQuery() -> MoreLikeThisQueryBuilder {
+        return MoreLikeThisQueryBuilder()
+    }
+
+    public static func scriptQuery() -> ScriptQueryBuilder {
+        return ScriptQueryBuilder()
+    }
+
+    public static func percolateQuery() -> PercoloteQueryBuilder {
+        return PercoloteQueryBuilder()
+    }
+
+    public static func wrapperQuery() -> WrapperQueryBuilder {
+        return WrapperQueryBuilder()
+    }
 }
