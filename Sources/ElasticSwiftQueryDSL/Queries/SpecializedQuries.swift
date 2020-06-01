@@ -151,7 +151,11 @@ extension MoreLikeThisQuery {
         if let likeitems = likeItems {
             like.append(contentsOf: likeitems.map { CodableValue($0) })
         }
-        try nested.encode(like, forKey: .like)
+        if like.count == 1 {
+            try nested.encode(like[0], forKey: .like)
+        } else {
+            try nested.encode(like, forKey: .like)
+        }
         var unlike: [CodableValue] = []
         if let unlikeTexts = self.unlikeTexts {
             unlike.append(contentsOf: unlikeTexts.map { CodableValue($0) })
@@ -160,7 +164,11 @@ extension MoreLikeThisQuery {
             unlike.append(contentsOf: unlikeitems.map { CodableValue($0) })
         }
         if !unlike.isEmpty {
-            try nested.encode(unlike, forKey: .unlike)
+            if unlike.count == 1 {
+                try nested.encode(unlike[0], forKey: .unlike)
+            } else {
+                try nested.encode(unlike, forKey: .unlike)
+            }
         }
     }
 
