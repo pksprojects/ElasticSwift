@@ -13,39 +13,6 @@ jobs:
         - export PATH="${HOME}/swift-RELEASE/usr/bin:${PATH}"
         - cd $TRAVIS_BUILD_DIR
     - os: linux
-      dist: xenial
-      sudo: required
-      install:
-        - cd $HOME
-        - sudo apt-get install -y clang libicu-dev
-        - wget -q -O swift.tar.gz https://swift.org/builds/swift-5.1.5-release/ubuntu1604/swift-5.1.5-RELEASE/swift-5.1.5-RELEASE-ubuntu16.04.tar.gz
-        - mkdir swift-RELEASE
-        - tar xzf swift.tar.gz -C swift-RELEASE --strip-components=1
-        - export PATH="${HOME}/swift-RELEASE/usr/bin:${PATH}"
-        - cd $TRAVIS_BUILD_DIR
-    - os: linux
-      dist: xenial
-      sudo: required
-      install:
-        - cd $HOME
-        - sudo apt-get install -y clang libicu-dev
-        - wget -q -O swift.tar.gz https://swift.org/builds/swift-5.2.2-release/ubuntu1604/swift-5.2.2-RELEASE/swift-5.2.2-RELEASE-ubuntu16.04.tar.gz
-        - mkdir swift-RELEASE
-        - tar xzf swift.tar.gz -C swift-RELEASE --strip-components=1
-        - export PATH="${HOME}/swift-RELEASE/usr/bin:${PATH}"
-        - cd $TRAVIS_BUILD_DIR
-    - os: linux
-      dist: bionic
-      sudo: required
-      install:
-        - cd $HOME
-        - sudo apt-get install -y clang libicu-dev
-        - wget -q -O swift.tar.gz https://swift.org/builds/swift-5.0.3-release/ubuntu1804/swift-5.0.3-RELEASE/swift-5.0.3-RELEASE-ubuntu18.04.tar.gz
-        - mkdir swift-RELEASE
-        - tar xzf swift.tar.gz -C swift-RELEASE --strip-components=1
-        - export PATH="${HOME}/swift-RELEASE/usr/bin:${PATH}"
-        - cd $TRAVIS_BUILD_DIR
-    - os: linux
       dist: bionic
       sudo: required
       install:
@@ -62,7 +29,7 @@ jobs:
       install:
         - cd $HOME
         - sudo apt-get install -y clang libicu-dev
-        - wget -q -O swift.tar.gz https://swift.org/builds/swift-5.2.2-release/ubuntu1804/swift-5.2.2-RELEASE/swift-5.2.2-RELEASE-ubuntu18.04.tar.gz
+        - wget -q -O swift.tar.gz https://swift.org/builds/swift-5.2.4-release/ubuntu1804/swift-5.2.4-RELEASE/swift-5.2.4-RELEASE-ubuntu18.04.tar.gz
         - mkdir swift-RELEASE
         - tar xzf swift.tar.gz -C swift-RELEASE --strip-components=1
         - export PATH="${HOME}/swift-RELEASE/usr/bin:${PATH}"
