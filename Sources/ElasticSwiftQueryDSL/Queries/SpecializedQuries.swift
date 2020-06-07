@@ -63,7 +63,7 @@ public struct MoreLikeThisQuery: Query {
         self.init(fields: fields, likeTexts: likeTexts, likeItems: likeItems, unlikeTexts: unlikeTexts, unlikeItems: unlikeItems, maxQueryTerms: maxQueryTerms, minTermFreq: minTermFreq, minDocFreq: minDocFreq, maxDocFreq: maxDocFreq, minWordLength: minWordLength, maxWordLength: maxWordLength, stopWords: stopWords, analyzer: analyzer, minimumShouldMatch: minimumShouldMatch, boostTerms: boostTerms, include: include, failOnUnsupportedField: failOnUnsupportedField)
     }
 
-    public init(withBuilder builder: MoreLikeThisQueryBuilder) throws {
+    internal init(withBuilder builder: MoreLikeThisQueryBuilder) throws {
         guard (builder.likeTexts != nil && !builder.likeTexts!.isEmpty) || (builder.likeItems != nil && !builder.likeItems!.isEmpty) else {
             throw QueryBuilderError.atlestOneElementRequired("likeTexts OR likeItems")
         }
@@ -259,7 +259,7 @@ public struct ScriptQuery: Query {
         self.script = script
     }
 
-    public init(withBuilder builder: ScriptQueryBuilder) throws {
+    internal init(withBuilder builder: ScriptQueryBuilder) throws {
         guard let script = builder.script else {
             throw QueryBuilderError.missingRequiredField("script")
         }
@@ -332,7 +332,7 @@ public struct PercolateQuery: Query {
         documents = nil
     }
 
-    public init(withBuilder builder: PercoloteQueryBuilder) throws {
+    internal init(withBuilder builder: PercoloteQueryBuilder) throws {
         guard let field = builder.field else {
             throw QueryBuilderError.missingRequiredField("field")
         }
@@ -439,7 +439,7 @@ public struct WrapperQuery: Query {
         self.query = query
     }
 
-    public init(withBuilder builder: WrapperQueryBuilder) throws {
+    internal init(withBuilder builder: WrapperQueryBuilder) throws {
         guard let query = builder.query else {
             throw QueryBuilderError.missingRequiredField("query")
         }

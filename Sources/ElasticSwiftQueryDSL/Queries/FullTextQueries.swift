@@ -279,7 +279,7 @@ public struct MultiMatchQuery: Query {
         self.fields = fields
     }
 
-    public init(withBuilder builder: MultiMatchQueryBuilder) throws {
+    internal init(withBuilder builder: MultiMatchQueryBuilder) throws {
         guard !builder.fields.isEmpty else {
             throw QueryBuilderError.atlestOneElementRequired("fields")
         }

@@ -272,7 +272,7 @@ public struct ParentIdQuery: Query {
         self.ignoreUnmapped = ignoreUnmapped
     }
 
-    public init(withBuilder builder: ParentIdQueryBuilder) throws {
+    internal init(withBuilder builder: ParentIdQueryBuilder) throws {
         guard builder.id != nil else {
             throw QueryBuilderError.missingRequiredField("id")
         }
