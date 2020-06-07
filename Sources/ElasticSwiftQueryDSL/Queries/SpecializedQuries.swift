@@ -383,8 +383,9 @@ extension PercolateQuery {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
+        try nested.encode(field, forKey: .field)
         if let documents = self.documents {
-            if documents.count == 0 {
+            if documents.count == 1 {
                 try nested.encode(documents[0], forKey: .document)
             } else {
                 try nested.encode(documents, forKey: .documents)
