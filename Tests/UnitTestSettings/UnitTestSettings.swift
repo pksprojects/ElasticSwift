@@ -7,8 +7,7 @@
 
 import Foundation
 
-/// @testable import to include labels in log output
-@testable import Logging
+import Logging
 
 let env = ProcessInfo.processInfo.environment
 
@@ -64,6 +63,53 @@ public struct ESConnection {
     public let privateKey: String?
     public let caCert: String?
 }
+
+/// Copy of `Logging.StdioOutputStream`
+/// [Look here for more details](https://github.com/apple/swift-log/blob/master/Sources/Logging/Logging.swift)
+/// A wrapper to facilitate `print`-ing to stderr and stdio that
+/// ensures access to the underlying `FILE` is locked to prevent
+/// cross-thread interleaving of output.
+internal struct StdioOutputStream: TextOutputStream {
+    internal let file: UnsafeMutablePointer<FILE>
+    internal let flushMode: FlushMode
+
+    internal func write(_ string: String) {
+        string.withCString { ptr in
+            flockfile(self.file)
+            defer {
+                funlockfile(self.file)
+            }
+            _ = fputs(ptr, self.file)
+            if case .always = self.flushMode {
+                self.flush()
+            }
+        }
+    }
+
+    /// Flush the underlying stream.
+    /// This has no effect when using the `.always` flush mode, which is the default
+    internal func flush() {
+        _ = fflush(file)
+    }
+
+    internal static let stderr = StdioOutputStream(file: systemStderr, flushMode: .always)
+    internal static let stdout = StdioOutputStream(file: systemStdout, flushMode: .always)
+
+    /// Defines the flushing strategy for the underlying stream.
+    internal enum FlushMode {
+        case undefined
+        case always
+    }
+}
+
+// Prevent name clashes
+#if os(macOS) || os(tvOS) || os(iOS) || os(watchOS)
+    let systemStderr = Darwin.stderr
+    let systemStdout = Darwin.stdout
+#else
+    let systemStderr = Glibc.stderr!
+    let systemStdout = Glibc.stdout!
+#endif
 
 /// Copy of `Logging.StreamLogHandler` with modifications to include label in log output
 ///
