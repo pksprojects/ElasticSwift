@@ -321,6 +321,12 @@ public class PercoloteQueryBuilder: QueryBuilder {
     }
 
     @discardableResult
+    public func set(index: String) -> Self {
+        _index = index
+        return self
+    }
+
+    @discardableResult
     public func set(type: String) -> Self {
         _type = type
         return self
