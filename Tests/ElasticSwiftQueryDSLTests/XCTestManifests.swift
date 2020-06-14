@@ -299,6 +299,19 @@
         // to regenerate.
         static let __allTests__SpecializedQueryBuilderTests = [
             ("test_01_moreLikeThisQueryBuilder", test_01_moreLikeThisQueryBuilder),
+            ("test_02_moreLikeThisQueryBuilder_missing_like", test_02_moreLikeThisQueryBuilder_missing_like),
+            ("test_03_moreLikeThisQueryBuilder", test_03_moreLikeThisQueryBuilder),
+            ("test_04_scriptQueryBuilder", test_04_scriptQueryBuilder),
+            ("test_05_scriptQueryBuilder_missing_script", test_05_scriptQueryBuilder_missing_script),
+            ("test_06_scriptQueryBuilder", test_06_scriptQueryBuilder),
+            ("test_07_percoloteQueryBuilder", test_07_percoloteQueryBuilder),
+            ("test_08_percoloteQueryBuilder_missing_field", test_08_percoloteQueryBuilder_missing_field),
+            ("test_09_percoloteQueryBuilder_missing_document", test_09_percoloteQueryBuilder_missing_document),
+            ("test_10_percoloteQueryBuilder", test_10_percoloteQueryBuilder),
+            ("test_11_percoloteQueryBuilder", test_11_percoloteQueryBuilder),
+            ("test_12_wrapperQueryBuilder", test_12_wrapperQueryBuilder),
+            ("test_13_wrapperQueryBuilder_missing_script", test_13_wrapperQueryBuilder_missing_script),
+            ("test_14_wrapperQueryBuilder", test_14_wrapperQueryBuilder),
         ]
     }
 
