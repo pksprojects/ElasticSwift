@@ -1415,13 +1415,84 @@ extension Highlight.FieldOptions: Equatable {
 
 // MARK: - Rescoring
 
-/// `SearchRequest` rescorer based on a query.
-public struct QueryRescorer {
-    public let windowSize: Int?
-    public let query: RescoreQuery
+/// Protocol that all rescorer conform to.
+public protocol Rescorer: Codable {
+    var rescorerType: RescorerType { get }
+    var windowSize: Int? { get }
 
-    public init(query: RescoreQuery, windowSize: Int? = nil) {
-        self.query = query
+    func isEqualTo(_ other: Rescorer) -> Bool
+}
+
+extension Rescorer where Self: Equatable {
+    public func isEqualTo(_ other: Rescorer) -> Bool {
+        if let o = other as? Self {
+            return self == o
+        }
+        return false
+    }
+}
+
+/// Protocol to wrap rescorer type information
+public protocol RescorerType: Codable {
+    var metaType: Rescorer.Type { get }
+
+    var name: String { get }
+
+    init?(_ name: String)
+
+    func isEqualTo(_ other: RescorerType) -> Bool
+}
+
+extension RescorerType where Self: RawRepresentable, Self.RawValue == String {
+    public var name: String {
+        return rawValue
+    }
+
+    public init?(_ name: String) {
+        if let v = Self(rawValue: name) {
+            self = v
+        } else {
+            return nil
+        }
+    }
+}
+
+extension RescorerType where Self: Equatable {
+    public func isEqualTo(_ other: RescorerType) -> Bool {
+        if let o = other as? Self {
+            return self == o
+        }
+        return false
+    }
+}
+
+public enum RescorerTypes: String, RescorerType, Codable {
+    case query
+}
+
+extension RescorerTypes {
+    public var metaType: Rescorer.Type {
+        switch self {
+        case .query:
+            return QueryRescorer.self
+        }
+    }
+}
+
+/// `SearchRequest` rescorer based on a query.
+public struct QueryRescorer: Rescorer {
+    public let rescorerType: RescorerType = RescorerTypes.query
+    public let windowSize: Int?
+    public let rescoreQuery: Query
+    public let queryWeight: Decimal?
+    public let rescoreQueryWeight: Decimal?
+    public let scoreMode: ScoreMode?
+
+    public init(_ rescoreQuery: Query, scoreMode: ScoreMode? = nil, queryWeight: Decimal? = nil, rescoreQueryWeight: Decimal? = nil, windowSize: Int? = nil) {
+        self.rescoreQuery = rescoreQuery
+        self.scoreMode = scoreMode
+        self.queryWeight = queryWeight
+        self.rescoreQueryWeight = rescoreQueryWeight
         self.windowSize = windowSize
     }
 }
@@ -1430,22 +1501,43 @@ extension QueryRescorer: Codable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(windowSize, forKey: .windowSize)
-        try container.encode(query, forKey: .query)
+        var queryContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .query)
+        try queryContainer.encode(rescoreQuery, forKey: .rescoreQuery)
+        try queryContainer.encodeIfPresent(scoreMode, forKey: .scoreMode)
+        try queryContainer.encodeIfPresent(queryWeight, forKey: .queryWeight)
+        try queryContainer.encodeIfPresent(rescoreQueryWeight, forKey: .rescoreQueryWeight)
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         windowSize = try container.decodeIntIfPresent(forKey: .windowSize)
-        query = try container.decode(RescoreQuery.self, forKey: .query)
+        let queryContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .query)
+        rescoreQuery = try queryContainer.decodeQuery(forKey: .rescoreQuery)
+        scoreMode = try queryContainer.decodeIfPresent(ScoreMode.self, forKey: .scoreMode)
+        queryWeight = try queryContainer.decodeDecimalIfPresent(forKey: .queryWeight)
+        rescoreQueryWeight = try queryContainer.decodeDecimalIfPresent(forKey: .rescoreQueryWeight)
     }
 
     enum CodingKeys: String, CodingKey {
         case windowSize = "window_size"
         case query
+        case rescoreQuery = "rescore_query"
+        case rescoreQueryWeight = "rescore_query_weight"
+        case queryWeight = "query_weight"
+        case scoreMode = "score_mode"
     }
 }
 
-extension QueryRescorer: Equatable {}
+extension QueryRescorer: Equatable {
+    public static func == (lhs: QueryRescorer, rhs: QueryRescorer) -> Bool {
+        return lhs.rescorerType.isEqualTo(rhs.rescorerType)
+            && lhs.windowSize == rhs.windowSize
+            && lhs.queryWeight == rhs.queryWeight
+            && lhs.rescoreQueryWeight == rhs.rescoreQueryWeight
+            && lhs.scoreMode == rhs.scoreMode
+            && isEqualQueries(lhs.rescoreQuery, rhs.rescoreQuery)
+    }
+}
 
 // MARK: - Collapsing
 
@@ -1605,7 +1697,7 @@ public struct SearchSource {
     public var docvalueFields: [DocValueField]?
     public var postFilter: Query?
     public var highlight: Highlight?
-    public var rescore: [QueryRescorer]?
+    public var rescore: [Rescorer]?
     public var searchAfter: CodableValue?
 }
 
@@ -1637,7 +1729,7 @@ extension SearchSource: Codable {
         }
 
         do {
-            rescore = try container.decodeArrayIfPresent(forKey: .rescore)
+            rescore = try container.decodeRescorersIfPresent(forKey: .rescore)
         } catch {
             let rescorer = try container.decode(QueryRescorer.self, forKey: .rescore)
             rescore = [rescorer]
@@ -1720,9 +1812,100 @@ extension SearchSource: Equatable {
             && lhs.storedFields == rhs.storedFields
             && lhs.docvalueFields == rhs.docvalueFields
             && lhs.highlight == rhs.highlight
-            && lhs.rescore == rhs.rescore
+            && isEqualRescorers(lhs.rescore, rhs.rescore)
             && lhs.searchAfter == rhs.searchAfter
             && isEqualQueries(lhs.query, rhs.query)
             && isEqualQueries(lhs.postFilter, rhs.postFilter)
+    }
+}
+
+public func isEqualRescorers(_ lhs: Rescorer?, _ rhs: Rescorer?) -> Bool {
+    if lhs == nil, rhs == nil {
+        return true
+    }
+    if let lhs = lhs, let rhs = rhs {
+        return lhs.isEqualTo(rhs)
+    }
+    return false
+}
+
+public func isEqualRescorers(_ lhs: [Rescorer]?, _ rhs: [Rescorer]?) -> Bool {
+    if lhs == nil, rhs == nil {
+        return true
+    }
+    if let lhs = lhs, let rhs = rhs {
+        if lhs.count == rhs.count {
+            return !zip(lhs, rhs).contains { !$0.isEqualTo($1) }
+        }
+    }
+    return false
+}
+
+extension KeyedEncodingContainer {
+    public mutating func encode(_ value: Rescorer, forKey key: KeyedEncodingContainer<K>.Key) throws {
+        try value.encode(to: superEncoder(forKey: key))
+    }
+
+    public mutating func encode(_ value: [Rescorer], forKey key: KeyedEncodingContainer<K>.Key) throws {
+        let rescorersEncoder = superEncoder(forKey: key)
+        var rescorersContainer = rescorersEncoder.unkeyedContainer()
+        for rescorer in value {
+            let rescorerEncoder = rescorersContainer.superEncoder()
+            try rescorer.encode(to: rescorerEncoder)
+        }
+    }
+}
+
+extension KeyedDecodingContainer {
+    public func decodeRescorer(forKey key: KeyedDecodingContainer<K>.Key) throws -> Rescorer {
+        let qContainer = try nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: key)
+        for rKey in qContainer.allKeys {
+            if let rType = RescorerTypes(rKey.stringValue) {
+                return try rType.metaType.init(from: superDecoder(forKey: key))
+            }
+        }
+        throw Swift.DecodingError.typeMismatch(RescorerTypes.self, .init(codingPath: codingPath, debugDescription: "Unable to identify rescorer type from key(s) \(qContainer.allKeys)"))
+    }
+
+    public func decodeRescorerIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Rescorer? {
+        guard contains(key) else {
+            return nil
+        }
+        return try decodeRescorer(forKey: key)
+    }
+
+    public func decodeRescorers(forKey key: KeyedDecodingContainer<K>.Key) throws -> [Rescorer] {
+        var arrayContainer = try nestedUnkeyedContainer(forKey: key)
+        var result = [Rescorer]()
+        if let count = arrayContainer.count {
+            while !arrayContainer.isAtEnd {
+                let query = try arrayContainer.decodeRescorer()
+                result.append(query)
+            }
+            if result.count != count {
+                throw Swift.DecodingError.dataCorrupted(.init(codingPath: arrayContainer.codingPath, debugDescription: "Unable to decode all Rescorers expected: \(count) actual: \(result.count). Probable cause: Unable to determine RescorerType form key(s)"))
+            }
+        }
+        return result
+    }
+
+    public func decodeRescorersIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> [Rescorer]? {
+        guard contains(key) else {
+            return nil
+        }
+        return try decodeRescorers(forKey: key)
+    }
+}
+
+extension UnkeyedDecodingContainer {
+    mutating func decodeRescorer() throws -> Rescorer {
+        var copy = self
+        let elementContainer = try copy.nestedContainer(keyedBy: DynamicCodingKeys.self)
+        for rKey in elementContainer.allKeys {
+            if let rType = RescorerTypes(rKey.stringValue) {
+                return try rType.metaType.init(from: superDecoder())
+            }
+        }
+        throw Swift.DecodingError.typeMismatch(RescorerTypes.self, .init(codingPath: codingPath, debugDescription: "Unable to identify rescorer type from key(s) \(elementContainer.allKeys)"))
     }
 }
