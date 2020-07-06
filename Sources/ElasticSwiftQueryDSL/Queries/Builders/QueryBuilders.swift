@@ -18,6 +18,10 @@ public final class QueryBuilders {
         return MatchAllQueryBuilder()
     }
 
+    public static func matchNoneQuery() -> MatchNoneQueryBuilder {
+        return MatchNoneQueryBuilder()
+    }
+
     public static func matchQuery() -> MatchQueryBuilder {
         return MatchQueryBuilder()
     }

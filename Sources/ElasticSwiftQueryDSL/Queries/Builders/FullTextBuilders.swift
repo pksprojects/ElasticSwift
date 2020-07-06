@@ -398,6 +398,18 @@ public class CommonTermsQueryBuilder: QueryBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(boost: Decimal) -> CommonTermsQueryBuilder {
+        _boost = boost
+        return self
+    }
+
+    @discardableResult
+    public func set(name: String) -> CommonTermsQueryBuilder {
+        _name = name
+        return self
+    }
+
     public var field: String? {
         return _field
     }

@@ -222,11 +222,15 @@ class JoiningQueryBuilderTests: XCTestCase {
             .set(id: "id")
             .set(type: "type")
             .set(ignoreUnmapped: false)
+            .set(boost: 1.0)
+            .set(name: "name")
             .build()
 
         XCTAssertEqual(query.id, "id")
         XCTAssertEqual(query.type, "type")
         XCTAssertEqual(query.ignoreUnmapped, false)
+        XCTAssertEqual(query.boost, 1.0)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_14_hasParentQueryBuilder_missing_id() throws {
@@ -236,6 +240,8 @@ class JoiningQueryBuilderTests: XCTestCase {
             .set(ignoreUnmapped: false)
             .set(score: true)
             .set(innerHits: [])
+            .set(boost: 1.0)
+            .set(name: "name")
             .build()
 
         XCTAssertTrue(query.query.isEqualTo(MatchAllQuery()))
@@ -243,6 +249,8 @@ class JoiningQueryBuilderTests: XCTestCase {
         XCTAssertEqual(query.ignoreUnmapped, false)
         XCTAssertEqual(query.innerHits, [])
         XCTAssertEqual(query.score, true)
+        XCTAssertEqual(query.boost, 1.0)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_15_hasChildQueryBuilder() throws {
@@ -254,6 +262,8 @@ class JoiningQueryBuilderTests: XCTestCase {
             .set(maxChildren: 2)
             .set(innerHits: [])
             .set(scoreMode: .avg)
+            .set(boost: 1.0)
+            .set(name: "name")
             .build()
 
         XCTAssertTrue(query.query.isEqualTo(MatchAllQuery()))
@@ -263,6 +273,8 @@ class JoiningQueryBuilderTests: XCTestCase {
         XCTAssertEqual(query.maxChildren, 2)
         XCTAssertEqual(query.innerHits, [])
         XCTAssertEqual(query.scoreMode, .avg)
+        XCTAssertEqual(query.boost, 1.0)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_16_nestedQueryBuilder_missing_id() throws {
@@ -272,6 +284,8 @@ class JoiningQueryBuilderTests: XCTestCase {
             .set(ignoreUnmapped: false)
             .set(innerHits: [])
             .set(scoreMode: .avg)
+            .set(boost: 1.0)
+            .set(name: "name")
             .build()
 
         XCTAssertTrue(query.query.isEqualTo(MatchAllQuery()))
@@ -279,5 +293,7 @@ class JoiningQueryBuilderTests: XCTestCase {
         XCTAssertEqual(query.ignoreUnmapped, false)
         XCTAssertEqual(query.innerHits, [])
         XCTAssertEqual(query.scoreMode, .avg)
+        XCTAssertEqual(query.boost, 1.0)
+        XCTAssertEqual(query.name, "name")
     }
 }

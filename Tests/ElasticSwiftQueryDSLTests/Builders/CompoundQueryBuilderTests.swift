@@ -55,9 +55,11 @@ class CompoundQueryBuilderTests: XCTestCase {
         let query = try QueryBuilders.constantScoreQuery()
             .set(query: MatchAllQuery())
             .set(boost: 0.8)
+            .set(name: "name")
             .build()
         XCTAssertEqual(query.query as! MatchAllQuery, MatchAllQuery())
         XCTAssertEqual(query.boost, 0.8)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_05_boolQueryBuilder() throws {
@@ -85,6 +87,7 @@ class CompoundQueryBuilderTests: XCTestCase {
             .must(query: MatchAllQuery())
             .mustNot(query: MatchAllQuery())
             .set(boost: 0.8)
+            .set(name: "name")
             .set(minimumShouldMatch: 10)
             .build()
         XCTAssertEqual(query.shouldClauses.first as! MatchAllQuery, MatchAllQuery())
@@ -92,6 +95,7 @@ class CompoundQueryBuilderTests: XCTestCase {
         XCTAssertEqual(query.mustClauses.first as! MatchAllQuery, MatchAllQuery())
         XCTAssertEqual(query.mustNotClauses.first as! MatchAllQuery, MatchAllQuery())
         XCTAssertEqual(query.boost, 0.8)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_08_disMaxQueryBuilder() throws {
@@ -125,10 +129,12 @@ class CompoundQueryBuilderTests: XCTestCase {
             .add(query: MatchAllQuery())
             .set(tieBreaker: 1.0)
             .set(boost: 0.8)
+            .set(name: "name")
             .build()
         XCTAssertEqual(query.queries.first as! MatchAllQuery, MatchAllQuery())
         XCTAssertEqual(query.tieBreaker, 1.0)
         XCTAssertEqual(query.boost, 0.8)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_13_functionScoreQueryBuilder() throws {
@@ -176,6 +182,7 @@ class CompoundQueryBuilderTests: XCTestCase {
             .set(boostMode: .avg)
             .set(scoreMode: .multiply)
             .set(boost: 0.8)
+            .set(name: "name")
             .build()
         XCTAssertEqual(query.query as! MatchAllQuery, MatchAllQuery())
         XCTAssertEqual(query.functions.first as! RandomScoreFunction, RandomScoreFunction())
@@ -184,6 +191,7 @@ class CompoundQueryBuilderTests: XCTestCase {
         XCTAssertEqual(query.boostMode, BoostMode.avg)
         XCTAssertEqual(query.scoreMode, ScoreMode.multiply)
         XCTAssertEqual(query.boost, 0.8)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_18_functionScoreQueryBuilder() throws {
@@ -248,9 +256,13 @@ class CompoundQueryBuilderTests: XCTestCase {
             .set(positive: MatchAllQuery())
             .set(negative: TermQuery(field: "text", value: "random"))
             .set(negativeBoost: 0.8)
+            .set(name: "name")
+            .set(boost: 1.0)
             .build()
         XCTAssertEqual(query.positive as! MatchAllQuery, MatchAllQuery())
         XCTAssertEqual(query.negative as! TermQuery, TermQuery(field: "text", value: "random"))
         XCTAssertEqual(query.negativeBoost, 0.8)
+        XCTAssertEqual(query.boost, 1.0)
+        XCTAssertEqual(query.name, "name")
     }
 }

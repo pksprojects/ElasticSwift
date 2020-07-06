@@ -235,6 +235,8 @@
             ("test_02_match_all_boost", test_02_match_all_boost),
             ("test_03_match_non_query", test_03_match_non_query),
             ("test_04_match_all_non_equality", test_04_match_all_non_equality),
+            ("test_05_match_all_decode", test_05_match_all_decode),
+            ("test_05_match_none_decode", test_05_match_none_decode),
         ]
     }
 

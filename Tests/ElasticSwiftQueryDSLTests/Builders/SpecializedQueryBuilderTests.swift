@@ -72,6 +72,8 @@ class SpecializedQueryBuilderTests: XCTestCase {
             .add(unlike: "unlike2")
             .add(stopWord: "stop2")
             .add(unlike: MoreLikeThisQuery.Item(id: "id4"))
+            .set(boost: 1.0)
+            .set(name: "name")
             .build()
         XCTAssertEqual(query.fields, ["field1", "field2"])
         XCTAssertEqual(query.likeTexts, ["like", "like2"])
@@ -90,6 +92,8 @@ class SpecializedQueryBuilderTests: XCTestCase {
         XCTAssertEqual(query.minWordLength, 1)
         XCTAssertEqual(query.minimumShouldMatch, "2")
         XCTAssertEqual(query.boostTerms, 2.0)
+        XCTAssertEqual(query.boost, 1.0)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_04_scriptQueryBuilder() throws {
@@ -167,6 +171,8 @@ class SpecializedQueryBuilderTests: XCTestCase {
             .set(routing: "routing")
             .set(version: 2)
             .set(preference: "preference")
+            .set(boost: 1.0)
+            .set(name: "name")
             .build()
         XCTAssertEqual(query.field, "field")
         XCTAssertEqual(query.id, "id")
@@ -175,6 +181,8 @@ class SpecializedQueryBuilderTests: XCTestCase {
         XCTAssertEqual(query.routing, "routing")
         XCTAssertEqual(query.version, 2)
         XCTAssertEqual(query.preference, "preference")
+        XCTAssertEqual(query.boost, 1.0)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_12_wrapperQueryBuilder() throws {

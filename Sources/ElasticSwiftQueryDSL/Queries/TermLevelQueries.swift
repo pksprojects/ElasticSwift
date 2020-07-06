@@ -179,7 +179,7 @@ public struct RangeQuery: MultiTermQuery {
     public var boost: Decimal?
     public var name: String?
 
-    public init(field: String, gte: String?, gt: String?, lte: String?, lt: String?, format: String? = nil, timeZone: String? = nil, boost: Decimal? = nil, relation: ShapeRelation? = nil, name _: String? = nil) {
+    public init(field: String, gte: String?, gt: String?, lte: String?, lt: String?, format: String? = nil, timeZone: String? = nil, boost: Decimal? = nil, relation: ShapeRelation? = nil, name: String? = nil) {
         self.field = field
         self.gte = gte
         self.gt = gt
@@ -189,6 +189,7 @@ public struct RangeQuery: MultiTermQuery {
         self.timeZone = timeZone
         self.boost = boost
         self.relation = relation
+        self.name = name
     }
 
     internal init(withBuilder builder: RangeQueryBuilder) throws {
