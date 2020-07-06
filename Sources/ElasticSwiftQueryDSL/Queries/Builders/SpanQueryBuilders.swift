@@ -14,6 +14,7 @@ public class SpanTermQueryBuilder: QueryBuilder {
     private var _field: String?
     private var _value: String?
     private var _boost: Decimal?
+    private var _name: String?
 
     public init() {}
 
@@ -35,6 +36,12 @@ public class SpanTermQueryBuilder: QueryBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(name: String) -> Self {
+        _name = name
+        return self
+    }
+
     public var field: String? {
         return _field
     }
@@ -47,6 +54,10 @@ public class SpanTermQueryBuilder: QueryBuilder {
         return _boost
     }
 
+    public var name: String? {
+        return _name
+    }
+
     public func build() throws -> SpanTermQuery {
         return try SpanTermQuery(withBuilder: self)
     }
@@ -56,6 +67,8 @@ public class SpanTermQueryBuilder: QueryBuilder {
 
 public class SpanMultiTermQueryBuilder: QueryBuilder {
     private var _match: MultiTermQuery?
+    private var _boost: Decimal?
+    private var _name: String?
 
     public init() {}
 
@@ -65,8 +78,28 @@ public class SpanMultiTermQueryBuilder: QueryBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(boost: Decimal) -> Self {
+        _boost = boost
+        return self
+    }
+
+    @discardableResult
+    public func set(name: String) -> Self {
+        _name = name
+        return self
+    }
+
     public var match: MultiTermQuery? {
         return _match
+    }
+
+    public var boost: Decimal? {
+        return _boost
+    }
+
+    public var name: String? {
+        return _name
     }
 
     public func build() throws -> SpanMultiTermQuery {
@@ -79,6 +112,8 @@ public class SpanMultiTermQueryBuilder: QueryBuilder {
 public class SpanFirstQueryBuilder: QueryBuilder {
     private var _match: SpanQuery?
     private var _end: Int?
+    private var _boost: Decimal?
+    private var _name: String?
 
     public init() {}
 
@@ -94,12 +129,32 @@ public class SpanFirstQueryBuilder: QueryBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(boost: Decimal) -> Self {
+        _boost = boost
+        return self
+    }
+
+    @discardableResult
+    public func set(name: String) -> Self {
+        _name = name
+        return self
+    }
+
     public var match: SpanQuery? {
         return _match
     }
 
     public var end: Int? {
         return _end
+    }
+
+    public var boost: Decimal? {
+        return _boost
+    }
+
+    public var name: String? {
+        return _name
     }
 
     public func build() throws -> SpanFirstQuery {
@@ -113,6 +168,8 @@ public class SpanNearQueryBuilder: QueryBuilder {
     private var _clauses: [SpanQuery]?
     private var _slop: Int?
     private var _inOrder: Bool?
+    private var _boost: Decimal?
+    private var _name: String?
 
     public init() {}
 
@@ -143,6 +200,18 @@ public class SpanNearQueryBuilder: QueryBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(boost: Decimal) -> Self {
+        _boost = boost
+        return self
+    }
+
+    @discardableResult
+    public func set(name: String) -> Self {
+        _name = name
+        return self
+    }
+
     public var clauses: [SpanQuery]? {
         return _clauses
     }
@@ -155,6 +224,14 @@ public class SpanNearQueryBuilder: QueryBuilder {
         return _inOrder
     }
 
+    public var boost: Decimal? {
+        return _boost
+    }
+
+    public var name: String? {
+        return _name
+    }
+
     public func build() throws -> SpanNearQuery {
         return try SpanNearQuery(withBuilder: self)
     }
@@ -164,6 +241,8 @@ public class SpanNearQueryBuilder: QueryBuilder {
 
 public class SpanOrQueryBuilder: QueryBuilder {
     private var _clauses: [SpanQuery]?
+    private var _boost: Decimal?
+    private var _name: String?
 
     public init() {}
 
@@ -182,8 +261,28 @@ public class SpanOrQueryBuilder: QueryBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(boost: Decimal) -> Self {
+        _boost = boost
+        return self
+    }
+
+    @discardableResult
+    public func set(name: String) -> Self {
+        _name = name
+        return self
+    }
+
     public var clauses: [SpanQuery]? {
         return _clauses
+    }
+
+    public var boost: Decimal? {
+        return _boost
+    }
+
+    public var name: String? {
+        return _name
     }
 
     public func build() throws -> SpanOrQuery {
@@ -198,6 +297,8 @@ public class SpanNotQueryBuilder: QueryBuilder {
     private var _exclude: SpanQuery?
     private var _pre: Int?
     private var _post: Int?
+    private var _boost: Decimal?
+    private var _name: String?
 
     public init() {}
 
@@ -225,6 +326,18 @@ public class SpanNotQueryBuilder: QueryBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(boost: Decimal) -> Self {
+        _boost = boost
+        return self
+    }
+
+    @discardableResult
+    public func set(name: String) -> Self {
+        _name = name
+        return self
+    }
+
     public var include: SpanQuery? {
         return _include
     }
@@ -241,6 +354,14 @@ public class SpanNotQueryBuilder: QueryBuilder {
         return _post
     }
 
+    public var boost: Decimal? {
+        return _boost
+    }
+
+    public var name: String? {
+        return _name
+    }
+
     public func build() throws -> SpanNotQuery {
         return try SpanNotQuery(withBuilder: self)
     }
@@ -251,6 +372,8 @@ public class SpanNotQueryBuilder: QueryBuilder {
 public class SpanContainingQueryBuilder: QueryBuilder {
     private var _big: SpanQuery?
     private var _little: SpanQuery?
+    private var _boost: Decimal?
+    private var _name: String?
 
     public init() {}
 
@@ -266,12 +389,32 @@ public class SpanContainingQueryBuilder: QueryBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(boost: Decimal) -> Self {
+        _boost = boost
+        return self
+    }
+
+    @discardableResult
+    public func set(name: String) -> Self {
+        _name = name
+        return self
+    }
+
     public var big: SpanQuery? {
         return _big
     }
 
     public var little: SpanQuery? {
         return _little
+    }
+
+    public var boost: Decimal? {
+        return _boost
+    }
+
+    public var name: String? {
+        return _name
     }
 
     public func build() throws -> SpanContainingQuery {
@@ -284,6 +427,8 @@ public class SpanContainingQueryBuilder: QueryBuilder {
 public class SpanWithinQueryBuilder: QueryBuilder {
     private var _big: SpanQuery?
     private var _little: SpanQuery?
+    private var _boost: Decimal?
+    private var _name: String?
 
     public init() {}
 
@@ -299,12 +444,32 @@ public class SpanWithinQueryBuilder: QueryBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(boost: Decimal) -> Self {
+        _boost = boost
+        return self
+    }
+
+    @discardableResult
+    public func set(name: String) -> Self {
+        _name = name
+        return self
+    }
+
     public var big: SpanQuery? {
         return _big
     }
 
     public var little: SpanQuery? {
         return _little
+    }
+
+    public var boost: Decimal? {
+        return _boost
+    }
+
+    public var name: String? {
+        return _name
     }
 
     public func build() throws -> SpanWithinQuery {
@@ -317,6 +482,8 @@ public class SpanWithinQueryBuilder: QueryBuilder {
 public class SpanFieldMaskingQueryBuilder: QueryBuilder {
     private var _query: SpanQuery?
     private var _field: String?
+    private var _boost: Decimal?
+    private var _name: String?
 
     public init() {}
 
@@ -332,12 +499,32 @@ public class SpanFieldMaskingQueryBuilder: QueryBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(boost: Decimal) -> Self {
+        _boost = boost
+        return self
+    }
+
+    @discardableResult
+    public func set(name: String) -> Self {
+        _name = name
+        return self
+    }
+
     public var query: SpanQuery? {
         return _query
     }
 
     public var field: String? {
         return _field
+    }
+
+    public var boost: Decimal? {
+        return _boost
+    }
+
+    public var name: String? {
+        return _name
     }
 
     public func build() throws -> SpanFieldMaskingQuery {

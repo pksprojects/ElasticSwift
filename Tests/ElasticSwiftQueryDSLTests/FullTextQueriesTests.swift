@@ -365,7 +365,7 @@ class FullTextQueriesTest: XCTestCase {
     }
 
     func test_16_commonTermsQuery_encode() throws {
-        let query = CommonTermsQuery(query: "this is bonsai cool", cutoffFrequency: 0.001)
+        let query = CommonTermsQuery(field: "body", query: "this is bonsai cool", cutoffFrequency: 0.001)
 
         let data = try JSONEncoder().encode(query)
 
@@ -390,6 +390,7 @@ class FullTextQueriesTest: XCTestCase {
 
     func test_17_commonTermsQuery_decode() throws {
         let query = try QueryBuilders.commonTermsQuery()
+            .set(field: "body")
             .set(query: "nelly the elephant as a cartoon")
             .set(cutoffFrequency: 0.001)
             .set(minimumShouldMatch: 2)
@@ -414,6 +415,7 @@ class FullTextQueriesTest: XCTestCase {
 
     func test_18_commonTermsQuery_decode_2() throws {
         let query = try QueryBuilders.commonTermsQuery()
+            .set(field: "body")
             .set(query: "nelly the elephant not as a cartoon")
             .set(cutoffFrequency: 0.001)
             .set(minimumShouldMatchLowFreq: 2)
@@ -442,6 +444,7 @@ class FullTextQueriesTest: XCTestCase {
 
     func test_19_commonTermsQuery_decode_3() throws {
         let query = try QueryBuilders.commonTermsQuery()
+            .set(field: "body")
             .set(query: "nelly the elephant not as a cartoon")
             .set(cutoffFrequency: 0.001)
             .set(lowFrequencyOperator: .and)
@@ -473,7 +476,7 @@ class FullTextQueriesTest: XCTestCase {
     }
 
     func test_20_commonTermsQuery_encode_2() throws {
-        let query = CommonTermsQuery(query: "nelly the elephant not as a cartoon", cutoffFrequency: 0.001, minimumShouldMatchLowFreq: 2, minimumShouldMatchHighFreq: 3)
+        let query = CommonTermsQuery(field: "body", query: "nelly the elephant not as a cartoon", cutoffFrequency: 0.001, minimumShouldMatchLowFreq: 2, minimumShouldMatchHighFreq: 3)
 
         let data = try JSONEncoder().encode(query)
 

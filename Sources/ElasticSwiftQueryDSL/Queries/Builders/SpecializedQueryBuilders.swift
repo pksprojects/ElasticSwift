@@ -29,6 +29,8 @@ public class MoreLikeThisQueryBuilder: QueryBuilder {
     private var _boostTerms: Decimal?
     private var _include: Bool?
     private var _failOnUnsupportedField: Bool?
+    private var _boost: Decimal?
+    private var _name: String?
 
     public init() {}
 
@@ -131,6 +133,18 @@ public class MoreLikeThisQueryBuilder: QueryBuilder {
     @discardableResult
     public func set(failOnUnsupportedField: Bool) -> Self {
         _failOnUnsupportedField = failOnUnsupportedField
+        return self
+    }
+
+    @discardableResult
+    public func set(boost: Decimal) -> Self {
+        _boost = boost
+        return self
+    }
+
+    @discardableResult
+    public func set(name: String) -> Self {
+        _name = name
         return self
     }
 
@@ -257,6 +271,14 @@ public class MoreLikeThisQueryBuilder: QueryBuilder {
         return _failOnUnsupportedField
     }
 
+    public var boost: Decimal? {
+        return _boost
+    }
+
+    public var name: String? {
+        return _name
+    }
+
     public func build() throws -> MoreLikeThisQuery {
         return try MoreLikeThisQuery(withBuilder: self)
     }
@@ -266,6 +288,8 @@ public class MoreLikeThisQueryBuilder: QueryBuilder {
 
 public class ScriptQueryBuilder: QueryBuilder {
     private var _script: Script?
+    private var _boost: Decimal?
+    private var _name: String?
 
     public init() {}
 
@@ -275,8 +299,28 @@ public class ScriptQueryBuilder: QueryBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(boost: Decimal) -> Self {
+        _boost = boost
+        return self
+    }
+
+    @discardableResult
+    public func set(name: String) -> Self {
+        _name = name
+        return self
+    }
+
     public var script: Script? {
         return _script
+    }
+
+    public var boost: Decimal? {
+        return _boost
+    }
+
+    public var name: String? {
+        return _name
     }
 
     public func build() throws -> ScriptQuery {
@@ -295,6 +339,8 @@ public class PercoloteQueryBuilder: QueryBuilder {
     private var _routing: String?
     private var _preference: String?
     private var _version: Int?
+    private var _boost: Decimal?
+    private var _name: String?
 
     public init() {}
 
@@ -356,6 +402,18 @@ public class PercoloteQueryBuilder: QueryBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(boost: Decimal) -> Self {
+        _boost = boost
+        return self
+    }
+
+    @discardableResult
+    public func set(name: String) -> Self {
+        _name = name
+        return self
+    }
+
     public var field: String? {
         return _field
     }
@@ -386,6 +444,14 @@ public class PercoloteQueryBuilder: QueryBuilder {
 
     public var version: Int? {
         return _version
+    }
+
+    public var boost: Decimal? {
+        return _boost
+    }
+
+    public var name: String? {
+        return _name
     }
 
     public func build() throws -> PercolateQuery {

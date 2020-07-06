@@ -13,6 +13,8 @@ import Foundation
 /// Protocol that all `Query` conforms to
 public protocol Query: Codable {
     var queryType: QueryType { get }
+    var boost: Decimal? { get set }
+    var name: String? { get set }
 
     func isEqualTo(_ other: Query) -> Bool
 }

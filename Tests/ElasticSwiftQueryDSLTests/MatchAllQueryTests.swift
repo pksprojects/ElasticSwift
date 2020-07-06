@@ -78,7 +78,7 @@ class MatchAllQueryTests: XCTestCase {
         let query2 = MatchNoneQuery()
 
         XCTAssertFalse(query1.isEqualTo(query2))
-        XCTAssertNotEqual(query1, MatchAllQuery(1.0))
+        XCTAssertNotEqual(query1, MatchAllQuery(boost: 1.0))
         XCTAssertEqual(query2, MatchNoneQuery())
     }
 }

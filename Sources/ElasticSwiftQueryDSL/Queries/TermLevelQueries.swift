@@ -15,12 +15,14 @@ public struct TermQuery: Query {
 
     public let field: String
     public let value: String
-    public let boost: Decimal?
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(field: String, value: String, boost: Decimal? = nil) {
+    public init(field: String, value: String, boost: Decimal? = nil, name: String? = nil) {
         self.field = field
         self.value = value
         self.boost = boost
+        self.name = name
     }
 
     internal init(withBuilder builder: TermQueryBuilder) throws {
@@ -32,7 +34,7 @@ public struct TermQuery: Query {
             throw QueryBuilderError.missingRequiredField("value")
         }
 
-        self.init(field: builder.field!, value: builder.value!, boost: builder.boost)
+        self.init(field: builder.field!, value: builder.value!, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -48,9 +50,11 @@ extension TermQuery {
         if let fieldContainer = try? nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field)) {
             value = try fieldContainer.decodeString(forKey: .value)
             boost = try fieldContainer.decodeDecimalIfPresent(forKey: .boost)
+            name = try fieldContainer.decodeStringIfPresent(forKey: .name)
         } else {
             value = try nested.decodeString(forKey: .key(named: field))
             boost = nil
+            name = nil
         }
     }
 
@@ -58,7 +62,7 @@ extension TermQuery {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
 
-        guard boost != nil else {
+        guard boost != nil || name != nil else {
             try nested.encode(value, forKey: .key(named: field))
             return
         }
@@ -66,11 +70,13 @@ extension TermQuery {
         var fieldContainer = nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
         try fieldContainer.encode(value, forKey: .value)
         try fieldContainer.encodeIfPresent(boost, forKey: .boost)
+        try fieldContainer.encodeIfPresent(name, forKey: .name)
     }
 
     enum CodingKeys: String, CodingKey {
         case boost
         case value
+        case name
     }
 }
 
@@ -80,6 +86,7 @@ extension TermQuery: Equatable {
             && lhs.field == rhs.field
             && lhs.value == rhs.value
             && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 }
 
@@ -90,10 +97,14 @@ public struct TermsQuery: Query {
 
     public let field: String
     public let values: [String]
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(field: String, values: [String]) {
+    public init(field: String, values: [String], boost: Decimal? = nil, name: String? = nil) {
         self.field = field
         self.values = values
+        self.boost = boost
+        self.name = name
     }
 
     internal init(withBuilder builder: TermsQueryBuilder) throws {
@@ -105,7 +116,7 @@ public struct TermsQuery: Query {
             throw QueryBuilderError.atlestOneElementRequired("values")
         }
 
-        self.init(field: builder.field!, values: builder.values)
+        self.init(field: builder.field!, values: builder.values, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -120,12 +131,21 @@ extension TermsQuery {
         field = nested.allKeys.first!.stringValue
 
         values = try nested.decode([String].self, forKey: .key(named: field))
+        boost = try nested.decodeDecimalIfPresent(forKey: .key(named: CodingKeys.boost.rawValue))
+        name = try nested.decodeStringIfPresent(forKey: .key(named: CodingKeys.name.rawValue))
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
         try nested.encode(values, forKey: .key(named: field))
+        try nested.encodeIfPresent(boost, forKey: .key(named: CodingKeys.boost.rawValue))
+        try nested.encodeIfPresent(name, forKey: .key(named: CodingKeys.name.rawValue))
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case boost
+        case name
     }
 }
 
@@ -134,6 +154,8 @@ extension TermsQuery: Equatable {
         return lhs.queryType.isEqualTo(rhs.queryType)
             && lhs.field == rhs.field
             && lhs.values == rhs.values
+            && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 }
 
@@ -153,10 +175,11 @@ public struct RangeQuery: MultiTermQuery {
     public let lt: String?
     public let format: String?
     public let timeZone: String?
-    public let boost: Decimal?
     public let relation: ShapeRelation?
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(field: String, gte: String?, gt: String?, lte: String?, lt: String?, format: String? = nil, timeZone: String? = nil, boost: Decimal? = nil, relation: ShapeRelation? = nil) {
+    public init(field: String, gte: String?, gt: String?, lte: String?, lt: String?, format: String? = nil, timeZone: String? = nil, boost: Decimal? = nil, relation: ShapeRelation? = nil, name _: String? = nil) {
         self.field = field
         self.gte = gte
         self.gt = gt
@@ -177,7 +200,7 @@ public struct RangeQuery: MultiTermQuery {
             throw QueryBuilderError.atleastOneFieldRequired(["gte", "gt", "lt", "lte"])
         }
 
-        self.init(field: builder.field!, gte: builder.gte, gt: builder.gt, lte: builder.lte, lt: builder.lt, format: builder.format, timeZone: builder.timeZone, boost: builder.boost, relation: builder.relation)
+        self.init(field: builder.field!, gte: builder.gte, gt: builder.gt, lte: builder.lte, lt: builder.lt, format: builder.format, timeZone: builder.timeZone, boost: builder.boost, relation: builder.relation, name: builder.name)
     }
 }
 
@@ -199,6 +222,7 @@ extension RangeQuery {
         format = try fieldContainer.decodeStringIfPresent(forKey: .format)
         timeZone = try fieldContainer.decodeStringIfPresent(forKey: .timeZone)
         boost = try fieldContainer.decodeDecimalIfPresent(forKey: .boost)
+        name = try fieldContainer.decodeStringIfPresent(forKey: .name)
         relation = try fieldContainer.decodeIfPresent(ShapeRelation.self, forKey: .relation)
     }
 
@@ -215,6 +239,7 @@ extension RangeQuery {
         try fieldContainer.encodeIfPresent(format, forKey: .format)
         try fieldContainer.encodeIfPresent(timeZone, forKey: .timeZone)
         try fieldContainer.encodeIfPresent(relation, forKey: .relation)
+        try fieldContainer.encodeIfPresent(name, forKey: .name)
     }
 
     enum CodingKeys: String, CodingKey {
@@ -226,6 +251,7 @@ extension RangeQuery {
         case format
         case timeZone = "time_zone"
         case relation
+        case name
     }
 }
 
@@ -241,6 +267,7 @@ extension RangeQuery: Equatable {
             && lhs.relation == rhs.relation
             && lhs.format == rhs.format
             && lhs.timeZone == rhs.timeZone
+            && lhs.name == rhs.name
     }
 }
 
@@ -250,9 +277,13 @@ public struct ExistsQuery: Query {
     public let queryType: QueryType = QueryTypes.exists
 
     public let field: String
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(field: String) {
+    public init(field: String, boost: Decimal? = nil, name: String? = nil) {
         self.field = field
+        self.boost = boost
+        self.name = name
     }
 
     internal init(withBuilder builder: ExistsQueryBuilder) throws {
@@ -260,7 +291,7 @@ public struct ExistsQuery: Query {
             throw QueryBuilderError.missingRequiredField("field")
         }
 
-        self.init(field: builder.field!)
+        self.init(field: builder.field!, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -270,16 +301,22 @@ extension ExistsQuery {
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
 
         field = try nested.decodeString(forKey: .field)
+        boost = try nested.decodeDecimalIfPresent(forKey: .boost)
+        name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         try nested.encode(field, forKey: .field)
+        try nested.encodeIfPresent(boost, forKey: .boost)
+        try nested.encodeIfPresent(name, forKey: .name)
     }
 
     enum CodingKeys: String, CodingKey {
         case field
+        case boost
+        case name
     }
 }
 
@@ -287,6 +324,8 @@ extension ExistsQuery: Equatable {
     public static func == (lhs: ExistsQuery, rhs: ExistsQuery) -> Bool {
         return lhs.queryType.isEqualTo(rhs.queryType)
             && lhs.field == rhs.field
+            && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 }
 
@@ -297,12 +336,14 @@ public struct PrefixQuery: MultiTermQuery {
 
     public let field: String
     public let value: String
-    public let boost: Decimal?
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(field: String, value: String, boost: Decimal? = nil) {
+    public init(field: String, value: String, boost: Decimal? = nil, name: String? = nil) {
         self.field = field
         self.value = value
         self.boost = boost
+        self.name = name
     }
 
     internal init(withBuilder builder: PrefixQueryBuilder) throws {
@@ -314,7 +355,7 @@ public struct PrefixQuery: MultiTermQuery {
             throw QueryBuilderError.missingRequiredField("value")
         }
 
-        self.init(field: builder.field!, value: builder.value!, boost: builder.boost)
+        self.init(field: builder.field!, value: builder.value!, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -330,9 +371,11 @@ extension PrefixQuery {
         if let fieldContainer = try? nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field)) {
             value = try fieldContainer.decodeString(forKey: .value)
             boost = try fieldContainer.decodeDecimalIfPresent(forKey: .boost)
+            name = try fieldContainer.decodeStringIfPresent(forKey: .name)
         } else {
             value = try nested.decodeString(forKey: .key(named: field))
             boost = nil
+            name = nil
         }
     }
 
@@ -348,11 +391,13 @@ extension PrefixQuery {
         var fieldContainer = nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
         try fieldContainer.encode(value, forKey: .value)
         try fieldContainer.encodeIfPresent(boost, forKey: .boost)
+        try fieldContainer.encodeIfPresent(name, forKey: .name)
     }
 
     enum CodingKeys: String, CodingKey {
         case boost
         case value
+        case name
     }
 }
 
@@ -362,6 +407,7 @@ extension PrefixQuery: Equatable {
             && lhs.field == rhs.field
             && lhs.value == rhs.value
             && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 }
 
@@ -372,12 +418,14 @@ public struct WildCardQuery: MultiTermQuery {
 
     public let field: String
     public let value: String
-    public let boost: Decimal?
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(field: String, value: String, boost: Decimal? = nil) {
+    public init(field: String, value: String, boost: Decimal? = nil, name: String? = nil) {
         self.field = field
         self.value = value
         self.boost = boost
+        self.name = name
     }
 
     internal init(withBuilder builder: WildCardQueryBuilder) throws {
@@ -389,7 +437,7 @@ public struct WildCardQuery: MultiTermQuery {
             throw QueryBuilderError.missingRequiredField("value")
         }
 
-        self.init(field: builder.field!, value: builder.value!, boost: builder.boost)
+        self.init(field: builder.field!, value: builder.value!, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -405,9 +453,11 @@ extension WildCardQuery {
         if let fieldContainer = try? nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field)) {
             value = try fieldContainer.decodeString(forKey: .value)
             boost = try fieldContainer.decodeDecimalIfPresent(forKey: .boost)
+            name = try fieldContainer.decodeStringIfPresent(forKey: .name)
         } else {
             value = try nested.decodeString(forKey: .key(named: field))
             boost = nil
+            name = nil
         }
     }
 
@@ -423,11 +473,13 @@ extension WildCardQuery {
         var fieldContainer = nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
         try fieldContainer.encode(value, forKey: .value)
         try fieldContainer.encodeIfPresent(boost, forKey: .boost)
+        try fieldContainer.encodeIfPresent(name, forKey: .name)
     }
 
     enum CodingKeys: String, CodingKey {
         case boost
         case value
+        case name
     }
 }
 
@@ -437,6 +489,7 @@ extension WildCardQuery: Equatable {
             && lhs.field == rhs.field
             && lhs.value == rhs.value
             && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 }
 
@@ -447,16 +500,18 @@ public struct RegexpQuery: MultiTermQuery {
 
     public let field: String
     public let value: String
-    public let boost: Decimal?
+    public var boost: Decimal?
     public let regexFlags: [RegexFlag]
     public let maxDeterminizedStates: Int?
+    public var name: String?
 
-    public init(field: String, value: String, boost: Decimal? = nil, regexFlags: [RegexFlag] = [], maxDeterminizedStates: Int? = nil) {
+    public init(field: String, value: String, boost: Decimal? = nil, regexFlags: [RegexFlag] = [], maxDeterminizedStates: Int? = nil, name: String? = nil) {
         self.field = field
         self.value = value
         self.boost = boost
         self.regexFlags = regexFlags
         self.maxDeterminizedStates = maxDeterminizedStates
+        self.name = name
     }
 
     internal init(withBuilder builder: RegexpQueryBuilder) throws {
@@ -468,7 +523,7 @@ public struct RegexpQuery: MultiTermQuery {
             throw QueryBuilderError.missingRequiredField("value")
         }
 
-        self.init(field: builder.field!, value: builder.value!, boost: builder.boost, regexFlags: builder.regexFlags, maxDeterminizedStates: builder.maxDeterminizedStates)
+        self.init(field: builder.field!, value: builder.value!, boost: builder.boost, regexFlags: builder.regexFlags, maxDeterminizedStates: builder.maxDeterminizedStates, name: builder.name)
     }
 
     public var regexFlagsStr: String {
@@ -490,11 +545,13 @@ extension RegexpQuery {
             boost = nil
             regexFlags = []
             maxDeterminizedStates = nil
+            name = nil
         } else {
             let fieldContainer = try nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
 
             value = try fieldContainer.decodeString(forKey: .value)
             boost = try fieldContainer.decodeDecimalIfPresent(forKey: .boost)
+            name = try fieldContainer.decodeStringIfPresent(forKey: .name)
             let regexFlagStr = try fieldContainer.decodeStringIfPresent(forKey: .flags)
             if let flagStr = regexFlagStr {
                 regexFlags = flagStr.split(separator: "|").map(String.init).map { RegexFlag(rawValue: $0)! }
@@ -520,6 +577,7 @@ extension RegexpQuery {
         try fieldContainer.encodeIfPresent(boost, forKey: .boost)
         try fieldContainer.encodeIfPresent(regexFlagsStr, forKey: .flags)
         try fieldContainer.encodeIfPresent(maxDeterminizedStates, forKey: .maxDeterminizedStates)
+        try fieldContainer.encodeIfPresent(name, forKey: .name)
     }
 
     enum CodingKeys: String, CodingKey {
@@ -527,6 +585,7 @@ extension RegexpQuery {
         case flags
         case value
         case maxDeterminizedStates = "max_determinized_states"
+        case name
     }
 }
 
@@ -538,6 +597,7 @@ extension RegexpQuery: Equatable {
             && lhs.regexFlags == rhs.regexFlags
             && lhs.boost == rhs.boost
             && lhs.maxDeterminizedStates == rhs.maxDeterminizedStates
+            && lhs.name == rhs.name
     }
 }
 
@@ -548,13 +608,14 @@ public struct FuzzyQuery: MultiTermQuery {
 
     public let field: String
     public let value: String
-    public let boost: Decimal?
+    public var boost: Decimal?
     public let fuzziness: Int?
     public let prefixLenght: Int?
     public let maxExpansions: Int?
     public let transpositions: Bool?
+    public var name: String?
 
-    public init(field: String, value: String, boost: Decimal? = nil, fuzziness: Int? = nil, prefixLenght: Int? = nil, maxExpansions: Int? = nil, transpositions: Bool? = nil) {
+    public init(field: String, value: String, boost: Decimal? = nil, fuzziness: Int? = nil, prefixLenght: Int? = nil, maxExpansions: Int? = nil, transpositions: Bool? = nil, name: String? = nil) {
         self.field = field
         self.value = value
         self.boost = boost
@@ -562,6 +623,7 @@ public struct FuzzyQuery: MultiTermQuery {
         self.prefixLenght = prefixLenght
         self.maxExpansions = maxExpansions
         self.transpositions = transpositions
+        self.name = name
     }
 
     internal init(withBuilder builder: FuzzyQueryBuilder) throws {
@@ -573,7 +635,7 @@ public struct FuzzyQuery: MultiTermQuery {
             throw QueryBuilderError.missingRequiredField("value")
         }
 
-        self.init(field: builder.field!, value: builder.value!, boost: builder.boost, fuzziness: builder.fuzziness, prefixLenght: builder.prefixLenght, maxExpansions: builder.maxExpansions, transpositions: builder.transpositions)
+        self.init(field: builder.field!, value: builder.value!, boost: builder.boost, fuzziness: builder.fuzziness, prefixLenght: builder.prefixLenght, maxExpansions: builder.maxExpansions, transpositions: builder.transpositions, name: builder.name)
     }
 }
 
@@ -593,6 +655,7 @@ extension FuzzyQuery {
             prefixLenght = nil
             maxExpansions = nil
             transpositions = nil
+            name = nil
         } else {
             let fieldContainer = try nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
             value = try fieldContainer.decodeString(forKey: .value)
@@ -601,6 +664,7 @@ extension FuzzyQuery {
             prefixLenght = try fieldContainer.decodeIntIfPresent(forKey: .prefixLength)
             maxExpansions = try fieldContainer.decodeIntIfPresent(forKey: .maxExpansions)
             transpositions = try fieldContainer.decodeBoolIfPresent(forKey: .transpositions)
+            name = try fieldContainer.decodeStringIfPresent(forKey: .name)
         }
     }
 
@@ -621,6 +685,7 @@ extension FuzzyQuery {
         try fieldContainer.encodeIfPresent(maxExpansions, forKey: .maxExpansions)
         try fieldContainer.encodeIfPresent(prefixLenght, forKey: .prefixLength)
         try fieldContainer.encodeIfPresent(transpositions, forKey: .transpositions)
+        try fieldContainer.encodeIfPresent(name, forKey: .name)
     }
 
     enum CodingKeys: String, CodingKey {
@@ -630,6 +695,7 @@ extension FuzzyQuery {
         case prefixLength = "prefix_length"
         case maxExpansions = "max_expansions"
         case transpositions
+        case name
     }
 }
 
@@ -643,6 +709,7 @@ extension FuzzyQuery: Equatable {
             && lhs.maxExpansions == rhs.maxExpansions
             && lhs.prefixLenght == rhs.prefixLenght
             && lhs.transpositions == rhs.transpositions
+            && lhs.name == rhs.name
     }
 }
 
@@ -652,9 +719,13 @@ public struct TypeQuery: Query {
     public let queryType: QueryType = QueryTypes.type
 
     public let type: String
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(type: String) {
+    public init(type: String, boost: Decimal? = nil, name: String? = nil) {
         self.type = type
+        self.boost = boost
+        self.name = name
     }
 
     internal init(withBuilder builder: TypeQueryBuilder) throws {
@@ -662,7 +733,7 @@ public struct TypeQuery: Query {
             throw QueryBuilderError.missingRequiredField("type")
         }
 
-        self.init(type: builder.type!)
+        self.init(type: builder.type!, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -672,16 +743,22 @@ extension TypeQuery {
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
 
         type = try nested.decodeString(forKey: .value)
+        boost = try nested.decodeDecimalIfPresent(forKey: .boost)
+        name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         try nested.encode(type, forKey: .value)
+        try nested.encodeIfPresent(boost, forKey: .boost)
+        try nested.encodeIfPresent(name, forKey: .name)
     }
 
     enum CodingKeys: String, CodingKey {
         case value
+        case boost
+        case name
     }
 }
 
@@ -689,6 +766,8 @@ extension TypeQuery: Equatable {
     public static func == (lhs: TypeQuery, rhs: TypeQuery) -> Bool {
         return lhs.queryType.isEqualTo(rhs.queryType)
             && lhs.type == rhs.type
+            && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 }
 
@@ -699,14 +778,18 @@ public struct IdsQuery: Query {
 
     public let type: String?
     public let ids: [String]
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(ids: [String], type: String? = nil) {
+    public init(ids: [String], type: String? = nil, boost: Decimal? = nil, name: String? = nil) {
         self.type = type
         self.ids = ids
+        self.boost = boost
+        self.name = name
     }
 
-    public init(ids: String..., type: String? = nil) {
-        self.init(ids: ids, type: type)
+    public init(ids: String..., type: String? = nil, boost: Decimal? = nil, name: String? = nil) {
+        self.init(ids: ids, type: type, boost: boost, name: name)
     }
 
     internal init(withBuilder builder: IdsQueryBuilder) throws {
@@ -714,7 +797,7 @@ public struct IdsQuery: Query {
             throw QueryBuilderError.atlestOneElementRequired("ids")
         }
 
-        self.init(ids: builder.ids, type: builder.type)
+        self.init(ids: builder.ids, type: builder.type, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -725,6 +808,8 @@ extension IdsQuery {
 
         type = try nested.decodeStringIfPresent(forKey: .type)
         ids = try nested.decode([String].self, forKey: .values)
+        boost = try nested.decodeDecimalIfPresent(forKey: .boost)
+        name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -732,11 +817,15 @@ extension IdsQuery {
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         try nested.encode(ids, forKey: .values)
         try nested.encodeIfPresent(type, forKey: .type)
+        try nested.encodeIfPresent(boost, forKey: .boost)
+        try nested.encodeIfPresent(name, forKey: .name)
     }
 
     enum CodingKeys: String, CodingKey {
         case values
         case type
+        case boost
+        case name
     }
 }
 
@@ -745,5 +834,7 @@ extension IdsQuery: Equatable {
         return lhs.queryType.isEqualTo(rhs.queryType)
             && lhs.ids == rhs.ids
             && lhs.type == rhs.type
+            && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 }

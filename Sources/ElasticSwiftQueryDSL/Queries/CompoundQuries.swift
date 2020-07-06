@@ -15,11 +15,13 @@ public struct ConstantScoreQuery: Query {
     public let queryType: QueryType = QueryTypes.constantScore
 
     public let query: Query
-    public let boost: Decimal?
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(_ query: Query, boost: Decimal? = nil) {
+    public init(_ query: Query, boost: Decimal? = nil, name: String? = nil) {
         self.query = query
         self.boost = boost
+        self.name = name
     }
 
     internal init(withBuilder builder: ConstantScoreQueryBuilder) throws {
@@ -27,7 +29,7 @@ public struct ConstantScoreQuery: Query {
             throw QueryBuilderError.missingRequiredField("query")
         }
 
-        self.init(builder.query!, boost: builder.boost)
+        self.init(builder.query!, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -36,6 +38,7 @@ extension ConstantScoreQuery {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         boost = try nested.decodeIfPresent(Decimal.self, forKey: .boost)
+        name = try nested.decodeStringIfPresent(forKey: .name)
         query = try nested.decodeQuery(forKey: .filter)
     }
 
@@ -44,11 +47,13 @@ extension ConstantScoreQuery {
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         try nested.encode(query, forKey: .filter)
         try nested.encodeIfPresent(boost, forKey: .boost)
+        try nested.encodeIfPresent(name, forKey: .name)
     }
 
     enum CodingKeys: String, CodingKey {
         case boost
         case filter
+        case name
     }
 }
 
@@ -57,6 +62,7 @@ extension ConstantScoreQuery: Equatable {
         return lhs.queryType.isEqualTo(rhs.queryType)
             && lhs.query.isEqualTo(rhs.query)
             && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 }
 
@@ -70,15 +76,17 @@ public struct BoolQuery: Query {
     public let shouldClauses: [Query]
     public let filterClauses: [Query]
     public let minimumShouldMatch: Int?
-    public let boost: Decimal?
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(must: [Query], mustNot: [Query], should: [Query], filter: [Query], minimumShouldMatch: Int? = nil, boost: Decimal? = nil) {
+    public init(must: [Query], mustNot: [Query], should: [Query], filter: [Query], minimumShouldMatch: Int? = nil, boost: Decimal? = nil, name: String? = nil) {
         mustNotClauses = mustNot
         mustClauses = must
         shouldClauses = should
         filterClauses = filter
         self.minimumShouldMatch = minimumShouldMatch
         self.boost = boost
+        self.name = name
     }
 
     internal init(withBuilder builder: BoolQueryBuilder) throws {
@@ -86,7 +94,7 @@ public struct BoolQuery: Query {
             throw QueryBuilderError.atleastOneFieldRequired(["filterClauses", "mustClauses", "mustNotClauses", "shouldClauses"])
         }
 
-        self.init(must: builder.mustClauses, mustNot: builder.mustNotClauses, should: builder.shouldClauses, filter: builder.filterClauses, minimumShouldMatch: builder.minimumShouldMatch, boost: builder.boost)
+        self.init(must: builder.mustClauses, mustNot: builder.mustNotClauses, should: builder.shouldClauses, filter: builder.filterClauses, minimumShouldMatch: builder.minimumShouldMatch, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -99,6 +107,7 @@ extension BoolQuery {
         mustNotClauses = try nested.decodeQueriesIfPresent(forKey: .mustNot) ?? []
         shouldClauses = try nested.decodeQueriesIfPresent(forKey: .should) ?? []
         boost = try nested.decodeIfPresent(Decimal.self, forKey: .boost)
+        name = try nested.decodeStringIfPresent(forKey: .name)
         minimumShouldMatch = try nested.decodeIntIfPresent(forKey: .minShouldMatch)
     }
 
@@ -118,6 +127,7 @@ extension BoolQuery {
             try nested.encode(shouldClauses, forKey: .should)
         }
         try nested.encodeIfPresent(boost, forKey: .boost)
+        try nested.encodeIfPresent(name, forKey: .name)
         try nested.encodeIfPresent(minimumShouldMatch, forKey: .minShouldMatch)
     }
 
@@ -128,6 +138,7 @@ extension BoolQuery {
         case filter
         case minShouldMatch = "minimum_should_match"
         case boost
+        case name
     }
 }
 
@@ -136,6 +147,7 @@ extension BoolQuery: Equatable {
         return lhs.queryType.isEqualTo(rhs.queryType)
             && lhs.minimumShouldMatch == rhs.minimumShouldMatch
             && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
             && lhs.filterClauses.count == rhs.filterClauses.count
             && !zip(lhs.filterClauses, rhs.filterClauses).contains { !$0.isEqualTo($1) }
             && lhs.mustClauses.count == rhs.mustClauses.count
@@ -155,13 +167,15 @@ public struct DisMaxQuery: Query {
     public static let DEFAULT_TIE_BREAKER: Decimal = 0.0
 
     public let tieBreaker: Decimal
-    public let boost: Decimal?
     public let queries: [Query]
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(_ queries: [Query], tieBreaker: Decimal = DisMaxQuery.DEFAULT_TIE_BREAKER, boost: Decimal? = nil) {
+    public init(_ queries: [Query], tieBreaker: Decimal = DisMaxQuery.DEFAULT_TIE_BREAKER, boost: Decimal? = nil, name: String? = nil) {
         self.tieBreaker = tieBreaker
         self.boost = boost
         self.queries = queries
+        self.name = name
     }
 
     internal init(withBuilder builder: DisMaxQueryBuilder) throws {
@@ -169,7 +183,7 @@ public struct DisMaxQuery: Query {
             throw QueryBuilderError.missingRequiredField("query")
         }
 
-        self.init(builder.queries, tieBreaker: builder.tieBreaker ?? DisMaxQuery.DEFAULT_TIE_BREAKER, boost: builder.boost)
+        self.init(builder.queries, tieBreaker: builder.tieBreaker ?? DisMaxQuery.DEFAULT_TIE_BREAKER, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -180,6 +194,7 @@ extension DisMaxQuery {
         tieBreaker = try nested.decodeDecimal(forKey: .tieBreaker)
         queries = try nested.decodeQueries(forKey: .queries)
         boost = try nested.decodeDecimalIfPresent(forKey: .boost)
+        name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -189,11 +204,13 @@ extension DisMaxQuery {
         try nested.encode(queries, forKey: .queries)
         try nested.encode(tieBreaker, forKey: .tieBreaker)
         try nested.encodeIfPresent(boost, forKey: .boost)
+        try nested.encodeIfPresent(name, forKey: .name)
     }
 
     enum CodingKeys: String, CodingKey {
         case queries
         case boost
+        case name
         case tieBreaker = "tie_breaker"
     }
 }
@@ -203,6 +220,7 @@ extension DisMaxQuery: Equatable {
         return lhs.queryType.isEqualTo(rhs.queryType)
             && lhs.tieBreaker == rhs.tieBreaker
             && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
             && lhs.queries.count == rhs.queries.count
             && !zip(lhs.queries, rhs.queries).contains { !$0.isEqualTo($1) }
     }
@@ -214,14 +232,15 @@ public struct FunctionScoreQuery: Query {
     public let queryType: QueryType = QueryTypes.functionScore
 
     public let query: Query
-    public let boost: Decimal?
     public let boostMode: BoostMode?
     public let maxBoost: Decimal?
     public let scoreMode: ScoreMode?
     public let minScore: Decimal?
     public let functions: [ScoreFunction]
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(query: Query, boost: Decimal? = nil, boostMode: BoostMode? = nil, maxBoost: Decimal? = nil, scoreMode: ScoreMode? = nil, minScore: Decimal? = nil, functions: [ScoreFunction]) {
+    public init(query: Query, boost: Decimal? = nil, boostMode: BoostMode? = nil, maxBoost: Decimal? = nil, scoreMode: ScoreMode? = nil, minScore: Decimal? = nil, functions: [ScoreFunction], name: String? = nil) {
         self.query = query
         self.boost = boost
         self.boostMode = boostMode
@@ -229,10 +248,11 @@ public struct FunctionScoreQuery: Query {
         self.scoreMode = scoreMode
         self.minScore = minScore
         self.functions = functions
+        self.name = name
     }
 
-    public init(query: Query, boost: Decimal? = nil, boostMode: BoostMode? = nil, maxBoost: Decimal? = nil, scoreMode: ScoreMode? = nil, minScore: Decimal? = nil, functions: ScoreFunction...) {
-        self.init(query: query, boost: boost, boostMode: boostMode, maxBoost: maxBoost, scoreMode: scoreMode, minScore: minScore, functions: functions)
+    public init(query: Query, boost: Decimal? = nil, name: String? = nil, boostMode: BoostMode? = nil, maxBoost: Decimal? = nil, scoreMode: ScoreMode? = nil, minScore: Decimal? = nil, functions: ScoreFunction...) {
+        self.init(query: query, boost: boost, boostMode: boostMode, maxBoost: maxBoost, scoreMode: scoreMode, minScore: minScore, functions: functions, name: name)
     }
 
     internal init(withBuilder builder: FunctionScoreQueryBuilder) throws {
@@ -244,7 +264,7 @@ public struct FunctionScoreQuery: Query {
             throw QueryBuilderError.atlestOneElementRequired("functions")
         }
 
-        self.init(query: builder.query!, boost: builder.boost, boostMode: builder.boostMode, maxBoost: builder.maxBoost, scoreMode: builder.scoreMode, minScore: builder.minScore, functions: builder.functions)
+        self.init(query: builder.query!, boost: builder.boost, boostMode: builder.boostMode, maxBoost: builder.maxBoost, scoreMode: builder.scoreMode, minScore: builder.minScore, functions: builder.functions, name: builder.name)
     }
 }
 
@@ -255,6 +275,7 @@ extension FunctionScoreQuery {
         query = try nested.decodeQuery(forKey: .query)
         functions = try nested.decodeScoreFunctionsIfPresent(forKey: .functions) ?? []
         boost = try nested.decodeDecimalIfPresent(forKey: .boost)
+        name = try nested.decodeStringIfPresent(forKey: .name)
         scoreMode = try nested.decodeIfPresent(ScoreMode.self, forKey: .scoreMode)
         boostMode = try nested.decodeIfPresent(BoostMode.self, forKey: .boostMode)
         maxBoost = try nested.decodeDecimalIfPresent(forKey: .maxBoost)
@@ -268,6 +289,7 @@ extension FunctionScoreQuery {
         try nested.encodeIfPresent(scoreMode, forKey: .scoreMode)
         try nested.encodeIfPresent(boostMode, forKey: .boostMode)
         try nested.encodeIfPresent(boost, forKey: .boost)
+        try nested.encodeIfPresent(name, forKey: .name)
         try nested.encodeIfPresent(maxBoost, forKey: .maxBoost)
         try nested.encodeIfPresent(minScore, forKey: .minScore)
         if !functions.isEmpty {
@@ -278,6 +300,7 @@ extension FunctionScoreQuery {
     enum CodingKeys: String, CodingKey {
         case query
         case boost
+        case name
         case boostMode = "boost_mode"
         case maxBoost = "max_boost"
         case scoreMode = "score_mode"
@@ -297,6 +320,7 @@ extension FunctionScoreQuery: Equatable {
             && lhs.scoreMode == rhs.scoreMode
             && lhs.functions.count == rhs.functions.count
             && !zip(lhs.functions, rhs.functions).contains { !$0.isEqualTo($1) }
+            && lhs.name == rhs.name
     }
 }
 
@@ -308,11 +332,15 @@ public struct BoostingQuery: Query {
     public let negative: Query
     public let positive: Query
     public let negativeBoost: Decimal?
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(positive: Query, negative: Query, negativeBoost: Decimal? = nil) {
+    public init(positive: Query, negative: Query, negativeBoost: Decimal? = nil, boost: Decimal? = nil, name: String? = nil) {
         self.positive = positive
         self.negative = negative
         self.negativeBoost = negativeBoost
+        self.boost = boost
+        self.name = name
     }
 
     internal init(withBuilder builder: BoostingQueryBuilder) throws {
@@ -324,7 +352,7 @@ public struct BoostingQuery: Query {
             throw QueryBuilderError.missingRequiredField("negative")
         }
 
-        self.init(positive: builder.positive!, negative: builder.negative!, negativeBoost: builder.negativeBoost)
+        self.init(positive: builder.positive!, negative: builder.negative!, negativeBoost: builder.negativeBoost, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -335,6 +363,8 @@ extension BoostingQuery {
         negative = try nested.decodeQuery(forKey: .negative)
         positive = try nested.decodeQuery(forKey: .positive)
         negativeBoost = try nested.decodeDecimalIfPresent(forKey: .negativeBoost)
+        boost = try nested.decodeDecimalIfPresent(forKey: .boost)
+        name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -344,12 +374,16 @@ extension BoostingQuery {
         try nested.encode(positive, forKey: .positive)
         try nested.encode(negative, forKey: .negative)
         try nested.encodeIfPresent(negativeBoost, forKey: .negativeBoost)
+        try nested.encodeIfPresent(boost, forKey: .boost)
+        try nested.encodeIfPresent(name, forKey: .name)
     }
 
     enum CodingKeys: String, CodingKey {
         case positive
         case negative
         case negativeBoost = "negative_boost"
+        case boost
+        case name
     }
 }
 
@@ -359,5 +393,7 @@ extension BoostingQuery: Equatable {
             && lhs.negative.isEqualTo(rhs.negative)
             && lhs.positive.isEqualTo(rhs.positive)
             && lhs.negativeBoost == rhs.negativeBoost
+            && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 }

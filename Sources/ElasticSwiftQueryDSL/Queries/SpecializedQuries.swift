@@ -19,6 +19,8 @@ public struct MoreLikeThisQuery: Query {
     public let likeItems: [Item]?
     public let unlikeTexts: [String]?
     public let unlikeItems: [Item]?
+    public var boost: Decimal?
+    public var name: String?
 
     // term selection parameters
     public var maxQueryTerms: Int?
@@ -39,7 +41,7 @@ public struct MoreLikeThisQuery: Query {
     // other parameters
     public var failOnUnsupportedField: Bool?
 
-    internal init(fields: [String]? = nil, likeTexts: [String]?, likeItems: [Item]? = nil, unlikeTexts: [String]? = nil, unlikeItems: [Item]? = nil, maxQueryTerms: Int? = nil, minTermFreq: Int? = nil, minDocFreq: Int? = nil, maxDocFreq: Int? = nil, minWordLength: Int? = nil, maxWordLength: Int? = nil, stopWords: [String]? = nil, analyzer: String? = nil, minimumShouldMatch: String? = nil, boostTerms: Decimal? = nil, include: Bool? = nil, failOnUnsupportedField: Bool? = nil) {
+    internal init(fields: [String]? = nil, likeTexts: [String]?, likeItems: [Item]? = nil, unlikeTexts: [String]? = nil, unlikeItems: [Item]? = nil, maxQueryTerms: Int? = nil, minTermFreq: Int? = nil, minDocFreq: Int? = nil, maxDocFreq: Int? = nil, minWordLength: Int? = nil, maxWordLength: Int? = nil, stopWords: [String]? = nil, analyzer: String? = nil, minimumShouldMatch: String? = nil, boostTerms: Decimal? = nil, include: Bool? = nil, failOnUnsupportedField: Bool? = nil, boost: Decimal? = nil, name: String? = nil) {
         self.fields = fields
         self.likeTexts = likeTexts
         self.likeItems = likeItems
@@ -57,10 +59,12 @@ public struct MoreLikeThisQuery: Query {
         self.boostTerms = boostTerms
         self.include = include
         self.failOnUnsupportedField = failOnUnsupportedField
+        self.boost = boost
+        self.name = name
     }
 
-    public init(_ likeTexts: [String], likeItems: [Item]? = nil, unlikeTexts: [String]? = nil, unlikeItems: [Item]? = nil, fields: [String]? = nil, maxQueryTerms: Int? = nil, minTermFreq: Int? = nil, minDocFreq: Int? = nil, maxDocFreq: Int? = nil, minWordLength: Int? = nil, maxWordLength: Int? = nil, stopWords: [String]? = nil, analyzer: String? = nil, minimumShouldMatch: String? = nil, boostTerms: Decimal? = nil, include: Bool? = nil, failOnUnsupportedField: Bool? = nil) {
-        self.init(fields: fields, likeTexts: likeTexts, likeItems: likeItems, unlikeTexts: unlikeTexts, unlikeItems: unlikeItems, maxQueryTerms: maxQueryTerms, minTermFreq: minTermFreq, minDocFreq: minDocFreq, maxDocFreq: maxDocFreq, minWordLength: minWordLength, maxWordLength: maxWordLength, stopWords: stopWords, analyzer: analyzer, minimumShouldMatch: minimumShouldMatch, boostTerms: boostTerms, include: include, failOnUnsupportedField: failOnUnsupportedField)
+    public init(_ likeTexts: [String], likeItems: [Item]? = nil, unlikeTexts: [String]? = nil, unlikeItems: [Item]? = nil, fields: [String]? = nil, maxQueryTerms: Int? = nil, minTermFreq: Int? = nil, minDocFreq: Int? = nil, maxDocFreq: Int? = nil, minWordLength: Int? = nil, maxWordLength: Int? = nil, stopWords: [String]? = nil, analyzer: String? = nil, minimumShouldMatch: String? = nil, boostTerms: Decimal? = nil, include: Bool? = nil, failOnUnsupportedField: Bool? = nil, boost: Decimal? = nil, name: String? = nil) {
+        self.init(fields: fields, likeTexts: likeTexts, likeItems: likeItems, unlikeTexts: unlikeTexts, unlikeItems: unlikeItems, maxQueryTerms: maxQueryTerms, minTermFreq: minTermFreq, minDocFreq: minDocFreq, maxDocFreq: maxDocFreq, minWordLength: minWordLength, maxWordLength: maxWordLength, stopWords: stopWords, analyzer: analyzer, minimumShouldMatch: minimumShouldMatch, boostTerms: boostTerms, include: include, failOnUnsupportedField: failOnUnsupportedField, boost: boost, name: name)
     }
 
     internal init(withBuilder builder: MoreLikeThisQueryBuilder) throws {
@@ -68,7 +72,7 @@ public struct MoreLikeThisQuery: Query {
             throw QueryBuilderError.atlestOneElementRequired("likeTexts OR likeItems")
         }
 
-        self.init(fields: builder.fields, likeTexts: builder.likeTexts, likeItems: builder.likeItems, unlikeTexts: builder.unlikeTexts, unlikeItems: builder.unlikeItems, maxQueryTerms: builder.maxQueryTerms, minTermFreq: builder.minTermFreq, minDocFreq: builder.minDocFreq, maxDocFreq: builder.maxDocFreq, minWordLength: builder.minWordLength, maxWordLength: builder.maxWordLength, stopWords: builder.stopWords, analyzer: builder.analyzer, minimumShouldMatch: builder.minimumShouldMatch, boostTerms: builder.boostTerms, include: builder.include, failOnUnsupportedField: builder.failOnUnsupportedField)
+        self.init(fields: builder.fields, likeTexts: builder.likeTexts, likeItems: builder.likeItems, unlikeTexts: builder.unlikeTexts, unlikeItems: builder.unlikeItems, maxQueryTerms: builder.maxQueryTerms, minTermFreq: builder.minTermFreq, minDocFreq: builder.minDocFreq, maxDocFreq: builder.maxDocFreq, minWordLength: builder.minWordLength, maxWordLength: builder.maxWordLength, stopWords: builder.stopWords, analyzer: builder.analyzer, minimumShouldMatch: builder.minimumShouldMatch, boostTerms: builder.boostTerms, include: builder.include, failOnUnsupportedField: builder.failOnUnsupportedField, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -89,22 +93,24 @@ extension MoreLikeThisQuery {
         boostTerms = try nested.decodeDecimalIfPresent(forKey: .boostTerms)
         include = try nested.decodeBoolIfPresent(forKey: .include)
 
-        func decodeLikeUnlike(container: KeyedDecodingContainer<CodingKeys>, key _: CodingKeys) throws -> ([String]?, [Item]?) {
+        func decodeLikeUnlike(container: KeyedDecodingContainer<CodingKeys>, key: CodingKeys) throws -> ([String]?, [Item]?) {
             var texts = [String]()
             var items = [Item]()
-            if let likeS = try? container.decodeString(forKey: .like) {
-                texts.append(likeS)
-            } else if let likeI = try? container.decode(Item.self, forKey: .like) {
-                items.append(likeI)
-            } else {
-                var likeAC = try container.nestedUnkeyedContainer(forKey: .like)
+            if container.contains(key) {
+                if let likeS = try? container.decodeString(forKey: key) {
+                    texts.append(likeS)
+                } else if let likeI = try? container.decode(Item.self, forKey: key) {
+                    items.append(likeI)
+                } else {
+                    var likeAC = try container.nestedUnkeyedContainer(forKey: key)
 
-                while !likeAC.isAtEnd {
-                    if let likeI = try? likeAC.decode(Item.self) {
-                        items.append(likeI)
-                    } else {
-                        let likeT = try likeAC.decodeString()
-                        texts.append(likeT)
+                    while !likeAC.isAtEnd {
+                        if let likeI = try? likeAC.decode(Item.self) {
+                            items.append(likeI)
+                        } else {
+                            let likeT = try likeAC.decodeString()
+                            texts.append(likeT)
+                        }
                     }
                 }
             }
@@ -124,6 +130,8 @@ extension MoreLikeThisQuery {
         likeItems = y
         unlikeTexts = p
         unlikeItems = q
+        boost = try nested.decodeDecimalIfPresent(forKey: .boost)
+        name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -170,6 +178,8 @@ extension MoreLikeThisQuery {
                 try nested.encode(unlike, forKey: .unlike)
             }
         }
+        try nested.encodeIfPresent(boost, forKey: .boost)
+        try nested.encodeIfPresent(name, forKey: .name)
     }
 
     enum CodingKeys: String, CodingKey {
@@ -189,6 +199,8 @@ extension MoreLikeThisQuery {
         case boostTerms = "boost_terms"
         case include
         case failOnUnsupportedField = "fail_on_unsupported_field"
+        case boost
+        case name
     }
 }
 
@@ -245,6 +257,25 @@ extension MoreLikeThisQuery.Item: Equatable {}
 extension MoreLikeThisQuery: Equatable {
     public static func == (lhs: MoreLikeThisQuery, rhs: MoreLikeThisQuery) -> Bool {
         return lhs.queryType.isEqualTo(rhs.queryType)
+            && lhs.fields == rhs.fields
+            && lhs.likeTexts == rhs.likeTexts
+            && lhs.likeItems == rhs.likeItems
+            && lhs.unlikeTexts == rhs.unlikeTexts
+            && lhs.unlikeItems == rhs.unlikeItems
+            && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
+            && lhs.maxQueryTerms == rhs.maxQueryTerms
+            && lhs.minTermFreq == rhs.minTermFreq
+            && lhs.minDocFreq == rhs.minDocFreq
+            && lhs.maxDocFreq == rhs.maxDocFreq
+            && lhs.minWordLength == rhs.minWordLength
+            && lhs.maxWordLength == rhs.maxWordLength
+            && lhs.stopWords == rhs.stopWords
+            && lhs.analyzer == rhs.analyzer
+            && lhs.minimumShouldMatch == rhs.minimumShouldMatch
+            && lhs.boostTerms == rhs.boostTerms
+            && lhs.include == rhs.include
+            && lhs.failOnUnsupportedField == rhs.failOnUnsupportedField
     }
 }
 
@@ -254,16 +285,20 @@ public struct ScriptQuery: Query {
     public let queryType: QueryType = QueryTypes.script
 
     public let script: Script
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(_ script: Script) {
+    public init(_ script: Script, boost: Decimal? = nil, name: String? = nil) {
         self.script = script
+        self.boost = boost
+        self.name = name
     }
 
     internal init(withBuilder builder: ScriptQueryBuilder) throws {
         guard let script = builder.script else {
             throw QueryBuilderError.missingRequiredField("script")
         }
-        self.init(script)
+        self.init(script, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -272,16 +307,22 @@ extension ScriptQuery {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         script = try nested.decode(Script.self, forKey: .script)
+        boost = try nested.decodeDecimalIfPresent(forKey: .boost)
+        name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
     public func encode(to encoder: Encoder) throws {
         var contianer = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = contianer.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         try nested.encode(script, forKey: .script)
+        try nested.encodeIfPresent(boost, forKey: .boost)
+        try nested.encodeIfPresent(name, forKey: .name)
     }
 
     enum CodingKeys: String, CodingKey {
         case script
+        case boost
+        case name
     }
 }
 
@@ -289,6 +330,8 @@ extension ScriptQuery: Equatable {
     public static func == (lhs: ScriptQuery, rhs: ScriptQuery) -> Bool {
         return lhs.queryType.isEqualTo(rhs.queryType)
             && lhs.script == rhs.script
+            && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 }
 
@@ -305,8 +348,10 @@ public struct PercolateQuery: Query {
     public var routing: String?
     public var preference: String?
     public var version: Int?
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(_ field: String, documents: [CodableValue]) {
+    public init(_ field: String, documents: [CodableValue], boost: Decimal? = nil, name: String? = nil) {
         self.field = field
         self.documents = documents
         index = nil
@@ -315,13 +360,15 @@ public struct PercolateQuery: Query {
         routing = nil
         preference = nil
         version = nil
+        self.boost = boost
+        self.name = name
     }
 
-    public init(_ field: String, documents: CodableValue...) {
-        self.init(field, documents: documents)
+    public init(_ field: String, documents: CodableValue..., boost: Decimal? = nil, name: String? = nil) {
+        self.init(field, documents: documents, boost: boost, name: name)
     }
 
-    public init(_ field: String, index: String, type: String, id: String, routing: String? = nil, preference: String? = nil, version: Int? = nil) {
+    public init(_ field: String, index: String, type: String, id: String, routing: String? = nil, preference: String? = nil, version: Int? = nil, boost: Decimal? = nil, name: String? = nil) {
         self.field = field
         self.index = index
         self.type = type
@@ -330,6 +377,8 @@ public struct PercolateQuery: Query {
         self.preference = preference
         self.version = version
         documents = nil
+        self.boost = boost
+        self.name = name
     }
 
     internal init(withBuilder builder: PercoloteQueryBuilder) throws {
@@ -342,11 +391,11 @@ public struct PercolateQuery: Query {
                 throw QueryBuilderError.atleastOneFieldRequired(["documents", "index AND type AND id"])
             }
 
-            self.init(field, index: index, type: type, id: id, routing: builder.routing, preference: builder.preference, version: builder.version)
+            self.init(field, index: index, type: type, id: id, routing: builder.routing, preference: builder.preference, version: builder.version, boost: builder.boost, name: builder.name)
             return
         }
 
-        self.init(field, documents: documents)
+        self.init(field, documents: documents, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -378,6 +427,8 @@ extension PercolateQuery {
             preference = try nested.decodeStringIfPresent(forKey: .preference)
             version = try nested.decodeIntIfPresent(forKey: .version)
         }
+        boost = try nested.decodeDecimalIfPresent(forKey: .boost)
+        name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -390,7 +441,6 @@ extension PercolateQuery {
             } else {
                 try nested.encode(documents, forKey: .documents)
             }
-            return
         } else {
             try nested.encode(index!, forKey: .index)
             try nested.encode(type!, forKey: .type)
@@ -399,6 +449,8 @@ extension PercolateQuery {
             try nested.encodeIfPresent(preference, forKey: .preference)
             try nested.encodeIfPresent(version, forKey: .version)
         }
+        try nested.encodeIfPresent(boost, forKey: .boost)
+        try nested.encodeIfPresent(name, forKey: .name)
     }
 
     enum CodingKeys: String, CodingKey {
@@ -411,6 +463,8 @@ extension PercolateQuery {
         case routing
         case preference
         case version
+        case boost
+        case name
     }
 }
 
@@ -425,6 +479,8 @@ extension PercolateQuery: Equatable {
             && lhs.routing == rhs.routing
             && lhs.preference == rhs.preference
             && lhs.version == rhs.version
+            && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 }
 
@@ -434,6 +490,8 @@ public struct WrapperQuery: Query {
     public let queryType: QueryType = QueryTypes.wrapper
 
     public let query: String
+    public var boost: Decimal?
+    public var name: String?
 
     public init(_ query: String) {
         self.query = query

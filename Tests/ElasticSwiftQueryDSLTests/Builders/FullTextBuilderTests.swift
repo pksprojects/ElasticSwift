@@ -243,15 +243,15 @@ class FullTextBuilderTests: XCTestCase {
     }
 
     func test_22_commonTermsQueryBuilder() throws {
-        XCTAssertNoThrow(try QueryBuilders.commonTermsQuery().set(query: "test search").set(cutoffFrequency: 0.001).build(), "Should not throw")
+        XCTAssertNoThrow(try QueryBuilders.commonTermsQuery().set(field: "field").set(query: "test search").set(cutoffFrequency: 0.001).build(), "Should not throw")
     }
 
     func test_23_commonTermsQueryBuilder() throws {
-        XCTAssertNoThrow(try QueryBuilders.commonTermsQuery().set(query: "test search").set(cutoffFrequency: 0.001).set(highFrequencyOperator: .and).set(lowFrequencyOperator: .or).set(minimumShouldMatch: 2).build(), "Should not throw")
+        XCTAssertNoThrow(try QueryBuilders.commonTermsQuery().set(field: "field").set(query: "test search").set(cutoffFrequency: 0.001).set(highFrequencyOperator: .and).set(lowFrequencyOperator: .or).set(minimumShouldMatch: 2).build(), "Should not throw")
     }
 
     func test_24_commonTermsQueryBuilder_missing_field() throws {
-        XCTAssertThrowsError(try QueryBuilders.commonTermsQuery().set(query: "test search").build(), "Should not throw") { error in
+        XCTAssertThrowsError(try QueryBuilders.commonTermsQuery().set(field: "field").set(query: "test search").build(), "Should not throw") { error in
             logger.info("Expected Error: \(error)")
             if let error = error as? QueryBuilderError {
                 switch error {
@@ -280,12 +280,14 @@ class FullTextBuilderTests: XCTestCase {
 
     func test_26_commonTermsQueryBuilder() throws {
         let query = try QueryBuilders.commonTermsQuery()
+            .set(field: "field")
             .set(query: "this is a test")
             .set(cutoffFrequency: 0.001)
             .set(highFrequencyOperator: .and)
             .set(lowFrequencyOperator: .or)
             .set(minimumShouldMatch: 2)
             .build()
+        XCTAssertEqual(query.field, "field")
         XCTAssertEqual(query.cutoffFrequency, 0.001)
         XCTAssertEqual(query.query, "this is a test")
         XCTAssertEqual(query.highFrequencyOperator, .and)
@@ -295,6 +297,7 @@ class FullTextBuilderTests: XCTestCase {
 
     func test_27_commonTermsQueryBuilder() throws {
         let query = try QueryBuilders.commonTermsQuery()
+            .set(field: "field")
             .set(query: "this is a test")
             .set(cutoffFrequency: 0.001)
             .set(highFrequencyOperator: .and)
@@ -302,6 +305,7 @@ class FullTextBuilderTests: XCTestCase {
             .set(minimumShouldMatchLowFreq: 2)
             .set(minimumShouldMatchHighFreq: 3)
             .build()
+        XCTAssertEqual(query.field, "field")
         XCTAssertEqual(query.cutoffFrequency, 0.001)
         XCTAssertEqual(query.query, "this is a test")
         XCTAssertEqual(query.highFrequencyOperator, .and)

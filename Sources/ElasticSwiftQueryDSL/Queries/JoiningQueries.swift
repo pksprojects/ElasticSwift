@@ -19,13 +19,17 @@ public struct NestedQuery: Query {
     public let scoreMode: ScoreMode?
     public let ignoreUnmapped: Bool?
     public let innerHits: CodableValue?
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(_ path: String, query: Query, scoreMode: ScoreMode? = nil, ignoreUnmapped: Bool? = nil, innerHits: CodableValue? = nil) {
+    public init(_ path: String, query: Query, scoreMode: ScoreMode? = nil, ignoreUnmapped: Bool? = nil, innerHits: CodableValue? = nil, boost: Decimal? = nil, name: String? = nil) {
         self.path = path
         self.query = query
         self.scoreMode = scoreMode
         self.ignoreUnmapped = ignoreUnmapped
         self.innerHits = innerHits
+        self.boost = boost
+        self.name = name
     }
 
     internal init(withBuilder builder: NestedQueryBuilder) throws {
@@ -37,7 +41,7 @@ public struct NestedQuery: Query {
             throw QueryBuilderError.missingRequiredField("query")
         }
 
-        self.init(builder.path!, query: builder.query!, scoreMode: builder.scoreMode, ignoreUnmapped: builder.ignoreUnmapped, innerHits: builder.innerHits)
+        self.init(builder.path!, query: builder.query!, scoreMode: builder.scoreMode, ignoreUnmapped: builder.ignoreUnmapped, innerHits: builder.innerHits, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -56,6 +60,8 @@ extension NestedQuery {
         ignoreUnmapped = try nested.decodeBoolIfPresent(forKey: .ignoreUnmapped)
         scoreMode = try nested.decodeIfPresent(ScoreMode.self, forKey: .scoreMode)
         innerHits = try nested.decodeIfPresent(CodableValue.self, forKey: .innerHits)
+        boost = try nested.decodeDecimalIfPresent(forKey: .boost)
+        name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -66,6 +72,8 @@ extension NestedQuery {
         try nested.encodeIfPresent(scoreMode, forKey: .scoreMode)
         try nested.encodeIfPresent(ignoreUnmapped, forKey: .ignoreUnmapped)
         try nested.encodeIfPresent(innerHits, forKey: .innerHits)
+        try nested.encodeIfPresent(boost, forKey: .boost)
+        try nested.encodeIfPresent(name, forKey: .name)
     }
 
     enum CodingKeys: String, CodingKey {
@@ -74,6 +82,8 @@ extension NestedQuery {
         case scoreMode = "score_mode"
         case ignoreUnmapped = "ignore_unmapped"
         case innerHits = "inner_hits"
+        case boost
+        case name
     }
 }
 
@@ -85,6 +95,8 @@ extension NestedQuery: Equatable {
             && lhs.scoreMode == rhs.scoreMode
             && lhs.ignoreUnmapped == rhs.ignoreUnmapped
             && lhs.innerHits == rhs.innerHits
+            && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 }
 
@@ -100,8 +112,10 @@ public struct HasChildQuery: Query {
     public let maxChildren: Int?
     public let ignoreUnmapped: Bool?
     public let innerHits: CodableValue?
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(_ type: String, query: Query, scoreMode: ScoreMode? = nil, minChildren: Int? = nil, maxChildren: Int? = nil, ignoreUnmapped: Bool? = nil, innerHits: CodableValue? = nil) {
+    public init(_ type: String, query: Query, scoreMode: ScoreMode? = nil, minChildren: Int? = nil, maxChildren: Int? = nil, ignoreUnmapped: Bool? = nil, innerHits: CodableValue? = nil, boost: Decimal? = nil, name: String? = nil) {
         self.type = type
         self.query = query
         self.scoreMode = scoreMode
@@ -109,6 +123,8 @@ public struct HasChildQuery: Query {
         self.minChildren = minChildren
         self.ignoreUnmapped = ignoreUnmapped
         self.innerHits = innerHits
+        self.boost = boost
+        self.name = name
     }
 
     internal init(withBuilder builder: HasChildQueryBuilder) throws {
@@ -120,7 +136,7 @@ public struct HasChildQuery: Query {
             throw QueryBuilderError.missingRequiredField("query")
         }
 
-        self.init(builder.type!, query: builder.query!, scoreMode: builder.scoreMode, minChildren: builder.minChildren, maxChildren: builder.maxChildren, ignoreUnmapped: builder.ignoreUnmapped, innerHits: builder.innerHits)
+        self.init(builder.type!, query: builder.query!, scoreMode: builder.scoreMode, minChildren: builder.minChildren, maxChildren: builder.maxChildren, ignoreUnmapped: builder.ignoreUnmapped, innerHits: builder.innerHits, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -141,6 +157,8 @@ extension HasChildQuery {
         innerHits = try nested.decodeIfPresent(CodableValue.self, forKey: .innerHits)
         minChildren = try nested.decodeIntIfPresent(forKey: .minChildren)
         maxChildren = try nested.decodeIntIfPresent(forKey: .maxChildren)
+        boost = try nested.decodeDecimalIfPresent(forKey: .boost)
+        name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -153,6 +171,8 @@ extension HasChildQuery {
         try nested.encodeIfPresent(innerHits, forKey: .innerHits)
         try nested.encodeIfPresent(minChildren, forKey: .minChildren)
         try nested.encodeIfPresent(maxChildren, forKey: .maxChildren)
+        try nested.encodeIfPresent(boost, forKey: .boost)
+        try nested.encodeIfPresent(name, forKey: .name)
     }
 
     enum CodingKeys: String, CodingKey {
@@ -163,6 +183,8 @@ extension HasChildQuery {
         case maxChildren = "max_children"
         case ignoreUnmapped = "ignore_unmapped"
         case innerHits = "inner_hits"
+        case boost
+        case name
     }
 }
 
@@ -175,6 +197,8 @@ extension HasChildQuery: Equatable {
             && lhs.minChildren == rhs.minChildren
             && lhs.maxChildren == rhs.maxChildren
             && lhs.ignoreUnmapped == rhs.ignoreUnmapped
+            && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 }
 
@@ -188,13 +212,17 @@ public struct HasParentQuery: Query {
     public let score: Bool?
     public let ignoreUnmapped: Bool?
     public let innerHits: CodableValue?
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(_ parentType: String, query: Query, score: Bool? = nil, ignoreUnmapped: Bool? = nil, innerHits: CodableValue? = nil) {
+    public init(_ parentType: String, query: Query, score: Bool? = nil, ignoreUnmapped: Bool? = nil, innerHits: CodableValue? = nil, boost: Decimal? = nil, name: String? = nil) {
         self.parentType = parentType
         self.query = query
         self.score = score
         self.ignoreUnmapped = ignoreUnmapped
         self.innerHits = innerHits
+        self.boost = boost
+        self.name = name
     }
 
     internal init(withBuilder builder: HasParentQueryBuilder) throws {
@@ -206,7 +234,7 @@ public struct HasParentQuery: Query {
             throw QueryBuilderError.missingRequiredField("query")
         }
 
-        self.init(builder.parentType!, query: builder.query!, score: builder.score, ignoreUnmapped: builder.ignoreUnmapped, innerHits: builder.innerHits)
+        self.init(builder.parentType!, query: builder.query!, score: builder.score, ignoreUnmapped: builder.ignoreUnmapped, innerHits: builder.innerHits, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -225,6 +253,8 @@ extension HasParentQuery {
         ignoreUnmapped = try nested.decodeBoolIfPresent(forKey: .ignoreUnmapped)
         score = try nested.decodeBoolIfPresent(forKey: .score)
         innerHits = try nested.decodeIfPresent(CodableValue.self, forKey: .innerHits)
+        boost = try nested.decodeDecimalIfPresent(forKey: .boost)
+        name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -235,6 +265,8 @@ extension HasParentQuery {
         try nested.encodeIfPresent(score, forKey: .score)
         try nested.encodeIfPresent(ignoreUnmapped, forKey: .ignoreUnmapped)
         try nested.encodeIfPresent(innerHits, forKey: .innerHits)
+        try nested.encodeIfPresent(boost, forKey: .boost)
+        try nested.encodeIfPresent(name, forKey: .name)
     }
 
     enum CodingKeys: String, CodingKey {
@@ -243,6 +275,8 @@ extension HasParentQuery {
         case score
         case ignoreUnmapped = "ignore_unmapped"
         case innerHits = "inner_hits"
+        case boost
+        case name
     }
 }
 
@@ -254,6 +288,8 @@ extension HasParentQuery: Equatable {
             && lhs.score == rhs.score
             && lhs.ignoreUnmapped == rhs.ignoreUnmapped
             && lhs.innerHits == rhs.innerHits
+            && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 }
 
@@ -265,11 +301,15 @@ public struct ParentIdQuery: Query {
     public let type: String
     public let id: String
     public let ignoreUnmapped: Bool?
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(_ id: String, type: String, ignoreUnmapped: Bool? = nil) {
+    public init(_ id: String, type: String, ignoreUnmapped: Bool? = nil, boost: Decimal? = nil, name: String? = nil) {
         self.id = id
         self.type = type
         self.ignoreUnmapped = ignoreUnmapped
+        self.boost = boost
+        self.name = name
     }
 
     internal init(withBuilder builder: ParentIdQueryBuilder) throws {
@@ -280,7 +320,7 @@ public struct ParentIdQuery: Query {
         guard builder.type != nil else {
             throw QueryBuilderError.missingRequiredField("type")
         }
-        self.init(builder.id!, type: builder.type!, ignoreUnmapped: builder.ignoreUnmapped)
+        self.init(builder.id!, type: builder.type!, ignoreUnmapped: builder.ignoreUnmapped, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -297,6 +337,8 @@ extension ParentIdQuery {
         type = try nested.decodeString(forKey: .type)
         id = try nested.decodeString(forKey: .id)
         ignoreUnmapped = try nested.decodeBoolIfPresent(forKey: .ignoreUnmapped)
+        boost = try nested.decodeDecimalIfPresent(forKey: .boost)
+        name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -305,12 +347,16 @@ extension ParentIdQuery {
         try nested.encode(type, forKey: .type)
         try nested.encode(id, forKey: .id)
         try nested.encodeIfPresent(ignoreUnmapped, forKey: .ignoreUnmapped)
+        try nested.encodeIfPresent(boost, forKey: .boost)
+        try nested.encodeIfPresent(name, forKey: .name)
     }
 
     enum CodingKeys: String, CodingKey {
         case type
         case id
         case ignoreUnmapped = "ignore_unmapped"
+        case boost
+        case name
     }
 }
 
@@ -320,5 +366,7 @@ extension ParentIdQuery: Equatable {
             && lhs.id == rhs.id
             && lhs.type == rhs.type
             && lhs.ignoreUnmapped == rhs.ignoreUnmapped
+            && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 }

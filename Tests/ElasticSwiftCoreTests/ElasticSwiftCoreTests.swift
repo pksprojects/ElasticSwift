@@ -267,9 +267,13 @@ enum MyTestQueryType: String, QueryType {
 struct MyTestQuery: Query, Equatable {
     static func == (lhs: MyTestQuery, rhs: MyTestQuery) -> Bool {
         return lhs.queryType.isEqualTo(rhs.queryType)
+            && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 
     var queryType: QueryType = MyTestQueryType.random1
+    var boost: Decimal?
+    var name: String?
 
     func toDic() -> [String: Any] {
         return [:]
@@ -296,9 +300,14 @@ struct MyTestQuery: Query, Equatable {
 struct MyTestQuery2: Query, Equatable {
     static func == (lhs: MyTestQuery2, rhs: MyTestQuery2) -> Bool {
         return lhs.queryType.isEqualTo(rhs.queryType)
+            && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 
     var queryType: QueryType = MyQueryType.query2
+
+    var boost: Decimal?
+    var name: String?
 
     init() {}
 

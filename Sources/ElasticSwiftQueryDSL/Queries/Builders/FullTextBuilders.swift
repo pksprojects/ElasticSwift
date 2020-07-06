@@ -14,6 +14,7 @@ public class MatchQueryBuilder: QueryBuilder {
     private var _field: String?
     private var _value: String?
     private var _boost: Decimal?
+    private var _name: String?
     private var _operator: Operator?
     private var _zeroTermQuery: ZeroTermQuery?
     private var _cutoffFrequency: Decimal?
@@ -59,6 +60,12 @@ public class MatchQueryBuilder: QueryBuilder {
     }
 
     @discardableResult
+    public func set(name: String) -> MatchQueryBuilder {
+        _name = name
+        return self
+    }
+
+    @discardableResult
     public func set(fuzziness: Fuzziness) -> MatchQueryBuilder {
         _fuzziness = fuzziness
         return self
@@ -80,6 +87,10 @@ public class MatchQueryBuilder: QueryBuilder {
 
     public var boost: Decimal? {
         return _boost
+    }
+
+    public var name: String? {
+        return _name
     }
 
     public var `operator`: Operator? {
@@ -113,6 +124,8 @@ public class MatchPhraseQueryBuilder: QueryBuilder {
     private var _field: String?
     private var _value: String?
     private var _analyzer: String?
+    private var _name: String?
+    private var _boost: Decimal?
 
     public init() {}
 
@@ -134,6 +147,18 @@ public class MatchPhraseQueryBuilder: QueryBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(name: String) -> MatchPhraseQueryBuilder {
+        _name = name
+        return self
+    }
+
+    @discardableResult
+    public func set(boost: Decimal) -> MatchPhraseQueryBuilder {
+        _boost = boost
+        return self
+    }
+
     public var field: String? {
         return _field
     }
@@ -144,6 +169,14 @@ public class MatchPhraseQueryBuilder: QueryBuilder {
 
     public var analyzer: String? {
         return _analyzer
+    }
+
+    public var name: String? {
+        return _name
+    }
+
+    public var boost: Decimal? {
+        return _boost
     }
 
     public func build() throws -> MatchPhraseQuery {
@@ -157,6 +190,8 @@ public class MatchPhrasePrefixQueryBuilder: QueryBuilder {
     private var _field: String?
     private var _value: String?
     private var _maxExpansions: Int?
+    private var _name: String?
+    private var _boost: Decimal?
 
     public init() {}
 
@@ -178,6 +213,18 @@ public class MatchPhrasePrefixQueryBuilder: QueryBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(name: String) -> Self {
+        _name = name
+        return self
+    }
+
+    @discardableResult
+    public func set(boost: Decimal) -> Self {
+        _boost = boost
+        return self
+    }
+
     public var field: String? {
         return _field
     }
@@ -188,6 +235,14 @@ public class MatchPhrasePrefixQueryBuilder: QueryBuilder {
 
     public var maxExpansions: Int? {
         return _maxExpansions
+    }
+
+    public var name: String? {
+        return _name
+    }
+
+    public var boost: Decimal? {
+        return _boost
     }
 
     public func build() throws -> MatchPhrasePrefixQuery {
@@ -202,6 +257,8 @@ public class MultiMatchQueryBuilder: QueryBuilder {
     private var _fields: [String] = []
     private var _type: MultiMatchQueryType?
     private var _tieBreaker: Decimal?
+    private var _name: String?
+    private var _boost: Decimal?
 
     init() {}
 
@@ -235,6 +292,18 @@ public class MultiMatchQueryBuilder: QueryBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(name: String) -> Self {
+        _name = name
+        return self
+    }
+
+    @discardableResult
+    public func set(boost: Decimal) -> Self {
+        _boost = boost
+        return self
+    }
+
     public var query: String? {
         return _query
     }
@@ -251,6 +320,14 @@ public class MultiMatchQueryBuilder: QueryBuilder {
         return _tieBreaker
     }
 
+    public var name: String? {
+        return _name
+    }
+
+    public var boost: Decimal? {
+        return _boost
+    }
+
     @discardableResult
     public func build() throws -> MultiMatchQuery {
         return try MultiMatchQuery(withBuilder: self)
@@ -260,6 +337,7 @@ public class MultiMatchQueryBuilder: QueryBuilder {
 // MARK: - Builder for Common Terms query.
 
 public class CommonTermsQueryBuilder: QueryBuilder {
+    private var _field: String?
     private var _query: String?
     private var _cutoffFrequency: Decimal?
     private var _lowFrequencyOperator: Operator?
@@ -267,8 +345,16 @@ public class CommonTermsQueryBuilder: QueryBuilder {
     private var _minimumShouldMatch: Int?
     private var _minimumShouldMatchLowFreq: Int?
     private var _minimumShouldMatchHighFreq: Int?
+    private var _name: String?
+    private var _boost: Decimal?
 
     init() {}
+
+    @discardableResult
+    public func set(field: String) -> CommonTermsQueryBuilder {
+        _field = field
+        return self
+    }
 
     @discardableResult
     public func set(query: String) -> CommonTermsQueryBuilder {
@@ -312,6 +398,10 @@ public class CommonTermsQueryBuilder: QueryBuilder {
         return self
     }
 
+    public var field: String? {
+        return _field
+    }
+
     public var query: String? {
         return _query
     }
@@ -338,6 +428,14 @@ public class CommonTermsQueryBuilder: QueryBuilder {
 
     public var minimumShouldMatchHighFreq: Int? {
         return _minimumShouldMatchHighFreq
+    }
+
+    public var name: String? {
+        return _name
+    }
+
+    public var boost: Decimal? {
+        return _boost
     }
 
     public func build() throws -> CommonTermsQuery {
@@ -372,6 +470,7 @@ public class QueryStringQueryBuilder: QueryBuilder {
     private var _timeZone: String?
     private var _quoteFieldSuffix: String?
     private var _autoGenerateSynonymsPhraseQuery: Bool?
+    private var _name: String?
 
     public init() {}
 
@@ -519,6 +618,12 @@ public class QueryStringQueryBuilder: QueryBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(name: String) -> Self {
+        _name = name
+        return self
+    }
+
     public var defaultField: String? {
         return _defaultField
     }
@@ -615,6 +720,10 @@ public class QueryStringQueryBuilder: QueryBuilder {
         return _autoGenerateSynonymsPhraseQuery
     }
 
+    public var name: String? {
+        return _name
+    }
+
     public func build() throws -> QueryStringQuery {
         return try QueryStringQuery(withBuilder: self)
     }
@@ -635,6 +744,8 @@ public class SimpleQueryStringQueryBuilder: QueryBuilder {
     private var _fuzzyTranspositions: Bool?
     private var _quoteFieldSuffix: String?
     private var _autoGenerateSynonymsPhraseQuery: Bool?
+    private var _boost: Decimal?
+    private var _name: String?
 
     public init() {}
 
@@ -710,6 +821,18 @@ public class SimpleQueryStringQueryBuilder: QueryBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(boost: Decimal) -> Self {
+        _boost = boost
+        return self
+    }
+
+    @discardableResult
+    public func set(name: String) -> Self {
+        _name = name
+        return self
+    }
+
     public var query: String? {
         return _query
     }
@@ -756,6 +879,14 @@ public class SimpleQueryStringQueryBuilder: QueryBuilder {
 
     public var autoGenerateSynonymsPhraseQuery: Bool? {
         return _autoGenerateSynonymsPhraseQuery
+    }
+
+    public var boost: Decimal? {
+        return _boost
+    }
+
+    public var name: String? {
+        return _name
     }
 
     public func build() throws -> SimpleQueryStringQuery {
