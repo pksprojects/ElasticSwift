@@ -16,8 +16,9 @@ public struct MatchAllQuery: Query {
     public var boost: Decimal?
     public var name: String?
 
-    public init(boost: Decimal? = nil, name _: String? = nil) {
+    public init(boost: Decimal? = nil, name: String? = nil) {
         self.boost = boost
+        self.name = name
     }
 
     internal init(withBuilder builder: MatchAllQueryBuilder) throws {
@@ -50,7 +51,7 @@ extension MatchAllQuery: Equatable {
     public static func == (lhs: MatchAllQuery, rhs: MatchAllQuery) -> Bool {
         return lhs.queryType.isEqualTo(rhs.queryType)
             && lhs.boost == rhs.boost
-            && rhs.name == rhs.name
+            && lhs.name == rhs.name
     }
 }
 
@@ -97,6 +98,6 @@ extension MatchNoneQuery: Equatable {
     public static func == (lhs: MatchNoneQuery, rhs: MatchNoneQuery) -> Bool {
         return lhs.queryType.isEqualTo(rhs.queryType)
             && lhs.boost == rhs.boost
-            && rhs.name == rhs.name
+            && lhs.name == rhs.name
     }
 }
