@@ -16,7 +16,7 @@ public class NestedQueryBuilder: QueryBuilder {
     private var _query: Query?
     private var _scoreMode: ScoreMode?
     private var _ignoreUnmapped: Bool?
-    private var _innerHits: CodableValue?
+    private var _innerHits: InnerHit?
     private var _boost: Decimal?
     private var _name: String?
 
@@ -47,7 +47,7 @@ public class NestedQueryBuilder: QueryBuilder {
     }
 
     @discardableResult
-    public func set(innerHits: CodableValue) -> Self {
+    public func set(innerHits: InnerHit) -> Self {
         _innerHits = innerHits
         return self
     }
@@ -80,7 +80,7 @@ public class NestedQueryBuilder: QueryBuilder {
         return _ignoreUnmapped
     }
 
-    public var innerHits: CodableValue? {
+    public var innerHits: InnerHit? {
         return _innerHits
     }
 
@@ -106,7 +106,7 @@ public class HasChildQueryBuilder: QueryBuilder {
     private var _minChildren: Int?
     private var _maxChildren: Int?
     private var _ignoreUnmapped: Bool?
-    private var _innerHits: CodableValue?
+    private var _innerHits: InnerHit?
     private var _boost: Decimal?
     private var _name: String?
 
@@ -137,7 +137,7 @@ public class HasChildQueryBuilder: QueryBuilder {
     }
 
     @discardableResult
-    public func set(innerHits: CodableValue) -> Self {
+    public func set(innerHits: InnerHit) -> Self {
         _innerHits = innerHits
         return self
     }
@@ -190,7 +190,7 @@ public class HasChildQueryBuilder: QueryBuilder {
         return _ignoreUnmapped
     }
 
-    public var innerHits: CodableValue? {
+    public var innerHits: InnerHit? {
         return _innerHits
     }
 
@@ -214,7 +214,7 @@ public class HasParentQueryBuilder: QueryBuilder {
     private var _query: Query?
     private var _score: Bool?
     private var _ignoreUnmapped: Bool?
-    private var _innerHits: CodableValue?
+    private var _innerHits: InnerHit?
     private var _boost: Decimal?
     private var _name: String?
 
@@ -245,7 +245,7 @@ public class HasParentQueryBuilder: QueryBuilder {
     }
 
     @discardableResult
-    public func set(innerHits: CodableValue) -> Self {
+    public func set(innerHits: InnerHit) -> Self {
         _innerHits = innerHits
         return self
     }
@@ -278,7 +278,7 @@ public class HasParentQueryBuilder: QueryBuilder {
         return _ignoreUnmapped
     }
 
-    public var innerHits: CodableValue? {
+    public var innerHits: InnerHit? {
         return _innerHits
     }
 
