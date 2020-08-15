@@ -185,7 +185,11 @@ extension SourceFilter: Codable {
             let excludes: [String] = try container.decodeArray(forKey: .excludes)
             self = .source(includes: includes, excludes: excludes)
         } else if var contianer = try? decoder.unkeyedContainer() {
-            let values: [String] = try contianer.decodeArray()
+            var values = [String]()
+            repeat {
+                let val = try contianer.decodeString()
+                values.append(val)
+            } while !contianer.isAtEnd
             self = .filters(values)
         } else {
             let container = try decoder.singleValueContainer()
