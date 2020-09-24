@@ -75,7 +75,7 @@ class ElasticSwiftNetworkingTests: XCTestCase {
             }
             e.fulfill()
         }
-        waitForExpectations(timeout: 10)
+        waitForExpectations(timeout: 30)
     }
 
     func test_03_ssl_config() throws {

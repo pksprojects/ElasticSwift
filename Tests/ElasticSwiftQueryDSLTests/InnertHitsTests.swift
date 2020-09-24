@@ -406,14 +406,18 @@ class InnertHitsTests: XCTestCase {
     }
 
     func test_18_highlight_decode() throws {
-        let highlight = Highlight(fields: [.init("field"), .init("field2")])
+        var globalOptions = Highlight.FieldOptions.init()
+        globalOptions.boundaryChars = ["|"]
+        globalOptions.scoreOrdered = true
+        let highlight = Highlight(fields: [.init("field")], globalOptions: globalOptions)
         let jsonStr =
             """
                 {
                    "fields" : {
-                        "field": {},
-                        "field2": {}
-                    }
+                        "field": {}
+                    },
+                    "boundary_chars": ["|"],
+                    "order": "score"
                 }
             """
 
