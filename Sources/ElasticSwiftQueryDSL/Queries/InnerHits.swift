@@ -607,7 +607,12 @@ extension Highlight: Codable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        fields = try container.decodeArray(forKey: .fields)
+        do {
+            let fieldsMap = try container.decode([String: FieldOptions].self, forKey: .fields)
+            fields = fieldsMap.map { Field($0.key, options: $0.value) }
+        } catch {
+            fields = try container.decodeArray(forKey: .fields)
+        }
         var options = FieldOptions()
         let chars: [String]? = try container.decodeArrayIfPresent(forKey: .boundaryChars)
         if let chars = chars {
@@ -628,7 +633,7 @@ extension Highlight: Codable {
         options.fragmentOffset = try container.decodeIntIfPresent(forKey: .fragmentOffset)
         options.fragmentSize = try container.decodeIntIfPresent(forKey: .fragmentSize)
         options.highlightQuery = try container.decodeQueryIfPresent(forKey: .highlightQuery)
-        options.matchedFields = try container.decodeArray(forKey: .matchedFields)
+        options.matchedFields = try container.decodeArrayIfPresent(forKey: .matchedFields)
         options.noMatchSize = try container.decodeIntIfPresent(forKey: .noMatchSize)
         options.numberOfFragments = try container.decodeIntIfPresent(forKey: .numberOfFragments)
         let order = try container.decodeStringIfPresent(forKey: .order)
@@ -643,8 +648,8 @@ extension Highlight: Codable {
             options.scoreOrdered = nil
         }
         options.phraseLimit = try container.decodeIntIfPresent(forKey: .phraseLimit)
-        options.preTags = try container.decodeArray(forKey: .preTags)
-        options.postTags = try container.decodeArray(forKey: .postTags)
+        options.preTags = try container.decodeArrayIfPresent(forKey: .preTags)
+        options.postTags = try container.decodeArrayIfPresent(forKey: .postTags)
         options.requireFieldMatch = try container.decodeBoolIfPresent(forKey: .requireFieldMatch)
         options.tagScheme = try container.decodeStringIfPresent(forKey: .tagsSchema)
         options.highlighterType = try container.decodeIfPresent(Highlight.HighlighterType.self, forKey: .type)
@@ -833,7 +838,7 @@ extension Highlight.FieldOptions: Codable {
         fragmentOffset = try container.decodeIntIfPresent(forKey: .fragmentOffset)
         fragmentSize = try container.decodeIntIfPresent(forKey: .fragmentSize)
         highlightQuery = try container.decodeQueryIfPresent(forKey: .highlightQuery)
-        matchedFields = try container.decodeArray(forKey: .matchedFields)
+        matchedFields = try container.decodeArrayIfPresent(forKey: .matchedFields)
         noMatchSize = try container.decodeIntIfPresent(forKey: .noMatchSize)
         numberOfFragments = try container.decodeIntIfPresent(forKey: .numberOfFragments)
         let order = try container.decodeStringIfPresent(forKey: .order)
@@ -848,8 +853,8 @@ extension Highlight.FieldOptions: Codable {
             scoreOrdered = nil
         }
         phraseLimit = try container.decodeIntIfPresent(forKey: .phraseLimit)
-        preTags = try container.decodeArray(forKey: .preTags)
-        postTags = try container.decodeArray(forKey: .postTags)
+        preTags = try container.decodeArrayIfPresent(forKey: .preTags)
+        postTags = try container.decodeArrayIfPresent(forKey: .postTags)
         requireFieldMatch = try container.decodeBoolIfPresent(forKey: .requireFieldMatch)
         tagScheme = try container.decodeStringIfPresent(forKey: .tagsSchema)
         highlighterType = try container.decodeIfPresent(Highlight.HighlighterType.self, forKey: .type)
@@ -900,6 +905,7 @@ extension Highlight.FieldOptions: Equatable {
             && lhs.scoreOrdered == rhs.scoreOrdered
             && lhs.phraseLimit == rhs.phraseLimit
             && lhs.preTags == rhs.preTags
+            && lhs.postTags == rhs.postTags
             && lhs.requireFieldMatch == rhs.requireFieldMatch
             && lhs.tagScheme == rhs.tagScheme
             && lhs.highlighterType == rhs.highlighterType
