@@ -1,6 +1,6 @@
 //
 //  InnertHitsTests.swift
-//  
+//
 //
 //  Created by Prafull Kumar Soni on 8/1/20.
 //
@@ -28,22 +28,22 @@ class InnertHitsTests: XCTestCase {
         super.tearDown()
         logger.info("====================TEST=END===============================")
     }
-    
+
     func test_01_innertHits_encode() throws {
         let innerHit = InnerHit(sourceFilter: .fetchSource(false), docvalueFields: [.init(field: "comments.text.keyword", format: "use_field_mapping")])
         let expectedJson =
-        """
-            {
-              "_source" : false,
-              "docvalue_fields" : [
+            """
                 {
-                  "field": "comments.text.keyword",
-                  "format": "use_field_mapping"
+                  "_source" : false,
+                  "docvalue_fields" : [
+                    {
+                      "field": "comments.text.keyword",
+                      "format": "use_field_mapping"
+                    }
+                  ]
                 }
-              ]
-            }
-        """
-        
+            """
+
         let data = try! JSONEncoder().encode(innerHit)
 
         let encodedStr = String(data: data, encoding: .utf8)!
@@ -55,41 +55,41 @@ class InnertHitsTests: XCTestCase {
         let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: expectedJson.data(using: .utf8)!)
         XCTAssertEqual(expectedDic, dic)
     }
-    
+
     func test_02_innerHits_decode() throws {
         let innerHit = InnerHit(sourceFilter: .fetchSource(false), docvalueFields: [.init(field: "comments.text.keyword", format: "use_field_mapping")])
         let jsonStr =
-        """
-            {
-              "_source" : false,
-              "docvalue_fields" : [
+            """
                 {
-                  "field": "comments.text.keyword",
-                  "format": "use_field_mapping"
+                  "_source" : false,
+                  "docvalue_fields" : [
+                    {
+                      "field": "comments.text.keyword",
+                      "format": "use_field_mapping"
+                    }
+                  ]
                 }
-              ]
-            }
-        """
+            """
 
         let decoded = try! JSONDecoder().decode(InnerHit.self, from: jsonStr.data(using: .utf8)!)
 
         XCTAssertEqual(innerHit, decoded)
     }
-    
+
     func test_03_innertHits_encode_2() throws {
         let innerHit = InnerHit(sourceFilter: .fetchSource(false), scriptFields: [.init(field: "test1", script: .init("params['_source']['message']"))])
         let expectedJson =
-        """
-            {
-              "_source" : false,
-              "script_fields" : {
-                  "test1" : {
-                      "script" : "params['_source']['message']"
+            """
+                {
+                  "_source" : false,
+                  "script_fields" : {
+                      "test1" : {
+                          "script" : "params['_source']['message']"
+                      }
                   }
-              }
-            }
-        """
-        
+                }
+            """
+
         let data = try! JSONEncoder().encode(innerHit)
 
         let encodedStr = String(data: data, encoding: .utf8)!
@@ -101,55 +101,55 @@ class InnertHitsTests: XCTestCase {
         let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: expectedJson.data(using: .utf8)!)
         XCTAssertEqual(expectedDic, dic)
     }
-    
+
     func test_04_innerHits_decode_2() throws {
         let innerHit = InnerHit(sourceFilter: .fetchSource(false), scriptFields: [.init(field: "test1", script: .init("params['_source']['message']"))])
         let jsonStr =
-        """
-            {
-              "_source" : false,
-              "script_fields" : {
-                  "test1" : {
-                      "script" : "params['_source']['message']"
+            """
+                {
+                  "_source" : false,
+                  "script_fields" : {
+                      "test1" : {
+                          "script" : "params['_source']['message']"
+                      }
                   }
-              }
-            }
-        """
+                }
+            """
 
         let decoded = try! JSONDecoder().decode(InnerHit.self, from: jsonStr.data(using: .utf8)!)
 
         XCTAssertEqual(innerHit, decoded)
     }
-    
+
     func test_05_innertHits_encode_3() throws {
         let innerHit = InnerHit(sourceFilter: .fetchSource(false), scriptFields: [
             .init(field: "test1", script: .init("doc['price'].value * 2", lang: "painless", params: nil)),
-            .init(field: "test2", script: .init("doc['price'].value * params.factor", lang: "painless", params: ["factor"  : 2]))
+            .init(field: "test2", script: .init("doc['price'].value * params.factor", lang: "painless", params: ["factor": 2])),
         ])
         let expectedJson =
-        """
-            {
-              "_source" : false,
-              "script_fields" : {
-                  "test1" : {
-                      "script" : {
-                          "lang": "painless",
-                          "source": "doc['price'].value * 2"
-                      }
-                  },
-                  "test2" : {
-                      "script" : {
-                          "lang": "painless",
-                          "source": "doc['price'].value * params.factor",
-                          "params" : {
-                              "factor"  : 2.0
+            """
+                {
+                  "_source" : false,
+                  "script_fields" : {
+                      "test1" : {
+                          "script" : {
+                              "lang": "painless",
+                              "source": "doc['price'].value * 2"
+                          }
+                      },
+                      "test2" : {
+                          "script" : {
+                              "lang": "painless",
+                              "source": "doc['price'].value * params.factor",
+                              "params" : {
+                                  "factor"  : 2.0
+                              }
                           }
                       }
                   }
-              }
-            }
-        """
-        
+                }
+            """
+
         let data = try! JSONEncoder().encode(innerHit)
 
         let encodedStr = String(data: data, encoding: .utf8)!
@@ -161,51 +161,51 @@ class InnertHitsTests: XCTestCase {
         let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: expectedJson.data(using: .utf8)!)
         XCTAssertEqual(expectedDic, dic)
     }
-    
+
     func test_05_innerHits_decode_3() throws {
         let innerHit = InnerHit(sourceFilter: .fetchSource(false), scriptFields: [
             .init(field: "test1", script: .init("doc['price'].value * 2", lang: "painless", params: nil)),
-            .init(field: "test2", script: .init("doc['price'].value * params.factor", lang: "painless", params: ["factor"  : 2]))
+            .init(field: "test2", script: .init("doc['price'].value * params.factor", lang: "painless", params: ["factor": 2])),
         ])
         let jsonStr =
-        """
-            {
-              "_source" : false,
-              "script_fields" : {
-                  "test1" : {
-                      "script" : {
-                          "lang": "painless",
-                          "source": "doc['price'].value * 2"
-                      }
-                  },
-                  "test2" : {
-                      "script" : {
-                          "lang": "painless",
-                          "source": "doc['price'].value * params.factor",
-                          "params" : {
-                              "factor"  : 2
+            """
+                {
+                  "_source" : false,
+                  "script_fields" : {
+                      "test1" : {
+                          "script" : {
+                              "lang": "painless",
+                              "source": "doc['price'].value * 2"
+                          }
+                      },
+                      "test2" : {
+                          "script" : {
+                              "lang": "painless",
+                              "source": "doc['price'].value * params.factor",
+                              "params" : {
+                                  "factor"  : 2
+                              }
                           }
                       }
                   }
-              }
-            }
-        """
+                }
+            """
 
         let decoded = try! JSONDecoder().decode(InnerHit.self, from: jsonStr.data(using: .utf8)!)
 
         XCTAssertEqual(innerHit.sourceFilter, decoded.sourceFilter)
-        XCTAssertTrue(innerHit.scriptFields!.map( { decoded.scriptFields!.contains($0) } ).reduce(true, {a, b in a && b}))
+        XCTAssertTrue(innerHit.scriptFields!.map { decoded.scriptFields!.contains($0) }.reduce(true) { a, b in a && b })
     }
-    
+
     func test_06_sourceFilter_encode() throws {
         let innerHit = InnerHit(sourceFilter: .filter("field"))
         let expectedJson =
-        """
-            {
-              "_source" : "field"
-            }
-        """
-        
+            """
+                {
+                  "_source" : "field"
+                }
+            """
+
         let data = try! JSONEncoder().encode(innerHit)
 
         let encodedStr = String(data: data, encoding: .utf8)!
@@ -217,30 +217,30 @@ class InnertHitsTests: XCTestCase {
         let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: expectedJson.data(using: .utf8)!)
         XCTAssertEqual(expectedDic, dic)
     }
-    
+
     func test_07_sourceFilter_decode() throws {
         let innerHit = InnerHit(sourceFilter: .filter("field"))
         let jsonStr =
-        """
-            {
-              "_source" : "field"
-            }
-        """
+            """
+                {
+                  "_source" : "field"
+                }
+            """
 
         let decoded = try! JSONDecoder().decode(InnerHit.self, from: jsonStr.data(using: .utf8)!)
 
         XCTAssertEqual(innerHit, decoded)
     }
-    
+
     func test_08_sourceFilter_encode_2() throws {
         let innerHit = InnerHit(sourceFilter: .filters(["field", "field2"]))
         let expectedJson =
-        """
-            {
-              "_source" : ["field", "field2"]
-            }
-        """
-        
+            """
+                {
+                  "_source" : ["field", "field2"]
+                }
+            """
+
         let data = try! JSONEncoder().encode(innerHit)
 
         let encodedStr = String(data: data, encoding: .utf8)!
@@ -252,33 +252,33 @@ class InnertHitsTests: XCTestCase {
         let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: expectedJson.data(using: .utf8)!)
         XCTAssertEqual(expectedDic, dic)
     }
-    
+
     func test_09_sourceFilter_decode_2() throws {
         let innerHit = InnerHit(sourceFilter: .filters(["field", "field2"]))
         let jsonStr =
-        """
-            {
-              "_source" : ["field", "field2"]
-            }
-        """
+            """
+                {
+                  "_source" : ["field", "field2"]
+                }
+            """
 
         let decoded = try! JSONDecoder().decode(InnerHit.self, from: jsonStr.data(using: .utf8)!)
 
         XCTAssertEqual(innerHit, decoded)
     }
-    
+
     func test_10_sourceFilter_encode_3() throws {
         let innerHit = InnerHit(sourceFilter: .source(includes: ["field1"], excludes: ["field2"]))
         let expectedJson =
-        """
-            {
-              "_source" : {
-                "includes": ["field1"],
-                "excludes": ["field2"]
-               }
-            }
-        """
-        
+            """
+                {
+                  "_source" : {
+                    "includes": ["field1"],
+                    "excludes": ["field2"]
+                   }
+                }
+            """
+
         let data = try! JSONEncoder().encode(innerHit)
 
         let encodedStr = String(data: data, encoding: .utf8)!
@@ -290,24 +290,24 @@ class InnertHitsTests: XCTestCase {
         let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: expectedJson.data(using: .utf8)!)
         XCTAssertEqual(expectedDic, dic)
     }
-    
+
     func test_11_sourceFilter_decode_3() throws {
         let innerHit = InnerHit(sourceFilter: .source(includes: ["field1"], excludes: ["field2"]))
         let jsonStr =
-        """
-            {
-               "_source" : {
-                "includes": ["field1"],
-                "excludes": ["field2"]
-               }
-            }
-        """
+            """
+                {
+                   "_source" : {
+                    "includes": ["field1"],
+                    "excludes": ["field2"]
+                   }
+                }
+            """
 
         let decoded = try! JSONDecoder().decode(InnerHit.self, from: jsonStr.data(using: .utf8)!)
 
         XCTAssertEqual(innerHit, decoded)
     }
-    
+
     func test_12_highlightBuilder() throws {
         XCTAssertNoThrow(try HighlightBuilder().set(fields: [.init("Field1")]).add(field: .init("field2")).build(), "Should not throw")
     }
@@ -335,11 +335,11 @@ class InnertHitsTests: XCTestCase {
         XCTAssertEqual(hightlight.fields, [.init("Field1")])
         XCTAssertEqual(hightlight.globalOptions, .init())
     }
-    
+
     func test_15_fieldOptionsBuilder() throws {
         XCTAssertNoThrow(FieldOptionsBuilder().build())
     }
-    
+
     func test_16_fieldOptionsBuilder() throws {
         let fieldOptions = FieldOptionsBuilder()
             .set(fragmenter: "fragmenter")
@@ -388,54 +388,54 @@ class InnertHitsTests: XCTestCase {
         XCTAssertEqual(fieldOptions.termVector, "vector")
         XCTAssertEqual(fieldOptions.indexOptions, "indexOptions")
     }
-    
+
     func test_17_highlight_decode() throws {
         let highlight = Highlight(fields: [.init("field")])
         let jsonStr =
-        """
-            {
-               "fields" : [{
-                    "field": {}
-                }]
-            }
-        """
+            """
+                {
+                   "fields" : [{
+                        "field": {}
+                    }]
+                }
+            """
 
         let decoded = try! JSONDecoder().decode(Highlight.self, from: jsonStr.data(using: .utf8)!)
 
         XCTAssertEqual(highlight, decoded)
     }
-    
+
     func test_18_highlight_decode() throws {
         let highlight = Highlight(fields: [.init("field"), .init("field2")])
         let jsonStr =
-        """
-            {
-               "fields" : {
-                    "field": {},
-                    "field2": {}
+            """
+                {
+                   "fields" : {
+                        "field": {},
+                        "field2": {}
+                    }
                 }
-            }
-        """
+            """
 
         let decoded = try! JSONDecoder().decode(Highlight.self, from: jsonStr.data(using: .utf8)!)
 
         XCTAssertEqual(highlight, decoded)
     }
-    
+
     func test_19_filed_decode() throws {
-        let field = Highlight.Field.init("field")
+        let field = Highlight.Field("field")
         let jsonStr =
-        """
-            {
-               "field": {}
-            }
-        """
+            """
+                {
+                   "field": {}
+                }
+            """
 
         let decoded = try! JSONDecoder().decode(Highlight.Field.self, from: jsonStr.data(using: .utf8)!)
 
         XCTAssertEqual(field, decoded)
     }
-    
+
     func test_20_filed_decode() throws {
         let fieldOptions = FieldOptionsBuilder()
             .set(fragmenter: "span")
@@ -463,37 +463,37 @@ class InnertHitsTests: XCTestCase {
             .build()
         let field = Highlight.Field("field", options: fieldOptions)
         let jsonStr =
-        """
-            {
-               "field": {
-                    "force_source": false,
-                    "matched_fields": ["comment", "comment.plain"],
-                    "type": "fvh",
-                    "fragment_size" : 2,
-                    "no_match_size": 2,
-                    "index_options" : "offsets",
-                    "term_vector" : "with_positions_offsets",
-                    "number_of_fragments" : 3,
-                    "fragmenter": "span",
-                    "phrase_limit": 5,
-                    "tag_schema": "schema",
-                    "boundary_chars": ["|"],
-                    "boundary_max_scan": 1,
-                    "boundary_scanner": "chars",
-                    "boundary_scanner_locale": "locale",
-                    "fragment_offset": 1,
-                    "encoder": "default",
-                    "highlight_query": {
-                        "match_all": {}
-                    },
-                    "order": "score",
-                    "pre_tags": ["preTag1"],
-                    "post_tags": ["postTag1"],
-                    "tags_schema": "schema",
-                    "require_field_match": true
-               }
-            }
-        """
+            """
+                {
+                   "field": {
+                        "force_source": false,
+                        "matched_fields": ["comment", "comment.plain"],
+                        "type": "fvh",
+                        "fragment_size" : 2,
+                        "no_match_size": 2,
+                        "index_options" : "offsets",
+                        "term_vector" : "with_positions_offsets",
+                        "number_of_fragments" : 3,
+                        "fragmenter": "span",
+                        "phrase_limit": 5,
+                        "tag_schema": "schema",
+                        "boundary_chars": ["|"],
+                        "boundary_max_scan": 1,
+                        "boundary_scanner": "chars",
+                        "boundary_scanner_locale": "locale",
+                        "fragment_offset": 1,
+                        "encoder": "default",
+                        "highlight_query": {
+                            "match_all": {}
+                        },
+                        "order": "score",
+                        "pre_tags": ["preTag1"],
+                        "post_tags": ["postTag1"],
+                        "tags_schema": "schema",
+                        "require_field_match": true
+                   }
+                }
+            """
 
         let decoded = try! JSONDecoder().decode(Highlight.Field.self, from: jsonStr.data(using: .utf8)!)
 

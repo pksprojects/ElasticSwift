@@ -203,7 +203,7 @@ public class CloseIndexRequestBuilder: RequestBuilder {
 // MARK: - Index Exists Request
 
 public struct IndexExistsRequest: Request {
-    public var headers: HTTPHeaders = HTTPHeaders()
+    public var headers = HTTPHeaders()
 
     public let name: String
 
@@ -248,7 +248,7 @@ extension IndexExistsRequest: Equatable {
 // MARK: - Create Index Reqeust
 
 public struct CreateIndexRequest: Request {
-    public var headers: HTTPHeaders = HTTPHeaders()
+    public var headers = HTTPHeaders()
 
     public let name: String
     public let aliases: [IndexAlias]?
@@ -336,7 +336,7 @@ extension CreateIndexRequest: Equatable {
 // MARK: - Get Index Request
 
 public struct GetIndexRequest: Request {
-    public var headers: HTTPHeaders = HTTPHeaders()
+    public var headers = HTTPHeaders()
 
     public let name: String
 
@@ -381,7 +381,7 @@ extension GetIndexRequest: Equatable {
 // MARK: - Delete Index Request
 
 public struct DeleteIndexRequest: Request {
-    public var headers: HTTPHeaders = HTTPHeaders()
+    public var headers = HTTPHeaders()
 
     public let name: String
 
@@ -426,7 +426,7 @@ extension DeleteIndexRequest: Equatable {
 // MARK: - Open Index Request
 
 public struct OpenIndexRequest: Request {
-    public var headers: HTTPHeaders = HTTPHeaders()
+    public var headers = HTTPHeaders()
 
     public let indices: [String]
 
@@ -479,7 +479,7 @@ extension OpenIndexRequest: Equatable {
 // MARK: - Close Index Request
 
 public struct CloseIndexRequest: Request {
-    public var headers: HTTPHeaders = HTTPHeaders()
+    public var headers = HTTPHeaders()
 
     public let indices: [String]
 

@@ -295,7 +295,7 @@ public class SearchRequestBuilder: RequestBuilder {
 // MARK: - Search Request
 
 public struct SearchRequest: Request {
-    public var headers: HTTPHeaders = HTTPHeaders()
+    public var headers = HTTPHeaders()
 
     public let indices: [String]?
     public let types: [String]?

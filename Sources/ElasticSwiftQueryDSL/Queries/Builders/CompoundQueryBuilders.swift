@@ -205,7 +205,7 @@ public class FunctionScoreQueryBuilder: QueryBuilder {
     private var _maxBoost: Decimal?
     private var _scoreMode: ScoreMode?
     private var _minScore: Decimal?
-    private var _functions: [ScoreFunction] = [ScoreFunction]()
+    private var _functions = [ScoreFunction]()
 
     public init() {}
 

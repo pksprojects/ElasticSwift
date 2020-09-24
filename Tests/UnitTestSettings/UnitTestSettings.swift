@@ -155,7 +155,8 @@ public struct StreamLogHandler: LogHandler {
     public func log(level: Logger.Level,
                     message: Logger.Message,
                     metadata: Logger.Metadata?,
-                    file _: String, function _: String, line _: UInt) {
+                    file _: String, function _: String, line _: UInt)
+    {
         let prettyMetadata = metadata?.isEmpty ?? true
             ? self.prettyMetadata
             : prettify(self.metadata.merging(metadata!, uniquingKeysWith: { _, new in new }))

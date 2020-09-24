@@ -93,7 +93,7 @@ public class DeleteRequestBuilder: RequestBuilder {
 // MARK: - Delete Request
 
 public struct DeleteRequest: Request, BulkableRequest {
-    public var headers: HTTPHeaders = HTTPHeaders()
+    public var headers = HTTPHeaders()
 
     public let index: String
     public let type: String

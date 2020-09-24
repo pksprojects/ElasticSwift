@@ -63,7 +63,7 @@ public class DeleteByQueryRequestBuilder: RequestBuilder {
 public struct DeleteByQueryRequest: Request {
     public typealias ResponseType = DeleteByQueryResponse
 
-    public var headers: HTTPHeaders = HTTPHeaders()
+    public var headers = HTTPHeaders()
 
     public let index: String
     public let type: String?

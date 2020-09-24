@@ -429,7 +429,7 @@ class SpanQueriesTests: XCTestCase {
     func test_18_spanContainingQuery_encode() throws {
         let query = SpanContainingQuery(big: SpanNearQuery([SpanTermQuery(field: "field1", value: "bar"),
                                                             SpanTermQuery(field: "field1", value: "baz")], slop: 5, inOrder: true),
-                                        little: SpanTermQuery(field: "field1", value: "foo"))
+        little: SpanTermQuery(field: "field1", value: "foo"))
 
         let data = try JSONEncoder().encode(query)
 
@@ -496,7 +496,7 @@ class SpanQueriesTests: XCTestCase {
     func test_20_spanWithinQuery_encode() throws {
         let query = SpanWithinQuery(big: SpanNearQuery([SpanTermQuery(field: "field1", value: "bar"),
                                                         SpanTermQuery(field: "field1", value: "baz")], slop: 5, inOrder: true),
-                                    little: SpanTermQuery(field: "field1", value: "foo"))
+        little: SpanTermQuery(field: "field1", value: "foo"))
 
         let data = try JSONEncoder().encode(query)
 
