@@ -18,8 +18,8 @@ Pod::Spec.new do |s|
     
     s.source_files = 'Sources/ElasticSwiftCore/**/*.swift'
   
-    s.dependency 'SwiftNIO', '~> 2.14'
-    s.dependency 'SwiftNIOHTTP1', '~> 2.14'
-    s.dependency 'Logging', '~> 1.2'
+    s.dependency 'SwiftNIO', '~> 2.22'
+    s.dependency 'SwiftNIOHTTP1', '~> 2.22'
+    s.dependency 'Logging', '~> 1.4'
   
   end
