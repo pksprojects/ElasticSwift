@@ -13,6 +13,7 @@ import Foundation
 public class ConstantScoreQueryBuilder: QueryBuilder {
     private var _query: Query?
     private var _boost: Decimal?
+    private var _name: String?
 
     public init() {}
 
@@ -28,12 +29,22 @@ public class ConstantScoreQueryBuilder: QueryBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(name: String) -> ConstantScoreQueryBuilder {
+        _name = name
+        return self
+    }
+
     public var query: Query? {
         return _query
     }
 
     public var boost: Decimal? {
         return _boost
+    }
+
+    public var name: String? {
+        return _name
     }
 
     public func build() throws -> ConstantScoreQuery {
@@ -50,6 +61,7 @@ public class BoolQueryBuilder: QueryBuilder {
     private var _filterClauses: [Query] = []
     private var _minimumShouldMatch: Int?
     private var _boost: Decimal?
+    private var _name: String?
 
     public init() {}
 
@@ -89,6 +101,12 @@ public class BoolQueryBuilder: QueryBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(name: String) -> BoolQueryBuilder {
+        _name = name
+        return self
+    }
+
     public var mustClauses: [Query] {
         return _mustClauses
     }
@@ -113,6 +131,10 @@ public class BoolQueryBuilder: QueryBuilder {
         return _boost
     }
 
+    public var name: String? {
+        return _name
+    }
+
     public func build() throws -> BoolQuery {
         return try BoolQuery(withBuilder: self)
     }
@@ -124,6 +146,7 @@ public class DisMaxQueryBuilder: QueryBuilder {
     private var _tieBreaker: Decimal?
     private var _boost: Decimal?
     private var _queries: [Query] = []
+    private var _name: String?
 
     public init() {}
 
@@ -136,6 +159,12 @@ public class DisMaxQueryBuilder: QueryBuilder {
     @discardableResult
     public func set(boost: Decimal) -> DisMaxQueryBuilder {
         _boost = boost
+        return self
+    }
+
+    @discardableResult
+    public func set(name: String) -> DisMaxQueryBuilder {
+        _name = name
         return self
     }
 
@@ -153,6 +182,10 @@ public class DisMaxQueryBuilder: QueryBuilder {
         return _boost
     }
 
+    public var name: String? {
+        return _name
+    }
+
     public var queries: [Query] {
         return _queries
     }
@@ -167,11 +200,12 @@ public class DisMaxQueryBuilder: QueryBuilder {
 public class FunctionScoreQueryBuilder: QueryBuilder {
     private var _query: Query?
     private var _boost: Decimal?
+    private var _name: String?
     private var _boostMode: BoostMode?
     private var _maxBoost: Decimal?
     private var _scoreMode: ScoreMode?
     private var _minScore: Decimal?
-    private var _functions: [ScoreFunction] = [ScoreFunction]()
+    private var _functions = [ScoreFunction]()
 
     public init() {}
 
@@ -184,6 +218,12 @@ public class FunctionScoreQueryBuilder: QueryBuilder {
     @discardableResult
     public func set(boost: Decimal) -> FunctionScoreQueryBuilder {
         _boost = boost
+        return self
+    }
+
+    @discardableResult
+    public func set(name: String) -> FunctionScoreQueryBuilder {
+        _name = name
         return self
     }
 
@@ -225,6 +265,10 @@ public class FunctionScoreQueryBuilder: QueryBuilder {
         return _boost
     }
 
+    public var name: String? {
+        return _name
+    }
+
     public var boostMode: BoostMode? {
         return _boostMode
     }
@@ -256,6 +300,8 @@ public class BoostingQueryBuilder: QueryBuilder {
     private var _negative: Query?
     private var _positive: Query?
     private var _negativeBoost: Decimal?
+    private var _boost: Decimal?
+    private var _name: String?
 
     public init() {}
 
@@ -277,6 +323,18 @@ public class BoostingQueryBuilder: QueryBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(boost: Decimal) -> BoostingQueryBuilder {
+        _boost = boost
+        return self
+    }
+
+    @discardableResult
+    public func set(name: String) -> BoostingQueryBuilder {
+        _name = name
+        return self
+    }
+
     public var negative: Query? {
         return _negative
     }
@@ -287,6 +345,14 @@ public class BoostingQueryBuilder: QueryBuilder {
 
     public var negativeBoost: Decimal? {
         return _negativeBoost
+    }
+
+    public var boost: Decimal? {
+        return _boost
+    }
+
+    public var name: String? {
+        return _name
     }
 
     public func build() throws -> BoostingQuery {

@@ -101,7 +101,7 @@ public class MultiTermVectorsRequestBuilder: RequestBuilder {
 // MARK: - Multi TermVectors Request
 
 public struct MultiTermVectorsRequest: Request {
-    public var headers: HTTPHeaders = HTTPHeaders()
+    public var headers = HTTPHeaders()
 
     public let index: String?
     public let type: String?

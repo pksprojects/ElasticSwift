@@ -22,8 +22,10 @@ public struct GeoShapeQuery: Query {
     public let indexedShapePath: String?
     public let relation: ShapeRelation?
     public let ignoreUnmapped: Bool?
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(field: String, shape: CodableValue?, indexedShapeId: String?, indexedShapeType: String?, indexedShapeIndex: String? = nil, indexedShapePath: String? = nil, relation: ShapeRelation? = nil, ignoreUnmapped: Bool? = nil) {
+    public init(field: String, shape: CodableValue?, indexedShapeId: String?, indexedShapeType: String?, indexedShapeIndex: String? = nil, indexedShapePath: String? = nil, relation: ShapeRelation? = nil, ignoreUnmapped: Bool? = nil, boost: Decimal? = nil, name: String? = nil) {
         self.field = field
         self.shape = shape
         self.relation = relation
@@ -32,6 +34,8 @@ public struct GeoShapeQuery: Query {
         self.indexedShapeType = indexedShapeType
         self.indexedShapeIndex = indexedShapeIndex
         self.indexedShapePath = indexedShapePath
+        self.boost = boost
+        self.name = name
     }
 
     internal init(withBuilder builder: GeoShapeQueryBuilder) throws {
@@ -47,7 +51,7 @@ public struct GeoShapeQuery: Query {
             throw QueryBuilderError.missingRequiredField("indexedShapeType")
         }
 
-        self.init(field: builder.field!, shape: builder.shape, indexedShapeId: builder.indexedShapeId, indexedShapeType: builder.indexedShapeType, indexedShapeIndex: builder.indexedShapeIndex, indexedShapePath: builder.indexedShapePath, relation: builder.relation, ignoreUnmapped: builder.ignoreUnmapped)
+        self.init(field: builder.field!, shape: builder.shape, indexedShapeId: builder.indexedShapeId, indexedShapeType: builder.indexedShapeType, indexedShapeIndex: builder.indexedShapeIndex, indexedShapePath: builder.indexedShapePath, relation: builder.relation, ignoreUnmapped: builder.ignoreUnmapped, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -76,7 +80,9 @@ extension GeoShapeQuery {
         }
 
         relation = try fieldContainer.decodeIfPresent(ShapeRelation.self, forKey: .relation)
-        ignoreUnmapped = try fieldContainer.decodeBoolIfPresent(forKey: .ignoreUnmapped)
+        ignoreUnmapped = try nested.decodeBoolIfPresent(forKey: .key(named: CodingKeys.ignoreUnmapped.rawValue))
+        boost = try nested.decodeDecimalIfPresent(forKey: .key(named: CodingKeys.boost.rawValue))
+        name = try nested.decodeStringIfPresent(forKey: .key(named: CodingKeys.name.rawValue))
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -88,7 +94,9 @@ extension GeoShapeQuery {
             let indexedShape = IndexedShape(id: indexedShapeId, type: indexedShapeType, index: indexedShapeIndex, path: indexedShapePath)
             try fieldContainer.encode(indexedShape, forKey: .indexedShape)
         }
-        try fieldContainer.encodeIfPresent(ignoreUnmapped, forKey: .ignoreUnmapped)
+        try nested.encodeIfPresent(ignoreUnmapped, forKey: .key(named: CodingKeys.ignoreUnmapped.rawValue))
+        try nested.encodeIfPresent(boost, forKey: .key(named: CodingKeys.boost.rawValue))
+        try nested.encodeIfPresent(name, forKey: .key(named: CodingKeys.name.rawValue))
     }
 
     enum CodingKeys: String, CodingKey {
@@ -97,6 +105,8 @@ extension GeoShapeQuery {
         case relation
         case indexedShape = "indexed_shape"
         case ignoreUnmapped = "ignore_unmapped"
+        case boost
+        case name
     }
 
     struct IndexedShape: Codable {
@@ -125,6 +135,8 @@ extension GeoShapeQuery: Equatable {
             && lhs.indexedShapePath == rhs.indexedShapePath
             && lhs.relation == rhs.relation
             && lhs.ignoreUnmapped == rhs.ignoreUnmapped
+            && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 }
 
@@ -140,14 +152,18 @@ public struct GeoBoundingBoxQuery: Query {
     public let type: GeoExecType?
     public let validationMethod: GeoValidationMethod?
     public let ignoreUnmapped: Bool?
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(field: String, topLeft: GeoPoint, bottomRight: GeoPoint, type: GeoExecType? = nil, validationMethod: GeoValidationMethod? = nil, ignoreUnmapped: Bool? = nil) {
+    public init(field: String, topLeft: GeoPoint, bottomRight: GeoPoint, type: GeoExecType? = nil, validationMethod: GeoValidationMethod? = nil, ignoreUnmapped: Bool? = nil, boost: Decimal? = nil, name: String? = nil) {
         self.field = field
         self.topLeft = topLeft
         self.bottomRight = bottomRight
         self.type = type
         self.validationMethod = validationMethod
         self.ignoreUnmapped = ignoreUnmapped
+        self.boost = boost
+        self.name = name
     }
 
     internal init(withBuilder builder: GeoBoundingBoxQueryBuilder) throws {
@@ -163,7 +179,7 @@ public struct GeoBoundingBoxQuery: Query {
             throw QueryBuilderError.missingRequiredField("bottomRight")
         }
 
-        self.init(field: builder.field!, topLeft: builder.topLeft!, bottomRight: builder.bottomRight!, type: builder.type, validationMethod: builder.validationMethod, ignoreUnmapped: builder.ignoreUnmapped)
+        self.init(field: builder.field!, topLeft: builder.topLeft!, bottomRight: builder.bottomRight!, type: builder.type, validationMethod: builder.validationMethod, ignoreUnmapped: builder.ignoreUnmapped, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -190,6 +206,8 @@ extension GeoBoundingBoxQuery {
         type = try nested.decodeIfPresent(GeoExecType.self, forKey: .key(named: CodingKeys.type.rawValue))
         validationMethod = try nested.decodeIfPresent(GeoValidationMethod.self, forKey: .key(named: CodingKeys.validationMethod.rawValue))
         ignoreUnmapped = try nested.decodeBoolIfPresent(forKey: .key(named: CodingKeys.ignoreUnmapped.rawValue))
+        boost = try nested.decodeDecimalIfPresent(forKey: .key(named: CodingKeys.boost.rawValue))
+        name = try nested.decodeStringIfPresent(forKey: .key(named: CodingKeys.name.rawValue))
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -201,6 +219,8 @@ extension GeoBoundingBoxQuery {
         try nested.encodeIfPresent(type, forKey: .key(named: CodingKeys.type.rawValue))
         try nested.encodeIfPresent(validationMethod, forKey: .key(named: CodingKeys.validationMethod.rawValue))
         try nested.encodeIfPresent(ignoreUnmapped, forKey: .key(named: CodingKeys.ignoreUnmapped.rawValue))
+        try nested.encodeIfPresent(boost, forKey: .key(named: CodingKeys.boost.rawValue))
+        try nested.encodeIfPresent(name, forKey: .key(named: CodingKeys.name.rawValue))
     }
 
     enum CodingKeys: String, CodingKey {
@@ -209,6 +229,8 @@ extension GeoBoundingBoxQuery {
         case ignoreUnmapped = "ignore_unmapped"
         case validationMethod = "validation_method"
         case type
+        case boost
+        case name
     }
 }
 
@@ -221,6 +243,8 @@ extension GeoBoundingBoxQuery: Equatable {
             && lhs.type == rhs.type
             && lhs.validationMethod == rhs.validationMethod
             && lhs.ignoreUnmapped == rhs.ignoreUnmapped
+            && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 }
 
@@ -235,14 +259,18 @@ public struct GeoDistanceQuery: Query {
     public let distanceType: GeoDistanceType?
     public let validationMethod: GeoValidationMethod?
     public let ignoreUnmapped: Bool?
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(field: String, point: GeoPoint, distance: String? = nil, distanceType: GeoDistanceType? = nil, validationMethod: GeoValidationMethod? = nil, ignoreUnmapped: Bool? = nil) {
+    public init(field: String, point: GeoPoint, distance: String? = nil, distanceType: GeoDistanceType? = nil, validationMethod: GeoValidationMethod? = nil, ignoreUnmapped: Bool? = nil, boost: Decimal? = nil, name: String? = nil) {
         self.field = field
         self.point = point
         self.distance = distance
         self.distanceType = distanceType
         self.validationMethod = validationMethod
         self.ignoreUnmapped = ignoreUnmapped
+        self.boost = boost
+        self.name = name
     }
 
     internal init(withBuilder builder: GeoDistanceQueryBuilder) throws {
@@ -254,7 +282,7 @@ public struct GeoDistanceQuery: Query {
             throw QueryBuilderError.missingRequiredField("point")
         }
 
-        self.init(field: builder.field!, point: builder.point!, distance: builder.distance, distanceType: builder.distanceType, validationMethod: builder.validationMethod, ignoreUnmapped: builder.ignoreUnmapped)
+        self.init(field: builder.field!, point: builder.point!, distance: builder.distance, distanceType: builder.distanceType, validationMethod: builder.validationMethod, ignoreUnmapped: builder.ignoreUnmapped, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -279,6 +307,8 @@ extension GeoDistanceQuery: Codable {
         distanceType = try nested.decodeIfPresent(GeoDistanceType.self, forKey: .key(named: CodingKeys.distanceType.rawValue))
         validationMethod = try nested.decodeIfPresent(GeoValidationMethod.self, forKey: .key(named: CodingKeys.validationMethod.rawValue))
         ignoreUnmapped = try nested.decodeBoolIfPresent(forKey: .key(named: CodingKeys.ignoreUnmapped.rawValue))
+        boost = try nested.decodeDecimalIfPresent(forKey: .key(named: CodingKeys.boost.rawValue))
+        name = try nested.decodeStringIfPresent(forKey: .key(named: CodingKeys.name.rawValue))
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -289,6 +319,8 @@ extension GeoDistanceQuery: Codable {
         try nested.encodeIfPresent(distanceType, forKey: .key(named: CodingKeys.distanceType.rawValue))
         try nested.encodeIfPresent(validationMethod, forKey: .key(named: CodingKeys.validationMethod.rawValue))
         try nested.encodeIfPresent(ignoreUnmapped, forKey: .key(named: CodingKeys.ignoreUnmapped.rawValue))
+        try nested.encodeIfPresent(boost, forKey: .key(named: CodingKeys.boost.rawValue))
+        try nested.encodeIfPresent(name, forKey: .key(named: CodingKeys.name.rawValue))
     }
 
     enum CodingKeys: String, CodingKey {
@@ -296,6 +328,8 @@ extension GeoDistanceQuery: Codable {
         case distanceType = "distance_type"
         case validationMethod = "validation_method"
         case ignoreUnmapped = "ignore_unmapped"
+        case boost
+        case name
     }
 }
 
@@ -308,6 +342,8 @@ extension GeoDistanceQuery: Equatable {
             && lhs.distanceType == rhs.distanceType
             && lhs.validationMethod == rhs.validationMethod
             && lhs.ignoreUnmapped == rhs.ignoreUnmapped
+            && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 }
 
@@ -320,12 +356,16 @@ public struct GeoPolygonQuery: Query {
     public let points: [GeoPoint]
     public let validationMethod: GeoValidationMethod?
     public let ignoreUnmapped: Bool?
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(field: String, points: [GeoPoint], validationMethod: GeoValidationMethod? = nil, ignoreUnmapped: Bool? = nil) {
+    public init(field: String, points: [GeoPoint], validationMethod: GeoValidationMethod? = nil, ignoreUnmapped: Bool? = nil, boost: Decimal? = nil, name: String? = nil) {
         self.field = field
         self.points = points
         self.validationMethod = validationMethod
         self.ignoreUnmapped = ignoreUnmapped
+        self.boost = boost
+        self.name = name
     }
 
     internal init(withBuilder builder: GeoPolygonQueryBuilder) throws {
@@ -337,7 +377,7 @@ public struct GeoPolygonQuery: Query {
             throw QueryBuilderError.atlestOneElementRequired("points")
         }
 
-        self.init(field: builder.field!, points: builder.points!, validationMethod: builder.validationMethod, ignoreUnmapped: builder.ignoreUnmapped)
+        self.init(field: builder.field!, points: builder.points!, validationMethod: builder.validationMethod, ignoreUnmapped: builder.ignoreUnmapped, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -361,6 +401,8 @@ extension GeoPolygonQuery: Codable {
         points = try fieldContainer.decodeArray(forKey: .points)
         validationMethod = try nested.decodeIfPresent(GeoValidationMethod.self, forKey: .key(named: CodingKeys.validationMethod.rawValue))
         ignoreUnmapped = try nested.decodeBoolIfPresent(forKey: .key(named: CodingKeys.ignoreUnmapped.rawValue))
+        boost = try nested.decodeDecimalIfPresent(forKey: .key(named: CodingKeys.boost.rawValue))
+        name = try nested.decodeStringIfPresent(forKey: .key(named: CodingKeys.name.rawValue))
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -370,18 +412,28 @@ extension GeoPolygonQuery: Codable {
         try fieldContainer.encode(points, forKey: .points)
         try nested.encodeIfPresent(validationMethod, forKey: .key(named: CodingKeys.validationMethod.rawValue))
         try nested.encodeIfPresent(ignoreUnmapped, forKey: .key(named: CodingKeys.ignoreUnmapped.rawValue))
+        try nested.encodeIfPresent(boost, forKey: .key(named: CodingKeys.boost.rawValue))
+        try nested.encodeIfPresent(name, forKey: .key(named: CodingKeys.name.rawValue))
     }
 
     enum CodingKeys: String, CodingKey {
         case points
         case validationMethod = "validation_method"
         case ignoreUnmapped = "ignore_unmapped"
+        case boost
+        case name
     }
 }
 
 extension GeoPolygonQuery: Equatable {
     public static func == (lhs: GeoPolygonQuery, rhs: GeoPolygonQuery) -> Bool {
         return lhs.queryType.isEqualTo(rhs.queryType)
+            && lhs.field == rhs.field
+            && lhs.points == rhs.points
+            && lhs.validationMethod == rhs.validationMethod
+            && lhs.ignoreUnmapped == rhs.ignoreUnmapped
+            && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 }
 

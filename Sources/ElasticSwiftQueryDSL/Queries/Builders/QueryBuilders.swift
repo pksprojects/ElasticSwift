@@ -18,6 +18,10 @@ public final class QueryBuilders {
         return MatchAllQueryBuilder()
     }
 
+    public static func matchNoneQuery() -> MatchNoneQueryBuilder {
+        return MatchNoneQueryBuilder()
+    }
+
     public static func matchQuery() -> MatchQueryBuilder {
         return MatchQueryBuilder()
     }
@@ -136,5 +140,57 @@ public final class QueryBuilders {
 
     public static func geoPolygonQuery() -> GeoPolygonQueryBuilder {
         return GeoPolygonQueryBuilder()
+    }
+
+    public static func moreLikeThisQuery() -> MoreLikeThisQueryBuilder {
+        return MoreLikeThisQueryBuilder()
+    }
+
+    public static func scriptQuery() -> ScriptQueryBuilder {
+        return ScriptQueryBuilder()
+    }
+
+    public static func percolateQuery() -> PercoloteQueryBuilder {
+        return PercoloteQueryBuilder()
+    }
+
+    public static func wrapperQuery() -> WrapperQueryBuilder {
+        return WrapperQueryBuilder()
+    }
+
+    public static func spanTermQuery() -> SpanTermQueryBuilder {
+        return SpanTermQueryBuilder()
+    }
+
+    public static func spanMultiTermQueryBuilder() -> SpanMultiTermQueryBuilder {
+        return SpanMultiTermQueryBuilder()
+    }
+
+    public static func spanFirstQuery() -> SpanFirstQueryBuilder {
+        return SpanFirstQueryBuilder()
+    }
+
+    public static func spanNearQuery() -> SpanNearQueryBuilder {
+        return SpanNearQueryBuilder()
+    }
+
+    public static func spanOrQuery() -> SpanOrQueryBuilder {
+        return SpanOrQueryBuilder()
+    }
+
+    public static func spanNotQuery() -> SpanNotQueryBuilder {
+        return SpanNotQueryBuilder()
+    }
+
+    public static func spanContainingQuery() -> SpanContainingQueryBuilder {
+        return SpanContainingQueryBuilder()
+    }
+
+    public static func spanWithinQuery() -> SpanWithinQueryBuilder {
+        return SpanWithinQueryBuilder()
+    }
+
+    public static func fieldMaskingSpanQuery() -> SpanFieldMaskingQueryBuilder {
+        return SpanFieldMaskingQueryBuilder()
     }
 }

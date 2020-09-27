@@ -136,7 +136,7 @@ public class ReIndexRequestBuilder: RequestBuilder {
 // MARK: - ReIndex Request
 
 public struct ReIndexRequest: Request {
-    public var headers: HTTPHeaders = HTTPHeaders()
+    public var headers = HTTPHeaders()
 
     public let source: Source
     public let destination: Destination

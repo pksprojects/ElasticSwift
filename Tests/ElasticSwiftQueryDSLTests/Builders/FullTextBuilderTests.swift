@@ -71,6 +71,7 @@ class FullTextBuilderTests: XCTestCase {
             .set(fuzziness: .auto)
             .set(cutoffFrequency: 0.1)
             .set(boost: 0.8)
+            .set(name: "name")
             .set(autoGenSynonymnsPhraseQuery: false)
             .build()
         XCTAssertEqual(query.field, "message")
@@ -79,6 +80,7 @@ class FullTextBuilderTests: XCTestCase {
         XCTAssertEqual(query.cutoffFrequency, Decimal(0.1))
         XCTAssertEqual(query.operator, Operator.or)
         XCTAssertEqual(query.boost, 0.8)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_05_matchPhraseQueryBuilder() throws {
@@ -122,10 +124,14 @@ class FullTextBuilderTests: XCTestCase {
             .set(field: "message")
             .set(value: "this is a test")
             .set(analyzer: "my_analyzer")
+            .set(boost: 1.0)
+            .set(name: "name")
             .build()
         XCTAssertEqual(query.field, "message")
         XCTAssertEqual(query.value, "this is a test")
         XCTAssertEqual(query.analyzer, "my_analyzer")
+        XCTAssertEqual(query.boost, 1.0)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_10_matchPhraseQueryBuilder() throws {
@@ -178,10 +184,14 @@ class FullTextBuilderTests: XCTestCase {
             .set(field: "message")
             .set(value: "quick brown f")
             .set(maxExpansions: 10)
+            .set(boost: 1.0)
+            .set(name: "name")
             .build()
         XCTAssertEqual(query.field, "message")
         XCTAssertEqual(query.value, "quick brown f")
         XCTAssertEqual(query.maxExpansions, 10)
+        XCTAssertEqual(query.boost, 1.0)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_16_matchPhrasePrefixQueryBuilder() throws {
@@ -235,23 +245,27 @@ class FullTextBuilderTests: XCTestCase {
             .set(query: "this is a test")
             .set(tieBreaker: 0.3)
             .set(type: .bestFields)
+            .set(boost: 1.0)
+            .set(name: "name")
             .build()
         XCTAssertEqual(query.fields, ["subject", "message"])
         XCTAssertEqual(query.query, "this is a test")
         XCTAssertEqual(query.tieBreaker, 0.3)
         XCTAssertEqual(query.type, .bestFields)
+        XCTAssertEqual(query.boost, 1.0)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_22_commonTermsQueryBuilder() throws {
-        XCTAssertNoThrow(try QueryBuilders.commonTermsQuery().set(query: "test search").set(cutoffFrequency: 0.001).build(), "Should not throw")
+        XCTAssertNoThrow(try QueryBuilders.commonTermsQuery().set(field: "field").set(query: "test search").set(cutoffFrequency: 0.001).build(), "Should not throw")
     }
 
     func test_23_commonTermsQueryBuilder() throws {
-        XCTAssertNoThrow(try QueryBuilders.commonTermsQuery().set(query: "test search").set(cutoffFrequency: 0.001).set(highFrequencyOperator: .and).set(lowFrequencyOperator: .or).set(minimumShouldMatch: 2).build(), "Should not throw")
+        XCTAssertNoThrow(try QueryBuilders.commonTermsQuery().set(field: "field").set(query: "test search").set(cutoffFrequency: 0.001).set(highFrequencyOperator: .and).set(lowFrequencyOperator: .or).set(minimumShouldMatch: 2).build(), "Should not throw")
     }
 
     func test_24_commonTermsQueryBuilder_missing_field() throws {
-        XCTAssertThrowsError(try QueryBuilders.commonTermsQuery().set(query: "test search").build(), "Should not throw") { error in
+        XCTAssertThrowsError(try QueryBuilders.commonTermsQuery().set(field: "field").set(query: "test search").build(), "Should not throw") { error in
             logger.info("Expected Error: \(error)")
             if let error = error as? QueryBuilderError {
                 switch error {
@@ -280,21 +294,28 @@ class FullTextBuilderTests: XCTestCase {
 
     func test_26_commonTermsQueryBuilder() throws {
         let query = try QueryBuilders.commonTermsQuery()
+            .set(field: "field")
             .set(query: "this is a test")
             .set(cutoffFrequency: 0.001)
             .set(highFrequencyOperator: .and)
             .set(lowFrequencyOperator: .or)
             .set(minimumShouldMatch: 2)
+            .set(boost: 1.0)
+            .set(name: "name")
             .build()
+        XCTAssertEqual(query.field, "field")
         XCTAssertEqual(query.cutoffFrequency, 0.001)
         XCTAssertEqual(query.query, "this is a test")
         XCTAssertEqual(query.highFrequencyOperator, .and)
         XCTAssertEqual(query.lowFrequencyOperator, .or)
         XCTAssertEqual(query.minimumShouldMatch, 2)
+        XCTAssertEqual(query.boost, 1.0)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_27_commonTermsQueryBuilder() throws {
         let query = try QueryBuilders.commonTermsQuery()
+            .set(field: "field")
             .set(query: "this is a test")
             .set(cutoffFrequency: 0.001)
             .set(highFrequencyOperator: .and)
@@ -302,6 +323,7 @@ class FullTextBuilderTests: XCTestCase {
             .set(minimumShouldMatchLowFreq: 2)
             .set(minimumShouldMatchHighFreq: 3)
             .build()
+        XCTAssertEqual(query.field, "field")
         XCTAssertEqual(query.cutoffFrequency, 0.001)
         XCTAssertEqual(query.query, "this is a test")
         XCTAssertEqual(query.highFrequencyOperator, .and)
@@ -355,6 +377,8 @@ class FullTextBuilderTests: XCTestCase {
             .set(maxDeterminizedStates: 4)
             .set(enablePositionIncrements: false)
             .set(autoGeneratePhraseQueries: false)
+            .set(boost: 1.0)
+            .set(name: "name")
             .build()
         XCTAssertEqual(query.minimumShouldMatch, 2)
         XCTAssertEqual(query.query, "this is a test")
@@ -380,6 +404,8 @@ class FullTextBuilderTests: XCTestCase {
         XCTAssertEqual(query.maxDeterminizedStates, 4)
         XCTAssertEqual(query.enablePositionIncrements, false)
         XCTAssertEqual(query.autoGeneratePhraseQueries, false)
+        XCTAssertEqual(query.boost, 1.0)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_31_simpleQueryStringQueryBuilder() throws {
@@ -414,6 +440,8 @@ class FullTextBuilderTests: XCTestCase {
             .set(fuzzyTranspositions: false)
             .set(fuzzyPrefixLength: 1)
             .set(fuzzyMaxExpansions: 2)
+            .set(boost: 1.0)
+            .set(name: "name")
             .build()
         XCTAssertEqual(query.minimumShouldMatch, 2)
         XCTAssertEqual(query.query, "this is a test")
@@ -427,5 +455,7 @@ class FullTextBuilderTests: XCTestCase {
         XCTAssertEqual(query.fuzzyTranspositions, false)
         XCTAssertEqual(query.fuzzyPrefixLength, 1)
         XCTAssertEqual(query.fuzzyMaxExpansions, 2)
+        XCTAssertEqual(query.boost, 1.0)
+        XCTAssertEqual(query.name, "name")
     }
 }

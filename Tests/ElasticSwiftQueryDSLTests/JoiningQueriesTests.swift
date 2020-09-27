@@ -30,7 +30,7 @@ class JoiningQueriesTests: XCTestCase {
     }
 
     func test_01_nestedQuery_encode() throws {
-        let query = NestedQuery("path", query: MatchAllQuery())
+        let query = NestedQuery("obj1", query: MatchAllQuery(), scoreMode: .avg, innerHits: InnerHit())
 
         let data = try JSONEncoder().encode(query)
 
@@ -40,12 +40,24 @@ class JoiningQueriesTests: XCTestCase {
 
         let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
 
-        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: "{\"nested\":{\"path\":\"path\",\"query\":{\"match_all\":{}}}}".data(using: .utf8)!)
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from:
+            """
+            {
+                "nested" : {
+                    "path" : "obj1",
+                    "query" : {
+                        "match_all" : {}
+                    },
+                    "score_mode" : "avg",
+                    "inner_hits" : {}
+                }
+            }
+            """.data(using: .utf8)!)
         XCTAssertEqual(expectedDic, dic)
     }
 
     func test_02_nestedQuery_decode() throws {
-        let query = NestedQuery("obj1", query: BoolQuery(must: [MatchQuery(field: "obj1.name", value: "blue"), RangeQuery(field: "obj1.count", gte: nil, gt: "5", lte: nil, lt: nil)], mustNot: [], should: [], filter: []), scoreMode: .avg)
+        let query = NestedQuery("obj1", query: BoolQuery(must: [MatchQuery(field: "obj1.name", value: "blue"), RangeQuery(field: "obj1.count", gte: nil, gt: "5", lte: nil, lt: nil)], mustNot: [], should: [], filter: []), scoreMode: .avg, innerHits: InnerHit())
 
         let jsonStr = """
         {
@@ -59,7 +71,8 @@ class JoiningQueriesTests: XCTestCase {
                         ]
                     }
                 },
-                "score_mode" : "avg"
+                "score_mode" : "avg",
+                "inner_hits" : {}
             }
         }
         """

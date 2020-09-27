@@ -20,12 +20,14 @@ public struct MatchQuery: Query {
     public let cutoffFrequency: Decimal?
     public let fuzziness: Fuzziness?
     public let autoGenSynonymnsPhraseQuery: Bool?
-    public let boost: Decimal?
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(field: String, value: String, boost: Decimal? = nil, operator: Operator? = nil, zeroTermQuery: ZeroTermQuery? = nil, cutoffFrequency: Decimal? = nil, fuzziness: Fuzziness? = nil, autoGenSynonymnsPhraseQuery: Bool? = nil) {
+    public init(field: String, value: String, boost: Decimal? = nil, operator: Operator? = nil, zeroTermQuery: ZeroTermQuery? = nil, cutoffFrequency: Decimal? = nil, fuzziness: Fuzziness? = nil, autoGenSynonymnsPhraseQuery: Bool? = nil, name: String? = nil) {
         self.field = field
         self.value = value
         self.boost = boost
+        self.name = name
         self.operator = `operator`
         self.zeroTermQuery = zeroTermQuery
         self.cutoffFrequency = cutoffFrequency
@@ -42,7 +44,7 @@ public struct MatchQuery: Query {
             throw QueryBuilderError.missingRequiredField("value")
         }
 
-        self.init(field: builder.field!, value: builder.value!, boost: builder.boost, operator: builder.operator, zeroTermQuery: builder.zeroTermQuery, cutoffFrequency: builder.cutoffFrequency, fuzziness: builder.fuzziness, autoGenSynonymnsPhraseQuery: builder.autoGenSynonymnsPhraseQuery)
+        self.init(field: builder.field!, value: builder.value!, boost: builder.boost, operator: builder.operator, zeroTermQuery: builder.zeroTermQuery, cutoffFrequency: builder.cutoffFrequency, fuzziness: builder.fuzziness, autoGenSynonymnsPhraseQuery: builder.autoGenSynonymnsPhraseQuery, name: builder.name)
     }
 }
 
@@ -59,6 +61,7 @@ extension MatchQuery {
         if let fieldContainer = try? nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field)) {
             value = try fieldContainer.decodeString(forKey: .query)
             boost = try fieldContainer.decodeDecimalIfPresent(forKey: .boost)
+            name = try fieldContainer.decodeStringIfPresent(forKey: .name)
             `operator` = try fieldContainer.decodeIfPresent(Operator.self, forKey: .operator)
             zeroTermQuery = try fieldContainer.decodeIfPresent(ZeroTermQuery.self, forKey: .zeroTermsQuery)
             cutoffFrequency = try fieldContainer.decodeDecimalIfPresent(forKey: .cutoffFrequency)
@@ -72,6 +75,7 @@ extension MatchQuery {
             fuzziness = nil
             autoGenSynonymnsPhraseQuery = nil
             boost = nil
+            name = nil
         }
     }
 
@@ -81,6 +85,7 @@ extension MatchQuery {
         var fieldContainer = nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
         try fieldContainer.encode(value, forKey: .query)
         try fieldContainer.encodeIfPresent(boost, forKey: .boost)
+        try fieldContainer.encodeIfPresent(name, forKey: .name)
         try fieldContainer.encodeIfPresent(`operator`, forKey: .operator)
         try fieldContainer.encodeIfPresent(zeroTermQuery, forKey: .zeroTermsQuery)
         try fieldContainer.encodeIfPresent(cutoffFrequency, forKey: .cutoffFrequency)
@@ -91,6 +96,7 @@ extension MatchQuery {
     enum CodingKeys: String, CodingKey {
         case query
         case boost
+        case name
         case `operator`
         case fuzziness
         case zeroTermsQuery = "zero_terms_query"
@@ -109,6 +115,8 @@ extension MatchQuery: Equatable {
             && lhs.fuzziness == rhs.fuzziness
             && lhs.operator == rhs.operator
             && lhs.zeroTermQuery == rhs.zeroTermQuery
+            && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 }
 
@@ -120,11 +128,15 @@ public struct MatchPhraseQuery: Query {
     public let field: String
     public let value: String
     public let analyzer: String?
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(field: String, value: String, analyzer: String? = nil) {
+    public init(field: String, value: String, analyzer: String? = nil, boost: Decimal? = nil, name: String? = nil) {
         self.field = field
         self.value = value
         self.analyzer = analyzer
+        self.boost = boost
+        self.name = name
     }
 
     internal init(withBuilder builder: MatchPhraseQueryBuilder) throws {
@@ -136,7 +148,7 @@ public struct MatchPhraseQuery: Query {
             throw QueryBuilderError.missingRequiredField("value")
         }
 
-        self.init(field: builder.field!, value: builder.value!, analyzer: builder.analyzer)
+        self.init(field: builder.field!, value: builder.value!, analyzer: builder.analyzer, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -153,16 +165,20 @@ extension MatchPhraseQuery {
         if let fieldContainer = try? nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field)) {
             value = try fieldContainer.decodeString(forKey: .query)
             analyzer = try fieldContainer.decodeStringIfPresent(forKey: .analyzer)
+            name = try fieldContainer.decodeStringIfPresent(forKey: .name)
+            boost = try fieldContainer.decodeDecimalIfPresent(forKey: .boost)
         } else {
             value = try nested.decodeString(forKey: .key(named: field))
             analyzer = nil
+            name = nil
+            boost = nil
         }
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
-        guard analyzer != nil else {
+        guard analyzer != nil || name != nil || boost != nil else {
             try nested.encode(value, forKey: .key(named: field))
             return
         }
@@ -170,11 +186,15 @@ extension MatchPhraseQuery {
         var fieldContainer = nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
         try fieldContainer.encode(value, forKey: .query)
         try fieldContainer.encode(analyzer, forKey: .analyzer)
+        try fieldContainer.encodeIfPresent(name, forKey: .name)
+        try fieldContainer.encodeIfPresent(boost, forKey: .boost)
     }
 
     enum CodingKeys: String, CodingKey {
         case query
         case analyzer
+        case name
+        case boost
     }
 }
 
@@ -184,6 +204,8 @@ extension MatchPhraseQuery: Equatable {
             && lhs.field == rhs.field
             && lhs.value == rhs.value
             && lhs.analyzer == rhs.analyzer
+            && lhs.name == rhs.name
+            && lhs.boost == rhs.boost
     }
 }
 
@@ -195,11 +217,15 @@ public struct MatchPhrasePrefixQuery: Query {
     public let field: String
     public let value: String
     public let maxExpansions: Int?
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(field: String, value: String, maxExpansions: Int? = nil) {
+    public init(field: String, value: String, maxExpansions: Int? = nil, boost: Decimal? = nil, name: String? = nil) {
         self.field = field
         self.value = value
         self.maxExpansions = maxExpansions
+        self.boost = boost
+        self.name = name
     }
 
     internal init(withBuilder builder: MatchPhrasePrefixQueryBuilder) throws {
@@ -211,7 +237,7 @@ public struct MatchPhrasePrefixQuery: Query {
             throw QueryBuilderError.missingRequiredField("value")
         }
 
-        self.init(field: builder.field!, value: builder.value!, maxExpansions: builder.maxExpansions)
+        self.init(field: builder.field!, value: builder.value!, maxExpansions: builder.maxExpansions, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -228,16 +254,20 @@ extension MatchPhrasePrefixQuery {
         if let fieldContainer = try? nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field)) {
             value = try fieldContainer.decodeString(forKey: .query)
             maxExpansions = try fieldContainer.decodeIntIfPresent(forKey: .maxExpansions)
+            name = try fieldContainer.decodeStringIfPresent(forKey: .name)
+            boost = try fieldContainer.decodeDecimalIfPresent(forKey: .boost)
         } else {
             value = try nested.decodeString(forKey: .key(named: field))
             maxExpansions = nil
+            name = nil
+            boost = nil
         }
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
-        guard maxExpansions != nil else {
+        guard maxExpansions != nil || name != nil || boost != nil else {
             try nested.encode(value, forKey: .key(named: field))
             return
         }
@@ -245,11 +275,15 @@ extension MatchPhrasePrefixQuery {
         var fieldContainer = nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
         try fieldContainer.encode(value, forKey: .query)
         try fieldContainer.encode(maxExpansions, forKey: .maxExpansions)
+        try fieldContainer.encodeIfPresent(name, forKey: .name)
+        try fieldContainer.encodeIfPresent(boost, forKey: .boost)
     }
 
     enum CodingKeys: String, CodingKey {
         case query
         case maxExpansions = "max_expansions"
+        case name
+        case boost
     }
 }
 
@@ -259,6 +293,8 @@ extension MatchPhrasePrefixQuery: Equatable {
             && lhs.field == rhs.field
             && lhs.value == rhs.value
             && lhs.maxExpansions == rhs.maxExpansions
+            && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 }
 
@@ -271,15 +307,19 @@ public struct MultiMatchQuery: Query {
     public let type: MultiMatchQueryType?
     public let query: String
     public let fields: [String]
+    public var boost: Decimal?
+    public var name: String?
 
-    internal init(query: String, fields: [String], tieBreaker: Decimal?, type: MultiMatchQueryType?) {
+    internal init(query: String, fields: [String], tieBreaker: Decimal?, type: MultiMatchQueryType?, boost: Decimal? = nil, name: String? = nil) {
         self.tieBreaker = tieBreaker
         self.type = type
         self.query = query
         self.fields = fields
+        self.boost = boost
+        self.name = name
     }
 
-    public init(withBuilder builder: MultiMatchQueryBuilder) throws {
+    internal init(withBuilder builder: MultiMatchQueryBuilder) throws {
         guard !builder.fields.isEmpty else {
             throw QueryBuilderError.atlestOneElementRequired("fields")
         }
@@ -288,7 +328,7 @@ public struct MultiMatchQuery: Query {
             throw QueryBuilderError.missingRequiredField("query")
         }
 
-        self.init(query: builder.query!, fields: builder.fields, tieBreaker: builder.tieBreaker, type: builder.type)
+        self.init(query: builder.query!, fields: builder.fields, tieBreaker: builder.tieBreaker, type: builder.type, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -300,6 +340,8 @@ extension MultiMatchQuery {
         fields = try nested.decodeArray(forKey: .fields)
         type = try nested.decodeIfPresent(MultiMatchQueryType.self, forKey: .type)
         tieBreaker = try nested.decodeDecimalIfPresent(forKey: .tieBreaker)
+        name = try nested.decodeStringIfPresent(forKey: .name)
+        boost = try nested.decodeDecimalIfPresent(forKey: .boost)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -310,6 +352,8 @@ extension MultiMatchQuery {
         try nested.encode(fields, forKey: .fields)
         try nested.encodeIfPresent(type, forKey: .type)
         try nested.encodeIfPresent(tieBreaker, forKey: .tieBreaker)
+        try nested.encodeIfPresent(name, forKey: .name)
+        try nested.encodeIfPresent(boost, forKey: .boost)
     }
 
     enum CodingKeys: String, CodingKey {
@@ -317,6 +361,8 @@ extension MultiMatchQuery {
         case fields
         case tieBreaker = "tie_breaker"
         case type
+        case name
+        case boost
     }
 }
 
@@ -327,16 +373,17 @@ extension MultiMatchQuery: Equatable {
             && lhs.fields == rhs.fields
             && lhs.tieBreaker == rhs.tieBreaker
             && lhs.type == rhs.type
+            && lhs.name == rhs.name
+            && lhs.boost == rhs.boost
     }
 }
 
 // MARK: - CommonTermsQuery
 
 public struct CommonTermsQuery: Query {
-    private static let BODY = "body"
-
     public let queryType: QueryType = QueryTypes.common
 
+    public let field: String
     public let query: String
     public let cutoffFrequency: Decimal
     public let lowFrequencyOperator: Operator?
@@ -344,8 +391,11 @@ public struct CommonTermsQuery: Query {
     public let minimumShouldMatch: Int?
     public let minimumShouldMatchLowFreq: Int?
     public let minimumShouldMatchHighFreq: Int?
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(query: String, cutoffFrequency: Decimal, lowFrequencyOperator: Operator? = nil, highFrequencyOperator: Operator? = nil, minimumShouldMatch: Int? = nil, minimumShouldMatchLowFreq: Int? = nil, minimumShouldMatchHighFreq: Int? = nil) {
+    public init(field: String, query: String, cutoffFrequency: Decimal, lowFrequencyOperator: Operator? = nil, highFrequencyOperator: Operator? = nil, minimumShouldMatch: Int? = nil, minimumShouldMatchLowFreq: Int? = nil, minimumShouldMatchHighFreq: Int? = nil, boost: Decimal? = nil, name: String? = nil) {
+        self.field = field
         self.query = query
         self.cutoffFrequency = cutoffFrequency
         self.lowFrequencyOperator = lowFrequencyOperator
@@ -353,6 +403,8 @@ public struct CommonTermsQuery: Query {
         self.minimumShouldMatch = minimumShouldMatch
         self.minimumShouldMatchLowFreq = minimumShouldMatchLowFreq
         self.minimumShouldMatchHighFreq = minimumShouldMatchHighFreq
+        self.boost = boost
+        self.name = name
     }
 
     internal init(withBuilder builder: CommonTermsQueryBuilder) throws {
@@ -364,7 +416,11 @@ public struct CommonTermsQuery: Query {
             throw QueryBuilderError.missingRequiredField("query")
         }
 
-        self.init(query: builder.query!, cutoffFrequency: builder.cutoffFrequency!, lowFrequencyOperator: builder.lowFrequencyOperator, highFrequencyOperator: builder.highFrequencyOperator, minimumShouldMatch: builder.minimumShouldMatch, minimumShouldMatchLowFreq: builder.minimumShouldMatchLowFreq, minimumShouldMatchHighFreq: builder.minimumShouldMatchHighFreq)
+        guard builder.field != nil else {
+            throw QueryBuilderError.missingRequiredField("field")
+        }
+
+        self.init(field: builder.field!, query: builder.query!, cutoffFrequency: builder.cutoffFrequency!, lowFrequencyOperator: builder.lowFrequencyOperator, highFrequencyOperator: builder.highFrequencyOperator, minimumShouldMatch: builder.minimumShouldMatch, minimumShouldMatchLowFreq: builder.minimumShouldMatchLowFreq, minimumShouldMatchHighFreq: builder.minimumShouldMatchHighFreq, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -372,39 +428,49 @@ extension CommonTermsQuery {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
-        let bodyContainer = try nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: CommonTermsQuery.BODY))
 
-        query = try bodyContainer.decodeString(forKey: .query)
-        cutoffFrequency = try bodyContainer.decodeDecimal(forKey: .cutoffFrequency)
-        lowFrequencyOperator = try bodyContainer.decodeIfPresent(Operator.self, forKey: .lowFreqOperator)
-        highFrequencyOperator = try bodyContainer.decodeIfPresent(Operator.self, forKey: .highFreqOperator)
-        if let minShouldMatch = try? bodyContainer.decodeIntIfPresent(forKey: .minimumShouldMatch) {
+        guard nested.allKeys.count == 1 else {
+            throw Swift.DecodingError.typeMismatch(MatchPhrasePrefixQuery.self, .init(codingPath: nested.codingPath, debugDescription: "Unable to find field name in key(s) expect: 1 key found: \(nested.allKeys.count)."))
+        }
+
+        field = nested.allKeys.first!.stringValue
+        let fieldContainer = try nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
+
+        query = try fieldContainer.decodeString(forKey: .query)
+        cutoffFrequency = try fieldContainer.decodeDecimal(forKey: .cutoffFrequency)
+        lowFrequencyOperator = try fieldContainer.decodeIfPresent(Operator.self, forKey: .lowFreqOperator)
+        highFrequencyOperator = try fieldContainer.decodeIfPresent(Operator.self, forKey: .highFreqOperator)
+        if let minShouldMatch = try? fieldContainer.decodeIntIfPresent(forKey: .minimumShouldMatch) {
             minimumShouldMatch = minShouldMatch
             minimumShouldMatchLowFreq = nil
             minimumShouldMatchHighFreq = nil
         } else {
-            let minContainer = try? bodyContainer.nestedContainer(keyedBy: CodingKeys.self, forKey: .minimumShouldMatch)
+            let minContainer = try? fieldContainer.nestedContainer(keyedBy: CodingKeys.self, forKey: .minimumShouldMatch)
             minimumShouldMatchLowFreq = try minContainer?.decodeIntIfPresent(forKey: .lowFreq)
             minimumShouldMatchHighFreq = try minContainer?.decodeIntIfPresent(forKey: .highFreq)
             minimumShouldMatch = nil
         }
+        boost = try fieldContainer.decodeDecimalIfPresent(forKey: .boost)
+        name = try fieldContainer.decodeStringIfPresent(forKey: .name)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
-        var bodyContainer = nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: CommonTermsQuery.BODY))
+        var fieldContainer = nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
 
-        try bodyContainer.encode(query, forKey: .query)
-        try bodyContainer.encode(cutoffFrequency, forKey: .cutoffFrequency)
-        try bodyContainer.encodeIfPresent(lowFrequencyOperator, forKey: .lowFreqOperator)
-        try bodyContainer.encodeIfPresent(highFrequencyOperator, forKey: .highFreqOperator)
-        try bodyContainer.encodeIfPresent(minimumShouldMatch, forKey: .minimumShouldMatch)
+        try fieldContainer.encode(query, forKey: .query)
+        try fieldContainer.encode(cutoffFrequency, forKey: .cutoffFrequency)
+        try fieldContainer.encodeIfPresent(lowFrequencyOperator, forKey: .lowFreqOperator)
+        try fieldContainer.encodeIfPresent(highFrequencyOperator, forKey: .highFreqOperator)
+        try fieldContainer.encodeIfPresent(minimumShouldMatch, forKey: .minimumShouldMatch)
         if let minHighFreq = minimumShouldMatchHighFreq, let minLowFreq = minimumShouldMatchLowFreq {
-            var minShouldMatchContainer = bodyContainer.nestedContainer(keyedBy: CodingKeys.self, forKey: .minimumShouldMatch)
+            var minShouldMatchContainer = fieldContainer.nestedContainer(keyedBy: CodingKeys.self, forKey: .minimumShouldMatch)
             try minShouldMatchContainer.encode(minLowFreq, forKey: .lowFreq)
             try minShouldMatchContainer.encode(minHighFreq, forKey: .highFreq)
         }
+        try fieldContainer.encodeIfPresent(boost, forKey: .boost)
+        try fieldContainer.encodeIfPresent(name, forKey: .name)
     }
 
     enum CodingKeys: String, CodingKey {
@@ -415,12 +481,15 @@ extension CommonTermsQuery {
         case minimumShouldMatch = "minimum_should_match"
         case lowFreq = "low_freq"
         case highFreq = "high_freq"
+        case name
+        case boost
     }
 }
 
 extension CommonTermsQuery: Equatable {
     public static func == (lhs: CommonTermsQuery, rhs: CommonTermsQuery) -> Bool {
         return lhs.queryType.isEqualTo(rhs.queryType)
+            && lhs.field == rhs.field
             && lhs.query == rhs.query
             && lhs.cutoffFrequency == rhs.cutoffFrequency
             && lhs.highFrequencyOperator == rhs.highFrequencyOperator
@@ -428,6 +497,8 @@ extension CommonTermsQuery: Equatable {
             && lhs.minimumShouldMatch == rhs.minimumShouldMatch
             && lhs.minimumShouldMatchLowFreq == rhs.minimumShouldMatchLowFreq
             && lhs.minimumShouldMatchHighFreq == rhs.minimumShouldMatchHighFreq
+            && lhs.name == rhs.name
+            && lhs.boost == rhs.boost
     }
 }
 
@@ -451,7 +522,6 @@ public struct QueryStringQuery: Query {
     public let fuzzyPrefixLength: Int?
     public let fuzzyTranspositions: Bool?
     public let phraseSlop: Int?
-    public let boost: Decimal?
     public let autoGeneratePhraseQueries: Bool?
     public let analyzeWildcard: Bool?
     public let maxDeterminizedStates: Int?
@@ -460,8 +530,10 @@ public struct QueryStringQuery: Query {
     public let timeZone: String?
     public let quoteFieldSuffix: String?
     public let autoGenerateSynonymsPhraseQuery: Bool?
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(_ query: String, fields: [String]? = nil, type: MultiMatchQueryType? = nil, tieBreaker: Decimal? = nil, defaultField: String? = nil, defaultOperator: String? = nil, analyzer: String? = nil, quoteAnalyzer: String? = nil, allowLeadingWildcard: Bool? = nil, enablePositionIncrements: Bool? = nil, fuzzyMaxExpansions: Int? = nil, fuzziness: String? = nil, fuzzyPrefixLength: Int? = nil, fuzzyTranspositions: Bool? = nil, phraseSlop: Int? = nil, boost: Decimal? = nil, autoGeneratePhraseQueries: Bool? = nil, analyzeWildcard: Bool? = nil, maxDeterminizedStates: Int? = nil, minimumShouldMatch: Int? = nil, lenient: Bool? = nil, timeZone: String? = nil, quoteFieldSuffix: String? = nil, autoGenerateSynonymsPhraseQuery: Bool? = nil) {
+    public init(_ query: String, fields: [String]? = nil, type: MultiMatchQueryType? = nil, tieBreaker: Decimal? = nil, defaultField: String? = nil, defaultOperator: String? = nil, analyzer: String? = nil, quoteAnalyzer: String? = nil, allowLeadingWildcard: Bool? = nil, enablePositionIncrements: Bool? = nil, fuzzyMaxExpansions: Int? = nil, fuzziness: String? = nil, fuzzyPrefixLength: Int? = nil, fuzzyTranspositions: Bool? = nil, phraseSlop: Int? = nil, boost: Decimal? = nil, autoGeneratePhraseQueries: Bool? = nil, analyzeWildcard: Bool? = nil, maxDeterminizedStates: Int? = nil, minimumShouldMatch: Int? = nil, lenient: Bool? = nil, timeZone: String? = nil, quoteFieldSuffix: String? = nil, autoGenerateSynonymsPhraseQuery: Bool? = nil, name: String? = nil) {
         self.defaultField = defaultField
         self.query = query
         self.fields = fields
@@ -486,6 +558,7 @@ public struct QueryStringQuery: Query {
         self.timeZone = timeZone
         self.quoteFieldSuffix = quoteFieldSuffix
         self.autoGenerateSynonymsPhraseQuery = autoGenerateSynonymsPhraseQuery
+        self.name = name
     }
 
     internal init(withBuilder builder: QueryStringQueryBuilder) throws {
@@ -493,7 +566,7 @@ public struct QueryStringQuery: Query {
             throw QueryBuilderError.missingRequiredField("query")
         }
 
-        self.init(builder.query!, fields: builder.fields, type: builder.type, tieBreaker: builder.tieBreaker, defaultField: builder.defaultField, defaultOperator: builder.defaultOperator, analyzer: builder.analyzer, quoteAnalyzer: builder.quoteAnalyzer, allowLeadingWildcard: builder.allowLeadingWildcard, enablePositionIncrements: builder.enablePositionIncrements, fuzzyMaxExpansions: builder.fuzzyMaxExpansions, fuzziness: builder.fuzziness, fuzzyPrefixLength: builder.fuzzyPrefixLength, fuzzyTranspositions: builder.fuzzyTranspositions, phraseSlop: builder.phraseSlop, boost: builder.boost, autoGeneratePhraseQueries: builder.autoGeneratePhraseQueries, analyzeWildcard: builder.analyzeWildcard, maxDeterminizedStates: builder.maxDeterminizedStates, minimumShouldMatch: builder.minimumShouldMatch, lenient: builder.lenient, timeZone: builder.timeZone, quoteFieldSuffix: builder.quoteFieldSuffix, autoGenerateSynonymsPhraseQuery: builder.autoGenerateSynonymsPhraseQuery)
+        self.init(builder.query!, fields: builder.fields, type: builder.type, tieBreaker: builder.tieBreaker, defaultField: builder.defaultField, defaultOperator: builder.defaultOperator, analyzer: builder.analyzer, quoteAnalyzer: builder.quoteAnalyzer, allowLeadingWildcard: builder.allowLeadingWildcard, enablePositionIncrements: builder.enablePositionIncrements, fuzzyMaxExpansions: builder.fuzzyMaxExpansions, fuzziness: builder.fuzziness, fuzzyPrefixLength: builder.fuzzyPrefixLength, fuzzyTranspositions: builder.fuzzyTranspositions, phraseSlop: builder.phraseSlop, boost: builder.boost, autoGeneratePhraseQueries: builder.autoGeneratePhraseQueries, analyzeWildcard: builder.analyzeWildcard, maxDeterminizedStates: builder.maxDeterminizedStates, minimumShouldMatch: builder.minimumShouldMatch, lenient: builder.lenient, timeZone: builder.timeZone, quoteFieldSuffix: builder.quoteFieldSuffix, autoGenerateSynonymsPhraseQuery: builder.autoGenerateSynonymsPhraseQuery, name: builder.name)
     }
 }
 
@@ -525,6 +598,7 @@ extension QueryStringQuery {
         timeZone = try nested.decodeStringIfPresent(forKey: .timeZone)
         quoteFieldSuffix = try nested.decodeStringIfPresent(forKey: .quoteFieldSuffix)
         autoGenerateSynonymsPhraseQuery = try nested.decodeBoolIfPresent(forKey: .autoGenerateSynonymsPhraseQuery)
+        name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -554,6 +628,7 @@ extension QueryStringQuery {
         try nested.encodeIfPresent(timeZone, forKey: .timeZone)
         try nested.encodeIfPresent(quoteFieldSuffix, forKey: .quoteFieldSuffix)
         try nested.encodeIfPresent(autoGenerateSynonymsPhraseQuery, forKey: .autoGenerateSynonymsPhraseQuery)
+        try nested.encodeIfPresent(name, forKey: .name)
     }
 
     enum CodingKeys: String, CodingKey {
@@ -581,6 +656,7 @@ extension QueryStringQuery {
         case timeZone = "time_zone"
         case quoteFieldSuffix = "quote_field_suffix"
         case autoGenerateSynonymsPhraseQuery = "auto_generate_synonyms_phrase_query"
+        case name
     }
 }
 
@@ -610,6 +686,7 @@ extension QueryStringQuery: Equatable {
             && lhs.phraseSlop == rhs.phraseSlop
             && lhs.quoteAnalyzer == rhs.quoteAnalyzer
             && lhs.timeZone == rhs.timeZone
+            && lhs.name == rhs.name
     }
 }
 
@@ -630,8 +707,10 @@ public struct SimpleQueryStringQuery: Query {
     public let fuzzyTranspositions: Bool?
     public let quoteFieldSuffix: String?
     public let autoGenerateSynonymsPhraseQuery: Bool?
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(query: String, fields: [String]? = nil, defaultOperator: String? = nil, analyzer: String? = nil, flags: String? = nil, lenient: Bool? = nil, minimumShouldMatch: Int? = nil, fuzzyMaxExpansions: Int? = nil, fuzzyPrefixLength: Int? = nil, fuzzyTranspositions: Bool? = nil, quoteFieldSuffix: String? = nil, autoGenerateSynonymsPhraseQuery: Bool? = nil) {
+    public init(query: String, fields: [String]? = nil, defaultOperator: String? = nil, analyzer: String? = nil, flags: String? = nil, lenient: Bool? = nil, minimumShouldMatch: Int? = nil, fuzzyMaxExpansions: Int? = nil, fuzzyPrefixLength: Int? = nil, fuzzyTranspositions: Bool? = nil, quoteFieldSuffix: String? = nil, autoGenerateSynonymsPhraseQuery: Bool? = nil, boost: Decimal? = nil, name: String? = nil) {
         self.query = query
         self.fields = fields
         self.defaultOperator = defaultOperator
@@ -644,6 +723,8 @@ public struct SimpleQueryStringQuery: Query {
         self.fuzzyTranspositions = fuzzyTranspositions
         self.quoteFieldSuffix = quoteFieldSuffix
         self.autoGenerateSynonymsPhraseQuery = autoGenerateSynonymsPhraseQuery
+        self.boost = boost
+        self.name = name
     }
 
     internal init(withBuilder builder: SimpleQueryStringQueryBuilder) throws {
@@ -651,7 +732,7 @@ public struct SimpleQueryStringQuery: Query {
             throw QueryBuilderError.missingRequiredField("query")
         }
 
-        self.init(query: builder.query!, fields: builder.fields, defaultOperator: builder.defaultOperator, analyzer: builder.analyzer, flags: builder.flags, lenient: builder.lenient, minimumShouldMatch: builder.minimumShouldMatch, fuzzyMaxExpansions: builder.fuzzyMaxExpansions, fuzzyPrefixLength: builder.fuzzyPrefixLength, fuzzyTranspositions: builder.fuzzyTranspositions, quoteFieldSuffix: builder.quoteFieldSuffix, autoGenerateSynonymsPhraseQuery: builder.autoGenerateSynonymsPhraseQuery)
+        self.init(query: builder.query!, fields: builder.fields, defaultOperator: builder.defaultOperator, analyzer: builder.analyzer, flags: builder.flags, lenient: builder.lenient, minimumShouldMatch: builder.minimumShouldMatch, fuzzyMaxExpansions: builder.fuzzyMaxExpansions, fuzzyPrefixLength: builder.fuzzyPrefixLength, fuzzyTranspositions: builder.fuzzyTranspositions, quoteFieldSuffix: builder.quoteFieldSuffix, autoGenerateSynonymsPhraseQuery: builder.autoGenerateSynonymsPhraseQuery, boost: builder.boost, name: builder.name)
     }
 }
 
@@ -671,6 +752,8 @@ extension SimpleQueryStringQuery {
         fuzzyTranspositions = try nested.decodeBoolIfPresent(forKey: .fuzzyTranspositions)
         quoteFieldSuffix = try nested.decodeStringIfPresent(forKey: .quoteFieldSuffix)
         autoGenerateSynonymsPhraseQuery = try nested.decodeBoolIfPresent(forKey: .autoGenerateSynonymsPhraseQuery)
+        boost = try nested.decodeDecimalIfPresent(forKey: .boost)
+        name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -689,6 +772,8 @@ extension SimpleQueryStringQuery {
         try nested.encodeIfPresent(lenient, forKey: .lenient)
         try nested.encodeIfPresent(quoteFieldSuffix, forKey: .quoteFieldSuffix)
         try nested.encodeIfPresent(autoGenerateSynonymsPhraseQuery, forKey: .autoGenerateSynonymsPhraseQuery)
+        try nested.encodeIfPresent(boost, forKey: .boost)
+        try nested.encodeIfPresent(name, forKey: .name)
     }
 
     enum CodingKeys: String, CodingKey {
@@ -704,6 +789,8 @@ extension SimpleQueryStringQuery {
         case lenient
         case quoteFieldSuffix = "quote_field_suffix"
         case autoGenerateSynonymsPhraseQuery = "auto_generate_synonyms_phrase_query"
+        case name
+        case boost
     }
 }
 
@@ -722,5 +809,7 @@ extension SimpleQueryStringQuery: Equatable {
             && lhs.lenient == rhs.lenient
             && lhs.minimumShouldMatch == rhs.minimumShouldMatch
             && lhs.quoteFieldSuffix == rhs.quoteFieldSuffix
+            && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 }

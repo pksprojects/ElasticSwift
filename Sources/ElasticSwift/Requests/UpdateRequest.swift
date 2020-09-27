@@ -128,7 +128,7 @@ public class UpdateRequestBuilder: RequestBuilder {
 // MARK: - Update Request
 
 public struct UpdateRequest: Request, BulkableRequest {
-    public var headers: HTTPHeaders = HTTPHeaders()
+    public var headers = HTTPHeaders()
 
     public let index: String
     public let type: String

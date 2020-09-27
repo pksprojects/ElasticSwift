@@ -60,7 +60,7 @@ public class GetRequestBuilder: RequestBuilder {
 // MARK: - Get Request
 
 public struct GetRequest: Request {
-    public var headers: HTTPHeaders = HTTPHeaders()
+    public var headers = HTTPHeaders()
 
     public var queryParams: [URLQueryItem] = []
 

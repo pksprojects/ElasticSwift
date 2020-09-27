@@ -31,7 +31,6 @@ public enum QueryTypes: String, Codable {
     case fuzzy
     case type
     case ids
-    case rescoreQuery
     case nested
     case hasChild = "has_child"
     case hasParent = "has_parent"
@@ -40,6 +39,19 @@ public enum QueryTypes: String, Codable {
     case geoBoundingBox = "geo_bounding_box"
     case geoDistance = "geo_distance"
     case geoPolygon = "geo_polygon"
+    case moreLikeThis = "more_like_this"
+    case script
+    case percolate
+    case wrapper
+    case spanTerm = "span_term"
+    case spanMulti = "span_multi"
+    case spanFirst = "span_first"
+    case spanNear = "span_near"
+    case spanOr = "span_or"
+    case spanNot = "span_not"
+    case spanContaining = "span_containing"
+    case spanWithin = "span_within"
+    case spanFieldMasking = "field_masking_span"
 }
 
 extension QueryTypes: QueryType {
@@ -93,8 +105,6 @@ extension QueryTypes: QueryType {
             return TypeQuery.self
         case .ids:
             return IdsQuery.self
-        case .rescoreQuery:
-            return RescoreQuery.self
         case .nested:
             return NestedQuery.self
         case .hasChild:
@@ -111,6 +121,32 @@ extension QueryTypes: QueryType {
             return GeoDistanceQuery.self
         case .geoPolygon:
             return GeoPolygonQuery.self
+        case .moreLikeThis:
+            return MoreLikeThisQuery.self
+        case .script:
+            return ScriptQuery.self
+        case .percolate:
+            return PercolateQuery.self
+        case .wrapper:
+            return WrapperQuery.self
+        case .spanTerm:
+            return SpanTermQuery.self
+        case .spanMulti:
+            return SpanMultiTermQuery.self
+        case .spanFirst:
+            return SpanFirstQuery.self
+        case .spanNear:
+            return SpanNearQuery.self
+        case .spanOr:
+            return SpanOrQuery.self
+        case .spanNot:
+            return SpanNotQuery.self
+        case .spanContaining:
+            return SpanContainingQuery.self
+        case .spanWithin:
+            return SpanWithinQuery.self
+        case .spanFieldMasking:
+            return SpanFieldMaskingQuery.self
         }
     }
 }
@@ -253,59 +289,6 @@ public enum ZeroTermQuery: String, Codable {
 public enum Operator: String, Codable {
     case and
     case or
-}
-
-// MARK: - Rescore Query
-
-/// Wrapper for Query for use in `QueryRescorer` to facilitate rescoring in `SearchRequest`
-public struct RescoreQuery: Query {
-    public let queryType: QueryType = QueryTypes.rescoreQuery
-
-    public let query: Query
-    public let queryWeight: Decimal?
-    public let rescoreQueryWeight: Decimal?
-    public let scoreMode: ScoreMode?
-
-    public init(_ query: Query, scoreMode: ScoreMode? = nil, queryWeight: Decimal? = nil, rescoreQueryWeight: Decimal? = nil) {
-        self.query = query
-        self.scoreMode = scoreMode
-        self.queryWeight = queryWeight
-        self.rescoreQueryWeight = rescoreQueryWeight
-    }
-}
-
-extension RescoreQuery {
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        query = try container.decodeQuery(forKey: .query)
-        scoreMode = try container.decodeIfPresent(ScoreMode.self, forKey: .scoreMode)
-        queryWeight = try container.decodeDecimalIfPresent(forKey: .queryWeight)
-        rescoreQueryWeight = try container.decodeDecimalIfPresent(forKey: .rescoreQueryWeight)
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(query, forKey: .query)
-        try container.encodeIfPresent(scoreMode, forKey: .scoreMode)
-        try container.encodeIfPresent(queryWeight, forKey: .queryWeight)
-        try container.encodeIfPresent(rescoreQueryWeight, forKey: .rescoreQueryWeight)
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case query = "rescore_query"
-        case rescoreQueryWeight = "rescore_query_weight"
-        case queryWeight = "query_weight"
-        case scoreMode = "score_mode"
-    }
-}
-
-extension RescoreQuery: Equatable {
-    public static func == (lhs: RescoreQuery, rhs: RescoreQuery) -> Bool {
-        return lhs.queryWeight == rhs.queryWeight
-            && lhs.rescoreQueryWeight == rhs.rescoreQueryWeight
-            && lhs.scoreMode == rhs.scoreMode
-            && isEqualQueries(lhs.query, rhs.query)
-    }
 }
 
 /// A helper function compares two queries wrapped as optional

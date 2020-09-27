@@ -16,7 +16,9 @@ public class NestedQueryBuilder: QueryBuilder {
     private var _query: Query?
     private var _scoreMode: ScoreMode?
     private var _ignoreUnmapped: Bool?
-    private var _innerHits: CodableValue?
+    private var _innerHits: InnerHit?
+    private var _boost: Decimal?
+    private var _name: String?
 
     public init() {}
 
@@ -45,8 +47,20 @@ public class NestedQueryBuilder: QueryBuilder {
     }
 
     @discardableResult
-    public func set(innerHits: CodableValue) -> Self {
+    public func set(innerHits: InnerHit) -> Self {
         _innerHits = innerHits
+        return self
+    }
+
+    @discardableResult
+    public func set(boost: Decimal) -> Self {
+        _boost = boost
+        return self
+    }
+
+    @discardableResult
+    public func set(name: String) -> Self {
+        _name = name
         return self
     }
 
@@ -66,8 +80,16 @@ public class NestedQueryBuilder: QueryBuilder {
         return _ignoreUnmapped
     }
 
-    public var innerHits: CodableValue? {
+    public var innerHits: InnerHit? {
         return _innerHits
+    }
+
+    public var boost: Decimal? {
+        return _boost
+    }
+
+    public var name: String? {
+        return _name
     }
 
     public func build() throws -> NestedQuery {
@@ -84,7 +106,9 @@ public class HasChildQueryBuilder: QueryBuilder {
     private var _minChildren: Int?
     private var _maxChildren: Int?
     private var _ignoreUnmapped: Bool?
-    private var _innerHits: CodableValue?
+    private var _innerHits: InnerHit?
+    private var _boost: Decimal?
+    private var _name: String?
 
     public init() {}
 
@@ -113,7 +137,7 @@ public class HasChildQueryBuilder: QueryBuilder {
     }
 
     @discardableResult
-    public func set(innerHits: CodableValue) -> Self {
+    public func set(innerHits: InnerHit) -> Self {
         _innerHits = innerHits
         return self
     }
@@ -127,6 +151,18 @@ public class HasChildQueryBuilder: QueryBuilder {
     @discardableResult
     public func set(maxChildren: Int) -> Self {
         _maxChildren = maxChildren
+        return self
+    }
+
+    @discardableResult
+    public func set(boost: Decimal) -> Self {
+        _boost = boost
+        return self
+    }
+
+    @discardableResult
+    public func set(name: String) -> Self {
+        _name = name
         return self
     }
 
@@ -154,8 +190,16 @@ public class HasChildQueryBuilder: QueryBuilder {
         return _ignoreUnmapped
     }
 
-    public var innerHits: CodableValue? {
+    public var innerHits: InnerHit? {
         return _innerHits
+    }
+
+    public var boost: Decimal? {
+        return _boost
+    }
+
+    public var name: String? {
+        return _name
     }
 
     public func build() throws -> HasChildQuery {
@@ -170,7 +214,9 @@ public class HasParentQueryBuilder: QueryBuilder {
     private var _query: Query?
     private var _score: Bool?
     private var _ignoreUnmapped: Bool?
-    private var _innerHits: CodableValue?
+    private var _innerHits: InnerHit?
+    private var _boost: Decimal?
+    private var _name: String?
 
     public init() {}
 
@@ -199,8 +245,20 @@ public class HasParentQueryBuilder: QueryBuilder {
     }
 
     @discardableResult
-    public func set(innerHits: CodableValue) -> Self {
+    public func set(innerHits: InnerHit) -> Self {
         _innerHits = innerHits
+        return self
+    }
+
+    @discardableResult
+    public func set(boost: Decimal) -> Self {
+        _boost = boost
+        return self
+    }
+
+    @discardableResult
+    public func set(name: String) -> Self {
+        _name = name
         return self
     }
 
@@ -220,8 +278,16 @@ public class HasParentQueryBuilder: QueryBuilder {
         return _ignoreUnmapped
     }
 
-    public var innerHits: CodableValue? {
+    public var innerHits: InnerHit? {
         return _innerHits
+    }
+
+    public var boost: Decimal? {
+        return _boost
+    }
+
+    public var name: String? {
+        return _name
     }
 
     public func build() throws -> HasParentQuery {
@@ -235,6 +301,8 @@ public class ParentIdQueryBuilder: QueryBuilder {
     private var _type: String?
     private var _id: String?
     private var _ignoreUnmapped: Bool?
+    private var _boost: Decimal?
+    private var _name: String?
 
     @discardableResult
     public func set(type: String) -> Self {
@@ -254,6 +322,18 @@ public class ParentIdQueryBuilder: QueryBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(boost: Decimal) -> Self {
+        _boost = boost
+        return self
+    }
+
+    @discardableResult
+    public func set(name: String) -> Self {
+        _name = name
+        return self
+    }
+
     public var type: String? {
         return _type
     }
@@ -264,6 +344,14 @@ public class ParentIdQueryBuilder: QueryBuilder {
 
     public var ignoreUnmapped: Bool? {
         return _ignoreUnmapped
+    }
+
+    public var boost: Decimal? {
+        return _boost
+    }
+
+    public var name: String? {
+        return _name
     }
 
     public func build() throws -> ParentIdQuery {

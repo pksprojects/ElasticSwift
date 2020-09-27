@@ -102,10 +102,12 @@ class TermLevelQueryBuilderTests: XCTestCase {
             .set(field: "message")
             .set(value: "to be or not to be")
             .set(boost: 2.0)
+            .set(name: "name")
             .build()
         XCTAssertEqual(query.field, "message")
         XCTAssertEqual(query.value, "to be or not to be")
         XCTAssertEqual(query.boost, 2.0)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_09_termsQueryBuilder() throws {
@@ -113,9 +115,13 @@ class TermLevelQueryBuilderTests: XCTestCase {
             .set(field: "message")
             .set(values: "to be or not to be")
             .add(value: "test")
+            .set(boost: 1.0)
+            .set(name: "name")
             .build()
         XCTAssertEqual(query.field, "message")
         XCTAssertEqual(query.values, ["to be or not to be", "test"])
+        XCTAssertEqual(query.boost, 1.0)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_10_rangeQueryBuilder() throws {
@@ -161,6 +167,7 @@ class TermLevelQueryBuilderTests: XCTestCase {
             .set(relation: .contains)
             .set(timeZone: "UTC")
             .set(boost: 2.0)
+            .set(name: "name")
             .build()
         XCTAssertEqual(query.field, "age")
         XCTAssertEqual(query.gt, "14")
@@ -171,6 +178,7 @@ class TermLevelQueryBuilderTests: XCTestCase {
         XCTAssertEqual(query.relation, .contains)
         XCTAssertEqual(query.timeZone, "UTC")
         XCTAssertEqual(query.boost, 2.0)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_14_existsQueryBuilder() throws {
@@ -239,10 +247,12 @@ class TermLevelQueryBuilderTests: XCTestCase {
             .set(field: "message")
             .set(value: "to be or not to be")
             .set(boost: 2.0)
+            .set(name: "name")
             .build()
         XCTAssertEqual(query.field, "message")
         XCTAssertEqual(query.value, "to be or not to be")
         XCTAssertEqual(query.boost, 2.0)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_22_wildCardQueryBuilder() throws {
@@ -286,10 +296,12 @@ class TermLevelQueryBuilderTests: XCTestCase {
             .set(field: "message")
             .set(value: "to be or not to be")
             .set(boost: 2.0)
+            .set(name: "name")
             .build()
         XCTAssertEqual(query.field, "message")
         XCTAssertEqual(query.value, "to be or not to be")
         XCTAssertEqual(query.boost, 2.0)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_27_regexpQueryBuilder() throws {
@@ -335,6 +347,7 @@ class TermLevelQueryBuilderTests: XCTestCase {
             .set(boost: 2.0)
             .set(regexFlags: .intersection, .empty)
             .set(maxDeterminizedStates: 1)
+            .set(name: "name")
             .build()
         XCTAssertEqual(query.field, "message")
         XCTAssertEqual(query.value, "to be or not to be")
@@ -342,6 +355,7 @@ class TermLevelQueryBuilderTests: XCTestCase {
         XCTAssertEqual(query.regexFlagsStr, "INTERSECTION|EMPTY")
         XCTAssertEqual(query.boost, 2.0)
         XCTAssertEqual(query.maxDeterminizedStates, 1)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_32_fuzzyQueryBuilder() throws {
@@ -389,6 +403,7 @@ class TermLevelQueryBuilderTests: XCTestCase {
             .set(prefixLength: 0)
             .set(maxExpansions: 100)
             .set(transpositions: true)
+            .set(name: "name")
             .build()
         XCTAssertEqual(query.field, "message")
         XCTAssertEqual(query.value, "to be or not to be")
@@ -397,6 +412,7 @@ class TermLevelQueryBuilderTests: XCTestCase {
         XCTAssertEqual(query.maxExpansions, 100)
         XCTAssertEqual(query.transpositions, true)
         XCTAssertEqual(query.boost, 2.0)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_37_typeQueryBuilder() throws {
@@ -420,8 +436,12 @@ class TermLevelQueryBuilderTests: XCTestCase {
     func test_39_typeQueryBuilder() throws {
         let query = try QueryBuilders.typeQuery()
             .set(type: "message")
+            .set(boost: 1.0)
+            .set(name: "name")
             .build()
         XCTAssertEqual(query.type, "message")
+        XCTAssertEqual(query.boost, 1.0)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_40_idsQueryBuilder() throws {
@@ -450,8 +470,12 @@ class TermLevelQueryBuilderTests: XCTestCase {
         let query = try QueryBuilders.idsQuery()
             .set(type: "_doc")
             .set(ids: "1", "4", "100")
+            .set(boost: 1.0)
+            .set(name: "name")
             .build()
         XCTAssertEqual(query.type, "_doc")
         XCTAssertEqual(query.ids, ["1", "4", "100"])
+        XCTAssertEqual(query.boost, 1.0)
+        XCTAssertEqual(query.name, "name")
     }
 }

@@ -225,7 +225,7 @@ public class TermVectorsRequestBuilder: RequestBuilder {
 // MARK: - TermVectors Request
 
 public struct TermVectorsRequest: Request {
-    public var headers: HTTPHeaders = HTTPHeaders()
+    public var headers = HTTPHeaders()
 
     public let index: String
     public let type: String

@@ -13,14 +13,16 @@ import Foundation
 public struct MatchAllQuery: Query {
     public let queryType: QueryType = QueryTypes.matchAll
 
-    public let boost: Decimal?
+    public var boost: Decimal?
+    public var name: String?
 
-    public init(_ boost: Decimal? = nil) {
+    public init(boost: Decimal? = nil, name: String? = nil) {
         self.boost = boost
+        self.name = name
     }
 
-    internal init(withBuilder builder: MatchAllQueryBuilder) {
-        self.init(builder.boost)
+    internal init(withBuilder builder: MatchAllQueryBuilder) throws {
+        self.init(boost: builder.boost, name: builder.name)
     }
 }
 
@@ -29,16 +31,19 @@ extension MatchAllQuery {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         boost = try nested.decodeIfPresent(Decimal.self, forKey: .boost)
+        name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         try nested.encodeIfPresent(boost, forKey: .boost)
+        try nested.encodeIfPresent(name, forKey: .name)
     }
 
     enum CodingKeys: String, CodingKey {
         case boost
+        case name
     }
 }
 
@@ -46,6 +51,7 @@ extension MatchAllQuery: Equatable {
     public static func == (lhs: MatchAllQuery, rhs: MatchAllQuery) -> Bool {
         return lhs.queryType.isEqualTo(rhs.queryType)
             && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 }
 
@@ -54,27 +60,44 @@ extension MatchAllQuery: Equatable {
 public struct MatchNoneQuery: Query {
     public let queryType: QueryType = QueryTypes.matchNone
 
-    public init() {}
+    public var boost: Decimal?
+    public var name: String?
 
-    internal init(withBuilder _: MatchNoneQueryBuilder) {
-        self.init()
+    public init(boost: Decimal? = nil, name: String? = nil) {
+        self.boost = boost
+        self.name = name
+    }
+
+    internal init(withBuilder builder: MatchNoneQueryBuilder) throws {
+        self.init(boost: builder.boost, name: builder.name)
     }
 }
 
 extension MatchNoneQuery {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
-        _ = try container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
+        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
+        boost = try nested.decodeDecimalIfPresent(forKey: .boost)
+        name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
-        try container.encode([String: String](), forKey: .key(named: queryType))
+        var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
+        try nested.encodeIfPresent(boost, forKey: .boost)
+        try nested.encodeIfPresent(name, forKey: .name)
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case boost
+        case name
     }
 }
 
 extension MatchNoneQuery: Equatable {
     public static func == (lhs: MatchNoneQuery, rhs: MatchNoneQuery) -> Bool {
         return lhs.queryType.isEqualTo(rhs.queryType)
+            && lhs.boost == rhs.boost
+            && lhs.name == rhs.name
     }
 }

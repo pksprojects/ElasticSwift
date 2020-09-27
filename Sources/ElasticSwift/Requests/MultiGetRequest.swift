@@ -154,7 +154,7 @@ public class MultiGetRequestBuilder: RequestBuilder {
 // MARK: - Multi-Get Request
 
 public struct MultiGetRequest: Request {
-    public var headers: HTTPHeaders = HTTPHeaders()
+    public var headers = HTTPHeaders()
 
     public let index: String?
     public let type: String?

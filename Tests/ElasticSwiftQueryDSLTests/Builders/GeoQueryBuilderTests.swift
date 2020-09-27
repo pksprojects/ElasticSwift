@@ -162,6 +162,8 @@ class GeoQueryBuilderTests: XCTestCase {
             .set(type: .indexed)
             .set(validationMethod: .strict)
             .set(ignoreUnmapped: true)
+            .set(boost: 1.0)
+            .set(name: "name")
             .build()
         XCTAssertEqual(query.field, "location")
         XCTAssertEqual(query.topLeft, GeoPoint(geoHash: "dr5r9ydj2y73"))
@@ -169,6 +171,8 @@ class GeoQueryBuilderTests: XCTestCase {
         XCTAssertEqual(query.type, GeoExecType.indexed)
         XCTAssertEqual(query.validationMethod, GeoValidationMethod.strict)
         XCTAssertEqual(query.ignoreUnmapped, true)
+        XCTAssertEqual(query.boost, 1.0)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_12_geoDistanceQueryBuilder() throws {
@@ -179,6 +183,8 @@ class GeoQueryBuilderTests: XCTestCase {
             .set(distanceType: .arc)
             .set(validationMethod: .strict)
             .set(ignoreUnmapped: true)
+            .set(boost: 1.0)
+            .set(name: "name")
             .build()
         XCTAssertEqual(query.field, "location")
         XCTAssertEqual(query.point, GeoPoint(lat: 40, lon: -70))
@@ -186,6 +192,8 @@ class GeoQueryBuilderTests: XCTestCase {
         XCTAssertEqual(query.distanceType, GeoDistanceType.arc)
         XCTAssertEqual(query.validationMethod, GeoValidationMethod.strict)
         XCTAssertEqual(query.ignoreUnmapped, true)
+        XCTAssertEqual(query.boost, 1.0)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_13_geoDistanceQueryBuilder() throws {
@@ -232,11 +240,15 @@ class GeoQueryBuilderTests: XCTestCase {
             .add(point: GeoPoint(lat: 41, lon: -70))
             .set(validationMethod: .strict)
             .set(ignoreUnmapped: true)
+            .set(boost: 1.0)
+            .set(name: "name")
             .build()
         XCTAssertEqual(query.field, "location")
         XCTAssertEqual(query.points, [GeoPoint(lat: 40, lon: -70), GeoPoint(lat: 41, lon: -70)])
         XCTAssertEqual(query.validationMethod, GeoValidationMethod.strict)
         XCTAssertEqual(query.ignoreUnmapped, true)
+        XCTAssertEqual(query.boost, 1.0)
+        XCTAssertEqual(query.name, "name")
     }
 
     func test_18_geoPloygonQueryBuilder() throws {

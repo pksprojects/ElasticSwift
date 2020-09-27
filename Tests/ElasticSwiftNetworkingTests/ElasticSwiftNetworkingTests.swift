@@ -46,7 +46,7 @@ class ElasticSwiftNetworkingTests: XCTestCase {
         } else {
             adaptorConfig = URLSessionAdaptorConfiguration.default
         }
-        
+
         let adaptor = URLSessionAdaptor(forHost: esConnection.host, adaptorConfig: adaptorConfig)
         let base64 = "\(esConnection.uname):\(esConnection.passwd)".data(using: .utf8)!.base64EncodedString()
         var headers = HTTPHeaders()
@@ -75,7 +75,7 @@ class ElasticSwiftNetworkingTests: XCTestCase {
             }
             e.fulfill()
         }
-        waitForExpectations(timeout: 10)
+        waitForExpectations(timeout: 30)
     }
 
     func test_03_ssl_config() throws {

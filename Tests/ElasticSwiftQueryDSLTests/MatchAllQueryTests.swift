@@ -78,7 +78,45 @@ class MatchAllQueryTests: XCTestCase {
         let query2 = MatchNoneQuery()
 
         XCTAssertFalse(query1.isEqualTo(query2))
-        XCTAssertNotEqual(query1, MatchAllQuery(1.0))
+        XCTAssertNotEqual(query1, MatchAllQuery(boost: 1.0))
         XCTAssertEqual(query2, MatchNoneQuery())
+    }
+
+    func test_05_match_all_decode() throws {
+        let query = try QueryBuilders.matchAllQuery()
+            .set(boost: 1.2)
+            .set(name: "name")
+            .build()
+
+        let jsonData = """
+            {
+                "match_all" : {
+                    "boost" : 1.2,
+                    "name" : "name"
+                }
+            }
+        """.data(using: .utf8)!
+
+        let decoded = try JSONDecoder().decode(MatchAllQuery.self, from: jsonData)
+        XCTAssertEqual(query, decoded)
+    }
+
+    func test_05_match_none_decode() throws {
+        let query = try QueryBuilders.matchNoneQuery()
+            .set(boost: 1.2)
+            .set(name: "name")
+            .build()
+
+        let jsonData = """
+            {
+                "match_none" : {
+                    "boost" : 1.2,
+                    "name" : "name"
+                }
+            }
+        """.data(using: .utf8)!
+
+        let decoded = try JSONDecoder().decode(MatchNoneQuery.self, from: jsonData)
+        XCTAssertEqual(query, decoded)
     }
 }

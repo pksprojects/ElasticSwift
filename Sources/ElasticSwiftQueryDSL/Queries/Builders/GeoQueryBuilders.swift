@@ -23,6 +23,9 @@ public class GeoShapeQueryBuilder: QueryBuilder {
     private var _relation: ShapeRelation?
     private var _ignoreUnmapped: Bool?
 
+    private var _boost: Decimal?
+    private var _name: String?
+
     public init() {}
 
     @discardableResult
@@ -73,6 +76,18 @@ public class GeoShapeQueryBuilder: QueryBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(name: String) -> Self {
+        _name = name
+        return self
+    }
+
+    @discardableResult
+    public func set(boost: Decimal) -> Self {
+        _boost = boost
+        return self
+    }
+
     public var field: String? {
         return _field
     }
@@ -105,6 +120,14 @@ public class GeoShapeQueryBuilder: QueryBuilder {
         return _ignoreUnmapped
     }
 
+    public var boost: Decimal? {
+        return _boost
+    }
+
+    public var name: String? {
+        return _name
+    }
+
     public func build() throws -> GeoShapeQuery {
         return try GeoShapeQuery(withBuilder: self)
     }
@@ -119,6 +142,8 @@ public class GeoBoundingBoxQueryBuilder: QueryBuilder {
     private var _type: GeoExecType?
     private var _validationMethod: GeoValidationMethod?
     private var _ignoreUnmapped: Bool?
+    private var _boost: Decimal?
+    private var _name: String?
 
     public init() {}
 
@@ -158,6 +183,18 @@ public class GeoBoundingBoxQueryBuilder: QueryBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(boost: Decimal) -> Self {
+        _boost = boost
+        return self
+    }
+
+    @discardableResult
+    public func set(name: String) -> Self {
+        _name = name
+        return self
+    }
+
     public var field: String? {
         return _field
     }
@@ -182,6 +219,14 @@ public class GeoBoundingBoxQueryBuilder: QueryBuilder {
         return _ignoreUnmapped
     }
 
+    public var boost: Decimal? {
+        return _boost
+    }
+
+    public var name: String? {
+        return _name
+    }
+
     public func build() throws -> GeoBoundingBoxQuery {
         return try GeoBoundingBoxQuery(withBuilder: self)
     }
@@ -196,6 +241,8 @@ public class GeoDistanceQueryBuilder: QueryBuilder {
     private var _distanceType: GeoDistanceType?
     private var _validationMethod: GeoValidationMethod?
     private var _ignoreUnmapped: Bool?
+    private var _boost: Decimal?
+    private var _name: String?
 
     public init() {}
 
@@ -235,6 +282,18 @@ public class GeoDistanceQueryBuilder: QueryBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(boost: Decimal) -> Self {
+        _boost = boost
+        return self
+    }
+
+    @discardableResult
+    public func set(name: String) -> Self {
+        _name = name
+        return self
+    }
+
     public var field: String? {
         return _field
     }
@@ -259,6 +318,14 @@ public class GeoDistanceQueryBuilder: QueryBuilder {
         return _ignoreUnmapped
     }
 
+    public var boost: Decimal? {
+        return _boost
+    }
+
+    public var name: String? {
+        return _name
+    }
+
     public func build() throws -> GeoDistanceQuery {
         return try GeoDistanceQuery(withBuilder: self)
     }
@@ -271,6 +338,8 @@ public class GeoPolygonQueryBuilder: QueryBuilder {
     private var _points: [GeoPoint]?
     private var _validationMethod: GeoValidationMethod?
     private var _ignoreUnmapped: Bool?
+    private var _boost: Decimal?
+    private var _name: String?
 
     public init() {}
 
@@ -308,6 +377,18 @@ public class GeoPolygonQueryBuilder: QueryBuilder {
         return self
     }
 
+    @discardableResult
+    public func set(boost: Decimal) -> Self {
+        _boost = boost
+        return self
+    }
+
+    @discardableResult
+    public func set(name: String) -> Self {
+        _name = name
+        return self
+    }
+
     public var field: String? {
         return _field
     }
@@ -322,6 +403,14 @@ public class GeoPolygonQueryBuilder: QueryBuilder {
 
     public var ignoreUnmapped: Bool? {
         return _ignoreUnmapped
+    }
+
+    public var boost: Decimal? {
+        return _boost
+    }
+
+    public var name: String? {
+        return _name
     }
 
     public func build() throws -> GeoPolygonQuery {

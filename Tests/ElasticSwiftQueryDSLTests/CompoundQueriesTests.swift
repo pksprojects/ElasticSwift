@@ -44,7 +44,7 @@ class CompoundQueriesTest: XCTestCase {
     }
 
     func test_02_constantScoreQuery_decode() throws {
-        let query = ConstantScoreQuery(MatchAllQuery(1.1), boost: 1.1)
+        let query = ConstantScoreQuery(MatchAllQuery(boost: 1.1), boost: 1.1)
 
         let jsonStr = "{\"constant_score\":{\"filter\":{\"match_all\":{\"boost\":1.1}},\"boost\":1.1}}"
 

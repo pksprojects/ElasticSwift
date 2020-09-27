@@ -295,7 +295,7 @@ public class SearchRequestBuilder: RequestBuilder {
 // MARK: - Search Request
 
 public struct SearchRequest: Request {
-    public var headers: HTTPHeaders = HTTPHeaders()
+    public var headers = HTTPHeaders()
 
     public let indices: [String]?
     public let types: [String]?
@@ -385,43 +385,6 @@ public struct SearchRequest: Request {
 }
 
 extension SearchRequest: Equatable {}
-
-public struct ScriptField {
-    public let field: String
-    public let script: Script
-}
-
-extension ScriptField: Codable {
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: DynamicCodingKeys.self)
-        var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
-        try nested.encode(script, forKey: .script)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
-        guard container.allKeys.count == 1 else {
-            throw Swift.DecodingError.typeMismatch(ScriptField.self, .init(codingPath: container.codingPath, debugDescription: "Unable to find field name in key(s) expect: 1 key found: \(container.allKeys.count)."))
-        }
-
-        field = container.allKeys.first!.stringValue
-        let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
-        script = try nested.decode(Script.self, forKey: .script)
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case script
-    }
-}
-
-extension ScriptField: Equatable {}
-
-public struct DocValueField: Codable {
-    public let field: String
-    public let format: String
-}
-
-extension DocValueField: Equatable {}
 
 /// Struct representing Index boost
 public struct IndexBoost {
@@ -774,654 +737,86 @@ extension SourceFilter: Codable {
 
 extension SourceFilter: Equatable {}
 
-// MARK: - Highlighting
-
-public class HighlightBuilder {
-    private var _fields: [Highlight.Field]?
-    private var _globalOptions: Highlight.FieldOptions?
-
-    @discardableResult
-    public func set(fields: [Highlight.Field]) -> Self {
-        _fields = fields
-        return self
-    }
-
-    @discardableResult
-    public func set(globalOptions: Highlight.FieldOptions) -> Self {
-        _globalOptions = globalOptions
-        return self
-    }
-
-    @discardableResult
-    public func add(field: Highlight.Field) -> Self {
-        if _fields != nil {
-            _fields?.append(field)
-        } else {
-            _fields = [field]
-        }
-        return self
-    }
-
-    public var fields: [Highlight.Field]? {
-        return _fields
-    }
-
-    public var globalOptions: Highlight.FieldOptions? {
-        return _globalOptions
-    }
-
-    public func build() throws -> Highlight {
-        return try Highlight(withBuilder: self)
-    }
-}
-
-public class FieldOptionsBuilder {
-    private var _fragmentSize: Int?
-    private var _numberOfFragments: Int?
-    private var _fragmentOffset: Int?
-    private var _encoder: Highlight.EncoderType?
-    private var _preTags: [String]?
-    private var _postTags: [String]?
-    private var _scoreOrdered: Bool?
-    private var _requireFieldMatch: Bool?
-    private var _highlighterType: Highlight.HighlighterType?
-    private var _forceSource: Bool?
-    private var _fragmenter: String?
-    private var _boundaryScannerType: Highlight.BoundaryScannerType?
-    private var _boundaryMaxScan: Int?
-    private var _boundaryChars: [Character]?
-    private var _boundaryScannerLocale: String?
-    private var _highlightQuery: Query?
-    private var _noMatchSize: Int?
-    private var _matchedFields: [String]?
-    private var _phraseLimit: Int?
-    private var _tagScheme: String?
-    private var _termVector: String?
-    private var _indexOptions: String?
-
-    public init() {}
-
-    @discardableResult
-    public func set(fragmentSize: Int) -> Self {
-        _fragmentSize = fragmentSize
-        return self
-    }
-
-    @discardableResult
-    public func set(numberOfFragments: Int) -> Self {
-        _numberOfFragments = numberOfFragments
-        return self
-    }
-
-    @discardableResult
-    public func set(fragmentOffset: Int) -> Self {
-        _fragmentOffset = fragmentOffset
-        return self
-    }
-
-    @discardableResult
-    public func set(encoder: Highlight.EncoderType) -> Self {
-        _encoder = encoder
-        return self
-    }
-
-    @discardableResult
-    public func set(preTags: [String]) -> Self {
-        _preTags = preTags
-        return self
-    }
-
-    @discardableResult
-    public func set(postTags: [String]) -> Self {
-        _postTags = postTags
-        return self
-    }
-
-    @discardableResult
-    public func set(scoreOrdered: Bool) -> Self {
-        _scoreOrdered = scoreOrdered
-        return self
-    }
-
-    @discardableResult
-    public func set(requireFieldMatch: Bool) -> Self {
-        _requireFieldMatch = requireFieldMatch
-        return self
-    }
-
-    @discardableResult
-    public func set(highlighterType: Highlight.HighlighterType) -> Self {
-        _highlighterType = highlighterType
-        return self
-    }
-
-    @discardableResult
-    public func set(forceSource: Bool) -> Self {
-        _forceSource = forceSource
-        return self
-    }
-
-    @discardableResult
-    public func set(fragmenter: String) -> Self {
-        _fragmenter = fragmenter
-        return self
-    }
-
-    @discardableResult
-    public func set(boundaryScannerType: Highlight.BoundaryScannerType) -> Self {
-        _boundaryScannerType = boundaryScannerType
-        return self
-    }
-
-    @discardableResult
-    public func set(boundaryMaxScan: Int) -> Self {
-        _boundaryMaxScan = boundaryMaxScan
-        return self
-    }
-
-    @discardableResult
-    public func set(boundaryChars: [Character]) -> Self {
-        _boundaryChars = boundaryChars
-        return self
-    }
-
-    @discardableResult
-    public func set(boundaryScannerLocale: String) -> Self {
-        _boundaryScannerLocale = boundaryScannerLocale
-        return self
-    }
-
-    @discardableResult
-    public func set(highlightQuery: Query) -> Self {
-        _highlightQuery = highlightQuery
-        return self
-    }
-
-    @discardableResult
-    public func set(noMatchSize: Int) -> Self {
-        _noMatchSize = noMatchSize
-        return self
-    }
-
-    @discardableResult
-    public func set(matchedFields: [String]) -> Self {
-        _matchedFields = matchedFields
-        return self
-    }
-
-    @discardableResult
-    public func set(phraseLimit: Int) -> Self {
-        _phraseLimit = phraseLimit
-        return self
-    }
-
-    @discardableResult
-    public func set(tagScheme: String) -> Self {
-        _tagScheme = tagScheme
-        return self
-    }
-
-    @discardableResult
-    public func set(termVector: String) -> Self {
-        _termVector = termVector
-        return self
-    }
-
-    @discardableResult
-    public func set(indexOptions: String) -> Self {
-        _indexOptions = indexOptions
-        return self
-    }
-
-    public var fragmentSize: Int? {
-        return _fragmentSize
-    }
-
-    public var numberOfFragments: Int? {
-        return _numberOfFragments
-    }
-
-    public var fragmentOffset: Int? {
-        return _fragmentOffset
-    }
-
-    public var encoder: Highlight.EncoderType? {
-        return _encoder
-    }
-
-    public var preTags: [String]? {
-        return _preTags
-    }
-
-    public var postTags: [String]? {
-        return _postTags
-    }
-
-    public var scoreOrdered: Bool? {
-        return _scoreOrdered
-    }
-
-    public var requireFieldMatch: Bool? {
-        return _requireFieldMatch
-    }
-
-    public var highlighterType: Highlight.HighlighterType? {
-        return _highlighterType
-    }
-
-    public var forceSource: Bool? {
-        return _forceSource
-    }
-
-    public var fragmenter: String? {
-        return _fragmenter
-    }
-
-    public var boundaryScannerType: Highlight.BoundaryScannerType? {
-        return _boundaryScannerType
-    }
-
-    public var boundaryMaxScan: Int? {
-        return _boundaryMaxScan
-    }
-
-    public var boundaryChars: [Character]? {
-        return _boundaryChars
-    }
-
-    public var boundaryScannerLocale: String? {
-        return _boundaryScannerLocale
-    }
-
-    public var highlightQuery: Query? {
-        return _highlightQuery
-    }
-
-    public var noMatchSize: Int? {
-        return _noMatchSize
-    }
-
-    public var matchedFields: [String]? {
-        return _matchedFields
-    }
-
-    public var phraseLimit: Int? {
-        return _phraseLimit
-    }
-
-    public var tagScheme: String? {
-        return _tagScheme
-    }
-
-    public var termVector: String? {
-        return _termVector
-    }
-
-    public var indexOptions: String? {
-        return _indexOptions
-    }
-
-    public func build() -> Highlight.FieldOptions {
-        return Highlight.FieldOptions(withBuilder: self)
-    }
-}
-
-public struct Highlight {
-    public let fields: [Field]
-    public let globalOptions: FieldOptions
-
-    public init(fields: [Field], globalOptions: FieldOptions = FieldOptions()) {
-        self.fields = fields
-        self.globalOptions = globalOptions
-    }
-
-    internal init(withBuilder builder: HighlightBuilder) throws {
-        guard builder.fields != nil, !builder.fields!.isEmpty else {
-            throw RequestBuilderError.atlestOneElementRequired("fields")
-        }
-
-        self.init(fields: builder.fields!, globalOptions: builder.globalOptions ?? FieldOptions())
-    }
-}
-
-extension Highlight: Codable {
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(fields, forKey: .fields)
-        try container.encodeIfPresent(globalOptions.boundaryChars?.map { String($0) }, forKey: .boundaryChars)
-        try container.encodeIfPresent(globalOptions.boundaryMaxScan, forKey: .boundaryMaxScan)
-        try container.encodeIfPresent(globalOptions.boundaryScannerType, forKey: .boundaryScannerType)
-        try container.encodeIfPresent(globalOptions.boundaryScannerLocale, forKey: .boundaryScannerLocale)
-        try container.encodeIfPresent(globalOptions.encoder, forKey: .encoder)
-        try container.encodeIfPresent(globalOptions.forceSource, forKey: .forceSource)
-        try container.encodeIfPresent(globalOptions.fragmenter, forKey: .fragmenter)
-        try container.encodeIfPresent(globalOptions.fragmentOffset, forKey: .fragmentOffset)
-        try container.encodeIfPresent(globalOptions.fragmentSize, forKey: .fragmentSize)
-        try container.encodeIfPresent(globalOptions.highlightQuery, forKey: .highlightQuery)
-        try container.encodeIfPresent(globalOptions.matchedFields, forKey: .matchedFields)
-        try container.encodeIfPresent(globalOptions.numberOfFragments, forKey: .numberOfFragments)
-        try container.encodeIfPresent((globalOptions.scoreOrdered ?? false) ? Highlight.FieldOptions.SCORE_ORDERER_VALUE : nil, forKey: .order)
-        try container.encodeIfPresent(globalOptions.phraseLimit, forKey: .phraseLimit)
-        try container.encodeIfPresent(globalOptions.preTags, forKey: .preTags)
-        try container.encodeIfPresent(globalOptions.postTags, forKey: .postTags)
-        try container.encodeIfPresent(globalOptions.requireFieldMatch, forKey: .requireFieldMatch)
-        try container.encodeIfPresent(globalOptions.tagScheme, forKey: .tagsSchema)
-        try container.encodeIfPresent(globalOptions.highlighterType, forKey: .type)
-        try container.encodeIfPresent(globalOptions.termVector, forKey: .termVector)
-        try container.encodeIfPresent(globalOptions.indexOptions, forKey: .indexOptions)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        fields = try container.decodeArray(forKey: .fields)
-        var options = FieldOptions()
-        let chars: [String]? = try container.decodeArrayIfPresent(forKey: .boundaryChars)
-        if let chars = chars {
-            var charArr = [Character]()
-            for char in chars {
-                charArr.append(contentsOf: [Character](char))
-            }
-            options.boundaryChars = charArr
-        } else {
-            options.boundaryChars = nil
-        }
-        options.boundaryMaxScan = try container.decodeIntIfPresent(forKey: .boundaryMaxScan)
-        options.boundaryScannerType = try container.decodeIfPresent(Highlight.BoundaryScannerType.self, forKey: .boundaryScannerType)
-        options.boundaryScannerLocale = try container.decodeStringIfPresent(forKey: .boundaryScannerLocale)
-        options.encoder = try container.decodeIfPresent(Highlight.EncoderType.self, forKey: .encoder)
-        options.forceSource = try container.decodeBoolIfPresent(forKey: .forceSource)
-        options.fragmenter = try container.decodeStringIfPresent(forKey: .fragmenter)
-        options.fragmentOffset = try container.decodeIntIfPresent(forKey: .fragmentOffset)
-        options.fragmentSize = try container.decodeIntIfPresent(forKey: .fragmentSize)
-        options.highlightQuery = try container.decodeQueryIfPresent(forKey: .highlightQuery)
-        options.matchedFields = try container.decodeArray(forKey: .matchedFields)
-        options.noMatchSize = try container.decodeIntIfPresent(forKey: .noMatchSize)
-        options.numberOfFragments = try container.decodeIntIfPresent(forKey: .numberOfFragments)
-        let order = try container.decodeStringIfPresent(forKey: .order)
-        if let order = order {
-            switch order {
-            case Highlight.FieldOptions.SCORE_ORDERER_VALUE:
-                options.scoreOrdered = true
-            default:
-                options.scoreOrdered = false
-            }
-        } else {
-            options.scoreOrdered = nil
-        }
-        options.phraseLimit = try container.decodeIntIfPresent(forKey: .phraseLimit)
-        options.preTags = try container.decodeArray(forKey: .preTags)
-        options.postTags = try container.decodeArray(forKey: .postTags)
-        options.requireFieldMatch = try container.decodeBoolIfPresent(forKey: .requireFieldMatch)
-        options.tagScheme = try container.decodeStringIfPresent(forKey: .tagsSchema)
-        options.highlighterType = try container.decodeIfPresent(Highlight.HighlighterType.self, forKey: .type)
-        options.termVector = try container.decodeStringIfPresent(forKey: .termVector)
-        options.indexOptions = try container.decodeStringIfPresent(forKey: .indexOptions)
-        globalOptions = options
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case fields
-        case boundaryChars = "boundary_chars"
-        case boundaryMaxScan = "boundary_max_scan"
-        case boundaryScannerType = "boundary_scanner"
-        case boundaryScannerLocale = "boundary_scanner_locale"
-        case encoder
-        case forceSource = "force_source"
-        case fragmenter
-        case fragmentOffset = "fragment_offset"
-        case fragmentSize = "fragment_size"
-        case highlightQuery = "highlight_query"
-        case matchedFields = "matched_fields"
-        case noMatchSize = "no_match_size"
-        case numberOfFragments = "number_of_fragments"
-        case order
-        case phraseLimit = "phrase_limit"
-        case preTags = "pre_tags"
-        case postTags = "post_tags"
-        case requireFieldMatch = "require_field_match"
-        case tagsSchema = "tags_schema"
-        case type
-        case termVector = "term_vector"
-        case indexOptions = "index_options"
-    }
-}
-
-extension Highlight: Equatable {}
-
-extension Highlight {
-    public struct Field {
-        public let name: String
-        public let options: FieldOptions
-
-        public init(_ name: String, options: FieldOptions = FieldOptions()) {
-            self.name = name
-            self.options = options
-        }
-    }
-
-    public struct FieldOptions {
-        fileprivate static let SCORE_ORDERER_VALUE = "score"
-
-        public var fragmentSize: Int?
-        public var numberOfFragments: Int?
-        public var fragmentOffset: Int?
-        public var encoder: EncoderType?
-        public var preTags: [String]?
-        public var postTags: [String]?
-        public var scoreOrdered: Bool?
-        public var requireFieldMatch: Bool?
-        public var highlighterType: HighlighterType?
-        public var forceSource: Bool?
-        public var fragmenter: String?
-        public var boundaryScannerType: BoundaryScannerType?
-        public var boundaryMaxScan: Int?
-        public var boundaryChars: [Character]?
-        public var boundaryScannerLocale: String?
-        public var highlightQuery: Query?
-        public var noMatchSize: Int?
-        public var matchedFields: [String]?
-        public var phraseLimit: Int?
-        public var tagScheme: String?
-        public var termVector: String?
-        public var indexOptions: String?
-
-        public init() {}
-
-        internal init(withBuilder builder: FieldOptionsBuilder) {
-            fragmentSize = builder.fragmentSize
-            numberOfFragments = builder.numberOfFragments
-            fragmentOffset = builder.fragmentOffset
-            encoder = builder.encoder
-            preTags = builder.preTags
-            postTags = builder.postTags
-            scoreOrdered = builder.scoreOrdered
-            requireFieldMatch = builder.requireFieldMatch
-            highlighterType = builder.highlighterType
-            forceSource = builder.forceSource
-            fragmenter = builder.fragmenter
-            boundaryScannerType = builder.boundaryScannerType
-            boundaryMaxScan = builder.boundaryMaxScan
-            boundaryChars = builder.boundaryChars
-            boundaryScannerLocale = builder.boundaryScannerLocale
-            highlightQuery = builder.highlightQuery
-            noMatchSize = builder.noMatchSize
-            matchedFields = builder.matchedFields
-            phraseLimit = builder.phraseLimit
-            tagScheme = builder.tagScheme
-            termVector = builder.termVector
-            indexOptions = builder.indexOptions
-        }
-    }
-
-    public enum BoundaryScannerType: String, Codable {
-        case chars
-        case word
-        case sentence
-    }
-
-    public enum EncoderType: String, Codable {
-        case `default`
-        case html
-    }
-
-    public enum HighlighterType: String, Codable {
-        case unified
-        case plain
-        case fvh
-    }
-}
-
-extension Highlight.Field: Codable {
-    public func encode(to encoder: Swift.Encoder) throws {
-        var container = encoder.container(keyedBy: DynamicCodingKeys.self)
-        try container.encodeIfPresent(options, forKey: .key(named: name))
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
-        guard container.allKeys.count == 1 else {
-            throw Swift.DecodingError.typeMismatch(Highlight.Field.self, .init(codingPath: container.codingPath, debugDescription: "Unable to find field name in key(s) expect: 1 key found: \(container.allKeys.count)."))
-        }
-
-        let field = container.allKeys.first!.stringValue
-
-        options = try container.decode(Highlight.FieldOptions.self, forKey: .key(named: field))
-        name = field
-    }
-}
-
-extension Highlight.Field: Equatable {}
-
-extension Highlight.FieldOptions: Codable {
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(boundaryChars?.map { String($0) }, forKey: .boundaryChars)
-        try container.encodeIfPresent(boundaryMaxScan, forKey: .boundaryMaxScan)
-        try container.encodeIfPresent(boundaryScannerType, forKey: .boundaryScannerType)
-        try container.encodeIfPresent(boundaryScannerLocale, forKey: .boundaryScannerLocale)
-        try container.encodeIfPresent(self.encoder, forKey: .encoder)
-        try container.encodeIfPresent(forceSource, forKey: .forceSource)
-        try container.encodeIfPresent(fragmenter, forKey: .fragmenter)
-        try container.encodeIfPresent(fragmentOffset, forKey: .fragmentOffset)
-        try container.encodeIfPresent(fragmentSize, forKey: .fragmentSize)
-        try container.encodeIfPresent(highlightQuery, forKey: .highlightQuery)
-        try container.encodeIfPresent(matchedFields, forKey: .matchedFields)
-        try container.encodeIfPresent(numberOfFragments, forKey: .numberOfFragments)
-        try container.encodeIfPresent((scoreOrdered ?? false) ? Highlight.FieldOptions.SCORE_ORDERER_VALUE : nil, forKey: .order)
-        try container.encodeIfPresent(phraseLimit, forKey: .phraseLimit)
-        try container.encodeIfPresent(preTags, forKey: .preTags)
-        try container.encodeIfPresent(postTags, forKey: .postTags)
-        try container.encodeIfPresent(requireFieldMatch, forKey: .requireFieldMatch)
-        try container.encodeIfPresent(tagScheme, forKey: .tagsSchema)
-        try container.encodeIfPresent(highlighterType, forKey: .type)
-        try container.encodeIfPresent(termVector, forKey: .termVector)
-        try container.encodeIfPresent(indexOptions, forKey: .indexOptions)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let chars: [String]? = try container.decodeArrayIfPresent(forKey: .boundaryChars)
-        if let chars = chars {
-            var charArr = [Character]()
-            for char in chars {
-                charArr.append(contentsOf: [Character](char))
-            }
-            boundaryChars = charArr
-        } else {
-            boundaryChars = nil
-        }
-        boundaryMaxScan = try container.decodeIntIfPresent(forKey: .boundaryMaxScan)
-        boundaryScannerType = try container.decodeIfPresent(Highlight.BoundaryScannerType.self, forKey: .boundaryScannerType)
-        boundaryScannerLocale = try container.decodeStringIfPresent(forKey: .boundaryScannerLocale)
-        encoder = try container.decodeIfPresent(Highlight.EncoderType.self, forKey: .encoder)
-        forceSource = try container.decodeBoolIfPresent(forKey: .forceSource)
-        fragmenter = try container.decodeStringIfPresent(forKey: .fragmenter)
-        fragmentOffset = try container.decodeIntIfPresent(forKey: .fragmentOffset)
-        fragmentSize = try container.decodeIntIfPresent(forKey: .fragmentSize)
-        highlightQuery = try container.decodeQueryIfPresent(forKey: .highlightQuery)
-        matchedFields = try container.decodeArray(forKey: .matchedFields)
-        noMatchSize = try container.decodeIntIfPresent(forKey: .noMatchSize)
-        numberOfFragments = try container.decodeIntIfPresent(forKey: .numberOfFragments)
-        let order = try container.decodeStringIfPresent(forKey: .order)
-        if let order = order {
-            switch order {
-            case Highlight.FieldOptions.SCORE_ORDERER_VALUE:
-                scoreOrdered = true
-            default:
-                scoreOrdered = false
-            }
-        } else {
-            scoreOrdered = nil
-        }
-        phraseLimit = try container.decodeIntIfPresent(forKey: .phraseLimit)
-        preTags = try container.decodeArray(forKey: .preTags)
-        postTags = try container.decodeArray(forKey: .postTags)
-        requireFieldMatch = try container.decodeBoolIfPresent(forKey: .requireFieldMatch)
-        tagScheme = try container.decodeStringIfPresent(forKey: .tagsSchema)
-        highlighterType = try container.decodeIfPresent(Highlight.HighlighterType.self, forKey: .type)
-        termVector = try container.decodeStringIfPresent(forKey: .termVector)
-        indexOptions = try container.decodeStringIfPresent(forKey: .indexOptions)
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case boundaryChars = "boundary_chars"
-        case boundaryMaxScan = "boundary_max_scan"
-        case boundaryScannerType = "boundary_scanner"
-        case boundaryScannerLocale = "boundary_scanner_locale"
-        case encoder
-        case forceSource = "force_source"
-        case fragmenter
-        case fragmentOffset = "fragment_offset"
-        case fragmentSize = "fragment_size"
-        case highlightQuery = "highlight_query"
-        case matchedFields = "matched_fields"
-        case noMatchSize = "no_match_size"
-        case numberOfFragments = "number_of_fragments"
-        case order
-        case phraseLimit = "phrase_limit"
-        case preTags = "pre_tags"
-        case postTags = "post_tags"
-        case requireFieldMatch = "require_field_match"
-        case tagsSchema = "tags_schema"
-        case type
-        case termVector = "term_vector"
-        case indexOptions = "index_options"
-    }
-}
-
-extension Highlight.FieldOptions: Equatable {
-    public static func == (lhs: Highlight.FieldOptions, rhs: Highlight.FieldOptions) -> Bool {
-        return lhs.boundaryChars == rhs.boundaryChars
-            && lhs.boundaryMaxScan == rhs.boundaryMaxScan
-            && lhs.boundaryScannerType == rhs.boundaryScannerType
-            && lhs.boundaryScannerLocale == rhs.boundaryScannerLocale
-            && lhs.encoder == rhs.encoder
-            && lhs.forceSource == rhs.forceSource
-            && lhs.fragmenter == rhs.fragmenter
-            && lhs.fragmentOffset == rhs.fragmentOffset
-            && lhs.fragmentSize == rhs.fragmentSize
-            && lhs.matchedFields == rhs.matchedFields
-            && lhs.noMatchSize == rhs.noMatchSize
-            && lhs.numberOfFragments == rhs.numberOfFragments
-            && lhs.scoreOrdered == rhs.scoreOrdered
-            && lhs.phraseLimit == rhs.phraseLimit
-            && lhs.preTags == rhs.preTags
-            && lhs.requireFieldMatch == rhs.requireFieldMatch
-            && lhs.tagScheme == rhs.tagScheme
-            && lhs.highlighterType == rhs.highlighterType
-            && isEqualQueries(lhs.highlightQuery, rhs.highlightQuery)
-    }
-}
-
 // MARK: - Rescoring
 
-/// `SearchRequest` rescorer based on a query.
-public struct QueryRescorer {
-    public let windowSize: Int?
-    public let query: RescoreQuery
+/// Protocol that all rescorer conform to.
+public protocol Rescorer: Codable {
+    var rescorerType: RescorerType { get }
+    var windowSize: Int? { get }
 
-    public init(query: RescoreQuery, windowSize: Int? = nil) {
-        self.query = query
+    func isEqualTo(_ other: Rescorer) -> Bool
+}
+
+extension Rescorer where Self: Equatable {
+    public func isEqualTo(_ other: Rescorer) -> Bool {
+        if let o = other as? Self {
+            return self == o
+        }
+        return false
+    }
+}
+
+/// Protocol to wrap rescorer type information
+public protocol RescorerType: Codable {
+    var metaType: Rescorer.Type { get }
+
+    var name: String { get }
+
+    init?(_ name: String)
+
+    func isEqualTo(_ other: RescorerType) -> Bool
+}
+
+extension RescorerType where Self: RawRepresentable, Self.RawValue == String {
+    public var name: String {
+        return rawValue
+    }
+
+    public init?(_ name: String) {
+        if let v = Self(rawValue: name) {
+            self = v
+        } else {
+            return nil
+        }
+    }
+}
+
+extension RescorerType where Self: Equatable {
+    public func isEqualTo(_ other: RescorerType) -> Bool {
+        if let o = other as? Self {
+            return self == o
+        }
+        return false
+    }
+}
+
+public enum RescorerTypes: String, RescorerType, Codable {
+    case query
+}
+
+extension RescorerTypes {
+    public var metaType: Rescorer.Type {
+        switch self {
+        case .query:
+            return QueryRescorer.self
+        }
+    }
+}
+
+/// `SearchRequest` rescorer based on a query.
+public struct QueryRescorer: Rescorer {
+    public let rescorerType: RescorerType = RescorerTypes.query
+    public let windowSize: Int?
+    public let rescoreQuery: Query
+    public let queryWeight: Decimal?
+    public let rescoreQueryWeight: Decimal?
+    public let scoreMode: ScoreMode?
+
+    public init(_ rescoreQuery: Query, scoreMode: ScoreMode? = nil, queryWeight: Decimal? = nil, rescoreQueryWeight: Decimal? = nil, windowSize: Int? = nil) {
+        self.rescoreQuery = rescoreQuery
+        self.scoreMode = scoreMode
+        self.queryWeight = queryWeight
+        self.rescoreQueryWeight = rescoreQueryWeight
         self.windowSize = windowSize
     }
 }
@@ -1430,159 +825,41 @@ extension QueryRescorer: Codable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(windowSize, forKey: .windowSize)
-        try container.encode(query, forKey: .query)
+        var queryContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .query)
+        try queryContainer.encode(rescoreQuery, forKey: .rescoreQuery)
+        try queryContainer.encodeIfPresent(scoreMode, forKey: .scoreMode)
+        try queryContainer.encodeIfPresent(queryWeight, forKey: .queryWeight)
+        try queryContainer.encodeIfPresent(rescoreQueryWeight, forKey: .rescoreQueryWeight)
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         windowSize = try container.decodeIntIfPresent(forKey: .windowSize)
-        query = try container.decode(RescoreQuery.self, forKey: .query)
+        let queryContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .query)
+        rescoreQuery = try queryContainer.decodeQuery(forKey: .rescoreQuery)
+        scoreMode = try queryContainer.decodeIfPresent(ScoreMode.self, forKey: .scoreMode)
+        queryWeight = try queryContainer.decodeDecimalIfPresent(forKey: .queryWeight)
+        rescoreQueryWeight = try queryContainer.decodeDecimalIfPresent(forKey: .rescoreQueryWeight)
     }
 
     enum CodingKeys: String, CodingKey {
         case windowSize = "window_size"
         case query
+        case rescoreQuery = "rescore_query"
+        case rescoreQueryWeight = "rescore_query_weight"
+        case queryWeight = "query_weight"
+        case scoreMode = "score_mode"
     }
 }
 
-extension QueryRescorer: Equatable {}
-
-// MARK: - Collapsing
-
-public struct Collapse {
-    public let field: String
-    public let innerHits: [InnerHit]?
-    public let maxConcurrentGroupRequests: Int?
-}
-
-extension Collapse: Codable {
-    enum CodingKeys: String, CodingKey {
-        case field
-        case innerHits = "inner_hits"
-        case maxConcurrentGroupRequests = "max_concurrent_group_searches"
-    }
-}
-
-extension Collapse: Equatable {}
-
-// MARK: - Inner Hits
-
-public struct InnerHit {
-    public var name: String?
-    public var ignoreUnmapped: Bool?
-    public var from: Int?
-    public var size: Int?
-    public var explain: Bool?
-    public var version: Bool?
-    public var trackScores: Bool?
-    public var sort: [Sort]?
-    public var query: Query?
-    public var sourceFilter: SourceFilter?
-    public var scriptFields: [ScriptField]?
-    public var storedFields: [String]?
-    public var docvalueFields: [DocValueField]?
-    public var highlight: Highlight?
-    public var collapse: Collapse?
-
-    public init() {}
-}
-
-extension InnerHit: Codable {
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        name = try container.decodeStringIfPresent(forKey: .name)
-        ignoreUnmapped = try container.decodeBoolIfPresent(forKey: .ignoreUnmapped)
-        from = try container.decodeIntIfPresent(forKey: .from)
-        size = try container.decodeIntIfPresent(forKey: .size)
-        explain = try container.decodeBoolIfPresent(forKey: .explain)
-        version = try container.decodeBoolIfPresent(forKey: .version)
-        trackScores = try container.decodeBoolIfPresent(forKey: .trackScores)
-        sort = try container.decodeIfPresent([Sort].self, forKey: .sort)
-        query = try container.decodeQueryIfPresent(forKey: .query)
-        sourceFilter = try container.decodeIfPresent(SourceFilter.self, forKey: .sourceFilter)
-        docvalueFields = try container.decodeIfPresent([DocValueField].self, forKey: .docvalueFields)
-        highlight = try container.decodeIfPresent(Highlight.self, forKey: .highlight)
-        collapse = try container.decodeIfPresent(Collapse.self, forKey: .collapse)
-        if container.contains(.scriptFields) {
-            do {
-                let scriptedField = try container.decode(ScriptField.self, forKey: .scriptFields)
-                scriptFields = [scriptedField]
-            } catch {
-                let nested = try container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .scriptFields)
-                var fields = [ScriptField]()
-                for key in nested.allKeys {
-                    let scriptContainer = try nested.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: key)
-                    let script = try scriptContainer.decode(Script.self, forKey: .key(named: ScriptField.CodingKeys.script.stringValue))
-                    fields.append(ScriptField(field: key.stringValue, script: script))
-                }
-                scriptFields = fields
-            }
-        }
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(name, forKey: .name)
-        try container.encodeIfPresent(ignoreUnmapped, forKey: .ignoreUnmapped)
-        try container.encodeIfPresent(from, forKey: .from)
-        try container.encodeIfPresent(size, forKey: .size)
-        try container.encodeIfPresent(explain, forKey: .explain)
-        try container.encodeIfPresent(version, forKey: .version)
-        try container.encodeIfPresent(trackScores, forKey: .trackScores)
-        try container.encodeIfPresent(sort, forKey: .sort)
-        try container.encodeIfPresent(query, forKey: .query)
-        try container.encodeIfPresent(sourceFilter, forKey: .sourceFilter)
-        try container.encodeIfPresent(storedFields, forKey: .storedFields)
-        try container.encodeIfPresent(docvalueFields, forKey: .docvalueFields)
-        try container.encodeIfPresent(highlight, forKey: .highlight)
-        try container.encodeIfPresent(collapse, forKey: .collapse)
-
-        if let scriptFields = self.scriptFields, !scriptFields.isEmpty {
-            if scriptFields.count == 1 {
-                try container.encode(scriptFields[0], forKey: .scriptFields)
-            } else {
-                var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .scriptFields)
-                for scriptField in scriptFields {
-                    var scriptContainer = nested.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: scriptField.field))
-                    try scriptContainer.encode(scriptField.script, forKey: .key(named: ScriptField.CodingKeys.script.stringValue))
-                }
-            }
-        }
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case name
-        case ignoreUnmapped = "ignore_unmapped"
-        case from
-        case size
-        case explain
-        case version
-        case trackScores = "track_scores"
-        case sort
-        case query
-        case sourceFilter = "_source"
-        case scriptFields = "script_fields"
-        case storedFields = "stored_fields"
-        case docvalueFields = "docvalue_fields"
-        case highlight
-        case collapse
-    }
-}
-
-extension InnerHit: Equatable {
-    public static func == (lhs: InnerHit, rhs: InnerHit) -> Bool {
-        return lhs.name == rhs.name
-            && lhs.ignoreUnmapped == rhs.ignoreUnmapped
-            && lhs.from == rhs.from
-            && lhs.size == rhs.size
-            && lhs.explain == rhs.explain
-            && lhs.version == rhs.version
-            && lhs.trackScores == rhs.trackScores
-            && lhs.sort == rhs.sort
-            && lhs.sourceFilter == rhs.sourceFilter
-            && lhs.scriptFields == rhs.scriptFields
-            && lhs.docvalueFields == rhs.docvalueFields
-            && lhs.highlight == rhs.highlight
+extension QueryRescorer: Equatable {
+    public static func == (lhs: QueryRescorer, rhs: QueryRescorer) -> Bool {
+        return lhs.rescorerType.isEqualTo(rhs.rescorerType)
+            && lhs.windowSize == rhs.windowSize
+            && lhs.queryWeight == rhs.queryWeight
+            && lhs.rescoreQueryWeight == rhs.rescoreQueryWeight
+            && lhs.scoreMode == rhs.scoreMode
+            && isEqualQueries(lhs.rescoreQuery, rhs.rescoreQuery)
     }
 }
 
@@ -1605,7 +882,7 @@ public struct SearchSource {
     public var docvalueFields: [DocValueField]?
     public var postFilter: Query?
     public var highlight: Highlight?
-    public var rescore: [QueryRescorer]?
+    public var rescore: [Rescorer]?
     public var searchAfter: CodableValue?
 }
 
@@ -1637,7 +914,7 @@ extension SearchSource: Codable {
         }
 
         do {
-            rescore = try container.decodeArrayIfPresent(forKey: .rescore)
+            rescore = try container.decodeRescorersIfPresent(forKey: .rescore)
         } catch {
             let rescorer = try container.decode(QueryRescorer.self, forKey: .rescore)
             rescore = [rescorer]
@@ -1720,9 +997,100 @@ extension SearchSource: Equatable {
             && lhs.storedFields == rhs.storedFields
             && lhs.docvalueFields == rhs.docvalueFields
             && lhs.highlight == rhs.highlight
-            && lhs.rescore == rhs.rescore
+            && isEqualRescorers(lhs.rescore, rhs.rescore)
             && lhs.searchAfter == rhs.searchAfter
             && isEqualQueries(lhs.query, rhs.query)
             && isEqualQueries(lhs.postFilter, rhs.postFilter)
+    }
+}
+
+public func isEqualRescorers(_ lhs: Rescorer?, _ rhs: Rescorer?) -> Bool {
+    if lhs == nil, rhs == nil {
+        return true
+    }
+    if let lhs = lhs, let rhs = rhs {
+        return lhs.isEqualTo(rhs)
+    }
+    return false
+}
+
+public func isEqualRescorers(_ lhs: [Rescorer]?, _ rhs: [Rescorer]?) -> Bool {
+    if lhs == nil, rhs == nil {
+        return true
+    }
+    if let lhs = lhs, let rhs = rhs {
+        if lhs.count == rhs.count {
+            return !zip(lhs, rhs).contains { !$0.isEqualTo($1) }
+        }
+    }
+    return false
+}
+
+extension KeyedEncodingContainer {
+    public mutating func encode(_ value: Rescorer, forKey key: KeyedEncodingContainer<K>.Key) throws {
+        try value.encode(to: superEncoder(forKey: key))
+    }
+
+    public mutating func encode(_ value: [Rescorer], forKey key: KeyedEncodingContainer<K>.Key) throws {
+        let rescorersEncoder = superEncoder(forKey: key)
+        var rescorersContainer = rescorersEncoder.unkeyedContainer()
+        for rescorer in value {
+            let rescorerEncoder = rescorersContainer.superEncoder()
+            try rescorer.encode(to: rescorerEncoder)
+        }
+    }
+}
+
+extension KeyedDecodingContainer {
+    public func decodeRescorer(forKey key: KeyedDecodingContainer<K>.Key) throws -> Rescorer {
+        let qContainer = try nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: key)
+        for rKey in qContainer.allKeys {
+            if let rType = RescorerTypes(rKey.stringValue) {
+                return try rType.metaType.init(from: superDecoder(forKey: key))
+            }
+        }
+        throw Swift.DecodingError.typeMismatch(RescorerTypes.self, .init(codingPath: codingPath, debugDescription: "Unable to identify rescorer type from key(s) \(qContainer.allKeys)"))
+    }
+
+    public func decodeRescorerIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Rescorer? {
+        guard contains(key) else {
+            return nil
+        }
+        return try decodeRescorer(forKey: key)
+    }
+
+    public func decodeRescorers(forKey key: KeyedDecodingContainer<K>.Key) throws -> [Rescorer] {
+        var arrayContainer = try nestedUnkeyedContainer(forKey: key)
+        var result = [Rescorer]()
+        if let count = arrayContainer.count {
+            while !arrayContainer.isAtEnd {
+                let query = try arrayContainer.decodeRescorer()
+                result.append(query)
+            }
+            if result.count != count {
+                throw Swift.DecodingError.dataCorrupted(.init(codingPath: arrayContainer.codingPath, debugDescription: "Unable to decode all Rescorers expected: \(count) actual: \(result.count). Probable cause: Unable to determine RescorerType form key(s)"))
+            }
+        }
+        return result
+    }
+
+    public func decodeRescorersIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> [Rescorer]? {
+        guard contains(key) else {
+            return nil
+        }
+        return try decodeRescorers(forKey: key)
+    }
+}
+
+extension UnkeyedDecodingContainer {
+    mutating func decodeRescorer() throws -> Rescorer {
+        var copy = self
+        let elementContainer = try copy.nestedContainer(keyedBy: DynamicCodingKeys.self)
+        for rKey in elementContainer.allKeys {
+            if let rType = RescorerTypes(rKey.stringValue) {
+                return try rType.metaType.init(from: superDecoder())
+            }
+        }
+        throw Swift.DecodingError.typeMismatch(RescorerTypes.self, .init(codingPath: codingPath, debugDescription: "Unable to identify rescorer type from key(s) \(elementContainer.allKeys)"))
     }
 }

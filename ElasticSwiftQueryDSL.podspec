@@ -20,6 +20,6 @@ Pod::Spec.new do |s|
   
     s.dependency 'ElasticSwiftCodableUtils', "#{s.version}"
     s.dependency 'ElasticSwiftCore', "#{s.version}"
-    s.dependency 'Logging', '~> 1.2'
+    s.dependency 'Logging', '~> 1.4'
   
 end

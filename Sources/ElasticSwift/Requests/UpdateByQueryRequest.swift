@@ -71,7 +71,7 @@ public class UpdateByQueryRequestBuilder: RequestBuilder {
 // MARK: - Update By Query Request
 
 public struct UpdateByQueryRequest: Request {
-    public var headers: HTTPHeaders = HTTPHeaders()
+    public var headers = HTTPHeaders()
 
     public let index: String
     public let type: String?
