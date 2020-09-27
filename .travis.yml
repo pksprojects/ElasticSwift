@@ -45,6 +45,7 @@ jobs:
         - tar xzf swift.tar.gz -C swift-RELEASE --strip-components=1
         - export PATH="${HOME}/swift-RELEASE/usr/bin:${PATH}"
         - cd $TRAVIS_BUILD_DIR
+        - sleep 10
     - os: osx
       sudo: required
       osx_image: xcode12
