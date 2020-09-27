@@ -45,7 +45,6 @@ jobs:
         - tar xzf swift.tar.gz -C swift-RELEASE --strip-components=1
         - export PATH="${HOME}/swift-RELEASE/usr/bin:${PATH}"
         - cd $TRAVIS_BUILD_DIR
-        - sleep 60
     - os: osx
       sudo: required
       osx_image: xcode12
@@ -64,6 +63,7 @@ before_install:
   - bin/elasticsearch -d -p pid
 before_script:
   - sleep 10
+  - curl -XGET 'http://localhost:9200'
 script:
   - swift build
   - swift test
