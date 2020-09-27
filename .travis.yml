@@ -62,7 +62,7 @@ before_install:
   - cd elasticsearch
   - bin/elasticsearch -d -p pid
 before_script:
-  - sleep 10
+  - sleep 30
   - curl -XGET 'http://localhost:9200'
 script:
   - swift build
