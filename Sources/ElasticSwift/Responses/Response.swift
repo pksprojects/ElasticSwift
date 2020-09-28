@@ -67,6 +67,7 @@ public struct SearchResponse<T: Codable>: Codable, Equatable where T: Equatable 
     public let shards: Shards
     public let hits: SearchHits<T>
     public let scrollId: String?
+    public let profile: SearchProfileShardResults?
 
     enum CodingKeys: String, CodingKey {
         case took
@@ -74,6 +75,7 @@ public struct SearchResponse<T: Codable>: Codable, Equatable where T: Equatable 
         case shards = "_shards"
         case hits
         case scrollId = "_scroll_id"
+        case profile
     }
 }
 
@@ -84,6 +86,70 @@ public struct Shards: Codable, Equatable {
     public let failed: Int
     public let failures: [ShardSearchFailure]?
 }
+
+public struct SearchProfileShardResults: Codable, Equatable {
+    public let shards: [ProfileShardResult]
+}
+
+public struct ProfileShardResult: Codable, Equatable {
+    public let id: String
+    public let searches: [QueryProfileShardResult]
+    public let aggregations: [ProfileResult]
+}
+
+public struct QueryProfileShardResult {
+    public let queryProfileResults: [ProfileResult]
+    public let rewriteTime: Int
+    public let collector: [CollectorResult]
+}
+
+extension QueryProfileShardResult: Codable {
+    enum CodingKeys: String, CodingKey {
+        case queryProfileResults = "query"
+        case rewriteTime = "rewrite_time"
+        case collector
+    }
+}
+
+extension QueryProfileShardResult: Equatable {}
+
+public struct ProfileResult {
+    public let type: String
+    public let description: String
+    public let nodeTime: String
+    public let timings: [String: Int]
+    public let children: [ProfileResult]?
+}
+
+extension ProfileResult: Codable {
+    enum CodingKeys: String, CodingKey {
+        case type
+        case description
+        case nodeTime = "time_in_nanos"
+        case timings = "breakdown"
+        case children
+    }
+}
+
+extension ProfileResult: Equatable {}
+
+public struct CollectorResult {
+    public let name: String
+    public let reason: String
+    public let time: String
+    public let children: [CollectorResult]?
+}
+
+extension CollectorResult: Codable {
+    enum CodingKeys: String, CodingKey {
+        case name
+        case reason
+        case time = "time_in_nanos"
+        case children
+    }
+}
+
+extension CollectorResult: Equatable {}
 
 public struct SearchHits<T: Codable>: Codable, Equatable where T: Equatable {
     public let total: Int
@@ -974,3 +1040,21 @@ extension UnratedDocument: Codable {
 }
 
 extension UnratedDocument: Equatable {}
+
+// MARK: - Get StoredScript Response
+
+public struct GetStoredScriptResponse {
+    public let id: String
+    public let found: Bool
+    public let script: StoredScriptSource?
+}
+
+extension GetStoredScriptResponse: Codable {
+    enum CodingKeys: String, CodingKey {
+        case id = "_id"
+        case found
+        case script
+    }
+}
+
+extension GetStoredScriptResponse: Equatable {}

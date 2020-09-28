@@ -230,6 +230,15 @@ public struct Script: Codable, Equatable {
     }
 }
 
+// MARK: - Script Type
+
+public enum ScriptType: String, Codable {
+    case inline
+    case stored
+}
+
+// MARK: - Enums
+
 public enum Fuzziness: String, Codable {
     case zero = "ZERO"
     case one = "ONE"

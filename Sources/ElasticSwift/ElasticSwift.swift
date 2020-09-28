@@ -243,6 +243,50 @@ extension ElasticClient {
     public func rankEval(_ rankEvalRequest: RankEvalRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<RankEvalResponse, Error>) -> Void) {
         return execute(request: rankEvalRequest, options: options, completionHandler: completionHandler)
     }
+
+    /// Asynchronously get stored script by id.
+    ///
+    /// [How to use scripts on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-scripting-using.html)
+    /// - Parameters:
+    ///   - getStoredScriptRequest: the request.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
+    ///   - completionHandler: callback to be invoked upon request completion.
+    public func getScript(_ getStoredScriptRequest: GetStoredScriptRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<GetStoredScriptResponse, Error>) -> Void) {
+        return execute(request: getStoredScriptRequest, options: options, completionHandler: completionHandler)
+    }
+
+    /// Asynchronously delete stored script by id.
+    ///
+    /// [How to use scripts on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-scripting-using.html)
+    /// - Parameters:
+    ///   - deleteStoredScriptRequest: the request.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
+    ///   - completionHandler: callback to be invoked upon request completion.
+    public func deleteScript(_ deleteStoredScriptRequest: DeleteStoredScriptRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<AcknowledgedResponse, Error>) -> Void) {
+        return execute(request: deleteStoredScriptRequest, options: options, completionHandler: completionHandler)
+    }
+
+    /// Asynchronously puts an stored script using the Scripting API.
+    ///
+    /// [Scripting API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-scripting-using.html)
+    /// - Parameters:
+    ///   - putStoredScriptRequest: the request.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
+    ///   - completionHandler: callback to be invoked upon request completion.
+    public func putScript(_ putStoredScriptRequest: PutStoredScriptRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<AcknowledgedResponse, Error>) -> Void) {
+        return execute(request: putStoredScriptRequest, options: options, completionHandler: completionHandler)
+    }
+
+    /// Asynchronously executes a request using the Search Template API.
+    ///
+    /// [Search Template API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-template.html)
+    /// - Parameters:
+    ///   - searchTemplateRequest: the request.
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
+    ///   - completionHandler: callback to be invoked upon request completion.
+    public func searchTemplate<T: Codable>(_ searchTemplateRequest: SearchTemplateRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<SearchResponse<T>, Error>) -> Void) {
+        return execute(request: searchTemplateRequest, options: options, completionHandler: completionHandler)
+    }
 }
 
 /// Extention declaring various flavors of elasticsearch client

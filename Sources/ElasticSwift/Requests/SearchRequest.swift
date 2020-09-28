@@ -1004,6 +1004,336 @@ extension SearchSource: Equatable {
     }
 }
 
+// MARK: - Search Template Request Builder
+
+public class SearchTemplateRequestBuilder: RequestBuilder {
+    public typealias RequestType = SearchTemplateRequest
+
+    private var _scriptType: ScriptType?
+    private var _script: String?
+    private var _params: [String: CodableValue]?
+    private var _index: String?
+    private var _type: String?
+    private var _explain: Bool?
+    private var _profile: Bool?
+
+    private var _ignoreUnavailable: Bool?
+    private var _ignoreThrottled: Bool?
+    private var _allowNoIndices: Bool?
+    private var _expandWildcards: ExpandWildcards?
+    private var _preference: String?
+    private var _routing: String?
+    private var _scroll: String?
+    private var _searchType: SearchType?
+    private var _typedKeys: Bool?
+    private var _restTotalHitsAsInt: Bool?
+
+    public init() {}
+
+    @discardableResult
+    public func set(scriptType: ScriptType) -> Self {
+        _scriptType = scriptType
+        return self
+    }
+
+    @discardableResult
+    public func set(script: String) -> Self {
+        _script = script
+        return self
+    }
+
+    @discardableResult
+    public func set(params: [String: CodableValue]) -> Self {
+        _params = params
+        return self
+    }
+
+    @discardableResult
+    public func set(index: String) -> Self {
+        _index = index
+        return self
+    }
+
+    @discardableResult
+    public func set(type: String) -> Self {
+        _type = type
+        return self
+    }
+
+    @discardableResult
+    public func set(explain _: Bool) -> Self {
+        _explain = _explain
+        return self
+    }
+
+    @discardableResult
+    public func set(profile: Bool) -> Self {
+        _profile = profile
+        return self
+    }
+
+    @discardableResult
+    public func set(ignoreUnavailable: Bool) -> Self {
+        _ignoreUnavailable = ignoreUnavailable
+        return self
+    }
+
+    @discardableResult
+    public func set(ignoreThrottled: Bool) -> Self {
+        _ignoreThrottled = ignoreThrottled
+        return self
+    }
+
+    @discardableResult
+    public func set(allowNoIndices: Bool) -> Self {
+        _allowNoIndices = allowNoIndices
+        return self
+    }
+
+    @discardableResult
+    public func set(routing: String) -> Self {
+        _routing = routing
+        return self
+    }
+
+    @discardableResult
+    public func set(scroll: String) -> Self {
+        _scroll = scroll
+        return self
+    }
+
+    @discardableResult
+    public func set(searchType: SearchType) -> Self {
+        _searchType = searchType
+        return self
+    }
+
+    @discardableResult
+    public func set(typedKeys: Bool) -> Self {
+        _typedKeys = typedKeys
+        return self
+    }
+
+    @discardableResult
+    public func set(restTotalHitsAsInt: Bool) -> Self {
+        _restTotalHitsAsInt = restTotalHitsAsInt
+        return self
+    }
+
+    @discardableResult
+    public func set(expandWildcards: ExpandWildcards) -> Self {
+        _expandWildcards = expandWildcards
+        return self
+    }
+
+    @discardableResult
+    public func set(preference: String) -> Self {
+        _preference = preference
+        return self
+    }
+
+    public var scriptType: ScriptType? {
+        return _scriptType
+    }
+
+    public var script: String? {
+        return _script
+    }
+
+    public var params: [String: CodableValue]? {
+        return _params
+    }
+
+    public var index: String? {
+        return _index
+    }
+
+    public var type: String? {
+        return _type
+    }
+
+    public var explain: Bool? {
+        return _explain
+    }
+
+    public var profile: Bool? {
+        return _profile
+    }
+
+    public var ignoreUnavailable: Bool? {
+        return _ignoreUnavailable
+    }
+
+    public var ignoreThrottled: Bool? {
+        return _ignoreThrottled
+    }
+
+    public var allowNoIndices: Bool? {
+        return _allowNoIndices
+    }
+
+    public var expandWildcards: ExpandWildcards? {
+        return _expandWildcards
+    }
+
+    public var preference: String? {
+        return _preference
+    }
+
+    public var routing: String? {
+        return _routing
+    }
+
+    public var scroll: String? {
+        return _scroll
+    }
+
+    public var searchType: SearchType? {
+        return _searchType
+    }
+
+    public var typedKeys: Bool? {
+        return _typedKeys
+    }
+
+    public var restTotalHitsAsInt: Bool? {
+        return _restTotalHitsAsInt
+    }
+
+    public func build() throws -> SearchTemplateRequest {
+        return try SearchTemplateRequest(withBuilder: self)
+    }
+}
+
+// MARK: - Search Template Request
+
+public struct SearchTemplateRequest: Request {
+    public var headers = HTTPHeaders()
+
+    public let scriptType: ScriptType
+    public let script: String
+    public let params: [String: CodableValue]
+    public let index: String?
+    public let type: String?
+    public let explain: Bool?
+    public let profile: Bool?
+
+    public var ignoreUnavailable: Bool?
+    public var ignoreThrottled: Bool?
+    public var allowNoIndices: Bool?
+    public var expandWildcards: ExpandWildcards?
+    public var preference: String?
+    public var routing: String?
+    public var scroll: String?
+    public var searchType: SearchType?
+    public var typedKeys: Bool?
+    public var restTotalHitsAsInt: Bool?
+
+    public init(scriptType: ScriptType, script: String, params: [String: CodableValue], index: String?, type: String?, explain: Bool?, profile: Bool?, ignoreUnavailable: Bool? = nil, ignoreThrottled: Bool? = nil, allowNoIndices: Bool? = nil, expandWildcards: ExpandWildcards? = nil, preference: String? = nil, routing: String? = nil, scroll: String? = nil, searchType: SearchType? = nil, typedKeys: Bool? = nil, restTotalHitsAsInt: Bool? = nil) {
+        self.scriptType = scriptType
+        self.script = script
+        self.params = params
+        self.index = index
+        self.type = type
+        self.explain = explain
+        self.profile = profile
+        self.ignoreUnavailable = ignoreUnavailable
+        self.ignoreThrottled = ignoreThrottled
+        self.allowNoIndices = allowNoIndices
+        self.expandWildcards = expandWildcards
+        self.preference = preference
+        self.routing = routing
+        self.scroll = scroll
+        self.searchType = searchType
+        self.typedKeys = typedKeys
+        self.restTotalHitsAsInt = restTotalHitsAsInt
+    }
+
+    internal init(withBuilder builder: SearchTemplateRequestBuilder) throws {
+        guard let script = builder.script else {
+            throw RequestBuilderError.missingRequiredField("script")
+        }
+
+        guard let scriptType = builder.scriptType else {
+            throw RequestBuilderError.missingRequiredField("scriptType")
+        }
+
+        guard let params = builder.params else {
+            throw RequestBuilderError.missingRequiredField("params")
+        }
+
+        self.init(scriptType: scriptType, script: script, params: params, index: builder.index, type: builder.type, explain: builder.explain, profile: builder.profile, ignoreUnavailable: builder.ignoreUnavailable, ignoreThrottled: builder.ignoreThrottled, allowNoIndices: builder.allowNoIndices, expandWildcards: builder.expandWildcards, preference: builder.preference, routing: builder.routing, scroll: builder.scroll, searchType: builder.searchType, typedKeys: builder.typedKeys, restTotalHitsAsInt: builder.restTotalHitsAsInt)
+    }
+
+    public var queryParams: [URLQueryItem] {
+        var queryItems = [URLQueryItem]()
+        if let ignoreUnavailable = self.ignoreUnavailable {
+            queryItems.append(URLQueryItem(name: QueryParams.ignoreUnavailable, value: ignoreUnavailable))
+        }
+        if let ignoreThrottled = self.ignoreThrottled {
+            queryItems.append(URLQueryItem(name: QueryParams.ignoreThrottled, value: ignoreThrottled))
+        }
+        if let allowNoIndices = self.allowNoIndices {
+            queryItems.append(URLQueryItem(name: QueryParams.allowNoIndices, value: allowNoIndices))
+        }
+        if let expandWildcards = self.expandWildcards {
+            queryItems.append(URLQueryItem(name: QueryParams.expandWildcards, value: expandWildcards.rawValue))
+        }
+        if let preference = self.preference {
+            queryItems.append(URLQueryItem(name: QueryParams.preference, value: preference))
+        }
+        if let routing = self.routing {
+            queryItems.append(URLQueryItem(name: QueryParams.routing, value: routing))
+        }
+        if let scroll = self.scroll {
+            queryItems.append(URLQueryItem(name: QueryParams.scroll, value: scroll))
+        }
+        if let searchType = self.searchType {
+            queryItems.append(URLQueryItem(name: QueryParams.searchType, value: searchType.rawValue))
+        }
+        if let typedKeys = self.typedKeys {
+            queryItems.append(URLQueryItem(name: QueryParams.typedKeys, value: typedKeys))
+        }
+        if let restTotalHitsAsInt = self.restTotalHitsAsInt {
+            queryItems.append(URLQueryItem(name: QueryParams.restTotalHitsAsInt, value: restTotalHitsAsInt))
+        }
+        return queryItems
+    }
+
+    public var method: HTTPMethod {
+        return .POST
+    }
+
+    public var endPoint: String {
+        var _endPoint = "_search/template"
+        if let type = self.type {
+            _endPoint = "\(type)/\(_endPoint)"
+        }
+        if let index = self.index {
+            _endPoint = "\(index)/\(_endPoint)"
+        }
+        return _endPoint
+    }
+
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        let body = (scriptType == .stored) ? Body(id: script, source: nil, params: params)
+            : Body(id: nil, source: script, params: params)
+        return serializer.encode(body).mapError { error -> MakeBodyError in
+            MakeBodyError.wrapped(error)
+        }
+    }
+
+    private struct Body: Encodable {
+        public let id: String?
+        public let source: String?
+        public let params: [String: CodableValue]
+    }
+}
+
+extension SearchTemplateRequest: Equatable {}
+
+// MARK: - Extensions
+
 public func isEqualRescorers(_ lhs: Rescorer?, _ rhs: Rescorer?) -> Bool {
     if lhs == nil, rhs == nil {
         return true
