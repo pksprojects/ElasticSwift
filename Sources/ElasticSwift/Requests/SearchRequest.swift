@@ -1061,8 +1061,8 @@ public class SearchTemplateRequestBuilder: RequestBuilder {
     }
 
     @discardableResult
-    public func set(explain _: Bool) -> Self {
-        _explain = _explain
+    public func set(explain: Bool) -> Self {
+        _explain = explain
         return self
     }
 
