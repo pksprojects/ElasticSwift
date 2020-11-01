@@ -48,8 +48,8 @@ public struct MatchQuery: Query {
     }
 }
 
-extension MatchQuery {
-    public init(from decoder: Decoder) throws {
+public extension MatchQuery {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
 
@@ -79,7 +79,7 @@ extension MatchQuery {
         }
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
         var fieldContainer = nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
@@ -93,7 +93,7 @@ extension MatchQuery {
         try fieldContainer.encodeIfPresent(autoGenSynonymnsPhraseQuery, forKey: .autoGenerateSynonymsPhraseQuery)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case query
         case boost
         case name
@@ -152,8 +152,8 @@ public struct MatchPhraseQuery: Query {
     }
 }
 
-extension MatchPhraseQuery {
-    public init(from decoder: Decoder) throws {
+public extension MatchPhraseQuery {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
 
@@ -175,7 +175,7 @@ extension MatchPhraseQuery {
         }
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
         guard analyzer != nil || name != nil || boost != nil else {
@@ -190,7 +190,7 @@ extension MatchPhraseQuery {
         try fieldContainer.encodeIfPresent(boost, forKey: .boost)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case query
         case analyzer
         case name
@@ -241,8 +241,8 @@ public struct MatchPhrasePrefixQuery: Query {
     }
 }
 
-extension MatchPhrasePrefixQuery {
-    public init(from decoder: Decoder) throws {
+public extension MatchPhrasePrefixQuery {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
 
@@ -264,7 +264,7 @@ extension MatchPhrasePrefixQuery {
         }
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
         guard maxExpansions != nil || name != nil || boost != nil else {
@@ -279,7 +279,7 @@ extension MatchPhrasePrefixQuery {
         try fieldContainer.encodeIfPresent(boost, forKey: .boost)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case query
         case maxExpansions = "max_expansions"
         case name
@@ -332,8 +332,8 @@ public struct MultiMatchQuery: Query {
     }
 }
 
-extension MultiMatchQuery {
-    public init(from decoder: Decoder) throws {
+public extension MultiMatchQuery {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         query = try nested.decodeString(forKey: .query)
@@ -344,7 +344,7 @@ extension MultiMatchQuery {
         boost = try nested.decodeDecimalIfPresent(forKey: .boost)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
 
@@ -356,7 +356,7 @@ extension MultiMatchQuery {
         try nested.encodeIfPresent(boost, forKey: .boost)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case query
         case fields
         case tieBreaker = "tie_breaker"
@@ -424,8 +424,8 @@ public struct CommonTermsQuery: Query {
     }
 }
 
-extension CommonTermsQuery {
-    public init(from decoder: Decoder) throws {
+public extension CommonTermsQuery {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
 
@@ -454,7 +454,7 @@ extension CommonTermsQuery {
         name = try fieldContainer.decodeStringIfPresent(forKey: .name)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
         var fieldContainer = nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
@@ -473,7 +473,7 @@ extension CommonTermsQuery {
         try fieldContainer.encodeIfPresent(name, forKey: .name)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case query
         case cutoffFrequency = "cutoff_frequency"
         case lowFreqOperator = "low_freq_operator"
@@ -570,8 +570,8 @@ public struct QueryStringQuery: Query {
     }
 }
 
-extension QueryStringQuery {
-    public init(from decoder: Decoder) throws {
+public extension QueryStringQuery {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         query = try nested.decodeString(forKey: .query)
@@ -601,7 +601,7 @@ extension QueryStringQuery {
         name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         try nested.encode(query, forKey: .query)
@@ -631,7 +631,7 @@ extension QueryStringQuery {
         try nested.encodeIfPresent(name, forKey: .name)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case query
         case fields
         case type
@@ -736,8 +736,8 @@ public struct SimpleQueryStringQuery: Query {
     }
 }
 
-extension SimpleQueryStringQuery {
-    public init(from decoder: Decoder) throws {
+public extension SimpleQueryStringQuery {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         query = try nested.decodeString(forKey: .query)
@@ -756,7 +756,7 @@ extension SimpleQueryStringQuery {
         name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
 
@@ -776,7 +776,7 @@ extension SimpleQueryStringQuery {
         try nested.encodeIfPresent(name, forKey: .name)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case query
         case fields
         case defaultOperator = "default_operator"

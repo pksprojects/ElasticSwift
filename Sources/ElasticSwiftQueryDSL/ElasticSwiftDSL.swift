@@ -312,28 +312,28 @@ public func isEqualQueries(_ lhs: Query?, _ rhs: Query?) -> Bool {
 }
 
 /// Extention for DynamicCodingKeys
-extension DynamicCodingKeys {
-    public static func key(named queryType: QueryType) -> DynamicCodingKeys {
+public extension DynamicCodingKeys {
+    static func key(named queryType: QueryType) -> DynamicCodingKeys {
         return .key(named: queryType.name)
     }
 
-    public static func key(named scoreFunctionType: ScoreFunctionType) -> DynamicCodingKeys {
+    static func key(named scoreFunctionType: ScoreFunctionType) -> DynamicCodingKeys {
         return .key(named: scoreFunctionType.rawValue)
     }
 }
 
 // MARK: - Codable Extenstions
 
-extension KeyedEncodingContainer {
-    public mutating func encode(_ value: Query, forKey key: KeyedEncodingContainer<K>.Key) throws {
+public extension KeyedEncodingContainer {
+    mutating func encode(_ value: Query, forKey key: KeyedEncodingContainer<K>.Key) throws {
         try value.encode(to: superEncoder(forKey: key))
     }
 
-    public mutating func encode(_ value: ScoreFunction, forKey key: KeyedEncodingContainer<K>.Key) throws {
+    mutating func encode(_ value: ScoreFunction, forKey key: KeyedEncodingContainer<K>.Key) throws {
         try value.encode(to: superEncoder(forKey: key))
     }
 
-    public mutating func encode(_ value: [Query], forKey key: KeyedEncodingContainer<K>.Key) throws {
+    mutating func encode(_ value: [Query], forKey key: KeyedEncodingContainer<K>.Key) throws {
         let queriesEncoder = superEncoder(forKey: key)
         var queriesContainer = queriesEncoder.unkeyedContainer()
         for query in value {
@@ -342,7 +342,7 @@ extension KeyedEncodingContainer {
         }
     }
 
-    public mutating func encode(_ value: [ScoreFunction], forKey key: KeyedEncodingContainer<K>.Key) throws {
+    mutating func encode(_ value: [ScoreFunction], forKey key: KeyedEncodingContainer<K>.Key) throws {
         let scoreFunctionEncoder = superEncoder(forKey: key)
         var scoreFunctionsContainer = scoreFunctionEncoder.unkeyedContainer()
         for scoreFunction in value {
@@ -351,13 +351,13 @@ extension KeyedEncodingContainer {
         }
     }
 
-    public mutating func encodeIfPresent(_ value: Query?, forKey key: KeyedEncodingContainer<K>.Key) throws {
+    mutating func encodeIfPresent(_ value: Query?, forKey key: KeyedEncodingContainer<K>.Key) throws {
         if let value = value {
             try value.encode(to: superEncoder(forKey: key))
         }
     }
 
-    public mutating func encode(_ value: [Query]?, forKey key: KeyedEncodingContainer<K>.Key) throws {
+    mutating func encode(_ value: [Query]?, forKey key: KeyedEncodingContainer<K>.Key) throws {
         if let value = value {
             let queriesEncoder = superEncoder(forKey: key)
             var queriesContainer = queriesEncoder.unkeyedContainer()
@@ -369,8 +369,8 @@ extension KeyedEncodingContainer {
     }
 }
 
-extension KeyedDecodingContainer {
-    public func decodeQuery(forKey key: KeyedDecodingContainer<K>.Key) throws -> Query {
+public extension KeyedDecodingContainer {
+    func decodeQuery(forKey key: KeyedDecodingContainer<K>.Key) throws -> Query {
         let qContainer = try nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: key)
         for qKey in qContainer.allKeys {
             if let qType = QueryTypes(qKey.stringValue) {
@@ -380,14 +380,14 @@ extension KeyedDecodingContainer {
         throw Swift.DecodingError.typeMismatch(QueryTypes.self, .init(codingPath: codingPath, debugDescription: "Unable to identify query type from key(s) \(qContainer.allKeys)"))
     }
 
-    public func decodeQueryIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Query? {
+    func decodeQueryIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Query? {
         guard contains(key) else {
             return nil
         }
         return try decodeQuery(forKey: key)
     }
 
-    public func decodeQueries(forKey key: KeyedDecodingContainer<K>.Key) throws -> [Query] {
+    func decodeQueries(forKey key: KeyedDecodingContainer<K>.Key) throws -> [Query] {
         var arrayContainer = try nestedUnkeyedContainer(forKey: key)
         var result = [Query]()
         if let count = arrayContainer.count {
@@ -402,7 +402,7 @@ extension KeyedDecodingContainer {
         return result
     }
 
-    public func decodeQueriesIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> [Query]? {
+    func decodeQueriesIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> [Query]? {
         guard contains(key) else {
             return nil
         }
@@ -410,7 +410,7 @@ extension KeyedDecodingContainer {
         return try decodeQueries(forKey: key)
     }
 
-    public func decodeScoreFunction(forKey key: KeyedDecodingContainer<K>.Key) throws -> ScoreFunction {
+    func decodeScoreFunction(forKey key: KeyedDecodingContainer<K>.Key) throws -> ScoreFunction {
         let fContainer = try nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: key)
 
         for fKey in fContainer.allKeys {
@@ -421,14 +421,14 @@ extension KeyedDecodingContainer {
         throw Swift.DecodingError.typeMismatch(ScoreFunctionType.self, .init(codingPath: codingPath, debugDescription: "Unable to identify score function type from key(s) \(fContainer.allKeys)"))
     }
 
-    public func decodeScoreFunctionIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> ScoreFunction? {
+    func decodeScoreFunctionIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> ScoreFunction? {
         guard contains(key) else {
             return nil
         }
         return try decodeScoreFunction(forKey: key)
     }
 
-    public func decodeScoreFunctions(forKey key: KeyedDecodingContainer<K>.Key) throws -> [ScoreFunction] {
+    func decodeScoreFunctions(forKey key: KeyedDecodingContainer<K>.Key) throws -> [ScoreFunction] {
         var arrayContainer = try nestedUnkeyedContainer(forKey: key)
         var result = [ScoreFunction]()
         if let count = arrayContainer.count {
@@ -443,7 +443,7 @@ extension KeyedDecodingContainer {
         return result
     }
 
-    public func decodeScoreFunctionsIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> [ScoreFunction]? {
+    func decodeScoreFunctionsIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> [ScoreFunction]? {
         guard contains(key) else {
             return nil
         }

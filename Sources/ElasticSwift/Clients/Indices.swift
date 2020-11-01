@@ -26,7 +26,7 @@ public class IndicesClient {
     }
 }
 
-extension IndicesClient {
+public extension IndicesClient {
     /// Asynchronously creates an index using the Create Index API.
     ///
     /// [Create Index API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html)
@@ -34,7 +34,7 @@ extension IndicesClient {
     ///   - createRequest: the request
     ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func create(_ createRequest: CreateIndexRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<CreateIndexResponse, Error>) -> Void) {
+    func create(_ createRequest: CreateIndexRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<CreateIndexResponse, Error>) -> Void) {
         client.execute(request: createRequest, options: options, completionHandler: completionHandler)
     }
 
@@ -45,7 +45,7 @@ extension IndicesClient {
     ///   - getReqeust: the request
     ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func get(_ getReqeust: GetIndexRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<GetIndexResponse, Error>) -> Void) {
+    func get(_ getReqeust: GetIndexRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<GetIndexResponse, Error>) -> Void) {
         client.execute(request: getReqeust, options: options, completionHandler: completionHandler)
     }
 
@@ -56,7 +56,7 @@ extension IndicesClient {
     ///   - getReqeust: the request
     ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func exists(_ getReqeust: GetIndexRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<IndexExistsResponse, Error>) -> Void) {
+    func exists(_ getReqeust: GetIndexRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<IndexExistsResponse, Error>) -> Void) {
         client.execute(request: getReqeust, options: options, converter: ResponseConverters.indexExistsResponseConverter, completionHandler: completionHandler)
     }
 
@@ -67,7 +67,7 @@ extension IndicesClient {
     ///   - existsReqeust: the request
     ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func exists(_ existsReqeust: IndexExistsRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<IndexExistsResponse, Error>) -> Void) {
+    func exists(_ existsReqeust: IndexExistsRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<IndexExistsResponse, Error>) -> Void) {
         client.execute(request: existsReqeust, options: options, converter: ResponseConverters.indexExistsResponseConverter, completionHandler: completionHandler)
     }
 
@@ -78,7 +78,7 @@ extension IndicesClient {
     ///   - deleteReqeust: the request
     ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func delete(_ deleteReqeust: DeleteIndexRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<AcknowledgedResponse, Error>) -> Void) {
+    func delete(_ deleteReqeust: DeleteIndexRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<AcknowledgedResponse, Error>) -> Void) {
         client.execute(request: deleteReqeust, options: options, completionHandler: completionHandler)
     }
 
@@ -89,7 +89,7 @@ extension IndicesClient {
     ///   - openReqeust: the request
     ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func open(_ openReqeust: OpenIndexRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<AcknowledgedResponse, Error>) -> Void) {
+    func open(_ openReqeust: OpenIndexRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<AcknowledgedResponse, Error>) -> Void) {
         client.execute(request: openReqeust, options: options, completionHandler: completionHandler)
     }
 
@@ -100,7 +100,7 @@ extension IndicesClient {
     ///   - closeReqeust: the request
     ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    public func close(_ closeReqeust: CloseIndexRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<AcknowledgedResponse, Error>) -> Void) {
+    func close(_ closeReqeust: CloseIndexRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<AcknowledgedResponse, Error>) -> Void) {
         client.execute(request: closeReqeust, options: options, completionHandler: completionHandler)
     }
 }

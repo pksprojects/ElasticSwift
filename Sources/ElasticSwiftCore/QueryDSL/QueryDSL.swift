@@ -19,8 +19,8 @@ public protocol Query: Codable {
     func isEqualTo(_ other: Query) -> Bool
 }
 
-extension Query where Self: Equatable {
-    public func isEqualTo(_ other: Query) -> Bool {
+public extension Query where Self: Equatable {
+    func isEqualTo(_ other: Query) -> Bool {
         if let o = other as? Self {
             return self == o
         }
@@ -41,12 +41,12 @@ public protocol QueryType: Codable {
     func isEqualTo(_ other: QueryType) -> Bool
 }
 
-extension QueryType where Self: RawRepresentable, Self.RawValue == String {
-    public var name: String {
+public extension QueryType where Self: RawRepresentable, Self.RawValue == String {
+    var name: String {
         return rawValue
     }
 
-    public init?(_ name: String) {
+    init?(_ name: String) {
         if let v = Self(rawValue: name) {
             self = v
         } else {
@@ -55,8 +55,8 @@ extension QueryType where Self: RawRepresentable, Self.RawValue == String {
     }
 }
 
-extension QueryType where Self: Equatable {
-    public func isEqualTo(_ other: QueryType) -> Bool {
+public extension QueryType where Self: Equatable {
+    func isEqualTo(_ other: QueryType) -> Bool {
         if let o = other as? Self {
             return self == o
         }

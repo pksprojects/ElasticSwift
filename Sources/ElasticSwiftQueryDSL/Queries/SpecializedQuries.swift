@@ -76,8 +76,8 @@ public struct MoreLikeThisQuery: Query {
     }
 }
 
-extension MoreLikeThisQuery {
-    public init(from decoder: Decoder) throws {
+public extension MoreLikeThisQuery {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         fields = try nested.decodeArrayIfPresent(forKey: .fields)
@@ -134,7 +134,7 @@ extension MoreLikeThisQuery {
         name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         try nested.encodeIfPresent(fields, forKey: .fields)
@@ -182,7 +182,7 @@ extension MoreLikeThisQuery {
         try nested.encodeIfPresent(name, forKey: .name)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case fields
         case like
         case unlike
@@ -204,8 +204,8 @@ extension MoreLikeThisQuery {
     }
 }
 
-extension MoreLikeThisQuery {
-    public struct Item {
+public extension MoreLikeThisQuery {
+    struct Item {
         public var index: String?
         public var type: String?
         public let id: String?
@@ -302,8 +302,8 @@ public struct ScriptQuery: Query {
     }
 }
 
-extension ScriptQuery {
-    public init(from decoder: Decoder) throws {
+public extension ScriptQuery {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         script = try nested.decode(Script.self, forKey: .script)
@@ -311,7 +311,7 @@ extension ScriptQuery {
         name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var contianer = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = contianer.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         try nested.encode(script, forKey: .script)
@@ -319,7 +319,7 @@ extension ScriptQuery {
         try nested.encodeIfPresent(name, forKey: .name)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case script
         case boost
         case name
@@ -399,8 +399,8 @@ public struct PercolateQuery: Query {
     }
 }
 
-extension PercolateQuery {
-    public init(from decoder: Decoder) throws {
+public extension PercolateQuery {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         field = try nested.decodeString(forKey: .field)
@@ -431,7 +431,7 @@ extension PercolateQuery {
         name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         try nested.encode(field, forKey: .field)
@@ -453,7 +453,7 @@ extension PercolateQuery {
         try nested.encodeIfPresent(name, forKey: .name)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case field
         case document
         case documents
@@ -505,20 +505,20 @@ public struct WrapperQuery: Query {
     }
 }
 
-extension WrapperQuery {
-    public init(from decoder: Decoder) throws {
+public extension WrapperQuery {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         query = try nested.decodeString(forKey: .query)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         try nested.encode(query, forKey: .query)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case query
     }
 }

@@ -183,8 +183,8 @@ public struct GeoBoundingBoxQuery: Query {
     }
 }
 
-extension GeoBoundingBoxQuery {
-    public init(from decoder: Decoder) throws {
+public extension GeoBoundingBoxQuery {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
 
@@ -210,7 +210,7 @@ extension GeoBoundingBoxQuery {
         name = try nested.decodeStringIfPresent(forKey: .key(named: CodingKeys.name.rawValue))
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .key(named: queryType))
         var fieldContainer = nested.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: field))
@@ -223,7 +223,7 @@ extension GeoBoundingBoxQuery {
         try nested.encodeIfPresent(name, forKey: .key(named: CodingKeys.name.rawValue))
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case topLeft = "top_left"
         case bottomRight = "bottom_right"
         case ignoreUnmapped = "ignore_unmapped"

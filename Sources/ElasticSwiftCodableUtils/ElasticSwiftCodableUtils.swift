@@ -18,34 +18,34 @@ public protocol ValueWrapper {
     init(_ value: ValueType)
 }
 
-extension ValueWrapper {
-    public init(nilLiteral _: ()) {
+public extension ValueWrapper {
+    init(nilLiteral _: ()) {
         self.init(NilValue.nil as! Self.ValueType)
     }
 
-    public init(booleanLiteral value: Bool) {
+    init(booleanLiteral value: Bool) {
         self.init(value as! Self.ValueType)
     }
 
-    public init(integerLiteral value: Int) {
+    init(integerLiteral value: Int) {
         self.init(value as! Self.ValueType)
     }
 
-    public init(floatLiteral value: Double) {
+    init(floatLiteral value: Double) {
         self.init(value as! Self.ValueType)
     }
 
-    public init(stringLiteral value: String) {
+    init(stringLiteral value: String) {
         self.init(value as! Self.ValueType)
     }
 
-    public init(extendedGraphemeClusterLiteral value: String) {
+    init(extendedGraphemeClusterLiteral value: String) {
         self.init(value as! Self.ValueType)
     }
 }
 
-extension ValueWrapper where Self: Encodable {
-    public func encode(to encoder: Encoder) throws {
+public extension ValueWrapper where Self: Encodable {
+    func encode(to encoder: Encoder) throws {
         if let value = self.value as? Encodable {
             try value.encode(to: encoder)
         } else {
@@ -54,8 +54,8 @@ extension ValueWrapper where Self: Encodable {
     }
 }
 
-extension ValueWrapper where Self: Decodable {
-    public init(from decoder: Decoder) throws {
+public extension ValueWrapper where Self: Decodable {
+    init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
 
         if container.decodeNil() {
@@ -106,10 +106,10 @@ extension ValueWrapper where Self: Decodable {
     }
 }
 
-extension ValueWrapper where Self: ExpressibleByArrayLiteral {
-    public typealias ArrayLiteralElement = Self
+public extension ValueWrapper where Self: ExpressibleByArrayLiteral {
+    typealias ArrayLiteralElement = Self
 
-    public init(arrayLiteral elements: Self...) {
+    init(arrayLiteral elements: Self...) {
         if let elements = elements.map({ $0.value as? Bool }) as? [Bool] {
             self.init(elements as! Self.ValueType)
         } else if let elements = elements.map({ $0.value as? Int }) as? [Int] {
@@ -148,12 +148,12 @@ extension ValueWrapper where Self: ExpressibleByArrayLiteral {
     }
 }
 
-extension ValueWrapper where Self: ExpressibleByDictionaryLiteral {
-    public typealias Key = String
+public extension ValueWrapper where Self: ExpressibleByDictionaryLiteral {
+    typealias Key = String
 
-    public typealias Value = Self
+    typealias Value = Self
 
-    public init(dictionaryLiteral elements: (String, Self)...) {
+    init(dictionaryLiteral elements: (String, Self)...) {
         if let elements = elements.map({ ($0.0, $0.1.value as? Bool) }) as? [(String, Bool)] {
             self.init([String: Bool](elements, uniquingKeysWith: { first, _ in first }) as! Self.ValueType)
         } else if let elements = elements.map({ ($0.0, $0.1.value as? Int) }) as? [(String, Int)] {
@@ -174,8 +174,8 @@ extension ValueWrapper where Self: ExpressibleByDictionaryLiteral {
     }
 }
 
-extension ValueWrapper where Self: Equatable {
-    public static func == (lhs: Self, rhs: Self) -> Bool {
+public extension ValueWrapper where Self: Equatable {
+    static func == (lhs: Self, rhs: Self) -> Bool {
         switch (lhs.value, rhs.value) {
         case let (lhs as Bool, rhs as Bool):
             return lhs == rhs
@@ -263,8 +263,8 @@ extension ValueWrapper where Self: Equatable {
     }
 }
 
-extension ValueWrapper where Self: CustomStringConvertible {
-    public var description: String {
+public extension ValueWrapper where Self: CustomStringConvertible {
+    var description: String {
         if let value = self.value as? CustomStringConvertible {
             return value.description
         }
@@ -272,8 +272,8 @@ extension ValueWrapper where Self: CustomStringConvertible {
     }
 }
 
-extension ValueWrapper where Self: CustomDebugStringConvertible {
-    public var debugDescription: String {
+public extension ValueWrapper where Self: CustomDebugStringConvertible {
+    var debugDescription: String {
         if let value = self.value as? CustomDebugStringConvertible {
             return value.debugDescription
         } else if let self = self as? CustomStringConvertible {

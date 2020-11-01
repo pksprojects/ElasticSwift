@@ -747,8 +747,8 @@ public protocol Rescorer: Codable {
     func isEqualTo(_ other: Rescorer) -> Bool
 }
 
-extension Rescorer where Self: Equatable {
-    public func isEqualTo(_ other: Rescorer) -> Bool {
+public extension Rescorer where Self: Equatable {
+    func isEqualTo(_ other: Rescorer) -> Bool {
         if let o = other as? Self {
             return self == o
         }
@@ -767,12 +767,12 @@ public protocol RescorerType: Codable {
     func isEqualTo(_ other: RescorerType) -> Bool
 }
 
-extension RescorerType where Self: RawRepresentable, Self.RawValue == String {
-    public var name: String {
+public extension RescorerType where Self: RawRepresentable, Self.RawValue == String {
+    var name: String {
         return rawValue
     }
 
-    public init?(_ name: String) {
+    init?(_ name: String) {
         if let v = Self(rawValue: name) {
             self = v
         } else {
@@ -781,8 +781,8 @@ extension RescorerType where Self: RawRepresentable, Self.RawValue == String {
     }
 }
 
-extension RescorerType where Self: Equatable {
-    public func isEqualTo(_ other: RescorerType) -> Bool {
+public extension RescorerType where Self: Equatable {
+    func isEqualTo(_ other: RescorerType) -> Bool {
         if let o = other as? Self {
             return self == o
         }
@@ -794,8 +794,8 @@ public enum RescorerTypes: String, RescorerType, Codable {
     case query
 }
 
-extension RescorerTypes {
-    public var metaType: Rescorer.Type {
+public extension RescorerTypes {
+    var metaType: Rescorer.Type {
         switch self {
         case .query:
             return QueryRescorer.self
@@ -1316,8 +1316,8 @@ public struct SearchTemplateRequest: Request {
     }
 
     public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
-        let body = (scriptType == .stored) ? Body(id: script, source: nil, params: params)
-            : Body(id: nil, source: script, params: params)
+        let body = (scriptType == .stored) ? Body(id: script, source: nil, params: params, explain: explain, profile: profile)
+            : Body(id: nil, source: script, params: params, explain: explain, profile: profile)
         return serializer.encode(body).mapError { error -> MakeBodyError in
             MakeBodyError.wrapped(error)
         }
@@ -1327,6 +1327,8 @@ public struct SearchTemplateRequest: Request {
         public let id: String?
         public let source: String?
         public let params: [String: CodableValue]
+        public let explain: Bool?
+        public let profile: Bool?
     }
 }
 
@@ -1356,12 +1358,12 @@ public func isEqualRescorers(_ lhs: [Rescorer]?, _ rhs: [Rescorer]?) -> Bool {
     return false
 }
 
-extension KeyedEncodingContainer {
-    public mutating func encode(_ value: Rescorer, forKey key: KeyedEncodingContainer<K>.Key) throws {
+public extension KeyedEncodingContainer {
+    mutating func encode(_ value: Rescorer, forKey key: KeyedEncodingContainer<K>.Key) throws {
         try value.encode(to: superEncoder(forKey: key))
     }
 
-    public mutating func encode(_ value: [Rescorer], forKey key: KeyedEncodingContainer<K>.Key) throws {
+    mutating func encode(_ value: [Rescorer], forKey key: KeyedEncodingContainer<K>.Key) throws {
         let rescorersEncoder = superEncoder(forKey: key)
         var rescorersContainer = rescorersEncoder.unkeyedContainer()
         for rescorer in value {
@@ -1371,8 +1373,8 @@ extension KeyedEncodingContainer {
     }
 }
 
-extension KeyedDecodingContainer {
-    public func decodeRescorer(forKey key: KeyedDecodingContainer<K>.Key) throws -> Rescorer {
+public extension KeyedDecodingContainer {
+    func decodeRescorer(forKey key: KeyedDecodingContainer<K>.Key) throws -> Rescorer {
         let qContainer = try nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: key)
         for rKey in qContainer.allKeys {
             if let rType = RescorerTypes(rKey.stringValue) {
@@ -1382,14 +1384,14 @@ extension KeyedDecodingContainer {
         throw Swift.DecodingError.typeMismatch(RescorerTypes.self, .init(codingPath: codingPath, debugDescription: "Unable to identify rescorer type from key(s) \(qContainer.allKeys)"))
     }
 
-    public func decodeRescorerIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Rescorer? {
+    func decodeRescorerIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Rescorer? {
         guard contains(key) else {
             return nil
         }
         return try decodeRescorer(forKey: key)
     }
 
-    public func decodeRescorers(forKey key: KeyedDecodingContainer<K>.Key) throws -> [Rescorer] {
+    func decodeRescorers(forKey key: KeyedDecodingContainer<K>.Key) throws -> [Rescorer] {
         var arrayContainer = try nestedUnkeyedContainer(forKey: key)
         var result = [Rescorer]()
         if let count = arrayContainer.count {
@@ -1404,7 +1406,7 @@ extension KeyedDecodingContainer {
         return result
     }
 
-    public func decodeRescorersIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> [Rescorer]? {
+    func decodeRescorersIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> [Rescorer]? {
         guard contains(key) else {
             return nil
         }

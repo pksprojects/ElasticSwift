@@ -26,22 +26,22 @@ public struct MatchAllQuery: Query {
     }
 }
 
-extension MatchAllQuery {
-    public init(from decoder: Decoder) throws {
+public extension MatchAllQuery {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         boost = try nested.decodeIfPresent(Decimal.self, forKey: .boost)
         name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         try nested.encodeIfPresent(boost, forKey: .boost)
         try nested.encodeIfPresent(name, forKey: .name)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case boost
         case name
     }
@@ -73,22 +73,22 @@ public struct MatchNoneQuery: Query {
     }
 }
 
-extension MatchNoneQuery {
-    public init(from decoder: Decoder) throws {
+public extension MatchNoneQuery {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         boost = try nested.decodeDecimalIfPresent(forKey: .boost)
         name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         try nested.encodeIfPresent(boost, forKey: .boost)
         try nested.encodeIfPresent(name, forKey: .name)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case boost
         case name
     }

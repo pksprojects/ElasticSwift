@@ -116,7 +116,7 @@ extension QueryProfileShardResult: Equatable {}
 public struct ProfileResult {
     public let type: String
     public let description: String
-    public let nodeTime: String
+    public let nodeTime: Int
     public let timings: [String: Int]
     public let children: [ProfileResult]?
 }
@@ -136,7 +136,7 @@ extension ProfileResult: Equatable {}
 public struct CollectorResult {
     public let name: String
     public let reason: String
-    public let time: String
+    public let time: Int
     public let children: [CollectorResult]?
 }
 

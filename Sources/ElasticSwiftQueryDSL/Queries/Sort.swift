@@ -9,7 +9,7 @@
 import ElasticSwiftCore
 import Foundation
 
-public final class SortBuilders {
+public enum SortBuilders {
     public static func scoreSort() -> ScoreSortBuilder {
         return ScoreSortBuilder()
     }

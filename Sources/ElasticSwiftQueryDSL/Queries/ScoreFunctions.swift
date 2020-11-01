@@ -29,13 +29,13 @@ public struct WeightScoreFunction: ScoreFunction {
     }
 }
 
-extension WeightScoreFunction {
-    public init(from decoder: Decoder) throws {
+public extension WeightScoreFunction {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         weight = try container.decodeDecimal(forKey: .key(named: scoreFunctionType))
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         try container.encode(weight, forKey: .key(named: scoreFunctionType))
     }
@@ -74,22 +74,22 @@ public struct RandomScoreFunction: ScoreFunction {
     }
 }
 
-extension RandomScoreFunction {
-    public init(from decoder: Decoder) throws {
+public extension RandomScoreFunction {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: scoreFunctionType))
         seed = try nested.decodeIntIfPresent(forKey: .seed)
         field = try nested.decodeStringIfPresent(forKey: .field)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: scoreFunctionType))
         try nested.encodeIfPresent(seed, forKey: .seed)
         try nested.encodeIfPresent(field, forKey: .field)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case seed
         case field
     }
@@ -127,20 +127,20 @@ public struct ScriptScoreFunction: ScoreFunction {
     }
 }
 
-extension ScriptScoreFunction {
-    public init(from decoder: Decoder) throws {
+public extension ScriptScoreFunction {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: scoreFunctionType))
         script = try nested.decode(Script.self, forKey: .script)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: scoreFunctionType))
         try nested.encode(script, forKey: .script)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case script
     }
 }
@@ -385,8 +385,8 @@ public struct FieldValueFactorScoreFunction: ScoreFunction {
     }
 }
 
-extension FieldValueFactorScoreFunction {
-    public init(from decoder: Decoder) throws {
+public extension FieldValueFactorScoreFunction {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: scoreFunctionType))
         field = try nested.decodeString(forKey: .field)
@@ -395,7 +395,7 @@ extension FieldValueFactorScoreFunction {
         modifier = try nested.decodeIfPresent(Modifier.self, forKey: .modifier)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: scoreFunctionType))
         try nested.encode(field, forKey: .field)
@@ -404,7 +404,7 @@ extension FieldValueFactorScoreFunction {
         try nested.encodeIfPresent(missing, forKey: .missing)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case field
         case factor
         case modifier

@@ -26,8 +26,8 @@ public protocol Request {
     func isEqualTo(_ other: Request) -> Bool
 }
 
-extension Request where Self: Equatable {
-    public func isEqualTo(_ other: Request) -> Bool {
+public extension Request where Self: Equatable {
+    func isEqualTo(_ other: Request) -> Bool {
         if let o = other as? Self {
             return self == o
         }
