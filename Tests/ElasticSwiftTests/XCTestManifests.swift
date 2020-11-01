@@ -153,6 +153,14 @@
             ("test_18_Search_searchAfter", test_18_Search_searchAfter),
             ("test_19_Search_search", test_19_Search_search),
             ("test_20_searchSource", test_20_searchSource),
+            ("test_21_SearchTemplateRequetBuilder", test_21_SearchTemplateRequetBuilder),
+            ("test_22_SearchTemplateRequetBuilder_2", test_22_SearchTemplateRequetBuilder_2),
+            ("test_23_SearchTemplateRequetBuilder_3", test_23_SearchTemplateRequetBuilder_3),
+            ("test_24_SearchTemplateRequetBuilder_4", test_24_SearchTemplateRequetBuilder_4),
+            ("test_25_SearchTemplateRequet", test_25_SearchTemplateRequet),
+            ("test_26_SearchTemplateRequet_2", test_26_SearchTemplateRequet_2),
+            ("test_27_SearchTemplateRequet_3", test_27_SearchTemplateRequet_3),
+            ("test_28_StoredScriptRequets", test_28_StoredScriptRequets),
         ]
     }
 

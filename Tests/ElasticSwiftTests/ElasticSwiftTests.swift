@@ -1223,3 +1223,109 @@ struct Tweet: Codable, Equatable {
     public let fullname: String
     public let text: String
 }
+
+func isEqualDictionaries(lhs: [String: Any], rhs: [String: Any]) -> Bool {
+    func isEqualAny(lhs: Any, rhs: Any) -> Bool {
+        switch (lhs, rhs) {
+        case let (lhs as Bool, rhs as Bool):
+            return lhs == rhs
+        case let (lhs as Int, rhs as Int):
+            return lhs == rhs
+        case let (lhs as Int8, rhs as Int8):
+            return lhs == rhs
+        case let (lhs as Int16, rhs as Int16):
+            return lhs == rhs
+        case let (lhs as Int32, rhs as Int32):
+            return lhs == rhs
+        case let (lhs as Int64, rhs as Int64):
+            return lhs == rhs
+        case let (lhs as UInt, rhs as UInt):
+            return lhs == rhs
+        case let (lhs as UInt8, rhs as UInt8):
+            return lhs == rhs
+        case let (lhs as UInt16, rhs as UInt16):
+            return lhs == rhs
+        case let (lhs as UInt32, rhs as UInt32):
+            return lhs == rhs
+        case let (lhs as UInt64, rhs as UInt64):
+            return lhs == rhs
+        case let (lhs as Float, rhs as Float):
+            return lhs == rhs
+        case let (lhs as Double, rhs as Double):
+            return lhs == rhs
+        case let (lhs as Decimal, rhs as Decimal):
+            return lhs == rhs
+        case let (lhs as String, rhs as String):
+            return lhs == rhs
+        case let (lhs as [String: Bool], rhs as [String: Bool]):
+            return lhs == rhs
+        case let (lhs as [String: Int], rhs as [String: Int]):
+            return lhs == rhs
+        case let (lhs as [String: UInt], rhs as [String: UInt]):
+            return lhs == rhs
+        case let (lhs as [String: Double], rhs as [String: Double]):
+            return lhs == rhs
+        case let (lhs as [String: Decimal], rhs as [String: Decimal]):
+            return lhs == rhs
+        case let (lhs as [String: String], rhs as [String: String]):
+            return lhs == rhs
+        case let (lhs as CodableValue, rhs as CodableValue):
+            return lhs == rhs
+        case let (lhs as [String: Any], rhs as [String: Any]):
+            return isEqualDictionaries(lhs: lhs, rhs: rhs)
+        case let (lhs as [Bool], rhs as [Bool]):
+            return lhs == rhs
+        case let (lhs as [Int], rhs as [Int]):
+            return lhs == rhs
+        case let (lhs as [Int8], rhs as [Int8]):
+            return lhs == rhs
+        case let (lhs as [Int16], rhs as [Int16]):
+            return lhs == rhs
+        case let (lhs as [Int32], rhs as [Int32]):
+            return lhs == rhs
+        case let (lhs as [Int64], rhs as [Int64]):
+            return lhs == rhs
+        case let (lhs as [UInt], rhs as [UInt]):
+            return lhs == rhs
+        case let (lhs as [UInt8], rhs as [UInt8]):
+            return lhs == rhs
+        case let (lhs as [UInt16], rhs as [UInt16]):
+            return lhs == rhs
+        case let (lhs as [UInt32], rhs as [UInt32]):
+            return lhs == rhs
+        case let (lhs as [UInt64], rhs as [UInt64]):
+            return lhs == rhs
+        case let (lhs as [Float], rhs as [Float]):
+            return lhs == rhs
+        case let (lhs as [Double], rhs as [Double]):
+            return lhs == rhs
+        case let (lhs as [Decimal], rhs as [Decimal]):
+            return lhs == rhs
+        case let (lhs as [String], rhs as [String]):
+            return lhs == rhs
+        case let (lhs as [CodableValue], rhs as [CodableValue]):
+            return lhs == rhs
+        case let (lhs as [[String: Any]], rhs as [[String: Any]]):
+            return lhs.elementsEqual(rhs, by: isEqualDictionaries(lhs:rhs:))
+        default:
+            return false
+        }
+    }
+
+    func isEqualAnyNullable(lhs: Any?, rhs: Any?) -> Bool {
+        if let lhs = lhs, let rhs = rhs {
+            return isEqualAny(lhs: lhs, rhs: rhs)
+        }
+        return false
+    }
+
+    if lhs.keys.count == rhs.keys.count {
+        for key in lhs.keys {
+            let val1 = lhs[key]
+            let val2 = rhs[key]
+            return isEqualAnyNullable(lhs: val1, rhs: val2)
+        }
+        return true
+    }
+    return false
+}

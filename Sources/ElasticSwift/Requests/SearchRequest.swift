@@ -747,8 +747,8 @@ public protocol Rescorer: Codable {
     func isEqualTo(_ other: Rescorer) -> Bool
 }
 
-extension Rescorer where Self: Equatable {
-    public func isEqualTo(_ other: Rescorer) -> Bool {
+public extension Rescorer where Self: Equatable {
+    func isEqualTo(_ other: Rescorer) -> Bool {
         if let o = other as? Self {
             return self == o
         }
@@ -767,12 +767,12 @@ public protocol RescorerType: Codable {
     func isEqualTo(_ other: RescorerType) -> Bool
 }
 
-extension RescorerType where Self: RawRepresentable, Self.RawValue == String {
-    public var name: String {
+public extension RescorerType where Self: RawRepresentable, Self.RawValue == String {
+    var name: String {
         return rawValue
     }
 
-    public init?(_ name: String) {
+    init?(_ name: String) {
         if let v = Self(rawValue: name) {
             self = v
         } else {
@@ -781,8 +781,8 @@ extension RescorerType where Self: RawRepresentable, Self.RawValue == String {
     }
 }
 
-extension RescorerType where Self: Equatable {
-    public func isEqualTo(_ other: RescorerType) -> Bool {
+public extension RescorerType where Self: Equatable {
+    func isEqualTo(_ other: RescorerType) -> Bool {
         if let o = other as? Self {
             return self == o
         }
@@ -794,8 +794,8 @@ public enum RescorerTypes: String, RescorerType, Codable {
     case query
 }
 
-extension RescorerTypes {
-    public var metaType: Rescorer.Type {
+public extension RescorerTypes {
+    var metaType: Rescorer.Type {
         switch self {
         case .query:
             return QueryRescorer.self
@@ -1004,6 +1004,338 @@ extension SearchSource: Equatable {
     }
 }
 
+// MARK: - Search Template Request Builder
+
+public class SearchTemplateRequestBuilder: RequestBuilder {
+    public typealias RequestType = SearchTemplateRequest
+
+    private var _scriptType: ScriptType?
+    private var _script: String?
+    private var _params: [String: CodableValue]?
+    private var _index: String?
+    private var _type: String?
+    private var _explain: Bool?
+    private var _profile: Bool?
+
+    private var _ignoreUnavailable: Bool?
+    private var _ignoreThrottled: Bool?
+    private var _allowNoIndices: Bool?
+    private var _expandWildcards: ExpandWildcards?
+    private var _preference: String?
+    private var _routing: String?
+    private var _scroll: String?
+    private var _searchType: SearchType?
+    private var _typedKeys: Bool?
+    private var _restTotalHitsAsInt: Bool?
+
+    public init() {}
+
+    @discardableResult
+    public func set(scriptType: ScriptType) -> Self {
+        _scriptType = scriptType
+        return self
+    }
+
+    @discardableResult
+    public func set(script: String) -> Self {
+        _script = script
+        return self
+    }
+
+    @discardableResult
+    public func set(params: [String: CodableValue]) -> Self {
+        _params = params
+        return self
+    }
+
+    @discardableResult
+    public func set(index: String) -> Self {
+        _index = index
+        return self
+    }
+
+    @discardableResult
+    public func set(type: String) -> Self {
+        _type = type
+        return self
+    }
+
+    @discardableResult
+    public func set(explain: Bool) -> Self {
+        _explain = explain
+        return self
+    }
+
+    @discardableResult
+    public func set(profile: Bool) -> Self {
+        _profile = profile
+        return self
+    }
+
+    @discardableResult
+    public func set(ignoreUnavailable: Bool) -> Self {
+        _ignoreUnavailable = ignoreUnavailable
+        return self
+    }
+
+    @discardableResult
+    public func set(ignoreThrottled: Bool) -> Self {
+        _ignoreThrottled = ignoreThrottled
+        return self
+    }
+
+    @discardableResult
+    public func set(allowNoIndices: Bool) -> Self {
+        _allowNoIndices = allowNoIndices
+        return self
+    }
+
+    @discardableResult
+    public func set(routing: String) -> Self {
+        _routing = routing
+        return self
+    }
+
+    @discardableResult
+    public func set(scroll: String) -> Self {
+        _scroll = scroll
+        return self
+    }
+
+    @discardableResult
+    public func set(searchType: SearchType) -> Self {
+        _searchType = searchType
+        return self
+    }
+
+    @discardableResult
+    public func set(typedKeys: Bool) -> Self {
+        _typedKeys = typedKeys
+        return self
+    }
+
+    @discardableResult
+    public func set(restTotalHitsAsInt: Bool) -> Self {
+        _restTotalHitsAsInt = restTotalHitsAsInt
+        return self
+    }
+
+    @discardableResult
+    public func set(expandWildcards: ExpandWildcards) -> Self {
+        _expandWildcards = expandWildcards
+        return self
+    }
+
+    @discardableResult
+    public func set(preference: String) -> Self {
+        _preference = preference
+        return self
+    }
+
+    public var scriptType: ScriptType? {
+        return _scriptType
+    }
+
+    public var script: String? {
+        return _script
+    }
+
+    public var params: [String: CodableValue]? {
+        return _params
+    }
+
+    public var index: String? {
+        return _index
+    }
+
+    public var type: String? {
+        return _type
+    }
+
+    public var explain: Bool? {
+        return _explain
+    }
+
+    public var profile: Bool? {
+        return _profile
+    }
+
+    public var ignoreUnavailable: Bool? {
+        return _ignoreUnavailable
+    }
+
+    public var ignoreThrottled: Bool? {
+        return _ignoreThrottled
+    }
+
+    public var allowNoIndices: Bool? {
+        return _allowNoIndices
+    }
+
+    public var expandWildcards: ExpandWildcards? {
+        return _expandWildcards
+    }
+
+    public var preference: String? {
+        return _preference
+    }
+
+    public var routing: String? {
+        return _routing
+    }
+
+    public var scroll: String? {
+        return _scroll
+    }
+
+    public var searchType: SearchType? {
+        return _searchType
+    }
+
+    public var typedKeys: Bool? {
+        return _typedKeys
+    }
+
+    public var restTotalHitsAsInt: Bool? {
+        return _restTotalHitsAsInt
+    }
+
+    public func build() throws -> SearchTemplateRequest {
+        return try SearchTemplateRequest(withBuilder: self)
+    }
+}
+
+// MARK: - Search Template Request
+
+public struct SearchTemplateRequest: Request {
+    public var headers = HTTPHeaders()
+
+    public let scriptType: ScriptType
+    public let script: String
+    public let params: [String: CodableValue]
+    public let index: String?
+    public let type: String?
+    public let explain: Bool?
+    public let profile: Bool?
+
+    public var ignoreUnavailable: Bool?
+    public var ignoreThrottled: Bool?
+    public var allowNoIndices: Bool?
+    public var expandWildcards: ExpandWildcards?
+    public var preference: String?
+    public var routing: String?
+    public var scroll: String?
+    public var searchType: SearchType?
+    public var typedKeys: Bool?
+    public var restTotalHitsAsInt: Bool?
+
+    public init(scriptType: ScriptType, script: String, params: [String: CodableValue], index: String?, type: String?, explain: Bool?, profile: Bool?, ignoreUnavailable: Bool? = nil, ignoreThrottled: Bool? = nil, allowNoIndices: Bool? = nil, expandWildcards: ExpandWildcards? = nil, preference: String? = nil, routing: String? = nil, scroll: String? = nil, searchType: SearchType? = nil, typedKeys: Bool? = nil, restTotalHitsAsInt: Bool? = nil) {
+        self.scriptType = scriptType
+        self.script = script
+        self.params = params
+        self.index = index
+        self.type = type
+        self.explain = explain
+        self.profile = profile
+        self.ignoreUnavailable = ignoreUnavailable
+        self.ignoreThrottled = ignoreThrottled
+        self.allowNoIndices = allowNoIndices
+        self.expandWildcards = expandWildcards
+        self.preference = preference
+        self.routing = routing
+        self.scroll = scroll
+        self.searchType = searchType
+        self.typedKeys = typedKeys
+        self.restTotalHitsAsInt = restTotalHitsAsInt
+    }
+
+    internal init(withBuilder builder: SearchTemplateRequestBuilder) throws {
+        guard let script = builder.script else {
+            throw RequestBuilderError.missingRequiredField("script")
+        }
+
+        guard let scriptType = builder.scriptType else {
+            throw RequestBuilderError.missingRequiredField("scriptType")
+        }
+
+        guard let params = builder.params else {
+            throw RequestBuilderError.missingRequiredField("params")
+        }
+
+        self.init(scriptType: scriptType, script: script, params: params, index: builder.index, type: builder.type, explain: builder.explain, profile: builder.profile, ignoreUnavailable: builder.ignoreUnavailable, ignoreThrottled: builder.ignoreThrottled, allowNoIndices: builder.allowNoIndices, expandWildcards: builder.expandWildcards, preference: builder.preference, routing: builder.routing, scroll: builder.scroll, searchType: builder.searchType, typedKeys: builder.typedKeys, restTotalHitsAsInt: builder.restTotalHitsAsInt)
+    }
+
+    public var queryParams: [URLQueryItem] {
+        var queryItems = [URLQueryItem]()
+        if let ignoreUnavailable = self.ignoreUnavailable {
+            queryItems.append(URLQueryItem(name: QueryParams.ignoreUnavailable, value: ignoreUnavailable))
+        }
+        if let ignoreThrottled = self.ignoreThrottled {
+            queryItems.append(URLQueryItem(name: QueryParams.ignoreThrottled, value: ignoreThrottled))
+        }
+        if let allowNoIndices = self.allowNoIndices {
+            queryItems.append(URLQueryItem(name: QueryParams.allowNoIndices, value: allowNoIndices))
+        }
+        if let expandWildcards = self.expandWildcards {
+            queryItems.append(URLQueryItem(name: QueryParams.expandWildcards, value: expandWildcards.rawValue))
+        }
+        if let preference = self.preference {
+            queryItems.append(URLQueryItem(name: QueryParams.preference, value: preference))
+        }
+        if let routing = self.routing {
+            queryItems.append(URLQueryItem(name: QueryParams.routing, value: routing))
+        }
+        if let scroll = self.scroll {
+            queryItems.append(URLQueryItem(name: QueryParams.scroll, value: scroll))
+        }
+        if let searchType = self.searchType {
+            queryItems.append(URLQueryItem(name: QueryParams.searchType, value: searchType.rawValue))
+        }
+        if let typedKeys = self.typedKeys {
+            queryItems.append(URLQueryItem(name: QueryParams.typedKeys, value: typedKeys))
+        }
+        if let restTotalHitsAsInt = self.restTotalHitsAsInt {
+            queryItems.append(URLQueryItem(name: QueryParams.restTotalHitsAsInt, value: restTotalHitsAsInt))
+        }
+        return queryItems
+    }
+
+    public var method: HTTPMethod {
+        return .POST
+    }
+
+    public var endPoint: String {
+        var _endPoint = "_search/template"
+        if let type = self.type {
+            _endPoint = "\(type)/\(_endPoint)"
+        }
+        if let index = self.index {
+            _endPoint = "\(index)/\(_endPoint)"
+        }
+        return _endPoint
+    }
+
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        let body = (scriptType == .stored) ? Body(id: script, source: nil, params: params, explain: explain, profile: profile)
+            : Body(id: nil, source: script, params: params, explain: explain, profile: profile)
+        return serializer.encode(body).mapError { error -> MakeBodyError in
+            MakeBodyError.wrapped(error)
+        }
+    }
+
+    private struct Body: Encodable {
+        public let id: String?
+        public let source: String?
+        public let params: [String: CodableValue]
+        public let explain: Bool?
+        public let profile: Bool?
+    }
+}
+
+extension SearchTemplateRequest: Equatable {}
+
+// MARK: - Extensions
+
 public func isEqualRescorers(_ lhs: Rescorer?, _ rhs: Rescorer?) -> Bool {
     if lhs == nil, rhs == nil {
         return true
@@ -1026,12 +1358,12 @@ public func isEqualRescorers(_ lhs: [Rescorer]?, _ rhs: [Rescorer]?) -> Bool {
     return false
 }
 
-extension KeyedEncodingContainer {
-    public mutating func encode(_ value: Rescorer, forKey key: KeyedEncodingContainer<K>.Key) throws {
+public extension KeyedEncodingContainer {
+    mutating func encode(_ value: Rescorer, forKey key: KeyedEncodingContainer<K>.Key) throws {
         try value.encode(to: superEncoder(forKey: key))
     }
 
-    public mutating func encode(_ value: [Rescorer], forKey key: KeyedEncodingContainer<K>.Key) throws {
+    mutating func encode(_ value: [Rescorer], forKey key: KeyedEncodingContainer<K>.Key) throws {
         let rescorersEncoder = superEncoder(forKey: key)
         var rescorersContainer = rescorersEncoder.unkeyedContainer()
         for rescorer in value {
@@ -1041,8 +1373,8 @@ extension KeyedEncodingContainer {
     }
 }
 
-extension KeyedDecodingContainer {
-    public func decodeRescorer(forKey key: KeyedDecodingContainer<K>.Key) throws -> Rescorer {
+public extension KeyedDecodingContainer {
+    func decodeRescorer(forKey key: KeyedDecodingContainer<K>.Key) throws -> Rescorer {
         let qContainer = try nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: key)
         for rKey in qContainer.allKeys {
             if let rType = RescorerTypes(rKey.stringValue) {
@@ -1052,14 +1384,14 @@ extension KeyedDecodingContainer {
         throw Swift.DecodingError.typeMismatch(RescorerTypes.self, .init(codingPath: codingPath, debugDescription: "Unable to identify rescorer type from key(s) \(qContainer.allKeys)"))
     }
 
-    public func decodeRescorerIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Rescorer? {
+    func decodeRescorerIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Rescorer? {
         guard contains(key) else {
             return nil
         }
         return try decodeRescorer(forKey: key)
     }
 
-    public func decodeRescorers(forKey key: KeyedDecodingContainer<K>.Key) throws -> [Rescorer] {
+    func decodeRescorers(forKey key: KeyedDecodingContainer<K>.Key) throws -> [Rescorer] {
         var arrayContainer = try nestedUnkeyedContainer(forKey: key)
         var result = [Rescorer]()
         if let count = arrayContainer.count {
@@ -1074,7 +1406,7 @@ extension KeyedDecodingContainer {
         return result
     }
 
-    public func decodeRescorersIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> [Rescorer]? {
+    func decodeRescorersIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> [Rescorer]? {
         guard contains(key) else {
             return nil
         }

@@ -100,6 +100,7 @@ public enum QueryParams: String {
     case df
     case lenient
     case terminateAfter = "terminate_after"
+    case typedKeys = "typed_keys"
 }
 
 enum EndPointCategory: String {

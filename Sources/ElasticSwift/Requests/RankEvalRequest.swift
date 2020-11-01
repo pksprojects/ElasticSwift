@@ -269,8 +269,8 @@ public protocol EvaluationMetric: Codable {
     func isEqualTo(_ other: EvaluationMetric) -> Bool
 }
 
-extension EvaluationMetric where Self: Equatable {
-    public func isEqualTo(_ other: EvaluationMetric) -> Bool {
+public extension EvaluationMetric where Self: Equatable {
+    func isEqualTo(_ other: EvaluationMetric) -> Bool {
         if let o = other as? Self {
             return self == o
         }
@@ -357,8 +357,8 @@ public struct PrecisionAtK: EvaluationMetric {
     }
 }
 
-extension PrecisionAtK {
-    public init(from decoder: Decoder) throws {
+public extension PrecisionAtK {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
 
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: type.rawValue))
@@ -368,7 +368,7 @@ extension PrecisionAtK {
         relevantRatingThreshhold = try nested.decodeIntIfPresent(forKey: .relevantRatingThreshhold)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: type.rawValue))
         try nested.encodeIfPresent(k, forKey: .k)
@@ -376,7 +376,7 @@ extension PrecisionAtK {
         try nested.encodeIfPresent(relevantRatingThreshhold, forKey: .relevantRatingThreshhold)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case ignoreUnlabeled = "ignore_unlabeled"
         case relevantRatingThreshhold = "relevant_rating_threshold"
         case k
@@ -400,8 +400,8 @@ public struct MeanReciprocalRank: EvaluationMetric {
     public let relevantRatingThreshhold: Int?
 }
 
-extension MeanReciprocalRank {
-    public init(from decoder: Decoder) throws {
+public extension MeanReciprocalRank {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
 
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: type.rawValue))
@@ -410,14 +410,14 @@ extension MeanReciprocalRank {
         k = try nested.decodeIntIfPresent(forKey: .k)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: type.rawValue))
         try nested.encodeIfPresent(k, forKey: .k)
         try nested.encodeIfPresent(relevantRatingThreshhold, forKey: .relevantRatingThreshhold)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case k
         case relevantRatingThreshhold = "relevant_rating_threshold"
     }
@@ -442,8 +442,8 @@ public struct DiscountedCumulativeGain: EvaluationMetric {
     public let unknownDocRating: Int?
 }
 
-extension DiscountedCumulativeGain {
-    public init(from decoder: Decoder) throws {
+public extension DiscountedCumulativeGain {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
 
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: type.rawValue))
@@ -453,14 +453,14 @@ extension DiscountedCumulativeGain {
         unknownDocRating = try nested.decodeIntIfPresent(forKey: .unknownDocRating)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: type.rawValue))
         try nested.encodeIfPresent(k, forKey: .k)
         try nested.encodeIfPresent(normalize, forKey: .normalize)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case k
         case normalize
         case unknownDocRating = "unknown_doc_rating"
@@ -478,8 +478,8 @@ public struct ExpectedReciprocalRank: EvaluationMetric {
     public let maxRelevance: Int
 }
 
-extension ExpectedReciprocalRank {
-    public init(from decoder: Decoder) throws {
+public extension ExpectedReciprocalRank {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
 
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: type.rawValue))
@@ -488,14 +488,14 @@ extension ExpectedReciprocalRank {
         k = try nested.decodeIntIfPresent(forKey: .k)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: type.rawValue))
         try nested.encodeIfPresent(k, forKey: .k)
         try nested.encode(maxRelevance, forKey: .maxRelevance)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case k
         case maxRelevance = "maximum_relevance"
     }
@@ -511,8 +511,8 @@ public protocol MetricDetail: Codable {
     func isEqualTo(_ other: MetricDetail) -> Bool
 }
 
-extension MetricDetail where Self: Equatable {
-    public func isEqualTo(_ other: MetricDetail) -> Bool {
+public extension MetricDetail where Self: Equatable {
+    func isEqualTo(_ other: MetricDetail) -> Bool {
         if let o = other as? Self {
             return self == o
         }
@@ -531,16 +531,16 @@ public func isEqualMetricDetails(_ lhs: MetricDetail?, _ rhs: MetricDetail?) -> 
     return false
 }
 
-extension PrecisionAtK {
-    public struct Details: MetricDetail {
+public extension PrecisionAtK {
+    struct Details: MetricDetail {
         public let type: EvaluationMetricType = .precision
         public let relevantRetrieved: Int
         public let retrieved: Int
     }
 }
 
-extension PrecisionAtK.Details {
-    public init(from decoder: Decoder) throws {
+public extension PrecisionAtK.Details {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
 
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: type.rawValue))
@@ -549,14 +549,14 @@ extension PrecisionAtK.Details {
         retrieved = try nested.decodeInt(forKey: .retrived)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: type.rawValue))
         try nested.encode(retrieved, forKey: .retrived)
         try nested.encode(relevantRetrieved, forKey: .relevantRetrieved)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case retrived = "docs_retrieved"
         case relevantRetrieved = "relevant_docs_retrieved"
     }
@@ -564,8 +564,8 @@ extension PrecisionAtK.Details {
 
 extension PrecisionAtK.Details: Equatable {}
 
-extension MeanReciprocalRank {
-    public struct Details: MetricDetail {
+public extension MeanReciprocalRank {
+    struct Details: MetricDetail {
         public let type: EvaluationMetricType = .meanReciprocalRank
 
         public let firstRelevantRank: Int
@@ -594,8 +594,8 @@ extension MeanReciprocalRank.Details: Codable {
 
 extension MeanReciprocalRank.Details: Equatable {}
 
-extension DiscountedCumulativeGain {
-    public struct Details: MetricDetail {
+public extension DiscountedCumulativeGain {
+    struct Details: MetricDetail {
         public var type: EvaluationMetricType = .discountedCumulativeGain
 
         public let dcg: Decimal
@@ -604,8 +604,8 @@ extension DiscountedCumulativeGain {
     }
 }
 
-extension DiscountedCumulativeGain.Details {
-    public init(from decoder: Decoder) throws {
+public extension DiscountedCumulativeGain.Details {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
 
         let nested = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: type.rawValue))
@@ -615,7 +615,7 @@ extension DiscountedCumulativeGain.Details {
         unratedDocs = try nested.decodeInt(forKey: .unratedDocs)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: type.rawValue))
         try nested.encode(dcg, forKey: .dcg)
@@ -623,7 +623,7 @@ extension DiscountedCumulativeGain.Details {
         try nested.encode(unratedDocs, forKey: .unratedDocs)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case dcg
         case idcg = "ideal_dcg"
         case unratedDocs = "unrated_docs"
@@ -632,8 +632,8 @@ extension DiscountedCumulativeGain.Details {
 
 extension DiscountedCumulativeGain.Details: Equatable {}
 
-extension ExpectedReciprocalRank {
-    public struct Details: MetricDetail {
+public extension ExpectedReciprocalRank {
+    struct Details: MetricDetail {
         public let type: EvaluationMetricType = .expectedReciprocalRank
         public let unratedDocs: Int
     }
@@ -663,16 +663,16 @@ extension ExpectedReciprocalRank.Details: Equatable {}
 
 // MARK: - Codable Extenstions
 
-extension KeyedEncodingContainer {
-    public mutating func encode(_ value: EvaluationMetric, forKey key: KeyedEncodingContainer<K>.Key) throws {
+public extension KeyedEncodingContainer {
+    mutating func encode(_ value: EvaluationMetric, forKey key: KeyedEncodingContainer<K>.Key) throws {
         try value.encode(to: superEncoder(forKey: key))
     }
 
-    public mutating func encode(_ value: MetricDetail, forKey key: KeyedEncodingContainer<K>.Key) throws {
+    mutating func encode(_ value: MetricDetail, forKey key: KeyedEncodingContainer<K>.Key) throws {
         try value.encode(to: superEncoder(forKey: key))
     }
 
-    public mutating func encode(_ value: [EvaluationMetric], forKey key: KeyedEncodingContainer<K>.Key) throws {
+    mutating func encode(_ value: [EvaluationMetric], forKey key: KeyedEncodingContainer<K>.Key) throws {
         let metricsEncoder = superEncoder(forKey: key)
         var metricsContainer = metricsEncoder.unkeyedContainer()
         for metric in value {
@@ -681,7 +681,7 @@ extension KeyedEncodingContainer {
         }
     }
 
-    public mutating func encode(_ value: [MetricDetail], forKey key: KeyedEncodingContainer<K>.Key) throws {
+    mutating func encode(_ value: [MetricDetail], forKey key: KeyedEncodingContainer<K>.Key) throws {
         let detailsEncoder = superEncoder(forKey: key)
         var detailsContainer = detailsEncoder.unkeyedContainer()
         for detail in value {
@@ -690,27 +690,27 @@ extension KeyedEncodingContainer {
         }
     }
 
-    public mutating func encodeIfPresent(_ value: EvaluationMetric?, forKey key: KeyedEncodingContainer<K>.Key) throws {
+    mutating func encodeIfPresent(_ value: EvaluationMetric?, forKey key: KeyedEncodingContainer<K>.Key) throws {
         if let value = value {
             try encode(value, forKey: key)
         }
     }
 
-    public mutating func encodeIfPresent(_ value: MetricDetail?, forKey key: KeyedEncodingContainer<K>.Key) throws {
+    mutating func encodeIfPresent(_ value: MetricDetail?, forKey key: KeyedEncodingContainer<K>.Key) throws {
         if let value = value {
             try encode(value, forKey: key)
         }
     }
 
-    public mutating func encodeIfPresent(_ value: [MetricDetail]?, forKey key: KeyedEncodingContainer<K>.Key) throws {
+    mutating func encodeIfPresent(_ value: [MetricDetail]?, forKey key: KeyedEncodingContainer<K>.Key) throws {
         if let value = value {
             try encode(value, forKey: key)
         }
     }
 }
 
-extension KeyedDecodingContainer {
-    public func decodeEvaluationMetric(forKey key: KeyedDecodingContainer<K>.Key) throws -> EvaluationMetric {
+public extension KeyedDecodingContainer {
+    func decodeEvaluationMetric(forKey key: KeyedDecodingContainer<K>.Key) throws -> EvaluationMetric {
         let mContainer = try nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: key)
         for mKey in mContainer.allKeys {
             if let mType = EvaluationMetricType(rawValue: mKey.stringValue) {
@@ -720,7 +720,7 @@ extension KeyedDecodingContainer {
         throw Swift.DecodingError.typeMismatch(EvaluationMetricType.self, .init(codingPath: codingPath, debugDescription: "Unable to identify evaluation metric type from key(s) \(mContainer.allKeys)"))
     }
 
-    public func decodeMetricDetail(forKey key: KeyedDecodingContainer<K>.Key) throws -> MetricDetail {
+    func decodeMetricDetail(forKey key: KeyedDecodingContainer<K>.Key) throws -> MetricDetail {
         let mContainer = try nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: key)
         for mKey in mContainer.allKeys {
             if let mType = EvaluationMetricType(rawValue: mKey.stringValue) {
@@ -730,21 +730,21 @@ extension KeyedDecodingContainer {
         throw Swift.DecodingError.typeMismatch(EvaluationMetricType.self, .init(codingPath: codingPath, debugDescription: "Unable to identify evaluation metric type from key(s) \(mContainer.allKeys)"))
     }
 
-    public func decodeEvaluationMetricIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> EvaluationMetric? {
+    func decodeEvaluationMetricIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> EvaluationMetric? {
         guard contains(key) else {
             return nil
         }
         return try decodeEvaluationMetric(forKey: key)
     }
 
-    public func decodeMetricDetailIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> MetricDetail? {
+    func decodeMetricDetailIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> MetricDetail? {
         guard contains(key) else {
             return nil
         }
         return try decodeMetricDetail(forKey: key)
     }
 
-    public func decodeEvaluationMetrics(forKey key: KeyedDecodingContainer<K>.Key) throws -> [EvaluationMetric] {
+    func decodeEvaluationMetrics(forKey key: KeyedDecodingContainer<K>.Key) throws -> [EvaluationMetric] {
         var arrayContainer = try nestedUnkeyedContainer(forKey: key)
         var result = [EvaluationMetric]()
         if let count = arrayContainer.count {
@@ -770,7 +770,7 @@ extension KeyedDecodingContainer {
         return result
     }
 
-    public func decodeMetricDetails(forKey key: KeyedDecodingContainer<K>.Key) throws -> [MetricDetail] {
+    func decodeMetricDetails(forKey key: KeyedDecodingContainer<K>.Key) throws -> [MetricDetail] {
         var arrayContainer = try nestedUnkeyedContainer(forKey: key)
         var result = [MetricDetail]()
         if let count = arrayContainer.count {
@@ -796,14 +796,14 @@ extension KeyedDecodingContainer {
         return result
     }
 
-    public func decodeEvaluationMetricsIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> [EvaluationMetric]? {
+    func decodeEvaluationMetricsIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> [EvaluationMetric]? {
         guard contains(key) else {
             return nil
         }
         return try decodeEvaluationMetrics(forKey: key)
     }
 
-    public func decodeMetricDetailsIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> [MetricDetail]? {
+    func decodeMetricDetailsIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> [MetricDetail]? {
         guard contains(key) else {
             return nil
         }

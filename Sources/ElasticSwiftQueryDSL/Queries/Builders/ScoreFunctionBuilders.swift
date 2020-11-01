@@ -59,8 +59,8 @@ public protocol ScoreFunction: Codable {
     func isEqualTo(_ other: ScoreFunction) -> Bool
 }
 
-extension ScoreFunction where Self: Equatable {
-    public func isEqualTo(_ other: ScoreFunction) -> Bool {
+public extension ScoreFunction where Self: Equatable {
+    func isEqualTo(_ other: ScoreFunction) -> Bool {
         if let o = other as? Self {
             return self == o
         }

@@ -45,8 +45,8 @@ public struct NestedQuery: Query {
     }
 }
 
-extension NestedQuery {
-    public init(from decoder: Decoder) throws {
+public extension NestedQuery {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
 
         guard container.allKeys.count == 1 else {
@@ -64,7 +64,7 @@ extension NestedQuery {
         name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         try nested.encode(path, forKey: .path)
@@ -76,7 +76,7 @@ extension NestedQuery {
         try nested.encodeIfPresent(name, forKey: .name)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case path
         case query
         case scoreMode = "score_mode"
@@ -140,8 +140,8 @@ public struct HasChildQuery: Query {
     }
 }
 
-extension HasChildQuery {
-    public init(from decoder: Decoder) throws {
+public extension HasChildQuery {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
 
         guard container.allKeys.count == 1 else {
@@ -161,7 +161,7 @@ extension HasChildQuery {
         name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         try nested.encode(type, forKey: .type)
@@ -175,7 +175,7 @@ extension HasChildQuery {
         try nested.encodeIfPresent(name, forKey: .name)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case type
         case query
         case scoreMode = "score_mode"
@@ -238,8 +238,8 @@ public struct HasParentQuery: Query {
     }
 }
 
-extension HasParentQuery {
-    public init(from decoder: Decoder) throws {
+public extension HasParentQuery {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
 
         guard container.allKeys.count == 1 else {
@@ -257,7 +257,7 @@ extension HasParentQuery {
         name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         try nested.encode(parentType, forKey: .parentType)
@@ -269,7 +269,7 @@ extension HasParentQuery {
         try nested.encodeIfPresent(name, forKey: .name)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case parentType = "parent_type"
         case query
         case score
@@ -324,8 +324,8 @@ public struct ParentIdQuery: Query {
     }
 }
 
-extension ParentIdQuery {
-    public init(from decoder: Decoder) throws {
+public extension ParentIdQuery {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
 
         guard container.allKeys.count == 1 else {
@@ -341,7 +341,7 @@ extension ParentIdQuery {
         name = try nested.decodeStringIfPresent(forKey: .name)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var nested = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: queryType))
         try nested.encode(type, forKey: .type)
@@ -351,7 +351,7 @@ extension ParentIdQuery {
         try nested.encodeIfPresent(name, forKey: .name)
     }
 
-    enum CodingKeys: String, CodingKey {
+    internal enum CodingKeys: String, CodingKey {
         case type
         case id
         case ignoreUnmapped = "ignore_unmapped"

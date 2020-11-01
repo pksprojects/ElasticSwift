@@ -687,8 +687,8 @@ extension Highlight: Codable {
 
 extension Highlight: Equatable {}
 
-extension Highlight {
-    public struct Field {
+public extension Highlight {
+    struct Field {
         public let name: String
         public let options: FieldOptions
 
@@ -698,7 +698,7 @@ extension Highlight {
         }
     }
 
-    public struct FieldOptions {
+    struct FieldOptions {
         fileprivate static let SCORE_ORDERER_VALUE = "score"
 
         public var fragmentSize: Int?
@@ -752,18 +752,18 @@ extension Highlight {
         }
     }
 
-    public enum BoundaryScannerType: String, Codable {
+    enum BoundaryScannerType: String, Codable {
         case chars
         case word
         case sentence
     }
 
-    public enum EncoderType: String, Codable {
+    enum EncoderType: String, Codable {
         case `default`
         case html
     }
 
-    public enum HighlighterType: String, Codable {
+    enum HighlighterType: String, Codable {
         case unified
         case plain
         case fvh

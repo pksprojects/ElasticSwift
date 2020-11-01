@@ -104,28 +104,28 @@ public class HTTPResponseBuilder {
 // MARK: - HTTPResponseStatus
 
 /// Helper extention for HTTPResponseStatus
-extension HTTPResponseStatus {
-    public func is1xxInformational() -> Bool {
+public extension HTTPResponseStatus {
+    func is1xxInformational() -> Bool {
         return code >= 100 && code < 200
     }
 
-    public func is2xxSuccessful() -> Bool {
+    func is2xxSuccessful() -> Bool {
         return code >= 200 && code < 300
     }
 
-    public func is3xxRedirection() -> Bool {
+    func is3xxRedirection() -> Bool {
         return code >= 300 && code < 400
     }
 
-    public func is4xxClientError() -> Bool {
+    func is4xxClientError() -> Bool {
         return code >= 400 && code < 500
     }
 
-    public func is5xxServerError() -> Bool {
+    func is5xxServerError() -> Bool {
         return code >= 500 && code < 600
     }
 
-    public func isError() -> Bool {
+    func isError() -> Bool {
         return is4xxClientError() || is5xxServerError()
     }
 }

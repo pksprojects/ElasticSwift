@@ -406,7 +406,7 @@ class InnertHitsTests: XCTestCase {
     }
 
     func test_18_highlight_decode() throws {
-        var globalOptions = Highlight.FieldOptions.init()
+        var globalOptions = Highlight.FieldOptions()
         globalOptions.boundaryChars = ["|"]
         globalOptions.scoreOrdered = true
         let highlight = Highlight(fields: [.init("field")], globalOptions: globalOptions)

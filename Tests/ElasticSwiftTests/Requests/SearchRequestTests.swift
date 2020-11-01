@@ -1246,6 +1246,229 @@ class SearchRequestTests: XCTestCase {
 
         XCTAssert(s1 == decoded)
     }
+
+    func test_21_SearchTemplateRequetBuilder() throws {
+        let requestBulder = SearchTemplateRequestBuilder()
+
+        requestBulder.set(index: "index")
+            .set(type: "type")
+            .set(script: "script")
+            .set(params: ["status": ["pending", "published"]])
+            .set(profile: true)
+            .set(explain: true)
+            .set(routing: "routing")
+            .set(scriptType: ScriptType.inline)
+            .set(ignoreThrottled: true)
+            .set(scroll: "1m")
+            .set(preference: "preference")
+            .set(searchType: SearchType.dfsQueryThenFetch)
+            .set(allowNoIndices: false)
+            .set(ignoreUnavailable: true)
+            .set(restTotalHitsAsInt: true)
+            .set(typedKeys: false)
+            .set(expandWildcards: ExpandWildcards.none)
+
+        let request = try requestBulder.build()
+
+        XCTAssertEqual(request.allowNoIndices, false)
+        XCTAssertEqual(request.expandWildcards, ExpandWildcards.none)
+        XCTAssertEqual(request.index, "index")
+        XCTAssertEqual(request.type, "type")
+        XCTAssertEqual(request.script, "script")
+        XCTAssertEqual(request.params, ["status": ["pending", "published"]])
+        XCTAssertEqual(request.profile, true)
+        XCTAssertEqual(request.explain, true)
+        XCTAssertEqual(request.routing, "routing")
+        XCTAssertEqual(request.scriptType, ScriptType.inline)
+        XCTAssertEqual(request.ignoreThrottled, true)
+        XCTAssertEqual(request.scroll, "1m")
+        XCTAssertEqual(request.preference, "preference")
+        XCTAssertEqual(request.searchType, SearchType.dfsQueryThenFetch)
+        XCTAssertEqual(request.ignoreUnavailable, true)
+        XCTAssertEqual(request.restTotalHitsAsInt, true)
+        XCTAssertEqual(request.typedKeys, false)
+        XCTAssertEqual(request.expandWildcards, ExpandWildcards.none)
+        XCTAssertEqual(request.endPoint, "index/type/_search/template")
+        XCTAssertEqual(request.queryParams.count, 10)
+        XCTAssertEqual(request.method, .POST)
+        XCTAssertEqual(request.headers.count, 0)
+    }
+
+    func test_22_SearchTemplateRequetBuilder_2() throws {
+        XCTAssertThrowsError(try SearchTemplateRequestBuilder().build(), "missing script") { error in
+            switch error {
+            case let RequestBuilderError.missingRequiredField(field):
+                XCTAssertEqual(field, "script")
+            default:
+                XCTAssert(false, "Unexpected error")
+            }
+        }
+    }
+
+    func test_23_SearchTemplateRequetBuilder_3() throws {
+        XCTAssertThrowsError(try SearchTemplateRequestBuilder().set(script: "script").build(), "missing scriptType") { error in
+            switch error {
+            case let RequestBuilderError.missingRequiredField(field):
+                XCTAssertEqual(field, "scriptType")
+            default:
+                XCTAssert(false, "Unexpected error")
+            }
+        }
+    }
+
+    func test_24_SearchTemplateRequetBuilder_4() throws {
+        XCTAssertThrowsError(try SearchTemplateRequestBuilder().set(script: "script").set(scriptType: ScriptType.inline).build(), "missing params") { error in
+            switch error {
+            case let RequestBuilderError.missingRequiredField(field):
+                XCTAssertEqual(field, "params")
+            default:
+                XCTAssert(false, "Unexpected error")
+            }
+        }
+    }
+
+    func test_25_SearchTemplateRequet() throws {
+        let request = try SearchTemplateRequestBuilder()
+            .set(script: "my_template")
+            .set(scriptType: .stored)
+            .set(params: ["my_param": "value"])
+            .build()
+
+        let body = request.makeBody(DefaultSerializer())
+
+        switch body {
+        case let .success(data):
+            let dataStr = String(data: data, encoding: .utf8)!
+            logger.info("DataStr: \(dataStr)")
+            let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+            let expectedDic: [String: CodableValue] = ["id": "my_template", "params": ["my_param": "value"]]
+            XCTAssertTrue(isEqualDictionaries(lhs: dic, rhs: expectedDic), "\(dic) \n is not equal to \n \(expectedDic)")
+        case let .failure(error):
+            XCTAssertTrue(false, "Error: \(error)")
+        }
+    }
+
+    func test_26_SearchTemplateRequet_2() throws {
+        let request = try SearchTemplateRequestBuilder()
+            .set(script: "{ \"query\": { \"terms\": {{#toJson}}statuses{{/toJson}} }}")
+            .set(scriptType: .inline)
+            .set(params: ["statuses": ["status": ["pending", "published"]]])
+            .build()
+
+        let body = request.makeBody(DefaultSerializer())
+
+        switch body {
+        case let .success(data):
+            let dataStr = String(data: data, encoding: .utf8)!
+            logger.info("DataStr: \(dataStr)")
+            let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+            let expectedDic: [String: CodableValue] = ["source": "{ \"query\": { \"terms\": {{#toJson}}statuses{{/toJson}} }}", "params": ["statuses": ["status": ["pending", "published"]]]]
+            XCTAssertTrue(isEqualDictionaries(lhs: dic, rhs: expectedDic), "\(dic) \n is not equal to \n \(expectedDic)")
+        case let .failure(error):
+            XCTAssertTrue(false, "Error: \(error)")
+        }
+    }
+
+    func test_27_SearchTemplateRequet_3() throws {
+        let e = expectation(description: "execution complete")
+
+        func handler(_ result: Result<SearchResponse<CodableValue>, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+                XCTAssert(false)
+            case let .success(response):
+                XCTAssertNotNil(response.hits)
+                XCTAssertNotNil(response.profile)
+                XCTAssertTrue(response.hits.hits.count == 0, "Count \(response.hits.hits.count)")
+                XCTAssertTrue(response.profile?.shards.count != 0, "Count \(String(describing: response.profile?.shards.count))")
+            }
+
+            e.fulfill()
+        }
+
+        let request = try SearchTemplateRequestBuilder()
+            .set(index: indexName)
+            .set(script: "{ \"query\": { \"terms\": {{#toJson}}statuses{{/toJson}} }}")
+            .set(scriptType: .inline)
+            .set(params: ["statuses": ["status": ["pending", "published"]]])
+            .set(profile: true)
+            .build()
+
+        client.searchTemplate(request, completionHandler: handler)
+
+        waitForExpectations(timeout: 10)
+    }
+
+    func test_28_StoredScriptRequets() throws {
+        let e = expectation(description: "execution complete")
+
+        let script = StoredScriptSource(lang: "mustache", source: """
+            {
+                "query": {
+                    "match": {
+                        "title": "{{query_string}}"
+                    }
+                }
+            }
+        """)
+
+        let putRequest = try PutStoredScriptRequestBuilder()
+            .set(id: "script_id")
+            .set(script: script)
+            .build()
+
+        let getRequest = try GetStoredScriptRequestBuilder()
+            .set(id: "script_id")
+            .build()
+
+        let deleteRequest = try DeleteStoredScriptRequestBuilder()
+            .set(id: "script_id")
+            .build()
+
+        func putHandler(_ result: Result<AcknowledgedResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                XCTAssertTrue(false, "Unexpected erorr \(error)")
+                e.fulfill()
+            case let .success(response):
+                if !response.acknowledged {
+                    XCTAssertTrue(response.acknowledged, "Unexpected erorr")
+                    e.fulfill()
+                }
+                client.getScript(getRequest, completionHandler: getHandler)
+            }
+        }
+
+        func getHandler(_ result: Result<GetStoredScriptResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                XCTAssertTrue(false, "Unexpected erorr \(error)")
+                e.fulfill()
+            case let .success(response):
+                logger.info("GetResponse: \(response)")
+                XCTAssertTrue(response.found, "Found: \(response.found)")
+                XCTAssertEqual(response.id, "script_id")
+                XCTAssertNotNil(response.script)
+                XCTAssertEqual(response.script!, script)
+                client.deleteScript(deleteRequest, completionHandler: deleteHandler)
+            }
+        }
+
+        func deleteHandler(_ result: Result<AcknowledgedResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                XCTAssertTrue(false, "Unexpected erorr \(error)")
+            case let .success(response):
+                XCTAssertTrue(response.acknowledged, "Acknowledged \(response.acknowledged)")
+            }
+            e.fulfill()
+        }
+
+        client.putScript(putRequest, completionHandler: putHandler)
+
+        waitForExpectations(timeout: 10)
+    }
 }
 
 struct Shirt: Codable, Equatable {
