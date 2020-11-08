@@ -65,10 +65,8 @@ public extension QueryType where Self: Equatable {
 }
 
 /// Protocol that all Builder for `Query` conforms to
-public protocol QueryBuilder {
-    associatedtype QueryType: Query
-
-    func build() throws -> QueryType
+public protocol QueryBuilder: ElasticSwiftTypeBuilder where ElasticSwiftType: Query {
+    
 }
 
 public struct DynamicCodingKeys: CodingKey {

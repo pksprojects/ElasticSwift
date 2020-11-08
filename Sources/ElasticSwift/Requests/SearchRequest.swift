@@ -884,6 +884,7 @@ public struct SearchSource {
     public var highlight: Highlight?
     public var rescore: [Rescorer]?
     public var searchAfter: CodableValue?
+    public var suggest: SuggestSource?
 }
 
 extension SearchSource: Codable {
@@ -905,6 +906,7 @@ extension SearchSource: Codable {
         postFilter = try container.decodeQueryIfPresent(forKey: .postFilter)
         highlight = try container.decodeIfPresent(Highlight.self, forKey: .highlight)
         searchAfter = try container.decodeIfPresent(CodableValue.self, forKey: .searchAfter)
+        suggest = try container.decodeIfPresent(SuggestSource.self, forKey: .suggest)
 
         do {
             scriptFields = try container.decodeArrayIfPresent(forKey: .scriptFields)
@@ -957,6 +959,7 @@ extension SearchSource: Codable {
             }
         }
         try container.encodeIfPresent(searchAfter, forKey: .searchAfter)
+        try container.encodeIfPresent(suggest, forKey: .suggest)
     }
 
     enum CodingKeys: String, CodingKey {
@@ -978,6 +981,7 @@ extension SearchSource: Codable {
         case highlight
         case rescore
         case searchAfter = "search_after"
+        case suggest
     }
 }
 
@@ -1001,6 +1005,7 @@ extension SearchSource: Equatable {
             && lhs.searchAfter == rhs.searchAfter
             && isEqualQueries(lhs.query, rhs.query)
             && isEqualQueries(lhs.postFilter, rhs.postFilter)
+            && lhs.suggest == rhs.suggest
     }
 }
 

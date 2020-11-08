@@ -55,8 +55,6 @@ public class RequestOptions {
 // MARK: - RequestBuilder Protocol
 
 /// Protocol to which all `Request` Builders conforms to
-public protocol RequestBuilder {
-    associatedtype RequestType: Request
-
-    func build() throws -> RequestType
+public protocol RequestBuilder: ElasticSwiftTypeBuilder where ElasticSwiftType: Request {
+    
 }
