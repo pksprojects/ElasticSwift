@@ -592,12 +592,10 @@ public struct PhraseSuggestion: Suggestion {
     public var forceUnigrams: Bool?
     public var tokenLimit: Int?
     public var highlight: Highlight?
-    public var collateQuery: String?
-    public var collateParams: [String: String]?
-    public var collatePrune: Bool?
-    public var smoothing: String?
+    public var collate: Collate?
+    public var smoothing: SmoothingModel?
     
-    public init(field: String, text: String? = nil, prefix: String? = nil, regex: String? = nil, analyzer: String? = nil, size: Int? = nil, shardSize: Int? = nil) {
+    public init(field: String, text: String? = nil, prefix: String? = nil, regex: String? = nil, analyzer: String? = nil, size: Int? = nil, shardSize: Int? = nil, maxErrors: Decimal? = nil, separator: String? = nil, realWordErrorLikelihood: Decimal? = nil, confidence: Decimal? = nil, gramSize: Int? = nil, forceUnigrams: Bool? = nil, tokenLimit: Int? = nil, highlight: PhraseSuggestion.Highlight? = nil, collate: Collate? = nil, smoothing: SmoothingModel? = nil) {
         self.field = field
         self.text = text
         self.prefix = prefix
@@ -605,6 +603,16 @@ public struct PhraseSuggestion: Suggestion {
         self.analyzer = analyzer
         self.size = size
         self.shardSize = shardSize
+        self.maxErrors = maxErrors
+        self.separator = separator
+        self.realWordErrorLikelihood = realWordErrorLikelihood
+        self.confidence = confidence
+        self.gramSize = gramSize
+        self.forceUnigrams = forceUnigrams
+        self.tokenLimit = tokenLimit
+        self.highlight = highlight
+        self.collate = collate
+        self.smoothing = smoothing
     }
     
     internal init(withBuilder builder: PhraseSuggestionBuilder) throws {
@@ -702,6 +710,12 @@ extension PhraseSuggestion {
             self.minDocFreq = minDocFreq
         }
     }
+    
+    public struct Collate {
+        public let query: Script
+        public let params: [String: CodableValue]?
+        public let purne: Bool
+    }
 }
 
 extension PhraseSuggestion.Highlight: Codable {
@@ -734,7 +748,32 @@ extension PhraseSuggestion.DirectCandidateGenerator: Codable {
 
 extension PhraseSuggestion.DirectCandidateGenerator: Equatable {}
 
-extension PhraseSuggestion: Equatable {}
+extension PhraseSuggestion.Collate: Codable {}
+
+extension PhraseSuggestion.Collate: Equatable {}
+
+extension PhraseSuggestion: Equatable {
+    public static func == (lhs: PhraseSuggestion, rhs: PhraseSuggestion) -> Bool {
+        return lhs.suggestionType == rhs.suggestionType
+            && lhs.field == rhs.field
+            && lhs.prefix == rhs.prefix
+            && lhs.text == rhs.text
+            && lhs.regex == rhs.regex
+            && lhs.analyzer == rhs.analyzer
+            && lhs.size == rhs.size
+            && lhs.shardSize == rhs.shardSize
+            && lhs.maxErrors == rhs.maxErrors
+            && lhs.separator == rhs.separator
+            && lhs.realWordErrorLikelihood == rhs.realWordErrorLikelihood
+            && lhs.confidence == rhs.confidence
+            && lhs.gramSize == rhs.gramSize
+            && lhs.forceUnigrams == rhs.forceUnigrams
+            && lhs.tokenLimit == rhs.tokenLimit
+            && lhs.highlight == rhs.highlight
+            && lhs.collate == rhs.collate
+            && isEqualSmoothingModels(lhs.smoothing, rhs.smoothing)
+    }
+}
 
 public enum SmoothingModelType: String, Codable {
     case laplace
@@ -756,6 +795,16 @@ extension SmoothingModel where Self: Equatable {
         }
         return false
     }
+}
+
+public func isEqualSmoothingModels(_ lhs: SmoothingModel?, _ rhs: SmoothingModel?) -> Bool {
+    if lhs == nil && rhs == nil {
+        return true
+    }
+    if let lhs = lhs, let rhs = rhs {
+        return lhs.isEqualTo(rhs)
+    }
+    return false
 }
 
 public struct StupidBackoff: SmoothingModel {
