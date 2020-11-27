@@ -356,15 +356,22 @@ public extension KeyedEncodingContainer {
             try value.encode(to: superEncoder(forKey: key))
         }
     }
-
-    mutating func encode(_ value: [Query]?, forKey key: KeyedEncodingContainer<K>.Key) throws {
+    
+    mutating func encodeIfPresent(_ value: ScoreFunction?, forKey key: KeyedEncodingContainer<K>.Key) throws {
         if let value = value {
-            let queriesEncoder = superEncoder(forKey: key)
-            var queriesContainer = queriesEncoder.unkeyedContainer()
-            for query in value {
-                let queryEncoder = queriesContainer.superEncoder()
-                try query.encode(to: queryEncoder)
-            }
+            try encode(value, forKey: key)
+        }
+    }
+
+    mutating func encodeIfPresent(_ value: [Query]?, forKey key: KeyedEncodingContainer<K>.Key) throws {
+        if let value = value {
+            try encode(value, forKey: key)
+        }
+    }
+    
+    mutating func encodeIfPresent(_ value: [ScoreFunction]?, forKey key: KeyedEncodingContainer<K>.Key) throws {
+        if let value = value {
+            try encode(value, forKey: key)
         }
     }
 }
