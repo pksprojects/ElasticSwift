@@ -131,7 +131,7 @@ extension SuggestSource: Codable {
 
 extension SuggestSource: Equatable {
     public static func == (lhs: SuggestSource, rhs: SuggestSource) -> Bool {
-        guard lhs.suggestions.count == lhs.suggestions.count else {
+        guard lhs.suggestions.count == rhs.suggestions.count else {
             return false
         }
         
