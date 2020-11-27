@@ -63,6 +63,17 @@ public extension Suggestion where Self: Equatable {
     }
 }
 
+public func isEqualSuggestions(_ lhs: Suggestion?, _ rhs: Suggestion?) -> Bool {
+    if lhs == nil && rhs == nil {
+        return true
+    }
+    if let lhs = lhs, let rhs = rhs {
+        return lhs.isEqualTo(rhs)
+    }
+    return false
+}
+
+
 public enum SuggestionType: String, Codable {
     case term
     case phrase
@@ -85,18 +96,24 @@ public extension SuggestionType {
 public struct SuggestSource {
     
     public var globalText: String?
-    public var suggestions: [String: String]
+    public var suggestions: [String: Suggestion]
     
 }
 
 extension SuggestSource: Codable {
     
     public init(from decoder: Decoder) throws {
-        var container = try decoder.unkeyedContainer()
-        var dic = try container.decode([String: String].self)
-        self.globalText = dic[CodingKeys.globalText.rawValue]
-        dic.removeValue(forKey: CodingKeys.globalText.rawValue)
-        self.suggestions = dic
+        let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
+        var sDic = [String: Suggestion]()
+        for key in container.allKeys {
+            if key.stringValue == CodingKeys.globalText.rawValue {
+                self.globalText = try container.decodeStringIfPresent(forKey: .key(named: CodingKeys.globalText.rawValue))
+            } else {
+                let suggestion = try container.decodeSuggestion(forKey: key)
+                sDic[key.stringValue] = suggestion
+            }
+        }
+        self.suggestions = sDic
     }
     
     public func encode(to encoder: Encoder) throws {
@@ -112,7 +129,19 @@ extension SuggestSource: Codable {
     }
 }
 
-extension SuggestSource: Equatable {}
+extension SuggestSource: Equatable {
+    public static func == (lhs: SuggestSource, rhs: SuggestSource) -> Bool {
+        guard lhs.suggestions.count == lhs.suggestions.count else {
+            return false
+        }
+        
+        return lhs.globalText == rhs.globalText
+            && lhs.suggestions.keys.allSatisfy({
+                rhs.suggestions.keys.contains($0)
+                && isEqualSuggestions(lhs.suggestions[$0], rhs.suggestions[$0])
+            })
+    }
+}
 
 
 public class TermSuggestionBuilder: SuggestionBuilder {
@@ -1182,5 +1211,90 @@ public extension DynamicCodingKeys {
     
     static func key(named smoothingModelType: SmoothingModelType) -> DynamicCodingKeys {
         return .key(named: smoothingModelType.rawValue)
+    }
+}
+
+
+// MARK: - Codable Extenstions
+
+public extension KeyedEncodingContainer {
+    mutating func encode(_ value: Suggestion, forKey key: KeyedEncodingContainer<K>.Key) throws {
+        try value.encode(to: superEncoder(forKey: key))
+    }
+
+    mutating func encode(_ value: [Suggestion], forKey key: KeyedEncodingContainer<K>.Key) throws {
+        let suggestionsEncoder = superEncoder(forKey: key)
+        var suggestionsContainer = suggestionsEncoder.unkeyedContainer()
+        for suggestion in value {
+            let suggestionEncoder = suggestionsContainer.superEncoder()
+            try suggestion.encode(to: suggestionEncoder)
+        }
+    }
+
+    mutating func encodeIfPresent(_ value: Suggestion?, forKey key: KeyedEncodingContainer<K>.Key) throws {
+        if let value = value {
+            try value.encode(to: superEncoder(forKey: key))
+        }
+    }
+
+    mutating func encodeIfPresent(_ value: [Suggestion]?, forKey key: KeyedEncodingContainer<K>.Key) throws {
+        if let value = value {
+            try self.encode(value, forKey: key)
+        }
+    }
+}
+
+public extension KeyedDecodingContainer {
+    func decodeSuggestion(forKey key: KeyedDecodingContainer<K>.Key) throws -> Suggestion {
+        let qContainer = try nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: key)
+        for sKey in qContainer.allKeys {
+            if let sType = SuggestionType(rawValue: sKey.stringValue) {
+                return try sType.metaType.init(from: superDecoder(forKey: key))
+            }
+        }
+        throw Swift.DecodingError.typeMismatch(SuggestionType.self, .init(codingPath: codingPath, debugDescription: "Unable to identify suggestion type from key(s) \(qContainer.allKeys)"))
+    }
+
+    func decodeSuggestionIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Suggestion? {
+        guard contains(key) else {
+            return nil
+        }
+        return try decodeSuggestion(forKey: key)
+    }
+
+    func decodeSuggestions(forKey key: KeyedDecodingContainer<K>.Key) throws -> [Suggestion] {
+        var arrayContainer = try nestedUnkeyedContainer(forKey: key)
+        var result = [Suggestion]()
+        if let count = arrayContainer.count {
+            while !arrayContainer.isAtEnd {
+                let query = try arrayContainer.decodeSuggestion()
+                result.append(query)
+            }
+            if result.count != count {
+                throw Swift.DecodingError.dataCorrupted(.init(codingPath: arrayContainer.codingPath, debugDescription: "Unable to decode all Suggestions expected: \(count) actual: \(result.count). Probable cause: Unable to determine SuggestionType form key(s)"))
+            }
+        }
+        return result
+    }
+
+    func decodeSuggestionsIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> [Suggestion]? {
+        guard contains(key) else {
+            return nil
+        }
+
+        return try decodeSuggestions(forKey: key)
+    }
+}
+
+extension UnkeyedDecodingContainer {
+    mutating func decodeSuggestion() throws -> Suggestion {
+        var copy = self
+        let elementContainer = try copy.nestedContainer(keyedBy: DynamicCodingKeys.self)
+        for sKey in elementContainer.allKeys {
+            if let sType = SuggestionType(rawValue: sKey.stringValue) {
+                return try sType.metaType.init(from: superDecoder())
+            }
+        }
+        throw Swift.DecodingError.typeMismatch(SuggestionType.self, .init(codingPath: codingPath, debugDescription: "Unable to identify suggestion type from key(s) \(elementContainer.allKeys)"))
     }
 }
