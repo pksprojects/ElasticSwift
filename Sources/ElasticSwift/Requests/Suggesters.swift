@@ -1,6 +1,6 @@
 //
 //  Suggesters.swift
-//  
+//
 //
 //  Created by Prafull Kumar Soni on 11/1/20.
 //
@@ -11,9 +11,7 @@ import ElasticSwiftQueryDSL
 import Foundation
 import NIOHTTP1
 
-
-public protocol SuggestionBuilder: ElasticSwiftTypeBuilder  where ElasticSwiftType: Suggestion {
-    
+public protocol SuggestionBuilder: ElasticSwiftTypeBuilder where ElasticSwiftType: Suggestion {
     var field: String? { get }
     var text: String? { get }
     var prefix: String? { get }
@@ -21,7 +19,7 @@ public protocol SuggestionBuilder: ElasticSwiftTypeBuilder  where ElasticSwiftTy
     var analyzer: String? { get }
     var size: Int? { get }
     var shardSize: Int? { get }
-    
+
     @discardableResult
     func set(field: String) -> Self
     @discardableResult
@@ -36,13 +34,11 @@ public protocol SuggestionBuilder: ElasticSwiftTypeBuilder  where ElasticSwiftTy
     func set(size: Int) -> Self
     @discardableResult
     func set(shardSize: Int) -> Self
-    
 }
 
 public protocol Suggestion: Codable {
-    
     var suggestionType: SuggestionType { get }
-    
+
     var field: String { get }
     var text: String? { get set }
     var prefix: String? { get set }
@@ -50,7 +46,7 @@ public protocol Suggestion: Codable {
     var analyzer: String? { get set }
     var size: Int? { get set }
     var shardSize: Int? { get set }
-    
+
     func isEqualTo(_ other: Suggestion) -> Bool
 }
 
@@ -64,7 +60,7 @@ public extension Suggestion where Self: Equatable {
 }
 
 public func isEqualSuggestions(_ lhs: Suggestion?, _ rhs: Suggestion?) -> Bool {
-    if lhs == nil && rhs == nil {
+    if lhs == nil, rhs == nil {
         return true
     }
     if let lhs = lhs, let rhs = rhs {
@@ -72,7 +68,6 @@ public func isEqualSuggestions(_ lhs: Suggestion?, _ rhs: Suggestion?) -> Bool {
     }
     return false
 }
-
 
 public enum SuggestionType: String, Codable {
     case term
@@ -94,36 +89,33 @@ public extension SuggestionType {
 }
 
 public struct SuggestSource {
-    
     public var globalText: String?
     public var suggestions: [String: Suggestion]
-    
 }
 
 extension SuggestSource: Codable {
-    
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         var sDic = [String: Suggestion]()
         for key in container.allKeys {
             if key.stringValue == CodingKeys.globalText.rawValue {
-                self.globalText = try container.decodeStringIfPresent(forKey: .key(named: CodingKeys.globalText.rawValue))
+                globalText = try container.decodeStringIfPresent(forKey: .key(named: CodingKeys.globalText.rawValue))
             } else {
                 let suggestion = try container.decodeSuggestion(forKey: key)
                 sDic[key.stringValue] = suggestion
             }
         }
-        self.suggestions = sDic
+        suggestions = sDic
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
-        try container.encode(self.globalText, forKey: .key(named: CodingKeys.globalText.rawValue))
-        for (k, v) in self.suggestions {
+        try container.encode(globalText, forKey: .key(named: CodingKeys.globalText.rawValue))
+        for (k, v) in suggestions {
             try container.encode(v, forKey: .key(named: k))
         }
     }
-    
+
     internal enum CodingKeys: String, CodingKey {
         case globalText = "text"
     }
@@ -134,20 +126,18 @@ extension SuggestSource: Equatable {
         guard lhs.suggestions.count == rhs.suggestions.count else {
             return false
         }
-        
+
         return lhs.globalText == rhs.globalText
-            && lhs.suggestions.keys.allSatisfy({
+            && lhs.suggestions.keys.allSatisfy {
                 rhs.suggestions.keys.contains($0)
-                && isEqualSuggestions(lhs.suggestions[$0], rhs.suggestions[$0])
-            })
+                    && isEqualSuggestions(lhs.suggestions[$0], rhs.suggestions[$0])
+            }
     }
 }
 
-
 public class TermSuggestionBuilder: SuggestionBuilder {
-    
     public typealias ElasticSwiftType = TermSuggestion
-    
+
     private var _field: String?
     private var _text: String?
     private var _prefix: String?
@@ -155,7 +145,7 @@ public class TermSuggestionBuilder: SuggestionBuilder {
     private var _analyzer: String?
     private var _size: Int?
     private var _shardSize: Int?
-    
+
     private var _sort: TermSuggestion.SortBy?
     private var _suggestMode: SuggestMode?
     private var _accuracy: Decimal?
@@ -166,225 +156,221 @@ public class TermSuggestionBuilder: SuggestionBuilder {
     private var _minWordLength: Int?
     private var _minDocFreq: Decimal?
     private var _stringDistance: TermSuggestion.StringDistance?
-    
+
     public init() {}
-    
+
     @discardableResult
     public func set(field: String) -> Self {
-        self._field = field
+        _field = field
         return self
     }
-    
+
     @discardableResult
     public func set(text: String) -> Self {
-        self._text = text
+        _text = text
         return self
     }
-    
+
     @discardableResult
     public func set(prefix: String) -> Self {
-        self._prefix = prefix
+        _prefix = prefix
         return self
     }
-    
+
     @discardableResult
     public func set(regex: String) -> Self {
-        self._regex = regex
+        _regex = regex
         return self
     }
-    
+
     @discardableResult
     public func set(analyzer: String) -> Self {
-        self._analyzer = analyzer
+        _analyzer = analyzer
         return self
     }
-    
+
     @discardableResult
     public func set(size: Int) -> Self {
-        self._size = size
+        _size = size
         return self
     }
-    
+
     @discardableResult
     public func set(shardSize: Int) -> Self {
-        self._shardSize = shardSize
+        _shardSize = shardSize
         return self
     }
-    
+
     @discardableResult
     public func set(sort: TermSuggestion.SortBy) -> Self {
-        self._sort = sort
+        _sort = sort
         return self
     }
-    
+
     @discardableResult
     public func set(suggestMode: SuggestMode) -> Self {
-        self._suggestMode = suggestMode
+        _suggestMode = suggestMode
         return self
     }
-    
+
     @discardableResult
     public func set(accuracy: Decimal) -> Self {
-        self._accuracy = accuracy
+        _accuracy = accuracy
         return self
     }
-    
+
     @discardableResult
     public func set(maxEdits: Int) -> Self {
-        self._maxEdits = maxEdits
+        _maxEdits = maxEdits
         return self
     }
-    
+
     @discardableResult
     public func set(maxInspections: Int) -> Self {
-        self._maxInspections = maxInspections
+        _maxInspections = maxInspections
         return self
     }
-    
+
     @discardableResult
     public func set(maxTermFreq: Decimal) -> Self {
-        self._maxTermFreq = maxTermFreq
+        _maxTermFreq = maxTermFreq
         return self
     }
-    
+
     @discardableResult
     public func set(prefixLength: Int) -> Self {
-        self._prefixLength = prefixLength
+        _prefixLength = prefixLength
         return self
     }
-    
+
     @discardableResult
     public func set(minWordLength: Int) -> Self {
-        self._minWordLength = minWordLength
+        _minWordLength = minWordLength
         return self
     }
-    
+
     @discardableResult
     public func set(minDocFreq: Decimal) -> Self {
-        self._minDocFreq = minDocFreq
+        _minDocFreq = minDocFreq
         return self
     }
-    
+
     @discardableResult
     public func set(stringDistance: TermSuggestion.StringDistance) -> Self {
-        self._stringDistance = stringDistance
+        _stringDistance = stringDistance
         return self
     }
-    
-    
+
     public var field: String? {
         return _field
     }
-    
+
     public var text: String? {
         return _text
     }
-    
+
     public var prefix: String? {
         return _prefix
     }
-    
+
     public var regex: String? {
         return _regex
     }
-    
+
     public var analyzer: String? {
         return _analyzer
     }
-    
+
     public var size: Int? {
         return _size
     }
-    
+
     public var shardSize: Int? {
         return _shardSize
     }
-    
+
     public var sort: TermSuggestion.SortBy? {
         return _sort
     }
-    
+
     public var suggestMode: SuggestMode? {
         return _suggestMode
     }
-    
+
     public var accuracy: Decimal? {
         return _accuracy
     }
-    
+
     public var maxEdits: Int? {
         return _maxEdits
     }
-    
+
     public var maxInspections: Int? {
         return _maxInspections
     }
-    
+
     public var maxTermFreq: Decimal? {
         return _maxTermFreq
     }
-    
+
     public var prefixLength: Int? {
         return _prefixLength
     }
-    
+
     public var minWordLength: Int? {
         return _minWordLength
     }
-    
+
     public var minDocFreq: Decimal? {
         return _minDocFreq
     }
-    
+
     public var stringDistance: TermSuggestion.StringDistance? {
         return _stringDistance
     }
-    
+
     public func build() throws -> TermSuggestion {
         return try TermSuggestion(withBuilder: self)
     }
 }
 
-
 public struct TermSuggestion: Suggestion {
-    
     public let suggestionType: SuggestionType = .term
-    
+
     public var field: String
-    
+
     public var text: String?
-    
+
     public var prefix: String?
-    
+
     public var regex: String?
-    
+
     public var analyzer: String?
-    
+
     public var size: Int?
-    
+
     public var shardSize: Int?
-    
+
     public var sort: SortBy?
-    
+
     public var suggestMode: SuggestMode?
-    
+
     public var accuracy: Decimal?
-    
+
     public var maxEdits: Int?
-    
+
     public var maxInspections: Int?
-    
+
     public var maxTermFreq: Decimal?
-    
+
     public var prefixLength: Int?
-    
+
     public var minWordLength: Int?
-    
+
     public var minDocFreq: Decimal?
-    
+
     public var stringDistance: StringDistance?
-    
-    
+
     public init(field: String, text: String? = nil, prefix: String? = nil, regex: String? = nil, analyzer: String? = nil, size: Int? = nil, shardSize: Int? = nil, sort: SortBy? = nil, suggestMode: SuggestMode? = nil, accuracy: Decimal? = nil, maxEdits: Int? = nil, maxInspections: Int? = nil, maxTermFreq: Decimal? = nil, prefixLength: Int? = nil, minWordLength: Int? = nil, minDocFreq: Decimal? = nil, stringDistance: StringDistance? = nil) {
         self.field = field
         self.text = text
@@ -404,48 +390,45 @@ public struct TermSuggestion: Suggestion {
         self.minDocFreq = minDocFreq
         self.stringDistance = stringDistance
     }
-    
+
     internal init(withBuilder builder: TermSuggestionBuilder) throws {
-        
         guard let field = builder.field else {
             throw SuggestionBuilderError.missingRequiredField("field")
         }
-        
+
         self.init(field: field, text: builder.text, prefix: builder.prefix, regex: builder.regex, analyzer: builder.analyzer, size: builder.size, shardSize: builder.shardSize, sort: builder.sort, suggestMode: builder.suggestMode, accuracy: builder.accuracy, maxEdits: builder.maxEdits, maxInspections: builder.maxInspections, maxTermFreq: builder.maxTermFreq, prefixLength: builder.prefixLength, minWordLength: builder.minWordLength, minDocFreq: builder.minDocFreq, stringDistance: builder.stringDistance)
     }
-    
 }
 
-extension TermSuggestion {
-    
-    public init(from decoder: Decoder) throws {
+public extension TermSuggestion {
+    init(from decoder: Decoder) throws {
         let contianer = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let namedContianer = try contianer.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: suggestionType))
-        self.field = try namedContianer.decodeString(forKey: .field)
-        self.text = try contianer.decodeStringIfPresent(forKey: .key(named: CodingKeys.text.rawValue))
-        self.prefix = try contianer.decodeStringIfPresent(forKey: .key(named: CodingKeys.prefix.rawValue))
-        self.regex = try contianer.decodeStringIfPresent(forKey: .key(named: CodingKeys.regex.rawValue))
-        self.analyzer = try namedContianer.decodeStringIfPresent(forKey: .analyzer)
-        self.size = try namedContianer.decodeIntIfPresent(forKey: .size)
-        self.shardSize = try namedContianer.decodeIntIfPresent(forKey: .shardSize)
-        self.sort = try namedContianer.decodeIfPresent(SortBy.self, forKey: .sort)
-        self.suggestMode = try namedContianer.decodeIfPresent(SuggestMode.self, forKey: .suggestMode)
-        self.accuracy = try namedContianer.decodeDecimalIfPresent(forKey: .accuracy)
-        self.maxEdits = try namedContianer.decodeIntIfPresent(forKey: .maxEdits)
-        self.maxInspections = try namedContianer.decodeIntIfPresent(forKey: .maxInspections)
-        self.maxTermFreq = try namedContianer.decodeDecimalIfPresent(forKey: .maxTermFreq)
-        self.prefixLength = try namedContianer.decodeIntIfPresent(forKey: .prefixLength)
-        self.minWordLength = try namedContianer.decodeIntIfPresent(forKey: .minWordLength)
-        self.minDocFreq = try namedContianer.decodeDecimalIfPresent(forKey: .minDocFreq)
-        self.stringDistance = try namedContianer.decodeIfPresent(StringDistance.self, forKey: .stringDistance)
+        field = try namedContianer.decodeString(forKey: .field)
+        text = try contianer.decodeStringIfPresent(forKey: .key(named: CodingKeys.text.rawValue))
+        prefix = try contianer.decodeStringIfPresent(forKey: .key(named: CodingKeys.prefix.rawValue))
+        regex = try contianer.decodeStringIfPresent(forKey: .key(named: CodingKeys.regex.rawValue))
+        analyzer = try namedContianer.decodeStringIfPresent(forKey: .analyzer)
+        size = try namedContianer.decodeIntIfPresent(forKey: .size)
+        shardSize = try namedContianer.decodeIntIfPresent(forKey: .shardSize)
+        sort = try namedContianer.decodeIfPresent(SortBy.self, forKey: .sort)
+        suggestMode = try namedContianer.decodeIfPresent(SuggestMode.self, forKey: .suggestMode)
+        accuracy = try namedContianer.decodeDecimalIfPresent(forKey: .accuracy)
+        maxEdits = try namedContianer.decodeIntIfPresent(forKey: .maxEdits)
+        maxInspections = try namedContianer.decodeIntIfPresent(forKey: .maxInspections)
+        maxTermFreq = try namedContianer.decodeDecimalIfPresent(forKey: .maxTermFreq)
+        prefixLength = try namedContianer.decodeIntIfPresent(forKey: .prefixLength)
+        minWordLength = try namedContianer.decodeIntIfPresent(forKey: .minWordLength)
+        minDocFreq = try namedContianer.decodeDecimalIfPresent(forKey: .minDocFreq)
+        stringDistance = try namedContianer.decodeIfPresent(StringDistance.self, forKey: .stringDistance)
     }
-    
-    public func encode(to encoder: Encoder) throws {
+
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         try container.encodeIfPresent(text, forKey: .key(named: CodingKeys.text.rawValue))
         try container.encodeIfPresent(prefix, forKey: .key(named: CodingKeys.prefix.rawValue))
         try container.encodeIfPresent(regex, forKey: .key(named: CodingKeys.regex.rawValue))
-        
+
         var namedContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: suggestionType))
         try namedContainer.encode(field, forKey: .field)
         try namedContainer.encodeIfPresent(analyzer, forKey: .analyzer)
@@ -462,8 +445,8 @@ extension TermSuggestion {
         try namedContainer.encodeIfPresent(minDocFreq, forKey: .minDocFreq)
         try namedContainer.encodeIfPresent(stringDistance, forKey: .stringDistance)
     }
-    
-    enum CodingKeys: String, CodingKey {
+
+    internal enum CodingKeys: String, CodingKey {
         case field
         case text
         case prefix
@@ -484,24 +467,22 @@ extension TermSuggestion {
     }
 }
 
-extension TermSuggestion {
-    
-    public enum SortBy: String, Codable {
+public extension TermSuggestion {
+    enum SortBy: String, Codable {
         case score
         case frequency
     }
-    
-    public enum StringDistance: String, Codable {
+
+    enum StringDistance: String, Codable {
         case `internal`
         case damerauLevenshtein = "damerau_levenshtein"
         case levenshtein
         case jaroWinkler = "jaro_winkler"
-        case ngram = "ngram"
+        case ngram
     }
 }
 
 extension TermSuggestion: Equatable {}
-
 
 public enum SuggestMode: String, Codable {
     case missing
@@ -509,15 +490,13 @@ public enum SuggestMode: String, Codable {
     case always
 }
 
-
 public enum SuggestionBuilderError: Error {
     case missingRequiredField(String)
 }
 
-
 public class PhraseSuggestionBuilder: SuggestionBuilder {
     public typealias ElasticSwiftType = PhraseSuggestion
-    
+
     private var _field: String?
     private var _text: String?
     private var _prefix: String?
@@ -525,86 +504,217 @@ public class PhraseSuggestionBuilder: SuggestionBuilder {
     private var _analyzer: String?
     private var _size: Int?
     private var _shardSize: Int?
-    
+
+    private var _maxErrors: Decimal?
+    private var _separator: String?
+    private var _realWordErrorLikelihood: Decimal?
+    private var _confidence: Decimal?
+    private var _gramSize: Int?
+    private var _forceUnigrams: Bool?
+    private var _tokenLimit: Int?
+    private var _highlight: PhraseSuggestion.Highlight?
+    private var _collate: PhraseSuggestion.Collate?
+    private var _smoothing: SmoothingModel?
+    private var _directGenerators: [PhraseSuggestion.DirectCandidateGenerator]?
+
     @discardableResult
     public func set(field: String) -> Self {
-        self._field = field
+        _field = field
         return self
     }
-    
+
     @discardableResult
     public func set(text: String) -> Self {
-        self._text = text
+        _text = text
         return self
     }
-    
+
     @discardableResult
     public func set(prefix: String) -> Self {
-        self._prefix = prefix
+        _prefix = prefix
         return self
     }
-    
+
     @discardableResult
     public func set(regex: String) -> Self {
-        self._regex = regex
+        _regex = regex
         return self
     }
-    
+
     @discardableResult
     public func set(analyzer: String) -> Self {
-        self._analyzer = analyzer
+        _analyzer = analyzer
         return self
     }
-    
+
     @discardableResult
     public func set(size: Int) -> Self {
-        self._size = size
+        _size = size
         return self
     }
-    
+
     @discardableResult
     public func set(shardSize: Int) -> Self {
-        self._shardSize = shardSize
+        _shardSize = shardSize
         return self
     }
-    
+
+    @discardableResult
+    public func set(maxErrors: Decimal) -> Self {
+        _maxErrors = maxErrors
+        return self
+    }
+
+    @discardableResult
+    public func set(separator: String) -> Self {
+        _separator = separator
+        return self
+    }
+
+    @discardableResult
+    public func set(realWordErrorLikelihood: Decimal) -> Self {
+        _realWordErrorLikelihood = realWordErrorLikelihood
+        return self
+    }
+
+    @discardableResult
+    public func set(confidence: Decimal) -> Self {
+        _confidence = confidence
+        return self
+    }
+
+    @discardableResult
+    public func set(gramSize: Int) -> Self {
+        _gramSize = gramSize
+        return self
+    }
+
+    @discardableResult
+    public func set(forceUnigrams: Bool) -> Self {
+        _forceUnigrams = forceUnigrams
+        return self
+    }
+
+    @discardableResult
+    public func set(tokenLimit: Int) -> Self {
+        _tokenLimit = tokenLimit
+        return self
+    }
+
+    @discardableResult
+    public func set(highlight: PhraseSuggestion.Highlight) -> Self {
+        _highlight = highlight
+        return self
+    }
+
+    @discardableResult
+    public func set(collate: PhraseSuggestion.Collate) -> Self {
+        _collate = collate
+        return self
+    }
+
+    @discardableResult
+    public func set(smoothing: SmoothingModel) -> Self {
+        _smoothing = smoothing
+        return self
+    }
+
+    @discardableResult
+    public func set(directGenerators: [PhraseSuggestion.DirectCandidateGenerator]) -> Self {
+        _directGenerators = directGenerators
+        return self
+    }
+
+    @discardableResult
+    public func add(directGenerator: PhraseSuggestion.DirectCandidateGenerator) -> Self {
+        if _directGenerators != nil {
+            _directGenerators?.append(directGenerator)
+        } else {
+            _directGenerators = [directGenerator]
+        }
+        return self
+    }
+
     public var field: String? {
         return _field
     }
-    
+
     public var text: String? {
         return _text
     }
-    
+
     public var prefix: String? {
         return _prefix
     }
-    
+
     public var regex: String? {
         return _regex
     }
-    
+
     public var analyzer: String? {
         return _analyzer
     }
-    
+
     public var size: Int? {
         return _size
     }
-    
+
     public var shardSize: Int? {
         return _shardSize
     }
-    
+
+    public var maxErrors: Decimal? {
+        return _maxErrors
+    }
+
+    public var separator: String? {
+        return _separator
+    }
+
+    public var realWordErrorLikelihood: Decimal? {
+        return _realWordErrorLikelihood
+    }
+
+    public var confidence: Decimal? {
+        return _confidence
+    }
+
+    public var gramSize: Int? {
+        return _gramSize
+    }
+
+    public var forceUnigrams: Bool? {
+        return _forceUnigrams
+    }
+
+    public var tokenLimit: Int? {
+        return _tokenLimit
+    }
+
+    public var highlight: PhraseSuggestion.Highlight? {
+        return _highlight
+    }
+
+    public var collate: PhraseSuggestion.Collate? {
+        return _collate
+    }
+
+    public var smoothing: SmoothingModel? {
+        return _smoothing
+    }
+
+    public var directGenerators: [PhraseSuggestion.DirectCandidateGenerator]? {
+        return _directGenerators
+    }
+
     public func build() throws -> PhraseSuggestion {
         return try PhraseSuggestion(withBuilder: self)
     }
 }
 
-
 public struct PhraseSuggestion: Suggestion {
     public let suggestionType: SuggestionType = .phrase
-    
+
     public var field: String
     public var text: String?
     public var prefix: String?
@@ -612,7 +722,7 @@ public struct PhraseSuggestion: Suggestion {
     public var analyzer: String?
     public var size: Int?
     public var shardSize: Int?
-    
+
     public var maxErrors: Decimal?
     public var separator: String?
     public var realWordErrorLikelihood: Decimal?
@@ -623,8 +733,9 @@ public struct PhraseSuggestion: Suggestion {
     public var highlight: Highlight?
     public var collate: Collate?
     public var smoothing: SmoothingModel?
-    
-    public init(field: String, text: String? = nil, prefix: String? = nil, regex: String? = nil, analyzer: String? = nil, size: Int? = nil, shardSize: Int? = nil, maxErrors: Decimal? = nil, separator: String? = nil, realWordErrorLikelihood: Decimal? = nil, confidence: Decimal? = nil, gramSize: Int? = nil, forceUnigrams: Bool? = nil, tokenLimit: Int? = nil, highlight: PhraseSuggestion.Highlight? = nil, collate: Collate? = nil, smoothing: SmoothingModel? = nil) {
+    public var directGenerators: [DirectCandidateGenerator]?
+
+    public init(field: String, text: String? = nil, prefix: String? = nil, regex: String? = nil, analyzer: String? = nil, size: Int? = nil, shardSize: Int? = nil, maxErrors: Decimal? = nil, separator: String? = nil, realWordErrorLikelihood: Decimal? = nil, confidence: Decimal? = nil, gramSize: Int? = nil, forceUnigrams: Bool? = nil, tokenLimit: Int? = nil, highlight: PhraseSuggestion.Highlight? = nil, collate: Collate? = nil, smoothing: SmoothingModel? = nil, directGenerators: [DirectCandidateGenerator]? = nil) {
         self.field = field
         self.text = text
         self.prefix = prefix
@@ -642,44 +753,70 @@ public struct PhraseSuggestion: Suggestion {
         self.highlight = highlight
         self.collate = collate
         self.smoothing = smoothing
+        self.directGenerators = directGenerators
     }
-    
+
     internal init(withBuilder builder: PhraseSuggestionBuilder) throws {
         guard let field = builder.field else {
             throw SuggestionBuilderError.missingRequiredField("field")
         }
-        self.init(field: field, text: builder.text, prefix: builder.prefix, regex: builder.regex, analyzer: builder.analyzer, size: builder.size, shardSize: builder.shardSize)
+        self.init(field: field, text: builder.text, prefix: builder.prefix, regex: builder.regex, analyzer: builder.analyzer, size: builder.size, shardSize: builder.shardSize, maxErrors: builder.maxErrors, separator: builder.separator, realWordErrorLikelihood: builder.realWordErrorLikelihood, confidence: builder.confidence, gramSize: builder.gramSize, forceUnigrams: builder.forceUnigrams, tokenLimit: builder.tokenLimit, highlight: builder.highlight, collate: builder.collate, smoothing: builder.smoothing, directGenerators: builder.directGenerators)
     }
-    
 }
 
-extension PhraseSuggestion {
-    public init(from decoder: Decoder) throws {
+public extension PhraseSuggestion {
+    init(from decoder: Decoder) throws {
         let contianer = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let namedContianer = try contianer.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: suggestionType))
-        self.field = try namedContianer.decodeString(forKey: .field)
-        self.text = try contianer.decodeStringIfPresent(forKey: .key(named: CodingKeys.text.rawValue))
-        self.prefix = try contianer.decodeStringIfPresent(forKey: .key(named: CodingKeys.prefix.rawValue))
-        self.regex = try contianer.decodeStringIfPresent(forKey: .key(named: CodingKeys.regex.rawValue))
-        self.analyzer = try namedContianer.decodeStringIfPresent(forKey: .analyzer)
-        self.size = try namedContianer.decodeIntIfPresent(forKey: .size)
-        self.shardSize = try namedContianer.decodeIntIfPresent(forKey: .shardSize)
+        field = try namedContianer.decodeString(forKey: .field)
+        text = try contianer.decodeStringIfPresent(forKey: .key(named: CodingKeys.text.rawValue))
+        prefix = try contianer.decodeStringIfPresent(forKey: .key(named: CodingKeys.prefix.rawValue))
+        regex = try contianer.decodeStringIfPresent(forKey: .key(named: CodingKeys.regex.rawValue))
+        analyzer = try namedContianer.decodeStringIfPresent(forKey: .analyzer)
+        size = try namedContianer.decodeIntIfPresent(forKey: .size)
+        shardSize = try namedContianer.decodeIntIfPresent(forKey: .shardSize)
+
+        maxErrors = try namedContianer.decodeDecimalIfPresent(forKey: .maxErrors)
+        separator = try namedContianer.decodeStringIfPresent(forKey: .separator)
+        realWordErrorLikelihood = try namedContianer.decodeDecimalIfPresent(forKey: .realWordErrorLikelihood)
+        confidence = try namedContianer.decodeDecimalIfPresent(forKey: .confidence)
+        gramSize = try namedContianer.decodeIntIfPresent(forKey: .gramSize)
+        forceUnigrams = try namedContianer.decodeBoolIfPresent(forKey: .forceUnigrams)
+        tokenLimit = try namedContianer.decodeIntIfPresent(forKey: .tokenLimit)
+        highlight = try namedContianer.decodeIfPresent(PhraseSuggestion.Highlight.self, forKey: .highlight)
+        collate = try namedContianer.decodeIfPresent(PhraseSuggestion.Collate.self, forKey: .collate)
+        smoothing = try namedContianer.decodeSmoothingModelIfPresent(forKey: .smoothing)
+        directGenerators = try namedContianer.decodeIfPresent([DirectCandidateGenerator].self, forKey: .directGenerator)
     }
-    
-    public func encode(to encoder: Encoder) throws {
+
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         try container.encodeIfPresent(text, forKey: .key(named: CodingKeys.text.rawValue))
         try container.encodeIfPresent(prefix, forKey: .key(named: CodingKeys.prefix.rawValue))
         try container.encodeIfPresent(regex, forKey: .key(named: CodingKeys.regex.rawValue))
-        
+
         var namedContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: suggestionType))
         try namedContainer.encode(field, forKey: .field)
         try namedContainer.encodeIfPresent(analyzer, forKey: .analyzer)
         try namedContainer.encodeIfPresent(size, forKey: .size)
         try namedContainer.encodeIfPresent(shardSize, forKey: .shardSize)
+
+        try namedContainer.encodeIfPresent(confidence, forKey: .confidence)
+        try namedContainer.encodeIfPresent(collate, forKey: .collate)
+        try namedContainer.encodeIfPresent(highlight, forKey: .highlight)
+        try namedContainer.encodeIfPresent(maxErrors, forKey: .maxErrors)
+        try namedContainer.encodeIfPresent(separator, forKey: .separator)
+        try namedContainer.encodeIfPresent(gramSize, forKey: .gramSize)
+        try namedContainer.encodeIfPresent(forceUnigrams, forKey: .forceUnigrams)
+        try namedContainer.encodeIfPresent(tokenLimit, forKey: .tokenLimit)
+        try namedContainer.encodeIfPresent(realWordErrorLikelihood, forKey: .realWordErrorLikelihood)
+        try namedContainer.encodeIfPresent(smoothing, forKey: .smoothing)
+        if let directGenerators = self.directGenerators, directGenerators.count > 0 {
+            try namedContainer.encode(directGenerators, forKey: .directGenerator)
+        }
     }
-    
-    enum CodingKeys: String, CodingKey {
+
+    internal enum CodingKeys: String, CodingKey {
         case field
         case text
         case prefix
@@ -691,22 +828,28 @@ extension PhraseSuggestion {
         case highlight
         case collate
         case smoothing
+        case gramSize = "gram_size"
+        case forceUnigrams = "force_unigrams"
+        case maxErrors = "max_errors"
+        case tokenLimit = "token_limit"
+        case realWordErrorLikelihood = "real_word_error_likelihood"
+        case separator
+        case confidence
     }
 }
 
-extension PhraseSuggestion {
-    
-    public struct Highlight {
+public extension PhraseSuggestion {
+    struct Highlight {
         public let preTag: String
         public let postTag: String
-        
+
         public init(preTag: String, postTag: String) {
             self.preTag = preTag
             self.postTag = postTag
         }
     }
-    
-    public struct DirectCandidateGenerator {
+
+    struct DirectCandidateGenerator {
         public var field: String
         public var preFilter: String?
         public var postFilter: String?
@@ -721,7 +864,7 @@ extension PhraseSuggestion {
         public var prefixLength: Int?
         public var minWordLength: Int?
         public var minDocFreq: Decimal?
-        
+
         public init(field: String, preFilter: String? = nil, postFilter: String? = nil, suggestMode: String? = nil, accuracy: Decimal? = nil, size: Int? = nil, sort: TermSuggestion.SortBy? = nil, stringDistance: TermSuggestion.StringDistance? = nil, maxEdits: Int? = nil, maxInspections: Int? = nil, maxTermFreq: Decimal? = nil, prefixLength: Int? = nil, minWordLength: Int? = nil, minDocFreq: Decimal? = nil) {
             self.field = field
             self.preFilter = preFilter
@@ -739,8 +882,8 @@ extension PhraseSuggestion {
             self.minDocFreq = minDocFreq
         }
     }
-    
-    public struct Collate {
+
+    struct Collate {
         public let query: Script
         public let params: [String: CodableValue]?
         public let purne: Bool
@@ -810,15 +953,27 @@ public enum SmoothingModelType: String, Codable {
     case linearInterpolation = "linear_interpolation"
 }
 
+extension SmoothingModelType {
+    var metaType: SmoothingModel.Type {
+        switch self {
+        case .laplace:
+            return Laplace.self
+        case .stupidBackoff:
+            return StupidBackoff.self
+        case .linearInterpolation:
+            return LinearInterpolation.self
+        }
+    }
+}
+
 public protocol SmoothingModel: Codable {
-    
     var smoothingModelType: SmoothingModelType { get }
-    
+
     func isEqualTo(_ other: SmoothingModel) -> Bool
 }
 
-extension SmoothingModel where Self: Equatable {
-    public func isEqualTo(_ other: SmoothingModel) -> Bool {
+public extension SmoothingModel where Self: Equatable {
+    func isEqualTo(_ other: SmoothingModel) -> Bool {
         if let o = other as? Self {
             return self == o
         }
@@ -827,7 +982,7 @@ extension SmoothingModel where Self: Equatable {
 }
 
 public func isEqualSmoothingModels(_ lhs: SmoothingModel?, _ rhs: SmoothingModel?) -> Bool {
-    if lhs == nil && rhs == nil {
+    if lhs == nil, rhs == nil {
         return true
     }
     if let lhs = lhs, let rhs = rhs {
@@ -838,25 +993,24 @@ public func isEqualSmoothingModels(_ lhs: SmoothingModel?, _ rhs: SmoothingModel
 
 public struct StupidBackoff: SmoothingModel {
     public let smoothingModelType: SmoothingModelType = .stupidBackoff
-    
+
     public let discount: Decimal
 }
 
-extension StupidBackoff {
-    
-    public init(from decoder: Decoder) throws {
+public extension StupidBackoff {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let namedContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: smoothingModelType))
-        self.discount = try namedContainer.decodeDecimal(forKey: .discount)
+        discount = try namedContainer.decodeDecimal(forKey: .discount)
     }
-    
-    public func encode(to encoder: Encoder) throws {
+
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var namedContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: smoothingModelType))
         try namedContainer.encode(discount, forKey: .discount)
     }
-    
-    enum CodingKeys: String, CodingKey {
+
+    internal enum CodingKeys: String, CodingKey {
         case discount
     }
 }
@@ -865,59 +1019,56 @@ extension StupidBackoff: Equatable {}
 
 public struct Laplace: SmoothingModel {
     public let smoothingModelType: SmoothingModelType = .laplace
-    
+
     public let alpha: Decimal
 }
 
-extension Laplace {
-    
-    public init(from decoder: Decoder) throws {
+public extension Laplace {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let namedContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: smoothingModelType))
-        self.alpha = try namedContainer.decodeDecimal(forKey: .alpha)
+        alpha = try namedContainer.decodeDecimal(forKey: .alpha)
     }
-    
-    public func encode(to encoder: Encoder) throws {
+
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var namedContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: smoothingModelType))
         try namedContainer.encode(alpha, forKey: .alpha)
     }
-    
-    enum CodingKeys: String, CodingKey {
+
+    internal enum CodingKeys: String, CodingKey {
         case alpha
     }
 }
 
 extension Laplace: Equatable {}
 
-
 public struct LinearInterpolation: SmoothingModel {
     public let smoothingModelType: SmoothingModelType = .linearInterpolation
-    
+
     public let trigramLambda: Decimal
     public let bigramLambda: Decimal
     public let unigramLambda: Decimal
 }
 
-extension LinearInterpolation {
-    
-    public init(from decoder: Decoder) throws {
+public extension LinearInterpolation {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let namedContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: smoothingModelType))
-        self.trigramLambda = try namedContainer.decodeDecimal(forKey: .trigramLambda)
-        self.bigramLambda = try namedContainer.decodeDecimal(forKey: .bigramLambda)
-        self.unigramLambda = try namedContainer.decodeDecimal(forKey: .unigramLambda)
+        trigramLambda = try namedContainer.decodeDecimal(forKey: .trigramLambda)
+        bigramLambda = try namedContainer.decodeDecimal(forKey: .bigramLambda)
+        unigramLambda = try namedContainer.decodeDecimal(forKey: .unigramLambda)
     }
-    
-    public func encode(to encoder: Encoder) throws {
+
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         var namedContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: smoothingModelType))
         try namedContainer.encode(trigramLambda, forKey: .trigramLambda)
         try namedContainer.encode(bigramLambda, forKey: .bigramLambda)
         try namedContainer.encode(unigramLambda, forKey: .unigramLambda)
     }
-    
-    enum CodingKeys: String, CodingKey {
+
+    internal enum CodingKeys: String, CodingKey {
         case trigramLambda = "trigram_lambda"
         case bigramLambda = "bigram_lambda"
         case unigramLambda = "unigram_lambda"
@@ -926,10 +1077,9 @@ extension LinearInterpolation {
 
 extension LinearInterpolation: Equatable {}
 
-
 public class CompletionSuggestionBuilder: SuggestionBuilder {
     public typealias ElasticSwiftType = CompletionSuggestion
-    
+
     private var _field: String?
     private var _text: String?
     private var _prefix: String?
@@ -940,134 +1090,135 @@ public class CompletionSuggestionBuilder: SuggestionBuilder {
     private var _skipDuplicates: Bool?
     private var _fuzzyOptions: CompletionSuggestion.FuzzyOptions?
     private var _regexOptions: CompletionSuggestion.RegexOptions?
-    
+
     @discardableResult
     public func set(field: String) -> Self {
-        self._field = field
+        _field = field
         return self
     }
-    
+
     @discardableResult
     public func set(text: String) -> Self {
-        self._text = text
+        _text = text
         return self
     }
-    
+
     @discardableResult
     public func set(prefix: String) -> Self {
-        self._prefix = prefix
+        _prefix = prefix
         return self
     }
-    
+
     @discardableResult
     public func set(regex: String) -> Self {
-        self._regex = regex
+        _regex = regex
         return self
     }
-    
+
     @discardableResult
     public func set(analyzer: String) -> Self {
-        self._analyzer = analyzer
+        _analyzer = analyzer
         return self
     }
-    
+
     @discardableResult
     public func set(size: Int) -> Self {
-        self._size = size
+        _size = size
         return self
     }
-    
+
     @discardableResult
     public func set(shardSize: Int) -> Self {
-        self._shardSize = shardSize
+        _shardSize = shardSize
         return self
     }
-    
+
     @discardableResult
     public func set(skipDuplicates: Bool) -> Self {
-        self._skipDuplicates = skipDuplicates
+        _skipDuplicates = skipDuplicates
         return self
     }
-    
+
     @discardableResult
     public func set(fuzzyOptions: CompletionSuggestion.FuzzyOptions) -> Self {
-        self._fuzzyOptions = fuzzyOptions
+        _fuzzyOptions = fuzzyOptions
         return self
     }
-    
+
     @discardableResult
     public func set(regexOptions: CompletionSuggestion.RegexOptions) -> Self {
-        self._regexOptions = regexOptions
+        _regexOptions = regexOptions
         return self
     }
-    
+
     public var field: String? {
         return _field
     }
-    
+
     public var text: String? {
         return _text
     }
-    
+
     public var prefix: String? {
         return _prefix
     }
-    
+
     public var regex: String? {
         return _regex
     }
-    
+
     public var analyzer: String? {
         return _analyzer
     }
-    
+
     public var size: Int? {
         return _size
     }
-    
+
     public var shardSize: Int? {
         return _shardSize
     }
-    
+
     public var skipDuplicates: Bool? {
         return _skipDuplicates
     }
+
     public var fuzzyOptions: CompletionSuggestion.FuzzyOptions? {
         return _fuzzyOptions
     }
+
     public var regexOptions: CompletionSuggestion.RegexOptions? {
         return _regexOptions
     }
-    
+
     public func build() throws -> CompletionSuggestion {
         return try CompletionSuggestion(withBuilder: self)
     }
 }
 
-
 public struct CompletionSuggestion: Suggestion {
     public let suggestionType: SuggestionType = .completion
-    
+
     public var field: String
-    
+
     public var text: String?
-    
+
     public var prefix: String?
-    
+
     public var regex: String?
-    
+
     public var analyzer: String?
-    
+
     public var size: Int?
-    
+
     public var shardSize: Int?
-    
+
     public var skipDuplicates: Bool?
-    
+
     public var fuzzyOptions: FuzzyOptions?
-    
+
     public var regexOptions: RegexOptions?
-    
+
     public init(field: String, text: String? = nil, prefix: String? = nil, regex: String? = nil, analyzer: String? = nil, size: Int? = nil, shardSize: Int? = nil, skipDuplicates: Bool? = nil, fuzzyOptions: FuzzyOptions? = nil, regexOptions: RegexOptions? = nil) {
         self.field = field
         self.text = text
@@ -1080,7 +1231,7 @@ public struct CompletionSuggestion: Suggestion {
         self.fuzzyOptions = fuzzyOptions
         self.regexOptions = regexOptions
     }
-    
+
     internal init(withBuilder builder: CompletionSuggestionBuilder) throws {
         guard let field = builder.field else {
             throw SuggestionBuilderError.missingRequiredField("field")
@@ -1089,29 +1240,28 @@ public struct CompletionSuggestion: Suggestion {
     }
 }
 
-extension CompletionSuggestion {
-    
-    public init(from decoder: Decoder) throws {
+public extension CompletionSuggestion {
+    init(from decoder: Decoder) throws {
         let contianer = try decoder.container(keyedBy: DynamicCodingKeys.self)
         let namedContianer = try contianer.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: suggestionType))
-        self.field = try namedContianer.decodeString(forKey: .field)
-        self.text = try contianer.decodeStringIfPresent(forKey: .key(named: CodingKeys.text.rawValue))
-        self.prefix = try contianer.decodeStringIfPresent(forKey: .key(named: CodingKeys.prefix.rawValue))
-        self.regex = try contianer.decodeStringIfPresent(forKey: .key(named: CodingKeys.regex.rawValue))
-        self.analyzer = try namedContianer.decodeStringIfPresent(forKey: .analyzer)
-        self.size = try namedContianer.decodeIntIfPresent(forKey: .size)
-        self.shardSize = try namedContianer.decodeIntIfPresent(forKey: .shardSize)
-        self.skipDuplicates = try namedContianer.decodeBoolIfPresent(forKey: .skipDuplicates)
-        self.fuzzyOptions = try namedContianer.decodeIfPresent(FuzzyOptions.self, forKey: .fuzzyOptions)
-        self.regexOptions = try namedContianer.decodeIfPresent(RegexOptions.self, forKey: .regex)
+        field = try namedContianer.decodeString(forKey: .field)
+        text = try contianer.decodeStringIfPresent(forKey: .key(named: CodingKeys.text.rawValue))
+        prefix = try contianer.decodeStringIfPresent(forKey: .key(named: CodingKeys.prefix.rawValue))
+        regex = try contianer.decodeStringIfPresent(forKey: .key(named: CodingKeys.regex.rawValue))
+        analyzer = try namedContianer.decodeStringIfPresent(forKey: .analyzer)
+        size = try namedContianer.decodeIntIfPresent(forKey: .size)
+        shardSize = try namedContianer.decodeIntIfPresent(forKey: .shardSize)
+        skipDuplicates = try namedContianer.decodeBoolIfPresent(forKey: .skipDuplicates)
+        fuzzyOptions = try namedContianer.decodeIfPresent(FuzzyOptions.self, forKey: .fuzzyOptions)
+        regexOptions = try namedContianer.decodeIfPresent(RegexOptions.self, forKey: .regex)
     }
-    
-    public func encode(to encoder: Encoder) throws {
+
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
         try container.encodeIfPresent(text, forKey: .key(named: CodingKeys.text.rawValue))
         try container.encodeIfPresent(prefix, forKey: .key(named: CodingKeys.prefix.rawValue))
         try container.encodeIfPresent(regex, forKey: .key(named: CodingKeys.regex.rawValue))
-        
+
         var namedContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .key(named: suggestionType))
         try namedContainer.encode(field, forKey: .field)
         try namedContainer.encodeIfPresent(analyzer, forKey: .analyzer)
@@ -1121,8 +1271,8 @@ extension CompletionSuggestion {
         try namedContainer.encodeIfPresent(fuzzyOptions, forKey: .fuzzyOptions)
         try namedContainer.encodeIfPresent(regexOptions, forKey: .regex)
     }
-    
-    enum CodingKeys: String, CodingKey {
+
+    internal enum CodingKeys: String, CodingKey {
         case field
         case text
         case prefix
@@ -1135,17 +1285,15 @@ extension CompletionSuggestion {
     }
 }
 
-extension CompletionSuggestion {
-    
-    public struct FuzzyOptions {
-        
+public extension CompletionSuggestion {
+    struct FuzzyOptions {
         public var fuzziness: Int?
         public var transpositions: Bool?
         public var fuzzyMinLength: Int?
         public var fuzzyPrefixLength: Int?
         public var unicodeAware: Bool?
         public var maxDeterminizedStates: Int?
-        
+
         public init(fuzziness: Int? = nil, transpositions: Bool? = nil, fuzzyMinLength: Int? = nil, fuzzyPrefixLength: Int? = nil, unicodeAware: Bool? = nil, maxDeterminizedStates: Int? = nil) {
             self.fuzziness = fuzziness
             self.transpositions = transpositions
@@ -1154,20 +1302,19 @@ extension CompletionSuggestion {
             self.unicodeAware = unicodeAware
             self.maxDeterminizedStates = maxDeterminizedStates
         }
-        
     }
-    
-    public struct RegexOptions {
+
+    struct RegexOptions {
         public var flags: RegexFlag?
         public var maxDeterminizedStates: Int?
-        
+
         public init(flags: RegexFlag? = nil, maxDeterminizedStates: Int? = nil) {
             self.flags = flags
             self.maxDeterminizedStates = maxDeterminizedStates
         }
     }
-    
-    public enum RegexFlag: String, Codable {
+
+    enum RegexFlag: String, Codable {
         case all = "ALL"
         case anystring = "ANYSTRING"
         case complement = "COMPLEMENT"
@@ -1202,23 +1349,25 @@ extension CompletionSuggestion.RegexOptions: Equatable {}
 
 extension CompletionSuggestion: Equatable {}
 
-
 /// Extention for DynamicCodingKeys
 public extension DynamicCodingKeys {
     static func key(named suggestionType: SuggestionType) -> DynamicCodingKeys {
         return .key(named: suggestionType.rawValue)
     }
-    
+
     static func key(named smoothingModelType: SmoothingModelType) -> DynamicCodingKeys {
         return .key(named: smoothingModelType.rawValue)
     }
 }
 
-
 // MARK: - Codable Extenstions
 
 public extension KeyedEncodingContainer {
     mutating func encode(_ value: Suggestion, forKey key: KeyedEncodingContainer<K>.Key) throws {
+        try value.encode(to: superEncoder(forKey: key))
+    }
+
+    mutating func encode(_ value: SmoothingModel, forKey key: KeyedEncodingContainer<K>.Key) throws {
         try value.encode(to: superEncoder(forKey: key))
     }
 
@@ -1231,7 +1380,22 @@ public extension KeyedEncodingContainer {
         }
     }
 
+    mutating func encode(_ value: [SmoothingModel], forKey key: KeyedEncodingContainer<K>.Key) throws {
+        let smoothingModelEncoder = superEncoder(forKey: key)
+        var smoothingModelContainer = smoothingModelEncoder.unkeyedContainer()
+        for smoothing in value {
+            let smoothingEncoder = smoothingModelContainer.superEncoder()
+            try smoothing.encode(to: smoothingEncoder)
+        }
+    }
+
     mutating func encodeIfPresent(_ value: Suggestion?, forKey key: KeyedEncodingContainer<K>.Key) throws {
+        if let value = value {
+            try value.encode(to: superEncoder(forKey: key))
+        }
+    }
+
+    mutating func encodeIfPresent(_ value: SmoothingModel?, forKey key: KeyedEncodingContainer<K>.Key) throws {
         if let value = value {
             try value.encode(to: superEncoder(forKey: key))
         }
@@ -1239,7 +1403,13 @@ public extension KeyedEncodingContainer {
 
     mutating func encodeIfPresent(_ value: [Suggestion]?, forKey key: KeyedEncodingContainer<K>.Key) throws {
         if let value = value {
-            try self.encode(value, forKey: key)
+            try encode(value, forKey: key)
+        }
+    }
+
+    mutating func encodeIfPresent(_ value: [SmoothingModel]?, forKey key: KeyedEncodingContainer<K>.Key) throws {
+        if let value = value {
+            try encode(value, forKey: key)
         }
     }
 }
@@ -1255,11 +1425,28 @@ public extension KeyedDecodingContainer {
         throw Swift.DecodingError.typeMismatch(SuggestionType.self, .init(codingPath: codingPath, debugDescription: "Unable to identify suggestion type from key(s) \(qContainer.allKeys)"))
     }
 
+    func decodeSmoothingModel(forKey key: KeyedDecodingContainer<K>.Key) throws -> SmoothingModel {
+        let smContainer = try nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: key)
+        for smKey in smContainer.allKeys {
+            if let smType = SmoothingModelType(rawValue: smKey.stringValue) {
+                return try smType.metaType.init(from: superDecoder(forKey: key))
+            }
+        }
+        throw Swift.DecodingError.typeMismatch(SmoothingModelType.self, .init(codingPath: codingPath, debugDescription: "Unable to identify smoothing mode type from key(s) \(smContainer.allKeys)"))
+    }
+
     func decodeSuggestionIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Suggestion? {
         guard contains(key) else {
             return nil
         }
         return try decodeSuggestion(forKey: key)
+    }
+
+    func decodeSmoothingModelIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> SmoothingModel? {
+        guard contains(key) else {
+            return nil
+        }
+        return try decodeSmoothingModel(forKey: key)
     }
 
     func decodeSuggestions(forKey key: KeyedDecodingContainer<K>.Key) throws -> [Suggestion] {
@@ -1296,5 +1483,16 @@ extension UnkeyedDecodingContainer {
             }
         }
         throw Swift.DecodingError.typeMismatch(SuggestionType.self, .init(codingPath: codingPath, debugDescription: "Unable to identify suggestion type from key(s) \(elementContainer.allKeys)"))
+    }
+
+    mutating func decodeSmoothingModel() throws -> SmoothingModel {
+        var copy = self
+        let elementContainer = try copy.nestedContainer(keyedBy: DynamicCodingKeys.self)
+        for sKey in elementContainer.allKeys {
+            if let sType = SmoothingModelType(rawValue: sKey.stringValue) {
+                return try sType.metaType.init(from: superDecoder())
+            }
+        }
+        throw Swift.DecodingError.typeMismatch(SmoothingModelType.self, .init(codingPath: codingPath, debugDescription: "Unable to identify smoothing model type from key(s) \(elementContainer.allKeys)"))
     }
 }

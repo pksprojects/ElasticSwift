@@ -155,6 +155,6 @@ public enum URLScheme: String {
 /// Generic protocol for Type Builders in ElasticSwift
 public protocol ElasticSwiftTypeBuilder {
     associatedtype ElasticSwiftType
-    
+
     func build() throws -> ElasticSwiftType
 }

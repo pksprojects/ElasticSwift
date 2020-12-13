@@ -356,7 +356,7 @@ public extension KeyedEncodingContainer {
             try value.encode(to: superEncoder(forKey: key))
         }
     }
-    
+
     mutating func encodeIfPresent(_ value: ScoreFunction?, forKey key: KeyedEncodingContainer<K>.Key) throws {
         if let value = value {
             try encode(value, forKey: key)
@@ -368,7 +368,7 @@ public extension KeyedEncodingContainer {
             try encode(value, forKey: key)
         }
     }
-    
+
     mutating func encodeIfPresent(_ value: [ScoreFunction]?, forKey key: KeyedEncodingContainer<K>.Key) throws {
         if let value = value {
             try encode(value, forKey: key)

@@ -55,6 +55,4 @@ public class RequestOptions {
 // MARK: - RequestBuilder Protocol
 
 /// Protocol to which all `Request` Builders conforms to
-public protocol RequestBuilder: ElasticSwiftTypeBuilder where ElasticSwiftType: Request {
-    
-}
+public protocol RequestBuilder: ElasticSwiftTypeBuilder where ElasticSwiftType: Request {}

@@ -65,9 +65,7 @@ public extension QueryType where Self: Equatable {
 }
 
 /// Protocol that all Builder for `Query` conforms to
-public protocol QueryBuilder: ElasticSwiftTypeBuilder where ElasticSwiftType: Query {
-    
-}
+public protocol QueryBuilder: ElasticSwiftTypeBuilder where ElasticSwiftType: Query {}
 
 public struct DynamicCodingKeys: CodingKey {
     public var stringValue: String

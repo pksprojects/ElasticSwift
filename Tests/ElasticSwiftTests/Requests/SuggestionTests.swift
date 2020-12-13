@@ -1,6 +1,6 @@
 //
 //  SuggestionTests.swift
-//  
+//
 //
 //  Created by Prafull Kumar Soni on 11/26/20.
 //
@@ -69,8 +69,7 @@ class SuggestionTests: XCTestCase {
         waitForExpectations(timeout: 10)
         logger.info("====================TEST=END===============================")
     }
-    
-    
+
     func test_01_termSuggestionBuilder() throws {
         let termSuggestion = try TermSuggestionBuilder()
             .set(text: "text")
@@ -91,7 +90,7 @@ class SuggestionTests: XCTestCase {
             .set(maxTermFreq: 10)
             .set(minWordLength: 3)
             .build()
-        
+
         XCTAssertEqual(termSuggestion.text, "text")
         XCTAssertEqual(termSuggestion.size, 10)
         XCTAssertEqual(termSuggestion.sort, .frequency)
@@ -110,7 +109,7 @@ class SuggestionTests: XCTestCase {
         XCTAssertEqual(termSuggestion.maxTermFreq, 10)
         XCTAssertEqual(termSuggestion.minWordLength, 3)
     }
-    
+
     func test_02_termSuggestionBuilder_missing_field() throws {
         XCTAssertThrowsError(try TermSuggestionBuilder().build(), "Should not throw") { error in
             logger.info("Expected Error: \(error)")
@@ -124,11 +123,11 @@ class SuggestionTests: XCTestCase {
             }
         }
     }
-    
+
     func test_03_termSuggestionBuilder() throws {
         XCTAssertNoThrow(try TermSuggestionBuilder().set(field: "field").build(), "Should not throw")
     }
-    
+
     func test_04_termSuggestion_decode() throws {
         let suggestion = try TermSuggestionBuilder()
             .set(field: "message")
@@ -142,18 +141,18 @@ class SuggestionTests: XCTestCase {
               }
             }
         """
-        
+
         let decoded = try JSONDecoder().decode(TermSuggestion.self, from: jsonStr.data(using: .utf8)!)
 
         XCTAssertEqual(suggestion, decoded)
     }
-    
+
     func test_05_termSuggestion_encode() throws {
         let suggestion = try TermSuggestionBuilder()
             .set(field: "message")
             .set(text: "tring out Elasticsearch")
             .build()
-        
+
         let data = try JSONEncoder().encode(suggestion)
 
         let encodedStr = String(data: data, encoding: .utf8)!
@@ -167,6 +166,151 @@ class SuggestionTests: XCTestCase {
           "text" : "tring out Elasticsearch",
           "term" : {
             "field" : "message"
+          }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+
+    func test_06_phraseSuggestion_missing_field() throws {
+        XCTAssertThrowsError(try PhraseSuggestionBuilder().build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? SuggestionBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("field", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_07_phraseSuggestion() throws {
+        XCTAssertNoThrow(try PhraseSuggestionBuilder().set(field: "field").build(), "Should not throw")
+    }
+
+    func test_08_phraseSuggestion() throws {
+        let suggestion = try PhraseSuggestionBuilder()
+            .set(field: "field")
+            .set(text: "text")
+            .set(size: 10)
+            .set(regex: "regex")
+            .set(prefix: "prefix")
+            .set(analyzer: "analyzer")
+            .set(shardSize: 5)
+            .set(collate: PhraseSuggestion.Collate(query: .init("script"), params: nil, purne: false))
+            .set(separator: "separator")
+            .set(highlight: PhraseSuggestion.Highlight(preTag: "pre-tag", postTag: "post-tag"))
+            .set(smoothing: StupidBackoff(discount: 10.0))
+            .set(maxErrors: 5)
+            .set(confidence: 2.5)
+            .set(gramSize: 3)
+            .set(tokenLimit: 2)
+            .set(forceUnigrams: false)
+            .set(realWordErrorLikelihood: 0.5)
+            .set(directGenerators: [PhraseSuggestion.DirectCandidateGenerator(field: "test1", suggestMode: "always")])
+            .add(directGenerator: .init(field: "test2", suggestMode: "always"))
+            .build()
+
+        XCTAssertEqual(suggestion.field, "field")
+        XCTAssertEqual(suggestion.text, "text")
+        XCTAssertEqual(suggestion.size, 10)
+        XCTAssertEqual(suggestion.regex, "regex")
+        XCTAssertEqual(suggestion.prefix, "prefix")
+        XCTAssertEqual(suggestion.analyzer, "analyzer")
+        XCTAssertEqual(suggestion.shardSize, 5)
+        XCTAssertEqual(suggestion.collate, PhraseSuggestion.Collate(query: .init("script"), params: nil, purne: false))
+        XCTAssertEqual(suggestion.separator, "separator")
+        XCTAssertEqual(suggestion.highlight, PhraseSuggestion.Highlight(preTag: "pre-tag", postTag: "post-tag"))
+        XCTAssertTrue(suggestion.smoothing!.isEqualTo(StupidBackoff(discount: 10.0)))
+        XCTAssertEqual(suggestion.maxErrors, 5)
+        XCTAssertEqual(suggestion.confidence, 2.5)
+        XCTAssertEqual(suggestion.gramSize, 3)
+        XCTAssertEqual(suggestion.tokenLimit, 2)
+        XCTAssertEqual(suggestion.forceUnigrams, false)
+        XCTAssertEqual(suggestion.realWordErrorLikelihood, 0.5)
+        XCTAssertEqual(suggestion.directGenerators, [PhraseSuggestion.DirectCandidateGenerator(field: "test1", suggestMode: "always"), .init(field: "test2", suggestMode: "always")])
+    }
+
+    func test_09_phraseSuggestion_decode() throws {
+        let suggestion = try PhraseSuggestionBuilder()
+            .set(field: "title.trigram")
+            .set(highlight: PhraseSuggestion.Highlight(preTag: "<em>", postTag: "</em>"))
+            .set(size: 1)
+            .set(gramSize: 3)
+            .set(directGenerators: [.init(field: "title.trigram", suggestMode: "always")])
+            .set(smoothing: Laplace(alpha: 0.7))
+            .build()
+        let jsonStr = """
+            {
+              "phrase": {
+                "field": "title.trigram",
+                "size": 1,
+                "gram_size": 3,
+                "direct_generator": [
+                  {
+                    "field": "title.trigram",
+                    "suggest_mode": "always"
+                  }
+                ],
+                "highlight": {
+                  "pre_tag": "<em>",
+                  "post_tag": "</em>"
+                },
+                "smoothing" : {
+                    "laplace" : {
+                       "alpha" : 0.7
+                    }
+                }
+              }
+            }
+        """
+
+        let decoded = try JSONDecoder().decode(PhraseSuggestion.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(suggestion, decoded)
+    }
+
+    func test_10_phraseSuggestion_encode() throws {
+        let suggestion = try PhraseSuggestionBuilder()
+            .set(field: "title.trigram")
+            .set(highlight: PhraseSuggestion.Highlight(preTag: "<em>", postTag: "</em>"))
+            .set(size: 1)
+            .set(gramSize: 3)
+            .set(directGenerators: [.init(field: "title.trigram", suggestMode: "always")])
+            .set(smoothing: Laplace(alpha: 0.7))
+            .build()
+
+        let data = try JSONEncoder().encode(suggestion)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+          "phrase": {
+            "field": "title.trigram",
+            "size": 1,
+            "gram_size": 3,
+            "direct_generator": [
+              {
+                "field": "title.trigram",
+                "suggest_mode": "always"
+              }
+            ],
+            "highlight": {
+              "pre_tag": "<em>",
+              "post_tag": "</em>"
+            },
+            "smoothing" : {
+                "laplace" : {
+                   "alpha" : 0.7
+                }
+            }
           }
         }
         """.data(using: .utf8)!)
