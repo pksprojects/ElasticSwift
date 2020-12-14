@@ -944,6 +944,7 @@ extension PhraseSuggestion: Equatable {
             && lhs.highlight == rhs.highlight
             && lhs.collate == rhs.collate
             && isEqualSmoothingModels(lhs.smoothing, rhs.smoothing)
+            && lhs.directGenerators == rhs.directGenerators
     }
 }
 
