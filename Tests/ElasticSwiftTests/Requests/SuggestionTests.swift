@@ -209,6 +209,7 @@ class SuggestionTests: XCTestCase {
             .set(tokenLimit: 2)
             .set(forceUnigrams: false)
             .set(realWordErrorLikelihood: 0.5)
+            .add(directGenerator: .init(field: "test1", suggestMode: "always"))
             .set(directGenerators: [PhraseSuggestion.DirectCandidateGenerator(field: "test1", suggestMode: "always")])
             .add(directGenerator: .init(field: "test2", suggestMode: "always"))
             .build()
@@ -312,6 +313,158 @@ class SuggestionTests: XCTestCase {
                 }
             }
           }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+    
+    func test_11_completionSuggestion_missing_field() throws {
+        XCTAssertThrowsError(try CompletionSuggestionBuilder().build(), "Should not throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? SuggestionBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("field", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_12_completionSuggestion() throws {
+        XCTAssertNoThrow(try CompletionSuggestionBuilder().set(field: "field").build(), "Should not throw")
+    }
+    
+    func test_13_completionSuggestion() throws {
+        let suggestion = try CompletionSuggestionBuilder()
+            .set(field: "field")
+            .set(text: "text")
+            .set(size: 10)
+            .set(regex: "regex")
+            .set(prefix: "prefix")
+            .set(analyzer: "analyzer")
+            .set(shardSize: 5)
+            .set(skipDuplicates: true)
+            .set(fuzzyOptions: CompletionSuggestion.FuzzyOptions())
+            .set(regexOptions: CompletionSuggestion.RegexOptions())
+            .build()
+
+        XCTAssertEqual(suggestion.field, "field")
+        XCTAssertEqual(suggestion.text, "text")
+        XCTAssertEqual(suggestion.size, 10)
+        XCTAssertEqual(suggestion.regex, "regex")
+        XCTAssertEqual(suggestion.prefix, "prefix")
+        XCTAssertEqual(suggestion.analyzer, "analyzer")
+        XCTAssertEqual(suggestion.shardSize, 5)
+        XCTAssertEqual(suggestion.skipDuplicates, true)
+        XCTAssertEqual(suggestion.fuzzyOptions, .init())
+        XCTAssertEqual(suggestion.regexOptions, .init())
+    }
+    
+    func test_14_completionSuggestion_decode() throws {
+        let suggestion = try CompletionSuggestionBuilder()
+            .set(field: "suggest")
+            .set(prefix: "nor")
+            .set(skipDuplicates: true)
+            .set(fuzzyOptions: CompletionSuggestion.FuzzyOptions(fuzziness: 2))
+            .build()
+        let jsonStr = """
+        {
+            "prefix" : "nor",
+            "completion" : {
+                "field" : "suggest",
+                "skip_duplicates": true,
+                "fuzzy" : {
+                    "fuzziness" : 2
+                }
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(CompletionSuggestion.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(suggestion, decoded)
+    }
+
+    func test_15_completionSuggestion_encode() throws {
+        let suggestion = try CompletionSuggestionBuilder()
+            .set(field: "suggest")
+            .set(prefix: "nor")
+            .set(skipDuplicates: true)
+            .set(fuzzyOptions: CompletionSuggestion.FuzzyOptions(fuzziness: 2))
+            .build()
+
+        let data = try JSONEncoder().encode(suggestion)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "prefix" : "nor",
+            "completion" : {
+                "field" : "suggest",
+                "skip_duplicates": true,
+                "fuzzy" : {
+                    "fuzziness" : 2
+                }
+            }
+        }
+        """.data(using: .utf8)!)
+        XCTAssertEqual(expectedDic, dic)
+    }
+    
+    func test_16_completionSuggestion_decode_2() throws {
+        let suggestion = try CompletionSuggestionBuilder()
+            .set(field: "suggest")
+            .set(regex: "n[ever|i]r")
+            .set(regexOptions: CompletionSuggestion.RegexOptions(flags: CompletionSuggestion.RegexFlag.intersection))
+            .build()
+        let jsonStr = """
+        {
+            "regex" : "n[ever|i]r",
+            "completion" : {
+                "field" : "suggest",
+                "regex" : {
+                    "flags" : "INTERSECTION"
+                }
+            }
+        }
+        """
+
+        let decoded = try JSONDecoder().decode(CompletionSuggestion.self, from: jsonStr.data(using: .utf8)!)
+
+        XCTAssertEqual(suggestion, decoded)
+    }
+
+    func test_17_completionSuggestion_encode_2() throws {
+        let suggestion = try CompletionSuggestionBuilder()
+            .set(field: "suggest")
+            .set(regex: "n[ever|i]r")
+            .set(regexOptions: CompletionSuggestion.RegexOptions(flags: CompletionSuggestion.RegexFlag.intersection))
+            .build()
+
+        let data = try JSONEncoder().encode(suggestion)
+
+        let encodedStr = String(data: data, encoding: .utf8)!
+
+        logger.debug("Script Encode test: \(encodedStr)")
+
+        let dic = try JSONDecoder().decode([String: CodableValue].self, from: data)
+
+        let expectedDic = try JSONDecoder().decode([String: CodableValue].self, from: """
+        {
+            "regex" : "n[ever|i]r",
+            "completion" : {
+                "field" : "suggest",
+                "regex" : {
+                    "flags" : "INTERSECTION"
+                }
+            }
         }
         """.data(using: .utf8)!)
         XCTAssertEqual(expectedDic, dic)
