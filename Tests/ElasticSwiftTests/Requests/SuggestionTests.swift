@@ -348,6 +348,10 @@ class SuggestionTests: XCTestCase {
             .set(skipDuplicates: true)
             .set(fuzzyOptions: CompletionSuggestion.FuzzyOptions())
             .set(regexOptions: CompletionSuggestion.RegexOptions())
+            .set(contexts: [
+                "cat": [CategoryQueryContext(context: "test"), CategoryQueryContext(context: "test2")],
+                "geo": [GeoQueryContext(context: .init(lat: 10, lon: 10))]
+            ])
             .build()
 
         XCTAssertEqual(suggestion.field, "field")
@@ -360,6 +364,10 @@ class SuggestionTests: XCTestCase {
         XCTAssertEqual(suggestion.skipDuplicates, true)
         XCTAssertEqual(suggestion.fuzzyOptions, .init())
         XCTAssertEqual(suggestion.regexOptions, .init())
+        XCTAssertTrue(isEqualContextDictionaries(suggestion.contexts, [
+            "cat": [CategoryQueryContext(context: "test"), CategoryQueryContext(context: "test2")],
+            "geo": [GeoQueryContext(context: .init(lat: 10, lon: 10))]
+        ]))
     }
     
     func test_14_completionSuggestion_decode() throws {
@@ -368,6 +376,10 @@ class SuggestionTests: XCTestCase {
             .set(prefix: "nor")
             .set(skipDuplicates: true)
             .set(fuzzyOptions: CompletionSuggestion.FuzzyOptions(fuzziness: 2))
+            .set(contexts: [
+                "cat": [CategoryQueryContext(context: "testa", prefix: true)],
+                "geo": [GeoQueryContext(context: .init(lat: 10, lon: 10))]
+            ])
             .build()
         let jsonStr = """
         {
@@ -377,6 +389,18 @@ class SuggestionTests: XCTestCase {
                 "skip_duplicates": true,
                 "fuzzy" : {
                     "fuzziness" : 2
+                },
+                "contexts": {
+                    "cat": [{
+                        "context": "testa",
+                        "prefix": true
+                    }],
+                    "geo": {
+                        "context": {
+                            "lat": 10,
+                            "lon": 10
+                        }
+                    }
                 }
             }
         }
@@ -393,6 +417,10 @@ class SuggestionTests: XCTestCase {
             .set(prefix: "nor")
             .set(skipDuplicates: true)
             .set(fuzzyOptions: CompletionSuggestion.FuzzyOptions(fuzziness: 2))
+            .set(contexts: [
+                "cat": [CategoryQueryContext(context: "test")],
+                "geo": [GeoQueryContext(context: .init(lat: 10, lon: 10))]
+            ])
             .build()
 
         let data = try JSONEncoder().encode(suggestion)
@@ -411,6 +439,17 @@ class SuggestionTests: XCTestCase {
                 "skip_duplicates": true,
                 "fuzzy" : {
                     "fuzziness" : 2
+                },
+                "contexts": {
+                    "cat": [{
+                        "context": "test"
+                    }],
+                    "geo": [{
+                        "context": {
+                            "lat": 10,
+                            "lon": 10
+                        }
+                    }]
                 }
             }
         }

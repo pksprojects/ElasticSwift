@@ -1091,6 +1091,7 @@ public class CompletionSuggestionBuilder: SuggestionBuilder {
     private var _skipDuplicates: Bool?
     private var _fuzzyOptions: CompletionSuggestion.FuzzyOptions?
     private var _regexOptions: CompletionSuggestion.RegexOptions?
+    private var _contexts: [String: [CompletionSuggestionQueryContext]]?
 
     @discardableResult
     public func set(field: String) -> Self {
@@ -1151,6 +1152,12 @@ public class CompletionSuggestionBuilder: SuggestionBuilder {
         _regexOptions = regexOptions
         return self
     }
+    
+    @discardableResult
+    public func set(contexts: [String: [CompletionSuggestionQueryContext]]) -> Self {
+        _contexts = contexts
+        return self
+    }
 
     public var field: String? {
         return _field
@@ -1191,6 +1198,10 @@ public class CompletionSuggestionBuilder: SuggestionBuilder {
     public var regexOptions: CompletionSuggestion.RegexOptions? {
         return _regexOptions
     }
+    
+    public var contexts: [String: [CompletionSuggestionQueryContext]]? {
+        return _contexts
+    }
 
     public func build() throws -> CompletionSuggestion {
         return try CompletionSuggestion(withBuilder: self)
@@ -1219,8 +1230,10 @@ public struct CompletionSuggestion: Suggestion {
     public var fuzzyOptions: FuzzyOptions?
 
     public var regexOptions: RegexOptions?
+    
+    public var contexts: [String: [CompletionSuggestionQueryContext]]?
 
-    public init(field: String, text: String? = nil, prefix: String? = nil, regex: String? = nil, analyzer: String? = nil, size: Int? = nil, shardSize: Int? = nil, skipDuplicates: Bool? = nil, fuzzyOptions: FuzzyOptions? = nil, regexOptions: RegexOptions? = nil) {
+    public init(field: String, text: String? = nil, prefix: String? = nil, regex: String? = nil, analyzer: String? = nil, size: Int? = nil, shardSize: Int? = nil, skipDuplicates: Bool? = nil, fuzzyOptions: FuzzyOptions? = nil, regexOptions: RegexOptions? = nil, contexts: [String: [CompletionSuggestionQueryContext]]? = nil) {
         self.field = field
         self.text = text
         self.prefix = prefix
@@ -1231,13 +1244,14 @@ public struct CompletionSuggestion: Suggestion {
         self.skipDuplicates = skipDuplicates
         self.fuzzyOptions = fuzzyOptions
         self.regexOptions = regexOptions
+        self.contexts = contexts
     }
 
     internal init(withBuilder builder: CompletionSuggestionBuilder) throws {
         guard let field = builder.field else {
             throw SuggestionBuilderError.missingRequiredField("field")
         }
-        self.init(field: field, text: builder.text, prefix: builder.prefix, regex: builder.regex, analyzer: builder.analyzer, size: builder.size, shardSize: builder.shardSize, skipDuplicates: builder.skipDuplicates, fuzzyOptions: builder.fuzzyOptions, regexOptions: builder.regexOptions)
+        self.init(field: field, text: builder.text, prefix: builder.prefix, regex: builder.regex, analyzer: builder.analyzer, size: builder.size, shardSize: builder.shardSize, skipDuplicates: builder.skipDuplicates, fuzzyOptions: builder.fuzzyOptions, regexOptions: builder.regexOptions, contexts: builder.contexts)
     }
 }
 
@@ -1255,6 +1269,20 @@ public extension CompletionSuggestion {
         skipDuplicates = try namedContianer.decodeBoolIfPresent(forKey: .skipDuplicates)
         fuzzyOptions = try namedContianer.decodeIfPresent(FuzzyOptions.self, forKey: .fuzzyOptions)
         regexOptions = try namedContianer.decodeIfPresent(RegexOptions.self, forKey: .regex)
+        if namedContianer.contains(.contexts) {
+            let contextsContainer = try namedContianer.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .contexts)
+            var dic = [String: [CompletionSuggestionQueryContext]]()
+            for k in contextsContainer.allKeys {
+                do {
+                    let contextValues = try contextsContainer.decodeSuggestionQueryContexts(forKey: k)
+                    dic[k.stringValue] = contextValues
+                } catch {
+                    let context = try contextsContainer.decodeSuggestionQueryContext(forKey: k)
+                    dic[k.stringValue] = [context]
+                }
+            }
+            contexts = dic
+        }
     }
 
     func encode(to encoder: Encoder) throws {
@@ -1271,6 +1299,13 @@ public extension CompletionSuggestion {
         try namedContainer.encodeIfPresent(skipDuplicates, forKey: .skipDuplicates)
         try namedContainer.encodeIfPresent(fuzzyOptions, forKey: .fuzzyOptions)
         try namedContainer.encodeIfPresent(regexOptions, forKey: .regex)
+        if let contexts = self.contexts {
+            var contextContainer = namedContainer.nestedContainer(keyedBy: DynamicCodingKeys.self, forKey: .contexts)
+            for (k, v) in contexts {
+                try contextContainer.encode(v, forKey: .key(named: k))
+            }
+            
+        }
     }
 
     internal enum CodingKeys: String, CodingKey {
@@ -1283,6 +1318,7 @@ public extension CompletionSuggestion {
         case shardSize = "shard_size"
         case skipDuplicates = "skip_duplicates"
         case fuzzyOptions = "fuzzy"
+        case contexts
     }
 }
 
@@ -1348,7 +1384,142 @@ extension CompletionSuggestion.RegexOptions: Codable {
 
 extension CompletionSuggestion.RegexOptions: Equatable {}
 
-extension CompletionSuggestion: Equatable {}
+extension CompletionSuggestion: Equatable {
+    public static func == (lhs: CompletionSuggestion, rhs: CompletionSuggestion) -> Bool {
+        return lhs.suggestionType == rhs.suggestionType
+            && lhs.field == rhs.field
+            && lhs.text == rhs.text
+            && lhs.prefix == rhs.prefix
+            && lhs.regex == rhs.regex
+            && lhs.analyzer == rhs.analyzer
+            && lhs.size == rhs.size
+            && lhs.shardSize == rhs.shardSize
+            && lhs.skipDuplicates == rhs.skipDuplicates
+            && lhs.fuzzyOptions == rhs.fuzzyOptions
+            && lhs.regexOptions == rhs.regexOptions
+            && isEqualContextDictionaries(lhs.contexts, rhs.contexts)
+    }
+}
+
+
+public func isEqualContextDictionaries(_ lhs: [String: [CompletionSuggestionQueryContext]]?, _ rhs: [String: [CompletionSuggestionQueryContext]]?) -> Bool {
+    if lhs == nil && rhs == nil {
+        return true
+    }
+    guard let lhs = lhs, let rhs = rhs, lhs.count == rhs.count else {
+        return false
+    }
+    let result = lhs.map({
+        guard let values = rhs[$0.key], values.count == $0.value.count, values.elementsEqual($0.value, by: { $0.isEqualTo($1) }) else {
+            return false
+        }
+        return true
+    }).reduce(true, { $0 && $1 })
+    return result
+}
+
+
+public enum CompletionSuggestionQueryContextType: String, Codable, CaseIterable {
+    case geo
+    case category
+}
+
+public extension CompletionSuggestionQueryContextType {
+    var metaType: CompletionSuggestionQueryContext.Type {
+        switch self {
+        case .category:
+            return CategoryQueryContext.self
+        case .geo:
+            return GeoQueryContext.self
+        }
+    }
+}
+
+public protocol CompletionSuggestionQueryContext: Codable {
+    var queryContextType: CompletionSuggestionQueryContextType { get }
+    
+    func isEqualTo(_ other: CompletionSuggestionQueryContext) -> Bool
+}
+
+public extension CompletionSuggestionQueryContext where Self: Equatable {
+    func isEqualTo(_ other: CompletionSuggestionQueryContext) -> Bool {
+        if let o = other as? Self {
+            return self == o
+        }
+        return false
+    }
+}
+
+public struct GeoQueryContext: CompletionSuggestionQueryContext {
+    public let queryContextType: CompletionSuggestionQueryContextType = .geo
+    
+    public let context: GeoPoint
+    public var boost: Int?
+    public var precision: Int?
+    public var neighbours: [Int]?
+}
+
+extension GeoQueryContext: Codable {
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.context = try container.decode(GeoPoint.self, forKey: .context)
+        self.boost = try container.decodeIntIfPresent(forKey: .boost)
+        self.precision = try container.decodeIntIfPresent(forKey: .precision)
+        self.neighbours = try container.decodeArrayIfPresent(forKey: .neighbours)
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.context, forKey: .context)
+        try container.encodeIfPresent(self.boost, forKey: .boost)
+        try container.encodeIfPresent(self.precision, forKey: .precision)
+        try container.encodeIfPresent(self.neighbours, forKey: .neighbours)
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case context
+        case boost
+        case precision
+        case neighbours
+    }
+}
+
+extension GeoQueryContext: Equatable {}
+
+
+public struct CategoryQueryContext: CompletionSuggestionQueryContext {
+    public let queryContextType: CompletionSuggestionQueryContextType = .category
+    
+    public var context: String
+    public var prefix: Bool?
+    public var boost: Int?
+}
+
+extension CategoryQueryContext: Codable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.context = try container.decodeString(forKey: .context)
+        self.prefix = try container.decodeBoolIfPresent(forKey: .prefix)
+        self.boost = try container.decodeIntIfPresent(forKey: .boost)
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.context, forKey: .context)
+        try container.encodeIfPresent(self.prefix, forKey: .prefix)
+        try container.encodeIfPresent(self.boost, forKey: .boost)
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case context
+        case prefix
+        case boost
+    }
+}
+
+extension CategoryQueryContext: Equatable {}
+
 
 /// Extention for DynamicCodingKeys
 public extension DynamicCodingKeys {
@@ -1371,6 +1542,10 @@ public extension KeyedEncodingContainer {
     mutating func encode(_ value: SmoothingModel, forKey key: KeyedEncodingContainer<K>.Key) throws {
         try value.encode(to: superEncoder(forKey: key))
     }
+    
+    mutating func encode(_ value: CompletionSuggestionQueryContext, forKey key: KeyedEncodingContainer<K>.Key) throws {
+        try value.encode(to: superEncoder(forKey: key))
+    }
 
     mutating func encode(_ value: [Suggestion], forKey key: KeyedEncodingContainer<K>.Key) throws {
         let suggestionsEncoder = superEncoder(forKey: key)
@@ -1389,6 +1564,15 @@ public extension KeyedEncodingContainer {
             try smoothing.encode(to: smoothingEncoder)
         }
     }
+    
+    mutating func encode(_ value: [CompletionSuggestionQueryContext], forKey key: KeyedEncodingContainer<K>.Key) throws {
+        let queryContextsEncoder = superEncoder(forKey: key)
+        var queryContextsContainer = queryContextsEncoder.unkeyedContainer()
+        for queryContext in value {
+            let queryContextEncoder = queryContextsContainer.superEncoder()
+            try queryContext.encode(to: queryContextEncoder)
+        }
+    }
 
     mutating func encodeIfPresent(_ value: Suggestion?, forKey key: KeyedEncodingContainer<K>.Key) throws {
         if let value = value {
@@ -1401,6 +1585,12 @@ public extension KeyedEncodingContainer {
             try value.encode(to: superEncoder(forKey: key))
         }
     }
+    
+    mutating func encodeIfPresent(_ value: CompletionSuggestionQueryContext?, forKey key: KeyedEncodingContainer<K>.Key) throws {
+        if let value = value {
+            try value.encode(to: superEncoder(forKey: key))
+        }
+    }
 
     mutating func encodeIfPresent(_ value: [Suggestion]?, forKey key: KeyedEncodingContainer<K>.Key) throws {
         if let value = value {
@@ -1409,6 +1599,12 @@ public extension KeyedEncodingContainer {
     }
 
     mutating func encodeIfPresent(_ value: [SmoothingModel]?, forKey key: KeyedEncodingContainer<K>.Key) throws {
+        if let value = value {
+            try encode(value, forKey: key)
+        }
+    }
+    
+    mutating func encodeIfPresent(_ value: [CompletionSuggestionQueryContext]?, forKey key: KeyedEncodingContainer<K>.Key) throws {
         if let value = value {
             try encode(value, forKey: key)
         }
@@ -1434,6 +1630,21 @@ public extension KeyedDecodingContainer {
             }
         }
         throw Swift.DecodingError.typeMismatch(SmoothingModelType.self, .init(codingPath: codingPath, debugDescription: "Unable to identify smoothing mode type from key(s) \(smContainer.allKeys)"))
+    }
+    
+    func decodeSuggestionQueryContext(forKey key: KeyedDecodingContainer<K>.Key) throws -> CompletionSuggestionQueryContext {
+        for type in CompletionSuggestionQueryContextType.allCases {
+            let result = try? type.metaType.init(from: superDecoder(forKey: key))
+            if let result = result {
+                if let result = result as? GeoQueryContext {
+                    if let geoHash = result.context.geoHash, (geoHash.rangeOfCharacter(from: CharacterSet(charactersIn: "ailo").union(CharacterSet.whitespacesAndNewlines)) != nil) {
+                        continue
+                    }
+                }
+                return result
+            }
+        }
+        throw Swift.DecodingError.typeMismatch(CompletionSuggestionQueryContextType.self, .init(codingPath: codingPath, debugDescription: "Unable to decode QueryContext for types \(CompletionSuggestionQueryContextType.allCases)"))
     }
 
     func decodeSuggestionIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> Suggestion? {
@@ -1464,6 +1675,21 @@ public extension KeyedDecodingContainer {
         }
         return result
     }
+    
+    func decodeSuggestionQueryContexts(forKey key: KeyedDecodingContainer<K>.Key) throws -> [CompletionSuggestionQueryContext] {
+        var arrayContainer = try nestedUnkeyedContainer(forKey: key)
+        var result = [CompletionSuggestionQueryContext]()
+        if let count = arrayContainer.count {
+            while !arrayContainer.isAtEnd {
+                let query = try arrayContainer.decodeSuggestionQueryContext()
+                result.append(query)
+            }
+            if result.count != count {
+                throw Swift.DecodingError.dataCorrupted(.init(codingPath: arrayContainer.codingPath, debugDescription: "Unable to decode all QueryContexts expected: \(count) actual: \(result.count). Probable cause: Unable to determine CompletionSuggestionQueryContextType form key(s)"))
+            }
+        }
+        return result
+    }
 
     func decodeSuggestionsIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> [Suggestion]? {
         guard contains(key) else {
@@ -1471,6 +1697,14 @@ public extension KeyedDecodingContainer {
         }
 
         return try decodeSuggestions(forKey: key)
+    }
+    
+    func decodeSuggestionQueryContextsIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> [CompletionSuggestionQueryContext]? {
+        guard contains(key) else {
+            return nil
+        }
+
+        return try decodeSuggestionQueryContexts(forKey: key)
     }
 }
 
@@ -1495,5 +1729,21 @@ extension UnkeyedDecodingContainer {
             }
         }
         throw Swift.DecodingError.typeMismatch(SmoothingModelType.self, .init(codingPath: codingPath, debugDescription: "Unable to identify smoothing model type from key(s) \(elementContainer.allKeys)"))
+    }
+    
+    mutating func decodeSuggestionQueryContext() throws -> CompletionSuggestionQueryContext {
+        for c in CompletionSuggestionQueryContextType.allCases {
+            var copy = self
+            let result = try? c.metaType.init(from: copy.superDecoder())
+            if let result = result {
+                if let result = result as? GeoQueryContext {
+                    if let geoHash = result.context.geoHash, (geoHash.rangeOfCharacter(from: CharacterSet(charactersIn: "ailo").union(CharacterSet.whitespacesAndNewlines)) != nil) {
+                        continue
+                    }
+                }
+                return try c.metaType.init(from: superDecoder())
+            }
+        }
+        throw Swift.DecodingError.typeMismatch(CompletionSuggestionQueryContext.self, .init(codingPath: codingPath, debugDescription: "Unable to decode QueryContext types \(CompletionSuggestionQueryContextType.allCases)"))
     }
 }
