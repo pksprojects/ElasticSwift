@@ -1457,6 +1457,14 @@ public struct GeoQueryContext: CompletionSuggestionQueryContext {
     public var boost: Int?
     public var precision: Int?
     public var neighbours: [Int]?
+    
+    public init(context: GeoPoint, boost: Int? = nil, precision: Int? = nil, neighbours: [Int]? = nil) {
+        self.context = context
+        self.boost = boost
+        self.precision = precision
+        self.neighbours = neighbours
+    }
+ 
 }
 
 extension GeoQueryContext: Codable {
@@ -1494,6 +1502,12 @@ public struct CategoryQueryContext: CompletionSuggestionQueryContext {
     public var context: String
     public var prefix: Bool?
     public var boost: Int?
+    
+    public init(context: String, prefix: Bool? = nil, boost: Int? = nil) {
+        self.context = context
+        self.prefix = prefix
+        self.boost = boost
+    }
 }
 
 extension CategoryQueryContext: Codable {
