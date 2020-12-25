@@ -135,9 +135,8 @@ extension SuggestSource: Equatable {
     }
 }
 
-public class TermSuggestionBuilder: SuggestionBuilder {
-    public typealias ElasticSwiftType = TermSuggestion
-
+public class BaseSuggestionBuilder {
+    
     private var _field: String?
     private var _text: String?
     private var _prefix: String?
@@ -145,20 +144,9 @@ public class TermSuggestionBuilder: SuggestionBuilder {
     private var _analyzer: String?
     private var _size: Int?
     private var _shardSize: Int?
-
-    private var _sort: TermSuggestion.SortBy?
-    private var _suggestMode: SuggestMode?
-    private var _accuracy: Decimal?
-    private var _maxEdits: Int?
-    private var _maxInspections: Int?
-    private var _maxTermFreq: Decimal?
-    private var _prefixLength: Int?
-    private var _minWordLength: Int?
-    private var _minDocFreq: Decimal?
-    private var _stringDistance: TermSuggestion.StringDistance?
-
-    public init() {}
-
+    
+    fileprivate init() {}
+    
     @discardableResult
     public func set(field: String) -> Self {
         _field = field
@@ -199,6 +187,54 @@ public class TermSuggestionBuilder: SuggestionBuilder {
     public func set(shardSize: Int) -> Self {
         _shardSize = shardSize
         return self
+    }
+    
+    public var field: String? {
+        return _field
+    }
+
+    public var text: String? {
+        return _text
+    }
+
+    public var prefix: String? {
+        return _prefix
+    }
+
+    public var regex: String? {
+        return _regex
+    }
+
+    public var analyzer: String? {
+        return _analyzer
+    }
+
+    public var size: Int? {
+        return _size
+    }
+
+    public var shardSize: Int? {
+        return _shardSize
+    }
+}
+
+
+public class TermSuggestionBuilder: BaseSuggestionBuilder, SuggestionBuilder {
+    public typealias ElasticSwiftType = TermSuggestion
+
+    private var _sort: TermSuggestion.SortBy?
+    private var _suggestMode: SuggestMode?
+    private var _accuracy: Decimal?
+    private var _maxEdits: Int?
+    private var _maxInspections: Int?
+    private var _maxTermFreq: Decimal?
+    private var _prefixLength: Int?
+    private var _minWordLength: Int?
+    private var _minDocFreq: Decimal?
+    private var _stringDistance: TermSuggestion.StringDistance?
+
+    public override init() {
+        super.init()
     }
 
     @discardableResult
@@ -259,34 +295,6 @@ public class TermSuggestionBuilder: SuggestionBuilder {
     public func set(stringDistance: TermSuggestion.StringDistance) -> Self {
         _stringDistance = stringDistance
         return self
-    }
-
-    public var field: String? {
-        return _field
-    }
-
-    public var text: String? {
-        return _text
-    }
-
-    public var prefix: String? {
-        return _prefix
-    }
-
-    public var regex: String? {
-        return _regex
-    }
-
-    public var analyzer: String? {
-        return _analyzer
-    }
-
-    public var size: Int? {
-        return _size
-    }
-
-    public var shardSize: Int? {
-        return _shardSize
     }
 
     public var sort: TermSuggestion.SortBy? {
@@ -494,16 +502,8 @@ public enum SuggestionBuilderError: Error {
     case missingRequiredField(String)
 }
 
-public class PhraseSuggestionBuilder: SuggestionBuilder {
+public class PhraseSuggestionBuilder: BaseSuggestionBuilder, SuggestionBuilder {
     public typealias ElasticSwiftType = PhraseSuggestion
-
-    private var _field: String?
-    private var _text: String?
-    private var _prefix: String?
-    private var _regex: String?
-    private var _analyzer: String?
-    private var _size: Int?
-    private var _shardSize: Int?
 
     private var _maxErrors: Decimal?
     private var _separator: String?
@@ -516,47 +516,9 @@ public class PhraseSuggestionBuilder: SuggestionBuilder {
     private var _collate: PhraseSuggestion.Collate?
     private var _smoothing: SmoothingModel?
     private var _directGenerators: [PhraseSuggestion.DirectCandidateGenerator]?
-
-    @discardableResult
-    public func set(field: String) -> Self {
-        _field = field
-        return self
-    }
-
-    @discardableResult
-    public func set(text: String) -> Self {
-        _text = text
-        return self
-    }
-
-    @discardableResult
-    public func set(prefix: String) -> Self {
-        _prefix = prefix
-        return self
-    }
-
-    @discardableResult
-    public func set(regex: String) -> Self {
-        _regex = regex
-        return self
-    }
-
-    @discardableResult
-    public func set(analyzer: String) -> Self {
-        _analyzer = analyzer
-        return self
-    }
-
-    @discardableResult
-    public func set(size: Int) -> Self {
-        _size = size
-        return self
-    }
-
-    @discardableResult
-    public func set(shardSize: Int) -> Self {
-        _shardSize = shardSize
-        return self
+    
+    public override init() {
+        super.init()
     }
 
     @discardableResult
@@ -633,34 +595,6 @@ public class PhraseSuggestionBuilder: SuggestionBuilder {
             _directGenerators = [directGenerator]
         }
         return self
-    }
-
-    public var field: String? {
-        return _field
-    }
-
-    public var text: String? {
-        return _text
-    }
-
-    public var prefix: String? {
-        return _prefix
-    }
-
-    public var regex: String? {
-        return _regex
-    }
-
-    public var analyzer: String? {
-        return _analyzer
-    }
-
-    public var size: Int? {
-        return _size
-    }
-
-    public var shardSize: Int? {
-        return _shardSize
     }
 
     public var maxErrors: Decimal? {
@@ -1078,61 +1012,16 @@ public extension LinearInterpolation {
 
 extension LinearInterpolation: Equatable {}
 
-public class CompletionSuggestionBuilder: SuggestionBuilder {
+public class CompletionSuggestionBuilder: BaseSuggestionBuilder, SuggestionBuilder {
     public typealias ElasticSwiftType = CompletionSuggestion
 
-    private var _field: String?
-    private var _text: String?
-    private var _prefix: String?
-    private var _regex: String?
-    private var _analyzer: String?
-    private var _size: Int?
-    private var _shardSize: Int?
     private var _skipDuplicates: Bool?
     private var _fuzzyOptions: CompletionSuggestion.FuzzyOptions?
     private var _regexOptions: CompletionSuggestion.RegexOptions?
     private var _contexts: [String: [CompletionSuggestionQueryContext]]?
 
-    @discardableResult
-    public func set(field: String) -> Self {
-        _field = field
-        return self
-    }
-
-    @discardableResult
-    public func set(text: String) -> Self {
-        _text = text
-        return self
-    }
-
-    @discardableResult
-    public func set(prefix: String) -> Self {
-        _prefix = prefix
-        return self
-    }
-
-    @discardableResult
-    public func set(regex: String) -> Self {
-        _regex = regex
-        return self
-    }
-
-    @discardableResult
-    public func set(analyzer: String) -> Self {
-        _analyzer = analyzer
-        return self
-    }
-
-    @discardableResult
-    public func set(size: Int) -> Self {
-        _size = size
-        return self
-    }
-
-    @discardableResult
-    public func set(shardSize: Int) -> Self {
-        _shardSize = shardSize
-        return self
+    public override init() {
+        super.init()
     }
 
     @discardableResult
@@ -1157,34 +1046,6 @@ public class CompletionSuggestionBuilder: SuggestionBuilder {
     public func set(contexts: [String: [CompletionSuggestionQueryContext]]) -> Self {
         _contexts = contexts
         return self
-    }
-
-    public var field: String? {
-        return _field
-    }
-
-    public var text: String? {
-        return _text
-    }
-
-    public var prefix: String? {
-        return _prefix
-    }
-
-    public var regex: String? {
-        return _regex
-    }
-
-    public var analyzer: String? {
-        return _analyzer
-    }
-
-    public var size: Int? {
-        return _size
-    }
-
-    public var shardSize: Int? {
-        return _shardSize
     }
 
     public var skipDuplicates: Bool? {
