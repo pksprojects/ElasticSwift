@@ -1238,7 +1238,7 @@ class SearchRequestTests: XCTestCase {
         let suggestions: [String: Suggestion] = [
             "term": try! TermSuggestionBuilder().set(field: "test_term").build(),
             "phrase": try! PhraseSuggestionBuilder().set(field: "test_phrase").build(),
-            "completion": try! CompletionSuggestionBuilder().set(field: "test_completion").build()
+            "completion": try! CompletionSuggestionBuilder().set(field: "test_completion").build(),
         ]
         s1.suggest = SuggestSource(globalText: "text message", suggestions: suggestions)
 
@@ -1475,7 +1475,7 @@ class SearchRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
-    
+
     func test_29_Suggest_search() throws {
         let e = expectation(description: "execution complete")
 
@@ -1495,36 +1495,35 @@ class SearchRequestTests: XCTestCase {
 
             e.fulfill()
         }
-        
+
         let indexName2 = indexName + "_test_29_suggest"
-        
+
         var searchSource = SearchSource()
         searchSource.suggest = SuggestSource(globalText: nil, suggestions: [
-            "song-suggest": try! CompletionSuggestionBuilder().set(field: "suggest").set(prefix: "nir").build()
+            "song-suggest": try! CompletionSuggestionBuilder().set(field: "suggest").set(prefix: "nir").build(),
         ])
 
         let request = SearchRequest(indices: [indexName2], types: nil, searchSource: searchSource)
-        
-        var indexRequest = IndexRequest.init(index: indexName2, id: "id1", source: CodableValue(["suggest" : [ "Nevermind", "Nirvana" ]]))
+
+        var indexRequest = IndexRequest(index: indexName2, id: "id1", source: CodableValue(["suggest": ["Nevermind", "Nirvana"]]))
         indexRequest.refresh = .true
-        
-        
+
         let createRequest = CreateIndexRequest(indexName2, aliases: nil, mappings: ["_doc": .init(type: nil, fields: nil, analyzer: nil, store: nil, termVector: nil, properties: ["suggest": .init(type: "completion", fields: nil, analyzer: nil, store: nil, termVector: nil, properties: nil), "title": .init(type: "keyword", fields: nil, analyzer: nil, store: nil, termVector: nil, properties: nil)])], settings: nil)
-        
+
         client.indices.create(createRequest, completionHandler: { result in
             switch result {
-            case .success(let response):
+            case let .success(response):
                 self.logger.info("Response: \(response)")
-            case .failure(let error):
+            case let .failure(error):
                 self.logger.info("Response: \(error)")
-                //XCTAssertTrue(false)
+                // XCTAssertTrue(false)
             }
             self.client.index(indexRequest, completionHandler: { result in
                 switch result {
-                case .success(let response):
+                case let .success(response):
                     self.logger.info("Response: \(response)")
                     self.client.search(request, completionHandler: handler)
-                case .failure(let error):
+                case let .failure(error):
                     self.logger.info("Response: \(error)")
                     XCTAssertTrue(false)
                 }

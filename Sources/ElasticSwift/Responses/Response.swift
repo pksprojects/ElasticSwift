@@ -100,7 +100,7 @@ public struct SuggestEntryOption: Codable, Equatable {
     public let id: String?
     public let _score: Decimal?
     public let source: CodableValue?
-    
+
     enum CodingKeys: String, CodingKey {
         case text
         case highlighted
@@ -111,7 +111,7 @@ public struct SuggestEntryOption: Codable, Equatable {
         case index = "_index"
         case type = "_type"
         case id = "_id"
-        case _score = "_score"
+        case _score
         case source = "_source"
     }
 }

@@ -317,7 +317,7 @@ class SuggestionTests: XCTestCase {
         """.data(using: .utf8)!)
         XCTAssertEqual(expectedDic, dic)
     }
-    
+
     func test_11_completionSuggestion_missing_field() throws {
         XCTAssertThrowsError(try CompletionSuggestionBuilder().build(), "Should not throw") { error in
             logger.info("Expected Error: \(error)")
@@ -335,7 +335,7 @@ class SuggestionTests: XCTestCase {
     func test_12_completionSuggestion() throws {
         XCTAssertNoThrow(try CompletionSuggestionBuilder().set(field: "field").build(), "Should not throw")
     }
-    
+
     func test_13_completionSuggestion() throws {
         let suggestion = try CompletionSuggestionBuilder()
             .set(field: "field")
@@ -350,7 +350,7 @@ class SuggestionTests: XCTestCase {
             .set(regexOptions: CompletionSuggestion.RegexOptions())
             .set(contexts: [
                 "cat": [CategoryQueryContext(context: "test"), CategoryQueryContext(context: "test2")],
-                "geo": [GeoQueryContext(context: .init(lat: 10, lon: 10))]
+                "geo": [GeoQueryContext(context: .init(lat: 10, lon: 10))],
             ])
             .build()
 
@@ -366,10 +366,10 @@ class SuggestionTests: XCTestCase {
         XCTAssertEqual(suggestion.regexOptions, .init())
         XCTAssertTrue(isEqualContextDictionaries(suggestion.contexts, [
             "cat": [CategoryQueryContext(context: "test"), CategoryQueryContext(context: "test2")],
-            "geo": [GeoQueryContext(context: .init(lat: 10, lon: 10))]
+            "geo": [GeoQueryContext(context: .init(lat: 10, lon: 10))],
         ]))
     }
-    
+
     func test_14_completionSuggestion_decode() throws {
         let suggestion = try CompletionSuggestionBuilder()
             .set(field: "suggest")
@@ -378,7 +378,7 @@ class SuggestionTests: XCTestCase {
             .set(fuzzyOptions: CompletionSuggestion.FuzzyOptions(fuzziness: 2))
             .set(contexts: [
                 "cat": [CategoryQueryContext(context: "testa", prefix: true)],
-                "geo": [GeoQueryContext(context: .init(lat: 10, lon: 10))]
+                "geo": [GeoQueryContext(context: .init(lat: 10, lon: 10))],
             ])
             .build()
         let jsonStr = """
@@ -419,7 +419,7 @@ class SuggestionTests: XCTestCase {
             .set(fuzzyOptions: CompletionSuggestion.FuzzyOptions(fuzziness: 2))
             .set(contexts: [
                 "cat": [CategoryQueryContext(context: "test")],
-                "geo": [GeoQueryContext(context: .init(lat: 10, lon: 10))]
+                "geo": [GeoQueryContext(context: .init(lat: 10, lon: 10))],
             ])
             .build()
 
@@ -456,7 +456,7 @@ class SuggestionTests: XCTestCase {
         """.data(using: .utf8)!)
         XCTAssertEqual(expectedDic, dic)
     }
-    
+
     func test_16_completionSuggestion_decode_2() throws {
         let suggestion = try CompletionSuggestionBuilder()
             .set(field: "suggest")

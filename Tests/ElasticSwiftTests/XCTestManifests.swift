@@ -161,6 +161,7 @@
             ("test_26_SearchTemplateRequet_2", test_26_SearchTemplateRequet_2),
             ("test_27_SearchTemplateRequet_3", test_27_SearchTemplateRequet_3),
             ("test_28_StoredScriptRequets", test_28_StoredScriptRequets),
+            ("test_29_Suggest_search", test_29_Suggest_search),
         ]
     }
 
@@ -191,6 +192,13 @@
             ("test_08_phraseSuggestion", test_08_phraseSuggestion),
             ("test_09_phraseSuggestion_decode", test_09_phraseSuggestion_decode),
             ("test_10_phraseSuggestion_encode", test_10_phraseSuggestion_encode),
+            ("test_11_completionSuggestion_missing_field", test_11_completionSuggestion_missing_field),
+            ("test_12_completionSuggestion", test_12_completionSuggestion),
+            ("test_13_completionSuggestion", test_13_completionSuggestion),
+            ("test_14_completionSuggestion_decode", test_14_completionSuggestion_decode),
+            ("test_15_completionSuggestion_encode", test_15_completionSuggestion_encode),
+            ("test_16_completionSuggestion_decode_2", test_16_completionSuggestion_decode_2),
+            ("test_17_completionSuggestion_encode_2", test_17_completionSuggestion_encode_2),
         ]
     }
 

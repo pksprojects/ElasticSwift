@@ -136,7 +136,6 @@ extension SuggestSource: Equatable {
 }
 
 public class BaseSuggestionBuilder {
-    
     private var _field: String?
     private var _text: String?
     private var _prefix: String?
@@ -144,9 +143,9 @@ public class BaseSuggestionBuilder {
     private var _analyzer: String?
     private var _size: Int?
     private var _shardSize: Int?
-    
+
     fileprivate init() {}
-    
+
     @discardableResult
     public func set(field: String) -> Self {
         _field = field
@@ -188,7 +187,7 @@ public class BaseSuggestionBuilder {
         _shardSize = shardSize
         return self
     }
-    
+
     public var field: String? {
         return _field
     }
@@ -218,7 +217,6 @@ public class BaseSuggestionBuilder {
     }
 }
 
-
 public class TermSuggestionBuilder: BaseSuggestionBuilder, SuggestionBuilder {
     public typealias ElasticSwiftType = TermSuggestion
 
@@ -233,7 +231,7 @@ public class TermSuggestionBuilder: BaseSuggestionBuilder, SuggestionBuilder {
     private var _minDocFreq: Decimal?
     private var _stringDistance: TermSuggestion.StringDistance?
 
-    public override init() {
+    override public init() {
         super.init()
     }
 
@@ -516,8 +514,8 @@ public class PhraseSuggestionBuilder: BaseSuggestionBuilder, SuggestionBuilder {
     private var _collate: PhraseSuggestion.Collate?
     private var _smoothing: SmoothingModel?
     private var _directGenerators: [PhraseSuggestion.DirectCandidateGenerator]?
-    
-    public override init() {
+
+    override public init() {
         super.init()
     }
 
@@ -1020,7 +1018,7 @@ public class CompletionSuggestionBuilder: BaseSuggestionBuilder, SuggestionBuild
     private var _regexOptions: CompletionSuggestion.RegexOptions?
     private var _contexts: [String: [CompletionSuggestionQueryContext]]?
 
-    public override init() {
+    override public init() {
         super.init()
     }
 
@@ -1041,7 +1039,7 @@ public class CompletionSuggestionBuilder: BaseSuggestionBuilder, SuggestionBuild
         _regexOptions = regexOptions
         return self
     }
-    
+
     @discardableResult
     public func set(contexts: [String: [CompletionSuggestionQueryContext]]) -> Self {
         _contexts = contexts
@@ -1059,7 +1057,7 @@ public class CompletionSuggestionBuilder: BaseSuggestionBuilder, SuggestionBuild
     public var regexOptions: CompletionSuggestion.RegexOptions? {
         return _regexOptions
     }
-    
+
     public var contexts: [String: [CompletionSuggestionQueryContext]]? {
         return _contexts
     }
@@ -1091,7 +1089,7 @@ public struct CompletionSuggestion: Suggestion {
     public var fuzzyOptions: FuzzyOptions?
 
     public var regexOptions: RegexOptions?
-    
+
     public var contexts: [String: [CompletionSuggestionQueryContext]]?
 
     public init(field: String, text: String? = nil, prefix: String? = nil, regex: String? = nil, analyzer: String? = nil, size: Int? = nil, shardSize: Int? = nil, skipDuplicates: Bool? = nil, fuzzyOptions: FuzzyOptions? = nil, regexOptions: RegexOptions? = nil, contexts: [String: [CompletionSuggestionQueryContext]]? = nil) {
@@ -1165,7 +1163,6 @@ public extension CompletionSuggestion {
             for (k, v) in contexts {
                 try contextContainer.encode(v, forKey: .key(named: k))
             }
-            
         }
     }
 
@@ -1262,23 +1259,21 @@ extension CompletionSuggestion: Equatable {
     }
 }
 
-
 public func isEqualContextDictionaries(_ lhs: [String: [CompletionSuggestionQueryContext]]?, _ rhs: [String: [CompletionSuggestionQueryContext]]?) -> Bool {
-    if lhs == nil && rhs == nil {
+    if lhs == nil, rhs == nil {
         return true
     }
     guard let lhs = lhs, let rhs = rhs, lhs.count == rhs.count else {
         return false
     }
-    let result = lhs.map({
+    let result = lhs.map {
         guard let values = rhs[$0.key], values.count == $0.value.count, values.elementsEqual($0.value, by: { $0.isEqualTo($1) }) else {
             return false
         }
         return true
-    }).reduce(true, { $0 && $1 })
+    }.reduce(true) { $0 && $1 }
     return result
 }
-
 
 public enum CompletionSuggestionQueryContextType: String, Codable, CaseIterable {
     case geo
@@ -1298,7 +1293,7 @@ public extension CompletionSuggestionQueryContextType {
 
 public protocol CompletionSuggestionQueryContext: Codable {
     var queryContextType: CompletionSuggestionQueryContextType { get }
-    
+
     func isEqualTo(_ other: CompletionSuggestionQueryContext) -> Bool
 }
 
@@ -1313,39 +1308,37 @@ public extension CompletionSuggestionQueryContext where Self: Equatable {
 
 public struct GeoQueryContext: CompletionSuggestionQueryContext {
     public let queryContextType: CompletionSuggestionQueryContextType = .geo
-    
+
     public let context: GeoPoint
     public var boost: Int?
     public var precision: Int?
     public var neighbours: [Int]?
-    
+
     public init(context: GeoPoint, boost: Int? = nil, precision: Int? = nil, neighbours: [Int]? = nil) {
         self.context = context
         self.boost = boost
         self.precision = precision
         self.neighbours = neighbours
     }
- 
 }
 
 extension GeoQueryContext: Codable {
-    
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.context = try container.decode(GeoPoint.self, forKey: .context)
-        self.boost = try container.decodeIntIfPresent(forKey: .boost)
-        self.precision = try container.decodeIntIfPresent(forKey: .precision)
-        self.neighbours = try container.decodeArrayIfPresent(forKey: .neighbours)
+        context = try container.decode(GeoPoint.self, forKey: .context)
+        boost = try container.decodeIntIfPresent(forKey: .boost)
+        precision = try container.decodeIntIfPresent(forKey: .precision)
+        neighbours = try container.decodeArrayIfPresent(forKey: .neighbours)
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(self.context, forKey: .context)
-        try container.encodeIfPresent(self.boost, forKey: .boost)
-        try container.encodeIfPresent(self.precision, forKey: .precision)
-        try container.encodeIfPresent(self.neighbours, forKey: .neighbours)
+        try container.encode(context, forKey: .context)
+        try container.encodeIfPresent(boost, forKey: .boost)
+        try container.encodeIfPresent(precision, forKey: .precision)
+        try container.encodeIfPresent(neighbours, forKey: .neighbours)
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case context
         case boost
@@ -1356,14 +1349,13 @@ extension GeoQueryContext: Codable {
 
 extension GeoQueryContext: Equatable {}
 
-
 public struct CategoryQueryContext: CompletionSuggestionQueryContext {
     public let queryContextType: CompletionSuggestionQueryContextType = .category
-    
+
     public var context: String
     public var prefix: Bool?
     public var boost: Int?
-    
+
     public init(context: String, prefix: Bool? = nil, boost: Int? = nil) {
         self.context = context
         self.prefix = prefix
@@ -1374,18 +1366,18 @@ public struct CategoryQueryContext: CompletionSuggestionQueryContext {
 extension CategoryQueryContext: Codable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.context = try container.decodeString(forKey: .context)
-        self.prefix = try container.decodeBoolIfPresent(forKey: .prefix)
-        self.boost = try container.decodeIntIfPresent(forKey: .boost)
+        context = try container.decodeString(forKey: .context)
+        prefix = try container.decodeBoolIfPresent(forKey: .prefix)
+        boost = try container.decodeIntIfPresent(forKey: .boost)
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(self.context, forKey: .context)
-        try container.encodeIfPresent(self.prefix, forKey: .prefix)
-        try container.encodeIfPresent(self.boost, forKey: .boost)
+        try container.encode(context, forKey: .context)
+        try container.encodeIfPresent(prefix, forKey: .prefix)
+        try container.encodeIfPresent(boost, forKey: .boost)
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case context
         case prefix
@@ -1394,7 +1386,6 @@ extension CategoryQueryContext: Codable {
 }
 
 extension CategoryQueryContext: Equatable {}
-
 
 /// Extention for DynamicCodingKeys
 public extension DynamicCodingKeys {
@@ -1417,7 +1408,7 @@ public extension KeyedEncodingContainer {
     mutating func encode(_ value: SmoothingModel, forKey key: KeyedEncodingContainer<K>.Key) throws {
         try value.encode(to: superEncoder(forKey: key))
     }
-    
+
     mutating func encode(_ value: CompletionSuggestionQueryContext, forKey key: KeyedEncodingContainer<K>.Key) throws {
         try value.encode(to: superEncoder(forKey: key))
     }
@@ -1439,7 +1430,7 @@ public extension KeyedEncodingContainer {
             try smoothing.encode(to: smoothingEncoder)
         }
     }
-    
+
     mutating func encode(_ value: [CompletionSuggestionQueryContext], forKey key: KeyedEncodingContainer<K>.Key) throws {
         let queryContextsEncoder = superEncoder(forKey: key)
         var queryContextsContainer = queryContextsEncoder.unkeyedContainer()
@@ -1460,7 +1451,7 @@ public extension KeyedEncodingContainer {
             try value.encode(to: superEncoder(forKey: key))
         }
     }
-    
+
     mutating func encodeIfPresent(_ value: CompletionSuggestionQueryContext?, forKey key: KeyedEncodingContainer<K>.Key) throws {
         if let value = value {
             try value.encode(to: superEncoder(forKey: key))
@@ -1478,7 +1469,7 @@ public extension KeyedEncodingContainer {
             try encode(value, forKey: key)
         }
     }
-    
+
     mutating func encodeIfPresent(_ value: [CompletionSuggestionQueryContext]?, forKey key: KeyedEncodingContainer<K>.Key) throws {
         if let value = value {
             try encode(value, forKey: key)
@@ -1506,13 +1497,13 @@ public extension KeyedDecodingContainer {
         }
         throw Swift.DecodingError.typeMismatch(SmoothingModelType.self, .init(codingPath: codingPath, debugDescription: "Unable to identify smoothing mode type from key(s) \(smContainer.allKeys)"))
     }
-    
+
     func decodeSuggestionQueryContext(forKey key: KeyedDecodingContainer<K>.Key) throws -> CompletionSuggestionQueryContext {
         for type in CompletionSuggestionQueryContextType.allCases {
             let result = try? type.metaType.init(from: superDecoder(forKey: key))
             if let result = result {
                 if let result = result as? GeoQueryContext {
-                    if let geoHash = result.context.geoHash, (geoHash.rangeOfCharacter(from: CharacterSet(charactersIn: "ailo").union(CharacterSet.whitespacesAndNewlines)) != nil) {
+                    if let geoHash = result.context.geoHash, geoHash.rangeOfCharacter(from: CharacterSet(charactersIn: "ailo").union(CharacterSet.whitespacesAndNewlines)) != nil {
                         continue
                     }
                 }
@@ -1550,7 +1541,7 @@ public extension KeyedDecodingContainer {
         }
         return result
     }
-    
+
     func decodeSuggestionQueryContexts(forKey key: KeyedDecodingContainer<K>.Key) throws -> [CompletionSuggestionQueryContext] {
         var arrayContainer = try nestedUnkeyedContainer(forKey: key)
         var result = [CompletionSuggestionQueryContext]()
@@ -1573,7 +1564,7 @@ public extension KeyedDecodingContainer {
 
         return try decodeSuggestions(forKey: key)
     }
-    
+
     func decodeSuggestionQueryContextsIfPresent(forKey key: KeyedDecodingContainer<K>.Key) throws -> [CompletionSuggestionQueryContext]? {
         guard contains(key) else {
             return nil
@@ -1605,14 +1596,14 @@ extension UnkeyedDecodingContainer {
         }
         throw Swift.DecodingError.typeMismatch(SmoothingModelType.self, .init(codingPath: codingPath, debugDescription: "Unable to identify smoothing model type from key(s) \(elementContainer.allKeys)"))
     }
-    
+
     mutating func decodeSuggestionQueryContext() throws -> CompletionSuggestionQueryContext {
         for c in CompletionSuggestionQueryContextType.allCases {
             var copy = self
             let result = try? c.metaType.init(from: copy.superDecoder())
             if let result = result {
                 if let result = result as? GeoQueryContext {
-                    if let geoHash = result.context.geoHash, (geoHash.rangeOfCharacter(from: CharacterSet(charactersIn: "ailo").union(CharacterSet.whitespacesAndNewlines)) != nil) {
+                    if let geoHash = result.context.geoHash, geoHash.rangeOfCharacter(from: CharacterSet(charactersIn: "ailo").union(CharacterSet.whitespacesAndNewlines)) != nil {
                         continue
                     }
                 }
