@@ -1235,6 +1235,12 @@ class SearchRequestTests: XCTestCase {
         s1.rescore = [QueryRescorer(MatchAllQuery(), scoreMode: .avg, queryWeight: 1.0, rescoreQueryWeight: 1.3)]
         s1.sorts = [FieldSortBuilder("test_field").build()]
         s1.scriptFields = [.init(field: "test", script: Script("test script"))]
+        let suggestions: [String: Suggestion] = [
+            "term": try! TermSuggestionBuilder().set(field: "test_term").build(),
+            "phrase": try! PhraseSuggestionBuilder().set(field: "test_phrase").build(),
+            "completion": try! CompletionSuggestionBuilder().set(field: "test_completion").build(),
+        ]
+        s1.suggest = SuggestSource(globalText: "text message", suggestions: suggestions)
 
         let encoded = try JSONEncoder().encode(s1)
 
@@ -1466,6 +1472,63 @@ class SearchRequestTests: XCTestCase {
         }
 
         client.putScript(putRequest, completionHandler: putHandler)
+
+        waitForExpectations(timeout: 10)
+    }
+
+    func test_29_Suggest_search() throws {
+        let e = expectation(description: "execution complete")
+
+        func handler(_ result: Result<SearchResponse<CodableValue>, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+                XCTAssert(false)
+            case let .success(response):
+                XCTAssertNotNil(response.hits)
+                XCTAssertNotNil(response.suggest)
+                XCTAssertNotNil(response.suggest?["song-suggest"])
+                XCTAssertNotNil(response.suggest?["song-suggest"]?.count == 1)
+                XCTAssertEqual(response.suggest!["song-suggest"]![0].text, "nir")
+                XCTAssertTrue(response.hits.hits.count == 0, "Count \(response.hits.hits.count)")
+            }
+
+            e.fulfill()
+        }
+
+        let indexName2 = indexName + "_test_29_suggest"
+
+        var searchSource = SearchSource()
+        searchSource.suggest = SuggestSource(globalText: nil, suggestions: [
+            "song-suggest": try! CompletionSuggestionBuilder().set(field: "suggest").set(prefix: "nir").build(),
+        ])
+
+        let request = SearchRequest(indices: [indexName2], types: nil, searchSource: searchSource)
+
+        var indexRequest = IndexRequest(index: indexName2, id: "id1", source: CodableValue(["suggest": ["Nevermind", "Nirvana"]]))
+        indexRequest.refresh = .true
+
+        let createRequest = CreateIndexRequest(indexName2, aliases: nil, mappings: ["_doc": .init(type: nil, fields: nil, analyzer: nil, store: nil, termVector: nil, properties: ["suggest": .init(type: "completion", fields: nil, analyzer: nil, store: nil, termVector: nil, properties: nil), "title": .init(type: "keyword", fields: nil, analyzer: nil, store: nil, termVector: nil, properties: nil)])], settings: nil)
+
+        client.indices.create(createRequest, completionHandler: { result in
+            switch result {
+            case let .success(response):
+                self.logger.info("Response: \(response)")
+            case let .failure(error):
+                self.logger.info("Response: \(error)")
+                // XCTAssertTrue(false)
+            }
+            self.client.index(indexRequest, completionHandler: { result in
+                switch result {
+                case let .success(response):
+                    self.logger.info("Response: \(response)")
+                    self.client.search(request, completionHandler: handler)
+                case let .failure(error):
+                    self.logger.info("Response: \(error)")
+                    XCTAssertTrue(false)
+                }
+            })
+        })
 
         waitForExpectations(timeout: 10)
     }

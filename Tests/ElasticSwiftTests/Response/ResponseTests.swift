@@ -104,7 +104,7 @@ class ResponseTests: XCTestCase {
         let serializer = DefaultSerializer()
 
         let hit = SearchHit(index: "test", type: "_doc", id: "1", score: 0.2876821, source: ["test": "test"], sort: nil, version: nil, seqNo: nil, primaryTerm: nil, fields: nil, explanation: nil, matchedQueries: nil, innerHits: nil, node: nil, shard: nil, highlightFields: ["content": .init(name: "content", fragments: ["test"])], nested: nil)
-        let searchResponse = SearchResponse(took: 1, timedOut: false, shards: .init(total: 1, successful: 1, skipped: 0, failed: 0, failures: nil), hits: .init(total: 1, maxScore: 1.0, hits: [hit]), scrollId: nil, profile: nil)
+        let searchResponse = SearchResponse(took: 1, timedOut: false, shards: .init(total: 1, successful: 1, skipped: 0, failed: 0, failures: nil), hits: .init(total: 1, maxScore: 1.0, hits: [hit]), scrollId: nil, profile: nil, suggest: nil)
 
         let result: Result<Data, EncodingError> = serializer.encode(searchResponse)
 
@@ -304,7 +304,7 @@ class ResponseTests: XCTestCase {
         let serializer = DefaultSerializer()
 
         let hit = SearchHit(index: "test", type: "_doc", id: "1", score: 0.2876821, source: ["test": "test"], sort: nil, version: nil, seqNo: nil, primaryTerm: nil, fields: ["test1": .init(name: "test1", values: ["value"])], explanation: nil, matchedQueries: nil, innerHits: ["comments.votes": .init(total: 0, maxScore: 0, hits: [])], node: nil, shard: nil, highlightFields: nil, nested: .init(field: "comments", offset: 1, nested: .init(field: "votes", offset: 0, nested: nil)))
-        let searchResponse = SearchResponse(took: 1, timedOut: false, shards: .init(total: 1, successful: 1, skipped: 0, failed: 0, failures: nil), hits: .init(total: 1, maxScore: 1.0, hits: [hit]), scrollId: nil, profile: nil)
+        let searchResponse = SearchResponse(took: 1, timedOut: false, shards: .init(total: 1, successful: 1, skipped: 0, failed: 0, failures: nil), hits: .init(total: 1, maxScore: 1.0, hits: [hit]), scrollId: nil, profile: nil, suggest: nil)
 
         let result: Result<Data, EncodingError> = serializer.encode(searchResponse)
 

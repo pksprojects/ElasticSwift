@@ -68,6 +68,7 @@ public struct SearchResponse<T: Codable>: Codable, Equatable where T: Equatable 
     public let hits: SearchHits<T>
     public let scrollId: String?
     public let profile: SearchProfileShardResults?
+    public let suggest: [String: [SuggestEntry]]?
 
     enum CodingKeys: String, CodingKey {
         case took
@@ -76,6 +77,42 @@ public struct SearchResponse<T: Codable>: Codable, Equatable where T: Equatable 
         case hits
         case scrollId = "_scroll_id"
         case profile
+        case suggest
+    }
+}
+
+public struct SuggestEntry: Codable, Equatable {
+    public let text: String
+    public let offset: Int
+    public let length: Int
+    public let options: [SuggestEntryOption]
+}
+
+public struct SuggestEntryOption: Codable, Equatable {
+    public let text: String
+    public let highlighted: String?
+    public let score: Decimal?
+    public let collateMatch: Bool?
+    public let freq: Int?
+    public let contexts: [String: [String]]?
+    public let index: String?
+    public let type: String?
+    public let id: String?
+    public let _score: Decimal?
+    public let source: CodableValue?
+
+    enum CodingKeys: String, CodingKey {
+        case text
+        case highlighted
+        case score
+        case collateMatch = "collate_match"
+        case freq
+        case contexts
+        case index = "_index"
+        case type = "_type"
+        case id = "_id"
+        case _score
+        case source = "_source"
     }
 }
 

@@ -151,3 +151,10 @@ public enum URLScheme: String {
     case http
     case https
 }
+
+/// Generic protocol for Type Builders in ElasticSwift
+public protocol ElasticSwiftTypeBuilder {
+    associatedtype ElasticSwiftType
+
+    func build() throws -> ElasticSwiftType
+}
