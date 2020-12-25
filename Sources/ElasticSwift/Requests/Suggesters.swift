@@ -110,7 +110,7 @@ extension SuggestSource: Codable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: DynamicCodingKeys.self)
-        try container.encode(globalText, forKey: .key(named: CodingKeys.globalText.rawValue))
+        try container.encodeIfPresent(globalText, forKey: .key(named: CodingKeys.globalText.rawValue))
         for (k, v) in suggestions {
             try container.encode(v, forKey: .key(named: k))
         }
