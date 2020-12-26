@@ -100,6 +100,7 @@ class ClusterRequestsTests: XCTestCase {
         XCTAssertEqual(request.waitForNoRelocatingShards, true)
         XCTAssertEqual(request.waitForNoInitializingShards, true)
         XCTAssertEqual(request.queryParams.count, 10)
+        XCTAssertEqual(request.endPoint, "_cluster/health/test,test1")
     }
 
     func test_03_clusterHealthRequest() throws {

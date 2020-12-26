@@ -36,9 +36,9 @@ public class ClusterClient {
         client.execute(request: clusterHealthReqeust, options: options, completionHandler: completionHandler)
     }
 
-    /// Asynchronously get cluster health using the Cluster Health API.
+    /// Asynchronously get the cluster wide settings using the Cluster Get Settings API.
     ///
-    /// [Cluster Health API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-health.html)
+    /// [Cluster Get Settings API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-get-settings.html)
     /// - Parameters:
     ///   - clusterGetSettingsRequest: the request
     ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
