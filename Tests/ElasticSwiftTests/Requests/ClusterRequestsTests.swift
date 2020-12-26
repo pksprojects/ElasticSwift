@@ -194,4 +194,128 @@ class ClusterRequestsTests: XCTestCase {
 
         waitForExpectations(timeout: 10)
     }
+
+    func test_08_clusterUpdateSettingsRequestBuilder_throw() throws {
+        XCTAssertThrowsError(try ClusterUpdateSettingsRequestBuilder().build(), "Should throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? RequestBuilderError {
+                switch error {
+                case let .atleastOneFieldRequired(fields):
+                    XCTAssertEqual(["persistent", "transient"], fields)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_09_clusterUpdateSettingsRequestBuilder_noThrow() throws {
+        XCTAssertNoThrow(try ClusterUpdateSettingsRequestBuilder().set(transient: ["indices.recovery.max_bytes_per_sec": "20mb"]).build())
+    }
+
+    func test_10_clusterUpdateSettingsRequestBuilder() throws {
+        let request = try ClusterUpdateSettingsRequestBuilder()
+            .set(timeout: "1m")
+            .set(masterTimeout: "1m")
+            .set(flatSettings: true)
+            .addTransient("indices.recovery.max_bytes_per_sec", value: "20mb")
+            .set(transient: ["indices.recovery.max_bytes_per_sec": "20mb"])
+            .addTransient("indices.recovery.max_bytes_per_sec", value: "50mb")
+            .addPersistent("indices.recovery.max_bytes_per_sec", value: "20mb")
+            .set(persistent: ["indices.recovery.max_bytes_per_sec": "20mb"])
+            .addPersistent("indices.recovery.max_bytes_per_sec", value: "30mb")
+            .build()
+
+        XCTAssertEqual(request.persistent, ["indices.recovery.max_bytes_per_sec": "30mb"])
+        XCTAssertEqual(request.transient, ["indices.recovery.max_bytes_per_sec": "50mb"])
+        XCTAssertEqual(request.flatSettings, true)
+        XCTAssertEqual(request.timeout, "1m")
+        XCTAssertEqual(request.masterTimeout, "1m")
+        XCTAssertEqual(request.queryParams.count, 3)
+    }
+
+    func test_11_clusterUpdateSettingsRequest_transient() throws {
+        let e = expectation(description: "execution complete")
+
+        func handler_2(_ result: Result<ClusterUpdateSettingsResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+                XCTAssert(false)
+            case let .success(response):
+                logger.info("Response: \(response)")
+                XCTAssertTrue(response.acknowledged, "Acknowledged: \(response.acknowledged)")
+                XCTAssertTrue(response.persistent.isEmpty, "Persistent: \(response.persistent)")
+                XCTAssertTrue(response.transient.isEmpty, "Transient: \(response.transient)")
+            }
+
+            e.fulfill()
+        }
+
+        var request2 = ClusterUpdateSettingsRequest(transient: ["indices.recovery.max_bytes_per_sec": CodableValue(NilValue.nil)])
+        request2.flatSettings = true
+
+        func handler(_ result: Result<ClusterUpdateSettingsResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+                XCTAssert(false)
+            case let .success(response):
+                logger.info("Response: \(response)")
+                XCTAssertTrue(response.acknowledged, "Acknowledged: \(response.acknowledged)")
+                XCTAssertTrue(response.persistent.isEmpty, "Persistent: \(response.persistent)")
+                XCTAssertFalse(response.transient.isEmpty, "Transient: \(response.transient)")
+                client.cluster.putSettings(request2, completionHandler: handler_2)
+            }
+        }
+
+        var request = ClusterUpdateSettingsRequest(transient: ["indices.recovery.max_bytes_per_sec": "20mb"])
+        request.flatSettings = true
+
+        client.cluster.putSettings(request, completionHandler: handler)
+
+        waitForExpectations(timeout: 10)
+    }
+
+    func test_12_clusterUpdateSettingsRequest_persistent() throws {
+        let e = expectation(description: "execution complete")
+
+        func handler_2(_ result: Result<ClusterUpdateSettingsResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+                XCTAssert(false)
+            case let .success(response):
+                logger.info("Response: \(response)")
+                XCTAssertTrue(response.acknowledged, "Acknowledged: \(response.acknowledged)")
+                XCTAssertTrue(response.persistent.isEmpty, "Persistent: \(response.persistent)")
+                XCTAssertTrue(response.transient.isEmpty, "Transient: \(response.transient)")
+            }
+
+            e.fulfill()
+        }
+
+        var request2 = ClusterUpdateSettingsRequest(persistent: ["indices.recovery.max_bytes_per_sec": CodableValue(NilValue.nil)])
+        request2.flatSettings = true
+
+        func handler(_ result: Result<ClusterUpdateSettingsResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+                XCTAssert(false)
+            case let .success(response):
+                logger.info("Response: \(response)")
+                XCTAssertTrue(response.acknowledged, "Acknowledged: \(response.acknowledged)")
+                XCTAssertFalse(response.persistent.isEmpty, "Persistent: \(response.persistent)")
+                XCTAssertTrue(response.transient.isEmpty, "Transient: \(response.transient)")
+                client.cluster.putSettings(request2, completionHandler: handler_2)
+            }
+        }
+
+        var request = ClusterUpdateSettingsRequest(persistent: ["indices.recovery.max_bytes_per_sec": "20mb"])
+        request.flatSettings = true
+
+        client.cluster.putSettings(request, completionHandler: handler)
+        waitForExpectations(timeout: 10)
+    }
 }

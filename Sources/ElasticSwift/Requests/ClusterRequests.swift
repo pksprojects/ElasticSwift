@@ -5,6 +5,7 @@
 //  Created by Prafull Kumar Soni on 12/25/20.
 //
 
+import ElasticSwiftCodableUtils
 import ElasticSwiftCore
 import Foundation
 import NIOHTTP1
@@ -273,6 +274,8 @@ public class ClusterGetSettingsRequestBuilder: RequestBuilder {
     private var _timeout: String?
     private var _masterTimeout: String?
 
+    public init() {}
+
     @discardableResult
     public func set(includeDefaults: Bool) -> Self {
         _includeDefaults = includeDefaults
@@ -368,3 +371,174 @@ public struct ClusterGetSettingsRequest: Request {
 }
 
 extension ClusterGetSettingsRequest: Equatable {}
+
+// MARK: - Cluster Update Settings
+
+public class ClusterUpdateSettingsRequestBuilder: RequestBuilder {
+    public typealias ElasticSwiftType = ClusterUpdateSettingsRequest
+
+    private var _persistent: [String: CodableValue]?
+    private var _transient: [String: CodableValue]?
+
+    private var _flatSettings: Bool?
+    private var _timeout: String?
+    private var _masterTimeout: String?
+
+    public init() {}
+
+    @discardableResult
+    public func set(persistent: [String: CodableValue]) -> Self {
+        _persistent = persistent
+        return self
+    }
+
+    @discardableResult
+    public func addPersistent(_ setting: String, value: CodableValue) -> Self {
+        if _persistent != nil {
+            _persistent?[setting] = value
+        } else {
+            _persistent = [setting: value]
+        }
+        return self
+    }
+
+    @discardableResult
+    public func set(transient: [String: CodableValue]) -> Self {
+        _transient = transient
+        return self
+    }
+
+    @discardableResult
+    public func addTransient(_ setting: String, value: CodableValue) -> Self {
+        if _transient != nil {
+            _transient?[setting] = value
+        } else {
+            _transient = [setting: value]
+        }
+        return self
+    }
+
+    @discardableResult
+    public func set(flatSettings: Bool) -> Self {
+        _flatSettings = flatSettings
+        return self
+    }
+
+    @discardableResult
+    public func set(timeout: String) -> Self {
+        _timeout = timeout
+        return self
+    }
+
+    @discardableResult
+    public func set(masterTimeout: String) -> Self {
+        _masterTimeout = masterTimeout
+        return self
+    }
+
+    public var persistent: [String: CodableValue]? {
+        return _persistent
+    }
+
+    public var transient: [String: CodableValue]? {
+        return _transient
+    }
+
+    public var flatSettings: Bool? {
+        return _flatSettings
+    }
+
+    public var timeout: String? {
+        return _timeout
+    }
+
+    public var masterTimeout: String? {
+        return _masterTimeout
+    }
+
+    public func build() throws -> ClusterUpdateSettingsRequest {
+        return try ClusterUpdateSettingsRequest(withBuilder: self)
+    }
+}
+
+public struct ClusterUpdateSettingsRequest: Request {
+    public var headers = HTTPHeaders()
+
+    public let persistent: [String: CodableValue]?
+    public let transient: [String: CodableValue]?
+
+    public var flatSettings: Bool?
+    public var timeout: String?
+    public var masterTimeout: String?
+
+    public init(persistent: [String: CodableValue], flatSettings: Bool? = nil, timeout: String? = nil, masterTimeout: String? = nil) {
+        self.init(persistent: persistent, transient: nil, flatSettings: flatSettings, timeout: timeout, masterTimeout: masterTimeout)
+    }
+
+    public init(transient: [String: CodableValue], flatSettings: Bool? = nil, timeout: String? = nil, masterTimeout: String? = nil) {
+        self.init(persistent: nil, transient: transient, flatSettings: flatSettings, timeout: timeout, masterTimeout: masterTimeout)
+    }
+
+    internal init(persistent: [String: CodableValue]?, transient: [String: CodableValue]?, flatSettings: Bool? = nil, timeout: String? = nil, masterTimeout: String? = nil) {
+        self.persistent = persistent
+        self.transient = transient
+        self.flatSettings = flatSettings
+        self.timeout = timeout
+        self.masterTimeout = masterTimeout
+    }
+
+    internal init(withBuilder builder: ClusterUpdateSettingsRequestBuilder) throws {
+        if builder.persistent == nil, builder.transient == nil {
+            throw RequestBuilderError.atleastOneFieldRequired(["persistent", "transient"])
+        }
+
+        self.init(persistent: builder.persistent, transient: builder.transient, flatSettings: builder.flatSettings, timeout: builder.timeout, masterTimeout: builder.masterTimeout)
+    }
+
+    public var queryParams: [URLQueryItem] {
+        var queryItems = [URLQueryItem]()
+        if let flatSettings = self.flatSettings {
+            queryItems.append(URLQueryItem(name: QueryParams.flatSettings, value: flatSettings))
+        }
+        if let timeout = self.timeout {
+            queryItems.append(URLQueryItem(name: QueryParams.timeout, value: timeout))
+        }
+        if let masterTimeout = self.masterTimeout {
+            queryItems.append(URLQueryItem(name: QueryParams.masterTimeout, value: masterTimeout))
+        }
+        return queryItems
+    }
+
+    public var method: HTTPMethod {
+        return .PUT
+    }
+
+    public var endPoint: String {
+        return "_cluster/settings"
+    }
+
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        let body = Body(persistent: persistent, transient: transient)
+        return serializer.encode(body).mapError { error -> MakeBodyError in
+            MakeBodyError.wrapped(error)
+        }
+    }
+
+    private struct Body: Encodable {
+        public var persistent: [String: CodableValue]?
+        public var transient: [String: CodableValue]?
+
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encodeIfPresent(persistent, forKey: .persistent)
+            try container.encodeIfPresent(transient, forKey: .transient)
+        }
+
+        enum CodingKeys: String, CodingKey {
+            case persistent
+            case transient
+        }
+    }
+}
+
+extension ClusterUpdateSettingsRequest: Equatable {}

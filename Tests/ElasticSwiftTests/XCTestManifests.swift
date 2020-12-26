@@ -13,6 +13,11 @@
             ("test_05_clusterGetSettingsRequestBuilder", test_05_clusterGetSettingsRequestBuilder),
             ("test_06_clusterGetSettingsRequest", test_06_clusterGetSettingsRequest),
             ("test_07_clusterGetSettingsRequest_2", test_07_clusterGetSettingsRequest_2),
+            ("test_08_clusterUpdateSettingsRequestBuilder_throw", test_08_clusterUpdateSettingsRequestBuilder_throw),
+            ("test_09_clusterUpdateSettingsRequestBuilder_noThrow", test_09_clusterUpdateSettingsRequestBuilder_noThrow),
+            ("test_10_clusterUpdateSettingsRequestBuilder", test_10_clusterUpdateSettingsRequestBuilder),
+            ("test_11_clusterUpdateSettingsRequest_transient", test_11_clusterUpdateSettingsRequest_transient),
+            ("test_12_clusterUpdateSettingsRequest_persistent", test_12_clusterUpdateSettingsRequest_persistent),
         ]
     }
 

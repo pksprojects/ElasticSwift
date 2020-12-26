@@ -1199,3 +1199,13 @@ public struct ClusterGetSettingsResponse {
 extension ClusterGetSettingsResponse: Codable {}
 
 extension ClusterGetSettingsResponse: Equatable {}
+
+public struct ClusterUpdateSettingsResponse {
+    public let acknowledged: Bool
+    public let persistent: [String: CodableValue]
+    public let transient: [String: CodableValue]
+}
+
+extension ClusterUpdateSettingsResponse: Codable {}
+
+extension ClusterUpdateSettingsResponse: Equatable {}
