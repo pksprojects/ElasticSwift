@@ -70,6 +70,24 @@ dependencies: [
 ]
 ```
 
+and then adding the appropriate ElasticSwift module(s) to your target dependencies.
+The syntax for adding target dependencies differs slightly between Swift
+versions. For example, if you want to depend on the `ElasticSwift` and `ElasticSwiftCore`
+modules, specify the following dependencies:
+
+#### Swift 5.0 and 5.1 (`swift-tools-version:5.[01]`)
+
+```swift
+    dependencies: ["ElasticSwift", "ElasticSwiftCore"]
+```
+
+#### Swift 5.2 (`swift-tools-version:5.2`)
+
+```swift
+    dependencies: [.product(name: "ElasticSwift", package: "elastic-swift"),
+                   .product(name: "ElasticSwiftCore", package: "elastic-swift")]
+```
+
 ## Usage
 
 ### Client
@@ -303,4 +321,20 @@ Below Table lists all the available search queries with their corresponding Quer
 | HasChildQuery | HasChildQueryBuilder | QueryBuilders.hasChildQuery() |
 | HasParentQuery | HasParentQueryBuilder | QueryBuilders.hasParentQuery() |
 | ParentIdQuery | ParentIdQueryBuilder | QueryBuilders.parentIdQuery() |
-
+| GeoShapeQuery | GeoShapeQueryBuilder| QueryBuilders.geoShapeQuery() |
+| GeoBoundingBoxQuery | GeoBoundingBoxQueryBuilder | QueryBuilders.geoBoundingBoxQuery() |
+| GeoDistanceQuery | GeoDistanceQueryBuilder | QueryBuilders.geoDistanceQuery() |
+| GeoPolygonQuery | GeoPolygonQueryBuilder | QueryBuilders.geoPolygonQuery() |
+| MoreLikeThisQuery | MoreLikeThisQueryBuilder | QueryBuilders.moreLikeThisQuery() |
+| ScriptQuery | ScriptQueryBuilder | QueryBuilders.scriptQuery() |
+| PercolateQuery | PercoloteQueryBuilder | QueryBuilders.percolateQuery() |
+| WrapperQuery | WrapperQueryBuilder | QueryBuilders.wrapperQuery() |
+| SpanTermQuery | SpanTermQueryBuilder | QueryBuilders.spanTermQuery() |
+| SpanMultiTermQuery | SpanMultiTermQueryBuilder | sQueryBuilders.panMultiTermQueryBuilder() |
+| SpanFirstQuery | SpanFirstQueryBuilder | QueryBuilders.spanFirstQuery() |
+| SpanNearQuery | SpanNearQueryBuilder | sQueryBuilders.panNearQuery() |
+| SpanOrQuery | SpanOrQueryBuilder | QueryBuilders.spanOrQuery() |
+| SpanNotQuery | SpanNotQueryBuilder | QueryBuilders.spanNotQuery() |
+| SpanContainingQuery | SpanContainingQueryBuilder | QueryBuilders.spanContainingQuery() |
+| SpanWithinQuery | SpanWithinQueryBuilder | QueryBuilders.spanWithinQuery() |
+| SpanFieldMaskingQueryBuilder | SpanFieldMaskingQueryBuilder | QueryBuilders.fieldMaskingSpanQuery() |
