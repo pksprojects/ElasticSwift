@@ -148,7 +148,7 @@ public class ClusterHealthRequestBuilder: RequestBuilder {
     }
 
     public func build() throws -> ClusterHealthRequest {
-        try ClusterHealthRequest(withBuilder: self)
+        return try ClusterHealthRequest(withBuilder: self)
     }
 }
 
