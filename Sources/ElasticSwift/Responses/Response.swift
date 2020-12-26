@@ -1095,3 +1095,97 @@ extension GetStoredScriptResponse: Codable {
 }
 
 extension GetStoredScriptResponse: Equatable {}
+
+// MARK: - Cluster Health Response
+
+public struct ClusterHealthResponse {
+    public let clusterName: String
+    public let status: ClusterHealthStatus
+    public let timedOut: Bool
+    public let numberOfNodes: Int
+    public let numberOfDataNodes: Int
+    public let activePrimaryShards: Int
+    public let activeShards: Int
+    public let relocatingShards: Int
+    public let initializingShards: Int
+    public let unassignedShards: Int
+    public let delayedUnassignedShards: Int
+    public let numberOfPendingTasks: Int
+    public let numberOfInFlightFetch: Int
+    public let taskMaxWaitingInQueueMillis: Int
+    public let activeShardsPercentAsNumber: Decimal
+    public let indices: [String: ClusterIndexHealth]?
+}
+
+extension ClusterHealthResponse: Codable {
+    enum CodingKeys: String, CodingKey {
+        case clusterName = "cluster_name"
+        case status
+        case timedOut = "timed_out"
+        case numberOfNodes = "number_of_nodes"
+        case numberOfDataNodes = "number_of_data_nodes"
+        case activePrimaryShards = "active_primary_shards"
+        case activeShards = "active_shards"
+        case relocatingShards = "relocating_shards"
+        case initializingShards = "initializing_shards"
+        case unassignedShards = "unassigned_shards"
+        case delayedUnassignedShards = "delayed_unassigned_shards"
+        case numberOfPendingTasks = "number_of_pending_tasks"
+        case numberOfInFlightFetch = "number_of_in_flight_fetch"
+        case taskMaxWaitingInQueueMillis = "task_max_waiting_in_queue_millis"
+        case activeShardsPercentAsNumber = "active_shards_percent_as_number"
+        case indices
+    }
+}
+
+extension ClusterHealthResponse: Equatable {}
+
+public struct ClusterIndexHealth {
+    public let status: ClusterHealthStatus
+    public let numberOfShards: Int
+    public let numberOfReplicas: Int
+    public let activePrimaryShards: Int
+    public let activeShards: Int
+    public let relocatingShards: Int
+    public let initializingShards: Int
+    public let unassignedShards: Int
+    public let shards: [String: ClusterShardHealth]?
+}
+
+extension ClusterIndexHealth: Codable {
+    enum CodingKeys: String, CodingKey {
+        case status
+        case numberOfShards = "number_of_shards"
+        case numberOfReplicas = "number_of_replicas"
+        case activePrimaryShards = "active_primary_shards"
+        case activeShards = "active_shards"
+        case relocatingShards = "relocating_shards"
+        case initializingShards = "initializing_shards"
+        case unassignedShards = "unassigned_shards"
+        case shards
+    }
+}
+
+extension ClusterIndexHealth: Equatable {}
+
+public struct ClusterShardHealth {
+    public let status: ClusterHealthStatus
+    public let primaryActive: Bool
+    public let activeShards: Int
+    public let relocatingShards: Int
+    public let initializingShards: Int
+    public let unassignedShards: Int
+}
+
+extension ClusterShardHealth: Codable {
+    enum CodingKeys: String, CodingKey {
+        case status
+        case primaryActive = "primary_active"
+        case activeShards = "active_shards"
+        case relocatingShards = "relocating_shards"
+        case initializingShards = "initializing_shards"
+        case unassignedShards = "unassigned_shards"
+    }
+}
+
+extension ClusterShardHealth: Equatable {}

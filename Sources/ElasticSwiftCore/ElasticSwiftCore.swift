@@ -101,6 +101,12 @@ public enum QueryParams: String {
     case lenient
     case terminateAfter = "terminate_after"
     case typedKeys = "typed_keys"
+    case level
+    case waitForNodes = "wait_for_nodes"
+    case waitForEvents = "wait_for_events"
+    case waitForNoRelocatingShards = "wait_for_no_relocating_shards"
+    case waitForNoInitializingShards = "wait_for_no_initializing_shards"
+    case waitForStatus = "wait_for_status"
 }
 
 enum EndPointCategory: String {
