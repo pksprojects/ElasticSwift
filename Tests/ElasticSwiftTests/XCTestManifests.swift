@@ -7,8 +7,12 @@
         // to regenerate.
         static let __allTests__ClusterRequestsTests = [
             ("test_01_clusterHealthRequestBuilder_noThrow", test_01_clusterHealthRequestBuilder_noThrow),
-            ("test_02_clusterHealthRequest", test_02_clusterHealthRequest),
             ("test_02_clusterHealthRequestBuilder", test_02_clusterHealthRequestBuilder),
+            ("test_03_clusterHealthRequest", test_03_clusterHealthRequest),
+            ("test_04_clusterGetSettingsRequestBuilder_noThrow", test_04_clusterGetSettingsRequestBuilder_noThrow),
+            ("test_05_clusterGetSettingsRequestBuilder", test_05_clusterGetSettingsRequestBuilder),
+            ("test_06_clusterGetSettingsRequest", test_06_clusterGetSettingsRequest),
+            ("test_07_clusterGetSettingsRequest_2", test_07_clusterGetSettingsRequest_2),
         ]
     }
 

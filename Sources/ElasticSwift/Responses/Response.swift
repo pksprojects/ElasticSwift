@@ -1189,3 +1189,13 @@ extension ClusterShardHealth: Codable {
 }
 
 extension ClusterShardHealth: Equatable {}
+
+public struct ClusterGetSettingsResponse {
+    public let persistent: [String: CodableValue]
+    public let transient: [String: CodableValue]
+    public let defaults: [String: CodableValue]?
+}
+
+extension ClusterGetSettingsResponse: Codable {}
+
+extension ClusterGetSettingsResponse: Equatable {}

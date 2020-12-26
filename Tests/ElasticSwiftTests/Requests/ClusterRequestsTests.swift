@@ -102,7 +102,7 @@ class ClusterRequestsTests: XCTestCase {
         XCTAssertEqual(request.queryParams.count, 10)
     }
 
-    func test_02_clusterHealthRequest() throws {
+    func test_03_clusterHealthRequest() throws {
         let e = expectation(description: "execution complete")
 
         func handler(_ result: Result<ClusterHealthResponse, Error>) {
@@ -112,7 +112,7 @@ class ClusterRequestsTests: XCTestCase {
                 XCTAssert(false)
             case let .success(response):
                 logger.info("Response: \(response)")
-                XCTAssertTrue(response.indices != nil, "Indices: \(response.indices)")
+                XCTAssertTrue(response.indices != nil, "Indices: \(String(describing: response.indices))")
             }
 
             e.fulfill()
@@ -122,6 +122,74 @@ class ClusterRequestsTests: XCTestCase {
         request.level = .shards
 
         client.cluster.health(request, completionHandler: handler)
+
+        waitForExpectations(timeout: 10)
+    }
+
+    func test_04_clusterGetSettingsRequestBuilder_noThrow() throws {
+        XCTAssertNoThrow(try ClusterGetSettingsRequestBuilder().build())
+    }
+
+    func test_05_clusterGetSettingsRequestBuilder() throws {
+        let request = try ClusterGetSettingsRequestBuilder()
+            .set(timeout: "1m")
+            .set(masterTimeout: "1m")
+            .set(flatSettings: true)
+            .set(includeDefaults: true)
+            .build()
+
+        XCTAssertEqual(request.flatSettings, true)
+        XCTAssertEqual(request.includeDefaults, true)
+        XCTAssertEqual(request.timeout, "1m")
+        XCTAssertEqual(request.masterTimeout, "1m")
+        XCTAssertEqual(request.queryParams.count, 4)
+    }
+
+    func test_06_clusterGetSettingsRequest() throws {
+        let e = expectation(description: "execution complete")
+
+        func handler(_ result: Result<ClusterGetSettingsResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+                XCTAssert(false)
+            case let .success(response):
+                logger.info("Response: \(response)")
+                XCTAssertTrue(response.defaults != nil, "Indices: \(String(describing: response.defaults))")
+            }
+
+            e.fulfill()
+        }
+
+        var request = ClusterGetSettingsRequest()
+        request.includeDefaults = true
+
+        client.cluster.getSettings(request, completionHandler: handler)
+
+        waitForExpectations(timeout: 10)
+    }
+
+    func test_07_clusterGetSettingsRequest_2() throws {
+        let e = expectation(description: "execution complete")
+
+        func handler(_ result: Result<ClusterGetSettingsResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error: \(error)")
+                XCTAssert(false)
+            case let .success(response):
+                logger.info("Response: \(response)")
+                XCTAssertTrue(response.defaults != nil, "Indices: \(String(describing: response.defaults))")
+            }
+
+            e.fulfill()
+        }
+
+        var request = ClusterGetSettingsRequest()
+        request.includeDefaults = true
+        request.flatSettings = true
+
+        client.cluster.getSettings(request, completionHandler: handler)
 
         waitForExpectations(timeout: 10)
     }

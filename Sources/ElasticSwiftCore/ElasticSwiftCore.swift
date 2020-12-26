@@ -107,6 +107,8 @@ public enum QueryParams: String {
     case waitForNoRelocatingShards = "wait_for_no_relocating_shards"
     case waitForNoInitializingShards = "wait_for_no_initializing_shards"
     case waitForStatus = "wait_for_status"
+    case flatSettings = "flat_settings"
+    case includeDefaults = "include_defaults"
 }
 
 enum EndPointCategory: String {
