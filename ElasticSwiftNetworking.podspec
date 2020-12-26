@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
     s.name         = "ElasticSwiftNetworking"
-    s.version      = "1.0.0-alpha.11"
+    s.version      = "1.0.0-beta.1"
     s.summary      = "Networking layer of ElasticSwift"
     s.description  = "ElasticSwift allows you to bring prower of elasticsearch in your apps on macOS, iOS, tvOS, watchOS and linux."
   
