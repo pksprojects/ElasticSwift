@@ -156,6 +156,13 @@ public struct AliasMetaData: Codable {
     public let routing: String?
     public let filter: CodableValue?
 
+    public init(indexRouting: String? = nil, searchRouting: String? = nil, routing: String? = nil, filter: CodableValue? = nil) {
+        self.indexRouting = indexRouting
+        self.searchRouting = searchRouting
+        self.routing = routing
+        self.filter = filter
+    }
+
     enum CodingKeys: String, CodingKey {
         case indexRouting = "index_routing"
         case searchRouting = "search_routing"
@@ -287,5 +294,25 @@ public struct IndexExistsResponse: Codable, Equatable {
 
     public init(_ exists: Bool) {
         self.exists = exists
+    }
+}
+
+// MARK: - Resize Response
+
+public struct ResizeResponse: Codable, Equatable {
+    public let acknowledged: Bool
+    public let shardsAcknowledged: Bool
+    public let index: String
+
+    init(acknowledged: Bool, shardsAcknowledged: Bool, index: String) {
+        self.acknowledged = acknowledged
+        self.shardsAcknowledged = shardsAcknowledged
+        self.index = index
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case acknowledged
+        case shardsAcknowledged = "shards_acknowledged"
+        case index
     }
 }

@@ -116,6 +116,13 @@
             ("test_02_GetIndex", test_02_GetIndex),
             ("test_03_IndexExists", test_03_IndexExists),
             ("test_04_index_open_and_close", test_04_index_open_and_close),
+            ("test_05_resizeRequestBuilder", test_05_resizeRequestBuilder),
+            ("test_06_resizeRequestBuilder", test_06_resizeRequestBuilder),
+            ("test_07_resizeRequestBuilder", test_07_resizeRequestBuilder),
+            ("test_08_resizeRequestBuilder", test_08_resizeRequestBuilder),
+            ("test_09_resizeRequestBuilder", test_09_resizeRequestBuilder),
+            ("test_10_shrink_request", test_10_shrink_request),
+            ("test_11_split_request", test_11_split_request),
             ("test_999_DeleteIndex", test_999_DeleteIndex),
         ]
     }
