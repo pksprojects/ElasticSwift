@@ -221,6 +221,207 @@ class IndicesRequestsTests: XCTestCase {
         waitForExpectations(timeout: 10)
     }
 
+    func test_05_resizeRequestBuilder() throws {
+        XCTAssertThrowsError(try ResizeRequestBuilder().build(), "Should throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? RequestBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("sourceIndex", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_06_resizeRequestBuilder() throws {
+        XCTAssertThrowsError(try ResizeRequestBuilder().set(sourceIndex: "source").build(), "Should throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? RequestBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("targetIndexRequest", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_07_resizeRequestBuilder() throws {
+        XCTAssertThrowsError(try ResizeRequestBuilder().set(sourceIndex: "source").set(targetIndexRequest: CreateIndexRequest("target")).build(), "Should throw") { error in
+            logger.info("Expected Error: \(error)")
+            if let error = error as? RequestBuilderError {
+                switch error {
+                case let .missingRequiredField(field):
+                    XCTAssertEqual("resizeType", field)
+                default:
+                    XCTFail("UnExpectedError: \(error)")
+                }
+            }
+        }
+    }
+
+    func test_08_resizeRequestBuilder() throws {
+        XCTAssertNoThrow(try ResizeRequestBuilder()
+            .set(sourceIndex: "source")
+            .set(targetIndexRequest: CreateIndexRequest("target"))
+            .set(resizeType: .shrink)
+            .build(), "Should not throw")
+    }
+
+    func test_09_resizeRequestBuilder() throws {
+        let request = try ResizeRequestBuilder()
+            .set(sourceIndex: "source")
+            .set(targetIndexRequest: CreateIndexRequest("target"))
+            .set(resizeType: .split)
+            .set(copySettings: true)
+            .set(masterTimeout: "mTimeout")
+            .set(timeout: "timeout")
+            .set(waitForActiveShards: "waitForActiveShards")
+            .build()
+
+        XCTAssertEqual(request.sourceIndex, "source")
+        XCTAssertEqual(request.targetIndexRequest, CreateIndexRequest("target"))
+        XCTAssertEqual(request.resizeType, .split)
+        XCTAssertEqual(request.copySettings, true)
+        XCTAssertEqual(request.masterTimeout, "mTimeout")
+        XCTAssertEqual(request.timeout, "timeout")
+        XCTAssertEqual(request.waitForActiveShards, "waitForActiveShards")
+        XCTAssertEqual(request.endPoint, "source/_split/target")
+    }
+
+    func test_10_shrink_request() throws {
+        let e = expectation(description: "execution complete")
+        let sourceIndex = CreateIndexRequest(String("\(indexName)_\(#function)".dropLast(2)),
+                                             settings: [
+                                                 "index.routing.allocation.require._name": CodableValue(NilValue.nil),
+                                                 "index.blocks.write": true,
+                                                 "index.number_of_shards": 2,
+                                             ])
+        let targetIndex = CreateIndexRequest("\(sourceIndex.name)_target",
+                                             aliases: [IndexAlias(name: "my_search_indices", metaData: AliasMetaData())],
+                                             settings: [
+                                                 "index.number_of_replicas": 1,
+                                                 "index.number_of_shards": 1,
+                                                 "index.codec": "best_compression",
+                                             ])
+
+        let shrinkRequest = try ResizeRequestBuilder()
+            .set(sourceIndex: sourceIndex.name)
+            .set(targetIndexRequest: targetIndex)
+            .set(resizeType: .shrink)
+            .set(copySettings: true)
+            .build()
+
+        func handleDeleteResult(_ result: Result<AcknowledgedResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error \(error)")
+                XCTAssertTrue(false)
+            case let .success(response):
+                logger.info("Response: \(response)")
+                XCTAssertTrue(response.acknowledged)
+            }
+            e.fulfill()
+        }
+
+        func handleShrinkResult(_ result: Result<ResizeResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error \(error)")
+                XCTAssertTrue(false)
+            case let .success(response):
+                logger.info("Response: \(response)")
+                XCTAssertTrue(response.acknowledged)
+            }
+            client.indices.delete(DeleteIndexRequest("\(sourceIndex.name),\(targetIndex.name)"), completionHandler: handleDeleteResult)
+        }
+
+        client.indices.create(sourceIndex) { result in
+            switch result {
+            case let .failure(error):
+                self.logger.error("Error \(error)")
+                if !"\(error)".contains("already exists") {
+                    XCTAssertTrue(false)
+                    e.fulfill()
+                    break
+                }
+            case let .success(response):
+                self.logger.info("Response: \(response)")
+                XCTAssertTrue(response.acknowledged)
+            }
+            self.client.indices.shrink(shrinkRequest, completionHandler: handleShrinkResult)
+        }
+
+        waitForExpectations(timeout: 10)
+    }
+
+    func test_11_split_request() throws {
+        let e = expectation(description: "execution complete")
+        let sourceIndex = CreateIndexRequest(String("\(indexName)_\(#function)".dropLast(2)),
+                                             settings: [
+                                                 "index.blocks.write": true,
+                                                 "index.number_of_shards": 1,
+                                                 "index.number_of_routing_shards": 2,
+                                             ])
+        let targetIndex = CreateIndexRequest("\(sourceIndex.name)_target",
+                                             aliases: [IndexAlias(name: "my_search_indices", metaData: AliasMetaData())],
+                                             settings: [
+                                                 "index.number_of_shards": 2,
+                                             ])
+
+        let splitRequest = try ResizeRequestBuilder()
+            .set(sourceIndex: sourceIndex.name)
+            .set(targetIndexRequest: targetIndex)
+            .set(resizeType: .split)
+            .set(copySettings: true)
+            .build()
+
+        func handleDeleteResult(_ result: Result<AcknowledgedResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error \(error)")
+                XCTAssertTrue(false)
+            case let .success(response):
+                logger.info("Response: \(response)")
+                XCTAssertTrue(response.acknowledged)
+            }
+            e.fulfill()
+        }
+
+        func handleSplitResult(_ result: Result<ResizeResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                logger.error("Error \(error)")
+                XCTAssertTrue(false)
+                e.fulfill()
+            case let .success(response):
+                logger.info("Response: \(response)")
+                XCTAssertTrue(response.acknowledged)
+                client.indices.delete(DeleteIndexRequest("\(sourceIndex.name),\(targetIndex.name)"), completionHandler: handleDeleteResult)
+            }
+        }
+
+        client.indices.create(sourceIndex) { result in
+            switch result {
+            case let .failure(error):
+                self.logger.error("Error \(error)")
+                if !"\(error)".contains("already exists") {
+                    XCTAssertTrue(false)
+                    e.fulfill()
+                    break
+                }
+            case let .success(response):
+                self.logger.info("Response: \(response)")
+                XCTAssertTrue(response.acknowledged)
+            }
+            self.client.indices.split(splitRequest, completionHandler: handleSplitResult)
+        }
+        waitForExpectations(timeout: 10)
+    }
+
     func test_999_DeleteIndex() throws {
         let e = expectation(description: "execution complete")
         func handler(_ result: Result<AcknowledgedResponse, Error>) {

@@ -109,6 +109,7 @@ public enum QueryParams: String {
     case waitForStatus = "wait_for_status"
     case flatSettings = "flat_settings"
     case includeDefaults = "include_defaults"
+    case copySettings = "copy_settings"
 }
 
 enum EndPointCategory: String {

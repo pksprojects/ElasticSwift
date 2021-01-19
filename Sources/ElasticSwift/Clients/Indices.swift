@@ -103,4 +103,26 @@ public extension IndicesClient {
     func close(_ closeReqeust: CloseIndexRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<AcknowledgedResponse, Error>) -> Void) {
         client.execute(request: closeReqeust, options: options, completionHandler: completionHandler)
     }
+
+    /// Asynchronously shrinks an index using the Shrink index API.
+    ///
+    /// [Shrink Index API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-open-close.html)
+    /// - Parameters:
+    ///   - closeReqeust: the request
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
+    ///   - completionHandler: callback to be invoked upon request completion.
+    func shrink(_ shrinkRequest: ResizeRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<ResizeResponse, Error>) -> Void) {
+        client.execute(request: shrinkRequest, options: options, completionHandler: completionHandler)
+    }
+
+    /// Asynchronously splits an index using the Split Index API.
+    ///
+    /// [Split Index API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-open-close.html)
+    /// - Parameters:
+    ///   - closeReqeust: the request
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
+    ///   - completionHandler: callback to be invoked upon request completion.
+    func split(_ splitRequest: ResizeRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<ResizeResponse, Error>) -> Void) {
+        client.execute(request: splitRequest, options: options, completionHandler: completionHandler)
+    }
 }

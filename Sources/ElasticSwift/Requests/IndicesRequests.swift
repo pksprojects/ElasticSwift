@@ -198,6 +198,96 @@ public class CloseIndexRequestBuilder: RequestBuilder {
     }
 }
 
+// MARK: - Resize Request Builder
+
+public class ResizeRequestBuilder: RequestBuilder {
+    public typealias ElasticSwiftType = ResizeRequest
+
+    private var _targetIndexRequest: CreateIndexRequest?
+    private var _sourceIndex: String?
+    private var _resizeType: ResizeType?
+    private var _copySettings: Bool?
+    private var _timeout: String?
+    private var _masterTimeout: String?
+    private var _waitForActiveShards: String?
+
+    public init() {}
+
+    @discardableResult
+    public func set(targetIndexRequest: CreateIndexRequest) -> Self {
+        _targetIndexRequest = targetIndexRequest
+        return self
+    }
+
+    @discardableResult
+    public func set(sourceIndex: String) -> Self {
+        _sourceIndex = sourceIndex
+        return self
+    }
+
+    @discardableResult
+    public func set(resizeType: ResizeType) -> Self {
+        _resizeType = resizeType
+        return self
+    }
+
+    @discardableResult
+    public func set(copySettings: Bool) -> Self {
+        _copySettings = copySettings
+        return self
+    }
+
+    @discardableResult
+    public func set(timeout: String) -> Self {
+        _timeout = timeout
+        return self
+    }
+
+    @discardableResult
+    public func set(masterTimeout: String) -> Self {
+        _masterTimeout = masterTimeout
+        return self
+    }
+
+    @discardableResult
+    public func set(waitForActiveShards: String) -> Self {
+        _waitForActiveShards = waitForActiveShards
+        return self
+    }
+
+    public var targetIndexRequest: CreateIndexRequest? {
+        return _targetIndexRequest
+    }
+
+    public var sourceIndex: String? {
+        return _sourceIndex
+    }
+
+    public var resizeType: ResizeType? {
+        return _resizeType
+    }
+
+    public var copySettings: Bool? {
+        return _copySettings
+    }
+
+    public var timeout: String? {
+        return _timeout
+    }
+
+    public var masterTimeout: String? {
+        return _masterTimeout
+    }
+
+    public var waitForActiveShards: String? {
+        return _waitForActiveShards
+    }
+
+    public func build() throws -> ResizeRequest {
+        return try ResizeRequest(withBuilder: self)
+    }
+}
+
 // MARK: - Requests
 
 // MARK: - Index Exists Request
@@ -531,4 +621,106 @@ extension CloseIndexRequest: Equatable {
             && lhs.queryParams == rhs.queryParams
             && lhs.endPoint == rhs.endPoint
     }
+}
+
+// MARK: - Resize Request
+
+public struct ResizeRequest: Request {
+    public var headers = HTTPHeaders()
+
+    public let targetIndexRequest: CreateIndexRequest
+    public let sourceIndex: String
+    public let resizeType: ResizeType
+    public var copySettings: Bool?
+    public var timeout: String?
+    public var masterTimeout: String?
+    public var waitForActiveShards: String?
+
+    public init(sourceIndex: String, targetIndexRequest: CreateIndexRequest, resizeType: ResizeType, copySettings: Bool? = nil, timeout: String? = nil, masterTimeout: String? = nil, waitForActiveShards: String? = nil) {
+        self.targetIndexRequest = targetIndexRequest
+        self.sourceIndex = sourceIndex
+        self.resizeType = resizeType
+        self.copySettings = copySettings
+        self.timeout = timeout
+        self.masterTimeout = masterTimeout
+        self.waitForActiveShards = waitForActiveShards
+    }
+
+    internal init(withBuilder builder: ResizeRequestBuilder) throws {
+        guard let sourceIndex = builder.sourceIndex else {
+            throw RequestBuilderError.missingRequiredField("sourceIndex")
+        }
+
+        guard let targetIndexRequest = builder.targetIndexRequest else {
+            throw RequestBuilderError.missingRequiredField("targetIndexRequest")
+        }
+
+        guard let resizeType = builder.resizeType else {
+            throw RequestBuilderError.missingRequiredField("resizeType")
+        }
+
+        self.init(sourceIndex: sourceIndex, targetIndexRequest: targetIndexRequest, resizeType: resizeType, copySettings: builder.copySettings, timeout: builder.timeout, masterTimeout: builder.masterTimeout, waitForActiveShards: builder.waitForActiveShards)
+    }
+
+    public var method: HTTPMethod {
+        return .POST
+    }
+
+    public var endPoint: String {
+        return "\(sourceIndex)/\(resizeType == ResizeType.shrink ? "_shrink" : "_split")/\(targetIndexRequest.name)"
+    }
+
+    public var queryParams: [URLQueryItem] {
+        var queryItems = [URLQueryItem]()
+        if let copySettings = self.copySettings {
+            queryItems.append(URLQueryItem(name: QueryParams.copySettings, value: copySettings))
+        }
+        if let timeout = self.timeout {
+            queryItems.append(URLQueryItem(name: QueryParams.timeout, value: timeout))
+        }
+        if let masterTimeout = self.masterTimeout {
+            queryItems.append(URLQueryItem(name: QueryParams.masterTimeout, value: masterTimeout))
+        }
+        if let waitForActiveShards = self.waitForActiveShards {
+            queryItems.append(URLQueryItem(name: QueryParams.waitForActiveShards, value: waitForActiveShards))
+        }
+        return queryItems
+    }
+
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        guard targetIndexRequest.aliases != nil || targetIndexRequest.settings != nil else {
+            return .failure(.noBodyForRequest)
+        }
+        let body = Body(aliases: targetIndexRequest.aliases, settings: targetIndexRequest.settings)
+        return serializer.encode(body).mapError {
+            error -> MakeBodyError in
+            .wrapped(error)
+        }
+    }
+
+    struct Body: Encodable {
+        public let aliases: [IndexAlias]?
+        public let settings: [String: CodableValue]?
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encodeIfPresent(settings, forKey: .settings)
+            if let aliases = self.aliases {
+                let dic = Dictionary(uniqueKeysWithValues: aliases.map { ($0.name, $0.metaData) })
+                try container.encode(dic, forKey: .aliases)
+            }
+        }
+
+        enum CodingKeys: CodingKey {
+            case aliases
+            case settings
+        }
+    }
+}
+
+extension ResizeRequest: Equatable {}
+
+public enum ResizeType: String, Codable {
+    case shrink
+    case split
 }
