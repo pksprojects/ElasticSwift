@@ -125,4 +125,26 @@ public extension IndicesClient {
     func split(_ splitRequest: ResizeRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<ResizeResponse, Error>) -> Void) {
         client.execute(request: splitRequest, options: options, completionHandler: completionHandler)
     }
+    
+    /// Asynchronously rolls over an index using the Rollover Index API.
+    ///
+    /// [Rollover Index API on elastic.co](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-rollover-index.html)
+    /// - Parameters:
+    ///   - rolloverRequest: the request
+    ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
+    ///   - completionHandler: callback to be invoked upon request completion.
+    func rollover(_ rolloverRequest: RolloverRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<RolloverResponse, Error>) -> Void) {
+        client.execute(request: rolloverRequest, options: options, completionHandler: completionHandler)
+    }
+    
+    // getAlias
+    // putSettings
+    // putTemplate
+    // validateQuery
+    // getIndexTemplateAsync
+    // existsTemplate
+    // analyze
+    // freeze
+    // unfreeze
+    // deleteTemplate
 }

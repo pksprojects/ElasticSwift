@@ -290,6 +290,7 @@ class IndicesRequestsTests: XCTestCase {
         XCTAssertEqual(request.timeout, "timeout")
         XCTAssertEqual(request.waitForActiveShards, "waitForActiveShards")
         XCTAssertEqual(request.endPoint, "source/_split/target")
+        XCTAssertEqual(request.queryParams.count, 4)
     }
 
     func test_10_shrink_request() throws {
@@ -419,6 +420,93 @@ class IndicesRequestsTests: XCTestCase {
             }
             self.client.indices.split(splitRequest, completionHandler: handleSplitResult)
         }
+        waitForExpectations(timeout: 10)
+    }
+    
+    func test_12_rollver_request() throws {
+        let e = expectation(description: "execution complete")
+        
+        let sourceIndex = CreateIndexRequest("\(indexName)-000001", aliases: [
+        IndexAlias(name: "\(indexName)-alias", metaData: AliasMetaData())])
+        
+        let docIndexReq = IndexRequest(index: "\(indexName)-alias", id: "1", source: [
+            "message": "a dummy log"
+        ])
+        
+        var docIndexReq2 = IndexRequest(index: "\(indexName)-alias", id: "2", source: [
+            "message": "a dummy log"
+        ])
+        
+        docIndexReq2.refresh = IndexRefresh.true
+        
+        let rolloverReq = RolloverRequest(alias: "\(indexName)-alias", conditions: [
+            "max_docs":   "1"
+        ], waitForActiveShards: "1")
+        
+        func handleRolloverResponse(_ result: Result<RolloverResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                self.logger.error("Error \(error)")
+                XCTAssertTrue(false)
+                e.fulfill()
+                break
+            case let .success(response):
+                self.logger.info("Response: \(response)")
+                XCTAssertEqual(response.newIndex, "\(indexName)-000002")
+                XCTAssertTrue(response.acknowledged)
+            }
+            self.client.indices.delete(DeleteIndexRequest("\(indexName)-*")) { result in
+                switch result {
+                case let .failure(error):
+                    self.logger.error("Error \(error)")
+                    e.fulfill()
+                    break
+                case let .success(response):
+                    self.logger.info("Response: \(response)")
+                    e.fulfill()
+                }
+            }
+        }
+        
+        var isSecond = false
+        func handleDocIndex(_ result: Result<IndexResponse, Error>) {
+            switch result {
+            case let .failure(error):
+                self.logger.error("Error \(error)")
+                if !"\(error)".contains("already exists") {
+                    XCTAssertTrue(false)
+                    e.fulfill()
+                    break
+                }
+            case let .success(response):
+                self.logger.info("Response: \(response)")
+                XCTAssertTrue(response.result == "created")
+            }
+            if (isSecond) {
+                self.client.indices.rollover(rolloverReq, completionHandler: handleRolloverResponse)
+            } else {
+                isSecond = true
+                self.client.index(docIndexReq2, completionHandler: handleDocIndex)
+            }
+            
+        }
+        
+        client.indices.create(sourceIndex) { result in
+            switch result {
+            case let .failure(error):
+                self.logger.error("Error \(error)")
+                if !"\(error)".contains("already exists") {
+                    XCTAssertTrue(false)
+                    e.fulfill()
+                    break
+                }
+            case let .success(response):
+                self.logger.info("Response: \(response)")
+                XCTAssertTrue(response.acknowledged)
+            }
+            self.client.index(docIndexReq, completionHandler: handleDocIndex)
+        }
+        
         waitForExpectations(timeout: 10)
     }
 

@@ -110,6 +110,7 @@ public enum QueryParams: String {
     case flatSettings = "flat_settings"
     case includeDefaults = "include_defaults"
     case copySettings = "copy_settings"
+    case dryRun = "dry_run"
 }
 
 enum EndPointCategory: String {

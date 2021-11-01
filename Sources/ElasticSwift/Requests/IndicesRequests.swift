@@ -724,3 +724,65 @@ public enum ResizeType: String, Codable {
     case shrink
     case split
 }
+
+// MARK: - Rollover Request
+
+public struct RolloverRequest: Request {
+    public var headers = HTTPHeaders()
+    
+    public let alias: String
+    public let conditions: [String: CodableValue]
+    public var newIndexName: String?
+    public var dryRun: Bool?
+    public var includeTypeName: Bool?
+    public var timeout: String?
+    public var masterTimeout: String?
+    public var waitForActiveShards: String?
+    
+    
+    public var queryParams: [URLQueryItem] {
+        var queryItems = [URLQueryItem]()
+        if let includeTypeName = self.includeTypeName {
+            queryItems.append(URLQueryItem(name: QueryParams.includeTypeName, value: includeTypeName))
+        }
+        if let dryRun = self.dryRun {
+            queryItems.append(URLQueryItem(name: QueryParams.dryRun, value: dryRun))
+        }
+        if let timeout = self.timeout {
+            queryItems.append(URLQueryItem(name: QueryParams.timeout, value: timeout))
+        }
+        if let masterTimeout = self.masterTimeout {
+            queryItems.append(URLQueryItem(name: QueryParams.masterTimeout, value: masterTimeout))
+        }
+        if let waitForActiveShards = self.waitForActiveShards {
+            queryItems.append(URLQueryItem(name: QueryParams.waitForActiveShards, value: waitForActiveShards))
+        }
+        return queryItems
+    }
+    
+    public var method: HTTPMethod {
+        return .POST
+    }
+    
+    public var endPoint: String {
+        var _endPoint = "\(self.alias)/_rollover"
+        if let newIndexName = self.newIndexName {
+            _endPoint = _endPoint + "/\(newIndexName)"
+        }
+        return _endPoint
+    }
+    
+    public func makeBody(_ serializer: Serializer) -> Result<Data, MakeBodyError> {
+        return serializer.encode(Body(conditions: self.conditions)).mapError {
+            error -> MakeBodyError in
+            .wrapped(error)
+        }
+    }
+    
+    struct Body: Encodable {
+        let conditions: [String: CodableValue]
+    }
+    
+}
+
+extension RolloverRequest: Equatable {}

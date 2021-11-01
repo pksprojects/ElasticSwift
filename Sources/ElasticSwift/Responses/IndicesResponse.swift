@@ -316,3 +316,38 @@ public struct ResizeResponse: Codable, Equatable {
         case index
     }
 }
+
+// MARK: - Rollover Response
+
+public struct RolloverResponse: Codable, Equatable {
+    
+    public let acknowledged: Bool
+    public let shardsAcknowledged: Bool
+    public let oldIndex: String
+    public let newIndex: String
+    public let rolledOver: Bool
+    public let dryRun: Bool
+    public let conditions: [String: Bool]
+    
+    
+    init(acknowledged: Bool, shardsAcknowledged: Bool, oldIndex: String, newIndex: String, rolledOver: Bool, dryRun: Bool, conditions: [String : Bool]) {
+        self.acknowledged = acknowledged
+        self.shardsAcknowledged = shardsAcknowledged
+        self.oldIndex = oldIndex
+        self.newIndex = newIndex
+        self.rolledOver = rolledOver
+        self.dryRun = dryRun
+        self.conditions = conditions
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case acknowledged
+        case shardsAcknowledged = "shards_acknowledged"
+        case oldIndex = "old_index"
+        case newIndex = "new_index"
+        case rolledOver = "rolled_over"
+        case dryRun = "dry_run"
+        case conditions
+    }
+}
+
