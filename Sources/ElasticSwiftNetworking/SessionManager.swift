@@ -92,7 +92,7 @@ class SessionManager: NSObject, URLSessionDelegate {
             if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust {
                 if let secTrust = challenge.protectionSpace.serverTrust {
                     if sslConfig == nil {
-                        return completionHandler(.cancelAuthenticationChallenge, nil)
+                        return completionHandler(.performDefaultHandling, nil)
                     }
                     let derCert = SecCertificate.create(derEncodedFile: (sslConfig?.certPath)!)
                     guard matchCerts(trust: secTrust, certificate: derCert!) else {
